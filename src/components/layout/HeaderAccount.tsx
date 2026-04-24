@@ -31,7 +31,7 @@ export function HeaderAccount() {
     return (
         <div className="flex items-center gap-2 border-l pl-3">
             <a
-                href="https://attest.ochk.io/dashboard"
+                href="https://ochk.io/dashboard"
                 className="text-muted-foreground hover:text-foreground font-mono text-[12px] tracking-tight transition-colors"
                 title={account.address}
             >

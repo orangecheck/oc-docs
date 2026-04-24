@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
             enableSystem={false}
             disableTransitionOnChange
         >
-            <OcSessionProvider config={{ authOrigin: 'https://attest.ochk.io' }}>
+            <OcSessionProvider>
                 <MDXProvider components={components}>
                     <LayoutHeader />
                     <main className="min-h-[calc(100vh-3rem)] py-8">

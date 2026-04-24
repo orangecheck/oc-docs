@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
                             "style-src 'self' 'unsafe-inline'",
                             "img-src 'self' data: https:",
                             "font-src 'self' data:",
-                            "connect-src 'self' https://attest.ochk.io",
+                            "connect-src 'self' https://ochk.io https://attest.ochk.io",
                             "frame-ancestors 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",

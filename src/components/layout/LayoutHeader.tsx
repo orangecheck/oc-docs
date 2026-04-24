@@ -32,8 +32,7 @@ export function LayoutHeader() {
                     href="/"
                     className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight"
                 >
-                    <span className="text-primary">§</span>
-                    <span>orangecheck docs</span>
+                    <span>oc&middot;<span className="text-primary">docs</span></span>
                 </Link>
 
                 <nav className="hidden items-center gap-1 md:flex">
@@ -59,11 +58,9 @@ export function LayoutHeader() {
                 <div className="flex items-center gap-2">
                     <a
                         href="https://ochk.io"
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-foreground hidden font-mono text-[11px] tracking-widest uppercase sm:inline"
                     >
-                        ochk.io ↗
+                        ochk.io
                     </a>
                     <HeaderAccount />
                     <ThemeToggle />

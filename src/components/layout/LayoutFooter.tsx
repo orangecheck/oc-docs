@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
 const ECOSYSTEM = [
-    { href: 'https://ochk.io', label: 'ochk.io — umbrella', external: true },
-    { href: 'https://lock.ochk.io', label: 'lock.ochk.io', external: true },
-    { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io', external: true },
+    { href: 'https://ochk.io', label: 'ochk.io — umbrella' },
+    { href: 'https://lock.ochk.io', label: 'lock.ochk.io' },
+    { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io' },
     { href: 'https://github.com/orangecheck', label: 'github org ↗', external: true },
 ];
 

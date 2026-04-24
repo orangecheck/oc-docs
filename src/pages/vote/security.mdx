@@ -1,0 +1,60 @@
+# security
+
+Short form. The normative threat model lives in [`oc-vote-protocol/SECURITY.md`](https://github.com/orangecheck/oc-vote-protocol/blob/main/SECURITY.md) — 14 numbered attack scenarios with status.
+
+## report
+
+Email **security@ochk.io** with a clear description + reproduction. We aim to acknowledge within 48 hours.
+
+## what oc vote protects
+
+- **Authenticity** of every poll + ballot (BIP-322 over content-addressed id).
+- **Tamper-evidence** — any byte change invalidates the id and the signature.
+- **Deterministic tallies** — any two conforming implementations produce byte-identical output.
+- **Bot resistance** — weight is sats × days of UTXO age; manufacturing fake voters costs real opportunity cost.
+- **Commitment binding in secret mode** — voters cannot change their choice at reveal time.
+
+## what oc vote does not protect
+
+- **Receipt-freeness** — after secret-mode reveal, ballots are publicly linkable. Full coercion-resistance requires homomorphic tally (Helios-style), out of scope for v0.
+- **Secret-ballot privacy vs. the creator** — creator holds `reveal_sk` in v0. They can peek early. They cannot publish an early tally without revealing the key (a detectable action).
+- **Non-reveal DoS** — if a secret-mode poll's creator refuses to publish the reveal, the poll is permanently abandoned. Participation is provable; the tally is not.
+- **Sender anonymity** — voter Bitcoin addresses are plaintext. For pseudonymity, vote from a fresh address (which typically passes no threshold).
+- **Metadata privacy** — questions, option labels, creator addresses, voter addresses, deadlines, snapshot blocks all plaintext. If any of these are sensitive, do not publish.
+- **Censorship resistance of Nostr relays** — hostile relays can refuse to store or serve. Mitigation: multi-relay publication (default 4) + self-hostable.
+- **Claim to replace legal voting** — this is a signaling primitive, not a replacement for statutory elections.
+
+## normative compliance (restated)
+
+Conforming implementations MUST:
+
+1. Verify every BIP-322 signature before processing.
+2. Canonicalize deterministically (RFC 8785 + `options[]` preservation).
+3. Require ≥ 6 confirmations at snapshot block before tallying.
+4. Never reveal or display partial tallies for secret-mode polls before a valid reveal event exists.
+5. Verify `secret.commit` at reveal time. A mismatched commit drops the ballot from the tally (never silently accepted).
+6. Reject polls with unsupported `weight_mode` (no partial support).
+7. Enforce `poll.deadline`. Ballots with `created_at > deadline` are discarded.
+
+## caveats
+
+- Signature malleability: Schnorr (P2TR) signatures are non-malleable. ECDSA (P2PKH) is technically malleable, but `ballot_id` is bound into the signed message and is itself a hash of canonical bytes, so malleated reissues still require the voter's private key.
+- Nonce randomness relies on platform CSPRNG.
+- No side-channel guarantees — JS crypto libs are best-effort constant-time.
+- No post-quantum layer — secp256k1 and X25519 both break under a sufficiently large quantum adversary.
+
+## attack scenarios
+
+Abridged from the spec's `SECURITY.md`. Each is either **mitigated**, **partially mitigated**, **accepted**, or **out of scope**.
+
+- Whale buys voter's private key → **not mitigated at protocol layer** (same as Bitcoin itself).
+- Creator rewrites poll after casting → **mitigated** by content addressing.
+- Voter double-votes → **mitigated** by per-voter de-dup + tiebreak.
+- Sybil splits stake across 10 addresses → **partially mitigated** (free in `sats`/`sats_days`; `one_per_address` depends on threshold).
+- Tallier publishes fraudulent result → **mitigated** by determinism (anyone re-runs the function).
+- Nostr relay drops ballots → **partially mitigated** by multi-relay publication.
+- Creator peeks at secret ballots → **accepted limitation** of v0.
+- Creator refuses to reveal → **accepted failure mode** of v0.
+- Reorg invalidates tally → **mitigated** by ≥ 6 confirmation requirement.
+- Ballot replay across polls → **mitigated** (poll_id is in the signed message).
+- Dishonest reveal (wrong reveal_sk) → **mitigated** (tallier verifies `x25519_base(reveal_sk) == poll.reveal_pk`).

@@ -1,0 +1,145 @@
+# specification
+
+This page is the human-readable mirror of [`oc-vote-protocol/SPEC.md`](https://github.com/orangecheck/oc-vote-protocol/blob/main/SPEC.md) v0. The GitHub version is the normative one — if this page ever drifts, the repo wins.
+
+## 1. poll object
+
+```json
+{
+  "v": 0,
+  "kind": "oc-vote/poll",
+  "creator": "<btc address>",
+  "question": "<single-line UTF-8, <= 280 bytes>",
+  "options": [ { "id": "<matches [a-z0-9_\\-]{1,32}>", "label": "..." } ],
+  "deadline": "<iso8601 UTC>",
+  "snapshot_block": <positive integer | "deadline">,
+  "weight_mode": "one_per_address" | "sats" | "sats_days" | "<registry>",
+  "weight_params": <object | null>,
+  "min_sats": <non-negative integer>,
+  "min_days": <non-negative integer>,
+  "mode": "public" | "secret",
+  "reveal_pk": "<32-byte hex X25519 pubkey> | null",
+  "tiebreak": "latest" | "first",
+  "notes": "<optional UTF-8, <= 2048 bytes> | null",
+  "created_at": "<iso8601 UTC>",
+  "sig": { "alg": "bip322", "pubkey": "<creator>", "value": "<base64>" }
+}
+```
+
+**poll_id** = `SHA256(canonical bytes of poll with sig.value = "")` expressed as lowercase hex.
+
+Publication: Nostr kind `30080`, `d`-tag `oc-vote:poll:<poll_id>`.
+
+## 2. ballot object
+
+```json
+{
+  "v": 0,
+  "kind": "oc-vote/ballot",
+  "poll_id": "<hex>",
+  "voter": "<btc address>",
+  "option": "<option id> | null",
+  "attestation_id": "<oc attestation id> | null",
+  "secret": null | {
+    "envelope": <oc-lock v2 envelope>,
+    "commit": "<sha256 hex of commit_msg>"
+  },
+  "created_at": "<iso8601 UTC>",
+  "sig": { "alg": "bip322", "pubkey": "<voter>", "value": "<base64>" }
+}
+```
+
+**ballot_id** = `SHA256(canonical bytes with sig.value = "")`.
+
+Publication: kind `30081`, `d`-tag `oc-vote:ballot:<poll_id>:<voter>` (replaceable per voter per poll).
+
+## 3. reveal object (secret mode)
+
+```json
+{
+  "v": 0,
+  "kind": "oc-vote/reveal",
+  "poll_id": "<hex>",
+  "reveal_sk": "<32-byte hex X25519 secret>",
+  "revealed_at": "<iso8601 UTC>",
+  "sig": { "alg": "bip322", "pubkey": "<creator>", "value": "<base64>" }
+}
+```
+
+Publication: kind `30082`, `d`-tag `oc-vote:reveal:<poll_id>`.
+
+## 4. canonicalization (SPEC §7)
+
+- UTF-8 JSON with keys sorted lexicographically at every level.
+- No insignificant whitespace.
+- `poll.options[]` preserves creator-declared order (spec's own exception to pure RFC 8785).
+- Numbers: integers plain, no floats expected.
+- Strings: `\uXXXX` only for control chars, `"`, `\`. Everything else literal.
+- Final byte: LF (0x0a).
+
+Reference: RFC 8785.
+
+## 5. tally algorithm (SPEC §8)
+
+Pure function over (poll, ballots, UTXO snapshot):
+
+1. Drop ballots whose `poll_id` ≠ target or `created_at > deadline`.
+2. Verify every `voter` BIP-322 signature (unless skipped).
+3. De-duplicate per voter using `poll.tiebreak` (`latest` or `first`).
+4. If `mode == secret` and no reveal: return `{state: awaiting_reveal}`.
+5. If secret: unseal each ballot via `reveal_sk`, verify commit, substitute option.
+6. Resolve `snapshot_block` to integer if "deadline" (must have ≥ 6 confirmations).
+7. For each voter: compute `weight = weight_for_mode(utxos_at(voter, H))`.
+8. Sum weights per option.
+
+Returns `{state: tallied, snapshot_block, turnout, tallies}`.
+
+## 6. weight modes (SPEC §5)
+
+Given `U = qualifying UTXOs at snapshot H, aged ≥ min_days`:
+
+- **one_per_address**: `1` if `sum(U) ≥ min_sats`, else `0`.
+- **sats**: `sum(U)` if `≥ min_sats`, else `0`.
+- **sats_days**: `sum(u.value × min(age_days(u), cap_days))`, gated by `min_sats`. Requires `weight_params.cap_days`.
+
+See [weight modes](/vote/weight-modes) for when to pick which.
+
+## 7. error codes (SPEC §9)
+
+| code | meaning |
+|---|---|
+| `E_BAD_SIG` | BIP-322 did not verify |
+| `E_WRONG_POLL` | ballot's poll_id does not match |
+| `E_PAST_DEADLINE` | created_at > deadline |
+| `E_UNKNOWN_OPTION` | ballot's option not in poll.options |
+| `E_COMMIT_MISMATCH` | revealed option does not match commit |
+| `E_BELOW_THRESHOLD` | voter weight = 0 (below min_sats/min_days) |
+| `E_NO_REVEAL` | secret-mode poll past deadline, no reveal |
+| `E_REORG` | snapshot block < 6 confirmations |
+| `E_UNSUPPORTED_MODE` | client does not implement weight_mode |
+
+## 8. nostr kinds
+
+| kind | object | tag namespace |
+|---|---|---|
+| 30080 | poll | `oc-vote:poll:*` |
+| 30081 | ballot (replaceable per voter per poll) | `oc-vote:ballot:*:*` |
+| 30082 | reveal | `oc-vote:reveal:*` |
+
+## 9. compliance checklist
+
+A client is v0 compliant iff it:
+
+- canonicalizes identically (all test vectors pass)
+- verifies every BIP-322 signature before counting
+- implements `one_per_address`, `sats`, and `sats_days`
+- enforces `min_sats` / `min_days`
+- de-duplicates per voter per tiebreak
+- defers tally when snapshot has < 6 confirmations
+- never reveals partial secret-mode tallies before a valid reveal event
+- verifies `secret.commit` at reveal time
+- emits the spec's error codes
+
+## 10. read the real spec
+
+[`oc-vote-protocol/SPEC.md`](https://github.com/orangecheck/oc-vote-protocol/blob/main/SPEC.md) — the normative version, with full canonicalization edge cases and test vectors.

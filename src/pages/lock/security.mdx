@@ -1,0 +1,254 @@
+export const metadata = {
+    title: 'Security implications · OC Lock',
+    description:
+        'A deliberate, honest read of what OC Lock protects, what it exposes, and how to use it without surprises.',
+};
+
+# Security implications
+
+OC Lock gives you end-to-end encryption *bound to a Bitcoin address you already control*. That binding is the whole premise — and every security property that follows comes from taking it seriously. This page covers what is protected, what is exposed by design, what remains a user decision, and the tradeoffs attached to each.
+
+If you are an implementer or researcher, you probably want the protocol's [`SECURITY.md`](https://github.com/orangecheck/oc-lock-protocol/blob/main/SECURITY.md) instead — it covers normative compliance, dependency posture, and reporting process.
+
+## One-glance threat model
+
+| Adversary | What they can learn | What they cannot | Mitigation |
+|---|---|---|---|
+| **Nostr relay operator** | Your device record exists; gift-wraps tagged to your chat pubkey arrive at times T₁…Tₙ | Who sent what, content, thread pairing | Self-host a relay, or fan out to more relays |
+| **Network observer (ISP, WiFi)** | You speak WebSocket/HTTPS to known relays | Content (TLS) | — |
+| **Blockchain observer** | Your Bitcoin address has on-chain history X; a Lock envelope was sent to/from it | Message content, device_sk, who they're corresponding with | Use an address with no on-chain history |
+| **Malicious relay serving a forged device record** | — | Forgery fails BIP-322 verification client-side; rejected before encryption | Baked in — you don't need to do anything |
+| **Stolen unlocked browser** | Full chat history, envelopes, device_sk | — | Passphrase-encrypt the device; 15-min idle auto-lock |
+| **Stolen locked browser** | Ciphertext at rest, nothing readable without passphrase | device_sk, message plaintext (unless passphrase is weak) | Strong passphrase; OS disk encryption |
+| **Compromised wallet extension** | Can sign arbitrary envelopes as you | Nothing already encrypted — but forward forgery | Use hardware wallet with manual sig paste |
+| **Recipient** | Full envelope content including your `from.address` (plaintext) | Anything beyond what you sent | Sign from a fresh Bitcoin address if you need sender anonymity |
+| **Possessor of your share URL** | Envelope ciphertext; cannot decrypt without recipient's device_sk | The message | Links are end-to-end safe without recipient's secret |
+
+## Identity-layer implications — sharing your Bitcoin address
+
+Using OC Lock means your Bitcoin address is an *identifier* that other people use to reach you. The implications mostly flow from a single fact: **a Bitcoin address and everything it has ever done on chain are public.**
+
+### What your counterparty can infer from your address
+
+- **On-chain history.** Balance, transaction flow, counterparty addresses, timestamps. All visible via any block explorer.
+- **Tag leakage.** If the address was funded from an exchange deposit or by a party who knows your real-world identity, the counterparty can often link you to that real name via clustering heuristics.
+- **Wealth signal.** A high-balance address broadcasts "this person controls X sats" to every sender.
+- **Activity fingerprint.** A quiet address signals a savings account; a chatty one signals active trading.
+
+### Address reuse across relationships
+
+Every message you receive via Lock uses the same address. Every sender therefore knows "this is the same you" across relationships. This is often desirable (continuity of identity), sometimes not (you'd like to separate personas).
+
+### Choosing an address deliberately
+
+Three postures, pick one per persona:
+
+| Posture | Use when | Address choice |
+|---|---|---|
+| **Identity-first** | Business correspondence, public accountability | Your main, known address — the whole point is identity |
+| **Pseudonymous** | Privacy-leaning personal use | Fresh bech32 address with no inbound transactions |
+| **Per-relationship** | High-sensitivity contexts (journalism, leaks) | New address per counterparty. Register a new device under each. Painful but clean. |
+
+### On-chain-free posture
+
+A fresh Segwit address with zero transactions leaks no chain history, but also provides no "this person is reachable / has stake" signal. If the counterparty wants to sybil-gate with OrangeCheck (see below), your empty address will be rejected — which may be a feature (privacy) or a bug (you can't receive), depending on your goals.
+
+## Device-key storage
+
+### At rest in IndexedDB
+
+Your `device_sk` lives in the browser's IndexedDB under the Lock origin. Two modes:
+
+- **Plain** — the secret is stored as raw bytes. Anyone with filesystem access to the browser profile can read it.
+- **Passphrase-encrypted** — PBKDF2-SHA256 at 600,000 iterations (OWASP 2023 baseline) wraps the secret under AES-256-GCM. An attacker with the encrypted blob still needs your passphrase.
+
+Unless you have reason to run the browser profile inside an already-hardened boundary (LUKS on Linux, FileVault on macOS with an unlocked user session), **passphrase-encrypt the device** from the manager.
+
+### In memory
+
+During a session the unwrapped secret is in RAM. Three defenses:
+
+- **Idle auto-lock at 15 minutes** — the in-memory cache is zeroized after inactivity. A 60-second warning toast offers "keep unlocked."
+- **Tab close** — `pagehide` clears the cache immediately.
+- **Zeroize-after-use** — transient values (`content_key`, `shared`, `kek`) are wiped after each operation.
+
+These are best-effort. JavaScript doesn't give us direct memory control — V8 may retain copies in its heap. If you're threat-modeling against a memory-dump adversary, the browser's sandbox isn't enough.
+
+### Exports
+
+A `.json` export contains either the raw `device_sk` (plaintext export) or a passphrase-encrypted wrapper. **Treat a plaintext export like a wallet seed.** Store encrypted exports on disk where convenient; store plaintext exports only in places you'd store a seed phrase (password manager, air-gapped drive).
+
+### Multi-device and rotation
+
+Each browser gets its own device secret. Rotating = generating a new keypair, re-signing the binding, publishing. Old envelopes sealed to the old `device_pk` become unrecoverable — this is the *forward-secrecy-at-rotation-boundaries* property. Rotate cheaply when you suspect compromise.
+
+## Transport layer — what Nostr sees
+
+### Device records (kind 30078)
+
+Public by design. Anyone can look up your address and read the record. Contains your Bitcoin address, `device_pk`, `device_id`, a BIP-322 binding signature, and a created-at. No secrets.
+
+### Chat gift-wraps (kind 1059)
+
+Each message is a kind-1059 event signed by an **ephemeral Schnorr key** the sender discards after publishing. The relay sees:
+
+- A throwaway sender pubkey
+- A `p` tag with the recipient's stable chat pubkey
+- An opaque base64 payload (the sealed OC Lock envelope)
+
+The relay cannot tell who sent the message, what it says, or which conversation it's part of. `created_at` is rounded down to the minute before signing, to reduce timing correlation with other observable actions.
+
+### What the relay still learns
+
+- **Your chat pubkey receives messages at rate R.** Over time, this is an observability signal about your communication volume.
+- **Event size correlates with message length.** We don't pad messages. If you send a 12-byte message and a 10-KB attachment back-to-back, a relay can distinguish them.
+- **Timing correlation.** If you trigger a visible action (wallet sign prompt, address lookup) and a gift-wrap appears on the relay seconds later, a relay operator watching closely might link them.
+
+### Relay malice — what we prevent vs. accept
+
+| Attack | Prevented? | Notes |
+|---|---|---|
+| Forging a device record (binding an attacker's `device_pk` to your address) | **Prevented** | BIP-322 verified client-side; forged records rejected before encryption |
+| Forging a chat message | **Prevented** | Envelope `sig.value` is a BIP-322 sig by the sender's address; verified client-side |
+| Reading message content | **Prevented** | AES-256-GCM; key never leaves recipient's device |
+| Dropping your publish or delivery | **Accepted (mitigable)** | Fan out to more relays, or self-host |
+| Replaying an old event | **Accepted (harmless)** | Envelope ids are content-addressed; duplicates idempotent |
+| Correlating your activity patterns | **Accepted** | True mixnet-level unlinkability is out of scope for v2 |
+
+## Sender authentication — BIP-322 non-repudiation
+
+Every envelope you seal includes a BIP-322 signature by your Bitcoin address over the envelope id. This is the authenticity guarantee — recipients can verify it offline, no server required.
+
+It's also **permanent and non-repudiable**. You cannot later deny having sent a specific envelope, short of claiming your wallet was compromised. For most uses this is desirable. For some — whistleblowing, anonymous tipping — it is not.
+
+If you need to send authentically but anonymously, sign from a **fresh Bitcoin address with no other transactions or published device records**. The envelope is still cryptographically authentic (the recipient knows *some* address sent it) but the address itself doesn't identify you. You lose the identity-binding benefit; that's the trade.
+
+### Wallet extension trust
+
+Browser wallets (UniSat, Xverse, Leather, OKX, Phantom) are third-party extensions with their own security model. OC Lock calls their `signMessage` API; it does not read private keys. But:
+
+- A malicious or compromised wallet can sign envelopes you didn't approve, producing forgeries in your name.
+- A wallet that leaks the signature output is a confidentiality issue only for the `binding_sig` and envelope `sig.value` — those are meant to be public anyway.
+
+Using a hardware wallet via manual paste (Sparrow, Coldcard, Bitcoin Core) avoids extension trust entirely. The wallet never sees a browser process; you paste signatures in manually.
+
+## Share-mechanism implications
+
+### URL fragments
+
+Share links use the URL fragment (`#`): `https://lock.ochk.io/unlock#eyJ2Ijoy…`. Fragments are:
+
+- **Not sent to servers** in a normal HTTP request. The Lock origin does not receive the envelope.
+- **Stored in browser history** alongside the URL. Anyone with local-history access can replay.
+- **Copied to clipboard** when you copy the URL. OS clipboard managers, synced clipboards (Universal Clipboard, KDE Connect), and password-manager clipboards may retain them.
+- **Visible to browser extensions** that have permission to read page URLs (includes the fragment).
+- **Unfurlers may strip or keep them.** Some link-preview services (Slack, Discord, Twitter) fetch URLs server-side; most strip fragments before fetching. Assume fragments leak to any preview service you paste links into.
+
+### QR codes
+
+A QR is a visual encoding of the share URL. If someone photographs the QR, they have the same URL — and the same access: ciphertext they can't decrypt without the recipient's `device_sk`. QR exposure is **no worse than link exposure**; both are ciphertext.
+
+### `.lock` files
+
+Downloaded as `application/vnd.oc-lock+json`. Contains the full canonical envelope. Same safety posture as the share link — ciphertext only, useful to the recipient only.
+
+## Chat-specific implications
+
+### Thread id is deterministic
+
+`thread_id = sha256("oc-lock/chat/thread/v1|" + min(addrA, addrB) + "|" + max(addrA, addrB))`. Anyone who knows both addresses can compute the same id. This does not leak content, but it means a correlation between two public addresses is provable. If you value plausible deniability about who you're talking to, avoid using addresses linked to your identity.
+
+### Local plaintext scrollback
+
+We cache decrypted plaintext in IndexedDB under `chat_messages`. This is deliberate — without it, scrollback would only be readable while the device is unlocked. The cache is **not separately passphrase-encrypted** today; it relies on device + OS encryption for at-rest confidentiality. If you treat browsers as untrusted storage, clear chat history regularly (per-thread or global).
+
+### Volume, timing, and tab-title leaks
+
+- An operator of the default relay pool knows you're receiving messages.
+- The unread badge in the browser tab title (`(3) app · oc·lock`) is visible to anyone who can see your screen.
+
+### Self-chat
+
+Sending to yourself (note to self) fans out to all of your own published devices. The envelope's `from.address` equals its recipient address. To a relay this looks identical to any other gift-wrap; to an on-device observer it looks like a message you sent to yourself.
+
+## Cryptographic limitations
+
+### Forward secrecy is coarse
+
+Per-message ephemeral X25519 keypairs (`eph_sk`, `eph_pk`) give **message-level** forward secrecy at send time — the sender's ephemeral secret is zeroized immediately after wrapping the content key. But the *recipient's* `device_sk` decrypts every envelope ever sealed to it. Compromise of `device_sk` at time T retroactively reveals all messages from T − ∞ to T.
+
+Mitigation: rotate `device_sk` periodically (cheap — one BIP-322 signature and one Nostr publish). On rotation, envelopes sealed to the old key are permanently unrecoverable from the new device.
+
+If you need Signal-grade per-message forward secrecy (double ratchet), OC Lock is not yet the right tool. It's on the v3 list.
+
+### Post-quantum is not addressed
+
+X25519 and secp256k1 both break under Shor's algorithm on a sufficiently capable quantum computer. AES-256 retains ~128-bit security against Grover. SHA-256 similar.
+
+Practical implication: a **"harvest now, decrypt later"** adversary could retain today's envelopes and decrypt them once PQ-capable hardware exists (estimated 2030s–2040s in academic forecasts; dates uncertain). For messages that must remain confidential on multi-decade timescales, OC Lock is the wrong tool today. A PQ layer (Kyber-based wrap of the content key) is planned.
+
+### Side channels
+
+JavaScript crypto libraries (`@noble/*`) make best-effort constant-time operations, but a hostile host can time them anyway. Browser cache effects and timing variances in V8's JIT are observable to an on-device adversary. There are no strong side-channel guarantees in browser-executed crypto.
+
+## Trust roots
+
+### Your browser
+
+If the browser runtime is compromised (malicious extension, XSS vulnerability in any page on the same origin, kernel-level malware), every secret OC Lock holds is compromised. Lock does not protect against a hostile host, and no browser app can.
+
+### Other tabs on the same origin
+
+All browser tabs at `lock.ochk.io` share the same IndexedDB and localStorage. If an attacker can get JavaScript execution on any page at that origin, they can read your device_sk. This is why our CSP is strict and we don't embed third-party scripts.
+
+### The Lock domain itself
+
+You trust the code served at `lock.ochk.io` is what it claims to be. If the DNS is hijacked or the Vercel deployment is compromised, a malicious replacement could exfiltrate your device secret next time you load the page. Mitigations:
+
+- Verify the TLS certificate chain (Let's Encrypt R12 issuer, SAN includes `lock.ochk.io`).
+- Use the app over HTTPS only; never accept a certificate warning.
+- Consider self-hosting from the [`oc-lock-web`](https://github.com/orangecheck/oc-lock-web) source for high-value scenarios.
+
+### Wallet extension
+
+Covered above. Summary: your Bitcoin wallet is an in-scope trust anchor.
+
+## Operational hazards
+
+- **Typo to a wrong address.** Envelopes are irrevocable once sealed and delivered. If you seal to `bc1q…abce` instead of `bc1q…abcd`, you've encrypted to a different person (if they have a Lock device) or no one. Always verify the lookup result before typing the message — the address auto-lookup now shows a green check when the record is verified.
+- **Lost browser / device.** `device_sk` is local-only. Without an export, envelopes addressed to that device are unrecoverable. Export after registration; store the export like a wallet seed.
+- **Phishing a fake /unlock page.** An attacker could host a clone of `lock.ochk.io` at a typo-domain and trick a user into pasting a `.json` device export there. Verify the URL bar shows the real origin.
+- **Screenshot exposure.** Screenshots of decrypted content are outside the protocol's control. Phones and desktops both sync screenshots to cloud by default.
+
+## Recommended postures
+
+### Everyday encrypted notes (low-stakes)
+
+- Register a device on your main browser. Passphrase-encrypt it.
+- Use your main Bitcoin address.
+- Accept that senders can see your address.
+
+### Sensitive journalism / whistleblowing
+
+- Register from a dedicated browser profile.
+- Use a fresh Bitcoin address funded from a privacy mixer or Lightning, not from an exchange.
+- Don't enable the OrangeCheck gate (requires stake history — correlates you).
+- Delete device, browser profile, and any exports after the session.
+- Consider Tails / Whonix for the session.
+
+### Commerce / transactional messaging
+
+- Use your public business address.
+- Enable OrangeCheck gate to filter inbound (sybil-resistant inbox).
+- Keep history purges per-thread.
+
+### Long-term confidentiality (years-to-decades)
+
+- OC Lock today is **not** suitable for this — X25519 is not post-quantum safe.
+- Wait for the PQ layer, or wrap the message in a separate PQ-safe scheme before sealing.
+
+## Reporting a vulnerability
+
+Email `security@ochk.io`. See the [protocol repo's `SECURITY.md`](https://github.com/orangecheck/oc-lock-protocol/blob/main/SECURITY.md) for the full process: response time targets, scope, normative compliance requirements, and dependency posture.
+
+Do not file public GitHub issues for suspected vulnerabilities.

@@ -1,0 +1,100 @@
+# walkthrough
+
+Narrative companion to the [spec](/vote/spec). Five flows, concrete scenarios, realistic addresses and block heights.
+
+## mental model
+
+```
+  ┌──────────┐                                ┌──────────────┐
+  │ Creator  │──── signs poll (BIP-322) ────→│   Nostr      │
+  │          │    publishes kind 30080        │  directory   │
+  └──────────┘                                │              │
+                                              │ 30080 poll   │
+  ┌──────────┐                                │ 30081 ballot │
+  │ Voter A  │──── signs ballot (BIP-322) ──→│ 30082 reveal │
+  │ Voter B  │    publishes kind 30081        │              │
+  │ Voter C  │    (replaceable per voter)     │              │
+  └──────────┘                                └──────────────┘
+                                                      │
+                                                      │ anyone pulls
+                                                      ↓
+                                              ┌───────────────┐
+                                              │   Observer    │
+                                              │   tallier     │
+                                              └───────────────┘
+                                                      │
+                                                      │ + UTXO state
+                                                      │   at snapshot
+                                                      ↓
+                                              ┌───────────────┐
+                                              │ Deterministic │
+                                              │    tally      │
+                                              └───────────────┘
+```
+
+Every actor has one job. The creator publishes a poll. The voter publishes a ballot. The observer runs a function. Nobody trusts anybody; the math holds.
+
+## flow 1 — public sats-days weighted poll
+
+Alice coordinates Bitcoin grant recipients. They want to allocate $5k among three candidate projects. Non-binding signal, weighted by sats × days.
+
+**Alice:** visits `vote.ochk.io/create`, enters question + 3 options, deadline 2026-05-08, weight_mode `sats_days` (cap 180 d), min_sats 100,000, min_days 30. Signs once. URL at `vote.ochk.io/p/<poll_id>`.
+
+**Bob:** opens the URL. Picks `split_b`. Signs once. His ballot lands on Nostr kind 30081 under `d = oc-vote:ballot:<poll_id>:<bob_addr>`.
+
+**Bob changes his mind:** picks `split_c` two days later. Same `d`-tag, higher `created_at`, relays replace the previous event.
+
+**At deadline:** the client resolves the snapshot block (greatest block with `median_time_past ≤ deadline` and ≥ 6 confirmations). Any observer re-runs the tally function against the published ballots + their own UTXO-source. Everyone gets the same numbers.
+
+## flow 2 — one-per-address with high threshold
+
+A Nostr community votes on a relay policy change. They want one-voter-one-vote and to price out address splitting. They set `weight_mode: one_per_address`, `min_sats: 1_000_000`, `min_days: 90`.
+
+Attacker trying to manufacture 100 extra votes needs 100 × 1M sats × 90 days of opportunity cost — prohibitive for a relay-policy argument. Honest voters pay nothing.
+
+## flow 3 — secret ballot
+
+A DAO votes on a contentious treasury disbursement. Ballots hidden until close so whales can't influence smaller voters by casting early.
+
+**Alice** (creator) generates an X25519 reveal keypair. `reveal_pk` goes in the poll; `reveal_sk` stays local.
+
+**Bob** encrypts `"yes"` into an OC Lock envelope addressed to `reveal_pk`, commits to `sha256("oc-vote/v0/commit\npoll_id:…\nvoter:…\noption:yes\n")`, and signs the ballot. Observers see Bob voted — but not what.
+
+**At deadline** Alice publishes `reveal_sk` as a kind-30082 event. Tallier unseals every ballot, verifies each commit, and computes the tally.
+
+If Alice refuses to reveal, the poll is permanently **abandoned**. Participation is still provable; the tally is not. This is an honest trade-off — see [secret ballot](/vote/secret-ballot).
+
+## flow 4 — multi-address voter
+
+Charlie controls two addresses: `bc1qcharlie1` (100k sat, 45 d old) and `bc1qcharlie2` (500k sat, 400 d old). He signs two ballots, one per address, both `yes`. The tally treats them independently:
+
+- `bc1qcharlie1`: 100k × min(45, 180) = 4,500,000 sat-days
+- `bc1qcharlie2`: 500k × min(400, 180) = 90,000,000 sat-days
+
+Total contribution to `yes`: 94,500,000 sat-days. Splitting or consolidating UTXOs after the snapshot doesn't change this.
+
+## flow 5 — dispute
+
+Dave thinks the poll page is lying. He runs:
+
+```bash
+npx @orangecheck/vote-cli tally <poll_id>
+```
+
+The CLI pulls the poll + ballots from his own relay set, verifies every signature, fetches UTXO state from his own bitcoind, and prints the tally. If his numbers match the web page: Dave was wrong. If they don't: the web page has a bug — file an issue with the diff. Correctness is defined by the spec's pure tally function, not by any server.
+
+## anti-patterns we rejected
+
+- Tokenized voting weight. Avoided — minting creates a walled garden.
+- KYC / unique-humanity. Avoided — injects a gatekeeper.
+- On-chain ballot posting. Avoided — would cost every voter a TX per ballot.
+- Authority-signed voter roll. Avoided — centralizes trust.
+- Tallier-as-a-service. Avoided — reintroduces the Snapshot trust problem.
+
+## how this composes with the family
+
+- **OrangeCheck** — voters may reference an existing OC attestation in `ballot.attestation_id` as a client hint. Authoritative check is always the UTXO snapshot.
+- **OC Lock** — every secret-mode ballot is an OC Lock envelope addressed to the poll's `reveal_pk`. The envelope format is unchanged.
+- **OC Vote** — produces a signal. That signal can feed back into either primitive.
+
+Three primitives, one substrate, zero tokens.

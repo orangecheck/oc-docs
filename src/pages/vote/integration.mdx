@@ -1,0 +1,109 @@
+# integration
+
+Concrete snippets for gating your community, DAO, forum, or app on an OC Vote poll. Every example uses [`@orangecheck/vote-core`](https://npmjs.com/package/@orangecheck/vote-core) + [`@orangecheck/vote-cli`](https://npmjs.com/package/@orangecheck/vote-cli) + the curl-friendly `/api/tally` endpoint.
+
+## fork-ready templates
+
+Three copy-forkable integrations live at [**`orangecheck/oc-vote-examples`**](https://github.com/orangecheck/oc-vote-examples):
+
+- [**Discord bot**](https://github.com/orangecheck/oc-vote-examples/tree/main/discord-bot) — `/poll <id>` + `/poll-watch <id>` slash commands that render tallies as embeds with bar charts. Stateless. ~200 lines of discord.js.
+- [**GitHub Action gate**](https://github.com/orangecheck/oc-vote-examples/tree/main/github-action-gate) — `uses: orangecheck/oc-vote-examples/github-action-gate@main`. Gates a job on a poll's tally via a configurable jq expression. Outputs `state` + `passed` + `tally-json`.
+- [**Shell recipes**](https://github.com/orangecheck/oc-vote-examples/tree/main/shell) — one-liner deploy-gates, create/vote/reveal flows, cron pollers, discovery — pure bash + `npx @orangecheck/vote-cli`.
+
+Fork, swap the placeholder poll id / Discord token / whatever, ship. Nothing in those templates is load-bearing for the protocol; they're UI patterns on top of the same `/api/tally` endpoint this page describes.
+
+## check a tally result server-side
+
+You've shipped a poll. You want your backend (Discord bot, forum moderator, DAO executor) to read the tally and act.
+
+```ts
+// anywhere in Node 20+
+const res = await fetch(`https://vote.ochk.io/api/tally?poll=${pollId}`);
+const tally = await res.json();
+
+if (tally.state !== 'tallied') throw new Error('poll not ready');
+const top = Object.entries(tally.tallies).sort((a, b) => b[1] - a[1])[0];
+// top = [optionId, weight]
+```
+
+The endpoint is cached 60s at the edge and verifies every BIP-322 signature before returning. For higher-value decisions, **verify independently** with the CLI — see below.
+
+## independent verification (the right way for high-value decisions)
+
+```bash
+npx -y @orangecheck/vote-cli tally <poll_id> --json
+```
+
+The CLI pulls the poll + ballots from Nostr, verifies every BIP-322 signature with `bip322-js`, fetches UTXO state at the snapshot block from your configured explorer (or self-host), and runs the pure tally function. If the JSON output matches vote.ochk.io's `/api/tally`, both implementations agree. If it doesn't — trust the CLI.
+
+Pipe it into anything:
+
+```bash
+# CI-style gate
+RESULT=$(oc-vote tally $POLL_ID --json | jq -r '.tallies.yes > .tallies.no')
+[[ "$RESULT" == "true" ]] && deploy.sh
+```
+
+## embed the tally as a Nostr-native signal
+
+Because polls and ballots live on Nostr (kinds 30080 / 30081 / 30082), any Nostr client can subscribe to a poll's ballots without touching vote.ochk.io at all. Filter:
+
+```json
+{ "kinds": [30081], "#poll_id": ["<poll_id>"] }
+```
+
+Parse each event's `content` as a canonical Ballot, call `ballotId()` from `@orangecheck/vote-core`, verify the BIP-322 signature against `voter`, and feed into `tally()`.
+
+## gate a Discord bot
+
+```ts
+import { tally } from '@orangecheck/vote-core';
+import { Client } from 'discord.js';
+
+// On command:
+const result = await fetchTally(pollId); // hit /api/tally or run CLI
+if (result.state !== 'tallied') return void reply('poll still open');
+
+const passed = result.tallies.yes > result.tallies.no;
+if (passed) grantRole(user);
+```
+
+For long-running votes, poll `/api/tally` every 5 minutes; for settled decisions, run one CLI verification at close.
+
+## gate a forum / submission queue
+
+- Post creation requires signing the submission against the poster's Bitcoin address (BIP-322).
+- Before admitting the post, verify the poster's OC Vote threshold: either by running a fresh OC Vote tally against a currently-running "membership" poll, or by checking a specific ballot event.
+
+## weight a DAO executor
+
+DAO governance frameworks can treat an OC Vote tally as the oracle for an on-chain execution. Pattern:
+
+1. A DAO contract waits for a specific `poll_id` to close.
+2. A signer (any honest observer) submits the tally + a proof (all ballot events + UTXO snapshot root) to the contract.
+3. The contract verifies the tally by running the pure function in-contract OR by checking that N independent signers agree on the result.
+
+OC Vote does not prescribe the on-chain half — you write that half in whatever chain's language suits you. The contribution is: a *reproducible, sybil-resistant, offline-verifiable* result that any honest observer produces byte-identically.
+
+## ballot-cast-on-behalf flows
+
+The protocol does not currently specify delegation (see `oc-vote-protocol/SPEC.md` §13 "Future work"). For now, voters sign their own ballots. If you need proxy voting, have the proxy address itself be credibly bonded and have delegators publish a separate signed "I delegate to bc1q..." message that your client interprets.
+
+## self-host the tallier
+
+If you care about the tallier's availability:
+
+```bash
+git clone https://github.com/orangecheck/oc-vote-protocol
+npm i @orangecheck/vote-core @orangecheck/vote-cli
+# self-host the Nostr relay set if you want end-to-end independence
+```
+
+The tally function has zero external dependencies beyond: a Bitcoin node (or any explorer), a Nostr relay set (or raw event JSON), and BIP-322 verification. vote.ochk.io is convenience; correctness is the library.
+
+## related pages
+
+- [`/vote/api`](/vote/api) — full library + CLI reference.
+- [`/vote/spec`](/vote/spec) — normative surface.
+- [`/vote/weight-modes`](/vote/weight-modes) — picking the right weight function.
+- [`/vote/security`](/vote/security) — what to trust, what not to.

@@ -150,10 +150,16 @@ export const DOCS_NAV: DocsSection[] = [
         label: 'OC Lock',
         blurb: 'End-to-end encryption addressed to a Bitcoin address.',
         items: [
+            { href: '/lock', label: 'Overview', blurb: 'What Lock is and who it is for.' },
             {
-                href: '/lock',
-                label: 'Overview',
-                blurb: 'What Lock is and who it is for.',
+                href: '/lock/why',
+                label: 'Why OC Lock',
+                blurb: 'The v1 postmortem — what went wrong and what v2 fixes.',
+            },
+            {
+                href: '/lock/quickstart',
+                label: 'Quickstart',
+                blurb: 'Seal your first vault in five minutes.',
             },
             {
                 href: '/lock/how-it-works',
@@ -161,14 +167,39 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Device keys → directory → seal → unseal.',
             },
             {
+                href: '/lock/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'Narrative tour of the flows and why they compose.',
+            },
+            {
                 href: '/lock/envelope-format',
                 label: 'Envelope format',
-                blurb: 'The JSON shape, canonicalization, and the fields every recipient must validate.',
+                blurb: 'Canonical JSON, field-by-field, byte-identical across clients.',
+            },
+            {
+                href: '/lock/envelope',
+                label: 'Envelope reference',
+                blurb: 'Per-field semantics, error cases, validation rules.',
             },
             {
                 href: '/lock/device-keys',
                 label: 'Device keys',
                 blurb: 'BIP-322-bound X25519 keys and the kind-30078 directory record.',
+            },
+            {
+                href: '/lock/chat',
+                label: 'Chat transport',
+                blurb: 'How sealed envelopes move across Nostr relays and out-of-band channels.',
+            },
+            {
+                href: '/lock/security',
+                label: 'Security posture',
+                blurb: 'What breaks, what leaks, and what an attacker must pay.',
+            },
+            {
+                href: '/lock/spec',
+                label: 'Specification',
+                blurb: 'Normative rules, canonicalization, error codes.',
             },
         ],
     },
@@ -177,10 +208,16 @@ export const DOCS_NAV: DocsSection[] = [
         label: 'OC Stamp',
         blurb: 'Bitcoin-block-anchored signed statements.',
         items: [
+            { href: '/stamp', label: 'Overview', blurb: 'What Stamp is and who it is for.' },
             {
-                href: '/stamp',
-                label: 'Overview',
-                blurb: 'What Stamp is and who it is for.',
+                href: '/stamp/why',
+                label: 'Why OC Stamp',
+                blurb: 'PGP + OTS + C2PA in one self-contained envelope.',
+            },
+            {
+                href: '/stamp/quickstart',
+                label: 'Quickstart',
+                blurb: 'Produce and verify your first stamp in five minutes.',
             },
             {
                 href: '/stamp/how-it-works',
@@ -188,14 +225,44 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Sign + anchor to a Bitcoin block via OpenTimestamps.',
             },
             {
+                href: '/stamp/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'The three envelopes and how they compose with Attest and Lock.',
+            },
+            {
+                href: '/stamp/envelope',
+                label: 'Envelope format',
+                blurb: 'Canonical JSON for signed statements and OTS proofs.',
+            },
+            {
+                href: '/stamp/ots',
+                label: 'OpenTimestamps',
+                blurb: 'OTS proofs, upgrade paths, and verification pipeline.',
+            },
+            {
                 href: '/stamp/ots-anchor',
-                label: 'OpenTimestamps anchor',
-                blurb: 'How stamp-ots bridges OTS proofs into the envelope.',
+                label: 'OTS anchor',
+                blurb: 'How stamp-ots bridges OpenTimestamps proofs into the envelope.',
+            },
+            {
+                href: '/stamp/nostr',
+                label: 'Nostr publication',
+                blurb: 'Publishing stamps on NIP-78 addressable events.',
             },
             {
                 href: '/stamp/use-cases',
                 label: 'Use cases',
                 blurb: 'Commit / release signing, long-form provenance, self-notarization.',
+            },
+            {
+                href: '/stamp/security',
+                label: 'Security posture',
+                blurb: 'Verification guarantees and what a stamp does NOT prove.',
+            },
+            {
+                href: '/stamp/spec',
+                label: 'Specification',
+                blurb: 'Normative rules, canonicalization, error codes.',
             },
         ],
     },
@@ -204,20 +271,56 @@ export const DOCS_NAV: DocsSection[] = [
         label: 'OC Vote',
         blurb: 'Stake-weighted sybil-resistant polls.',
         items: [
+            { href: '/vote', label: 'Overview', blurb: 'What Vote is and who it is for.' },
             {
-                href: '/vote',
-                label: 'Overview',
-                blurb: 'What Vote is and who it is for.',
+                href: '/vote/why',
+                label: 'Why OC Vote',
+                blurb: 'What polls break without Bitcoin-stake weights.',
+            },
+            {
+                href: '/vote/quickstart',
+                label: 'Quickstart',
+                blurb: 'Create a poll, cast a ballot, tally — all cross-impl-testable.',
             },
             {
                 href: '/vote/weight-modes',
                 label: 'Weight modes',
-                blurb: 'one_per_address, sats, sats_days — how each resolves to a ballot weight.',
+                blurb: 'one_per_address / sats / sats_days — how each resolves to a weight.',
             },
             {
                 href: '/vote/tally-algorithm',
                 label: 'Tally algorithm',
                 blurb: 'Deterministic, pure, cross-impl-testable.',
+            },
+            {
+                href: '/vote/secret-ballot',
+                label: 'Secret ballot',
+                blurb: 'Commit-reveal flow and the permanent-abandonment trade-off.',
+            },
+            {
+                href: '/vote/integration',
+                label: 'Integration guide',
+                blurb: 'Dropping a Vote poll into your app, end to end.',
+            },
+            {
+                href: '/vote/api',
+                label: 'Library + CLI',
+                blurb: 'The vote-core API surface and the oc-vote CLI.',
+            },
+            {
+                href: '/vote/security',
+                label: 'Security posture',
+                blurb: 'Threat model, explicit non-goals, censorship boundary.',
+            },
+            {
+                href: '/vote/spec',
+                label: 'Specification',
+                blurb: 'Normative rules and tally reference.',
+            },
+            {
+                href: '/vote/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'Five flows with realistic addresses and block heights.',
             },
         ],
     },
@@ -231,6 +334,36 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'Overview',
                 blurb: 'Design-state. What Agent will be, what it will not replace.',
                 badge: 'design',
+            },
+            {
+                href: '/agent/why',
+                label: 'Why OC Agent',
+                blurb: 'Delegating to scripts / bots without surrendering the principal key.',
+            },
+            {
+                href: '/agent/quickstart',
+                label: 'Quickstart',
+                blurb: 'Mint a delegation, sign an action envelope, verify downstream.',
+            },
+            {
+                href: '/agent/scopes',
+                label: 'Scope grammar',
+                blurb: 'BNF for scopes, sub-scope containment, constraint semantics.',
+            },
+            {
+                href: '/agent/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'The three envelopes and the two canonical flows.',
+            },
+            {
+                href: '/agent/security',
+                label: 'Security posture',
+                blurb: 'Revocation, blast radius, and what scopes cannot contain.',
+            },
+            {
+                href: '/agent/spec',
+                label: 'Specification',
+                blurb: 'Normative rules. Early draft — subject to change.',
             },
         ],
     },

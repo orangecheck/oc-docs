@@ -1,0 +1,88 @@
+export const metadata = {
+    title: 'Security — OC Agent',
+    description: 'Threat model, trust assumptions, implementation requirements, what OC Agent proves and does not prove.',
+};
+
+# Security
+
+A consolidated view of what the protocol proves, what it does not prove, the trust assumptions it relies on, and the threat model it targets. For the detailed 13-threat treatment see the upstream [`SECURITY.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/SECURITY.md).
+
+## Guarantees
+
+A full verification of an agent-action `A` against its cited delegation `D` establishes:
+
+| Check clean | Guarantee |
+|---|---|
+| `E_BAD_SIG` on D | Holder of `D.principal.address`'s key at `issued_at` authorized this delegation. |
+| `E_REVOKED` absent | No effective revocation predates the action's signed-at (modulo OTS anchoring). |
+| `E_BAD_ACTION_STAMP` clean | Holder of `D.agent.address`'s key at `A.signed_at` authorized this action. |
+| `E_SCOPE_DENIED` absent | The exercised scope is a legal narrowing of a granted scope. |
+| `E_BOND_UNVERIFIED` absent | The principal's declared bond is still staked on-chain. |
+| `A.ots` confirmed + verified | Action's envelope id existed before the declared Bitcoin block. |
+
+## What OC Agent does NOT prove
+
+- **That the agent actually performed the declared action.** A stamped agent-action proves "the agent's key signed a commitment to X." Whether X happened in the real world — the HTTP request was sent, the invoice was paid, the post was published — is a downstream question. Observers MAY match the action's `content.hash` to downstream artifacts to confirm.
+- **That the action was in the principal's interest.** Scope containment is necessary, not sufficient. The bond is what puts reputational cost on the principal's choice to delegate.
+- **Confidentiality of the grant or the action content.** Wrap in [OC Lock](https://lock.ochk.io) to the intended recipient when confidentiality is needed.
+- **Agent key rotation.** A compromised agent key requires a new delegation to a new agent address plus revocation of the old delegation. Prior actions remain signed by the original key.
+- **Sender anonymity.** All addresses are plaintext.
+- **Post-quantum authenticity.** secp256k1 breaks under a cryptographically relevant quantum adversary. No PQ layer in v1.
+- **On-chain enforcement of the bond.** The bond is a publicly auditable reputational signal, not escrow.
+
+## Threat model (summary)
+
+| # | Threat | Mitigation |
+|---|---|---|
+| T1 | Forged delegation | BIP-322 under principal's key |
+| T2 | Forged agent-action | BIP-322 under agent's key |
+| T3 | Scope escalation | Deterministic sub-scope algorithm |
+| T4 | Wrong-agent action | `agent.address` ↔ `signer.address` equality check |
+| T5 | Replay after expiry | Action `signed_at` must be in `[issued_at, expires_at)` |
+| T6 | Replay across delegations | `delegation_id` is a hash; unique per delegation |
+| T7 | Revocation censorship | Publish to ≥3 diverse Nostr relays; verifier MAY treat absence as still-valid |
+| T8 | Revocation forgery | BIP-322 under principal (or agent-if-authorized) |
+| T9 | Priority manipulation | OTS anchoring of actions and revocations |
+| T10 | Bond misrepresentation | Attestation re-resolution against current chain state |
+| T11 | Unregistered scope confusion | Strict mode rejects unknown; permissive never inflates to wildcard |
+| T12 | Scope-key confusion | Strict mode rejects unknown keys; permissive ignores as constraint |
+| T13 | Malicious relay | Authenticity is BIP-322 in envelope; relays cannot forge |
+
+## Trust assumptions
+
+- secp256k1 signatures remain unforgeable at current parameter sizes.
+- BIP-322 is implemented correctly by signing and verifying clients across address types.
+- SHA-256 collision resistance holds.
+- OpenTimestamps calendars do not backdate (required only if anchoring is used).
+- Bitcoin block headers are available to the verifier.
+- Nostr relays have at-least-one-honest availability (publish to ≥3 diverse relays).
+- Wallet UI faithfully renders the canonical message being signed.
+
+## Implementation requirements
+
+Compliant implementations MUST:
+
+1. Reject envelopes whose `v` is unknown.
+2. Reconstruct the canonical message byte-for-byte from envelope fields and compare the hash to the declared id before trusting any field.
+3. Verify the BIP-322 signature before evaluating scopes, bonds, or any semantically-weighted field.
+4. Reject envelopes with unknown scope products or verbs in strict mode; ignore (without widening) in permissive mode.
+5. Compute the sub-scope relation deterministically.
+6. Cross-reference `A.delegation_id` with `D.id`, `A.signer.address` with `D.agent.address`, `A.signed_at` with `D`'s window.
+7. Query revocation feeds for the cited `delegation_id` unless the caller opts out.
+8. Re-resolve `bond.attestation_id` against current chain state when bond policy is in effect.
+9. Produce the error codes in §SPEC 11.
+
+SHOULD:
+
+- Anchor high-stakes actions and revocations to OpenTimestamps.
+- Publish delegations to ≥3 diverse Nostr relays.
+- Wrap sensitive delegations in OC Lock.
+- Render scope strings in canonical form before asking the user to sign.
+
+## Reporting vulnerabilities
+
+Private security advisory on [`oc-agent-protocol`](https://github.com/orangecheck/oc-agent-protocol) or email `security@ochk.io`. Do not file vulnerabilities as public issues.
+
+## Known limitations
+
+v1 explicitly defers: sub-delegation (agent-to-agent), on-chain bond slashing, privacy-preserving encrypted scopes with public verifiability, multi-principal joint delegations, per-action bond increments, and post-quantum hybrid signatures. Each is a spec-level addition that composes with v1 rather than breaking it.

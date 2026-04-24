@@ -1,0 +1,120 @@
+export const metadata = {
+    title: 'Chat transport · OC Lock',
+    description:
+        'How OC Lock turns one-shot envelopes into a persistent chat inbox — the transport design, the trust model, the tradeoffs.',
+};
+
+# Chat transport
+
+OC Lock's core protocol seals a single envelope from a sender to a recipient. Chat is that same primitive *applied repeatedly, over a persistent transport, with local thread state.* Nothing new happens cryptographically — the envelope format, the device keys, the BIP-322 sender signature, the OrangeCheck gate are all unchanged. What changes is:
+
+- messages arrive without the sender having to copy-paste a URL
+- both sides keep per-conversation history
+- the inbox listens continuously so new messages decrypt automatically
+
+## Why chat on Lock at all
+
+Most encrypted chat apps build their own identity layer: a phone number, an email, a random pubkey you have to share. Lock already has a better one — **a Bitcoin address you control**. That address is:
+
+- **not an account** — nothing to sign up for, nothing to confirm, nothing to phish
+- **verifiable** — every message is signed BIP-322 from the sender's address, so recipients can prove who sent it without trusting a server
+- **sybil-resistant on demand** — opt into the OrangeCheck filter and only accept DMs from addresses that hold on-chain stake
+- **portable across devices** — register a new device with the same address and your inbox is there, no account migration
+
+The whole premise of Lock is that Bitcoin is an identity system, not an access oracle. Chat is the natural second verb after seal/unseal: if you can encrypt *one* message to an address, you can encrypt *many*.
+
+## Advantages over alternatives
+
+### vs. Nostr DMs (NIP-04 / NIP-17)
+Nostr DMs identify you by a `npub` — a Schnorr pubkey you have to manage separately from any other identity. Lock uses a **BIP-322 signature from your Bitcoin wallet** as the binding. The same wallet you already use; no new key to lose.
+
+### vs. Signal / WhatsApp
+Those use phone numbers as the identity anchor. OC Lock uses a Bitcoin address. No carrier, no SIM, no phone number leaks, no metadata going to a central server that can be compelled to hand it over. The relays see *encrypted blobs tagged to a recipient pubkey* and nothing about who sent them.
+
+### vs. PGP/GPG email
+PGP's identity is a long-lived keypair you publish to a keyserver. Key rotation is painful; compromise is terminal. Lock's device keys rotate cheaply — register a new device, the old one dies, envelopes that were addressed to the old device become unrecoverable (good for forward secrecy at device-loss boundaries).
+
+### vs. a custom backend
+Zero servers to run. No trust in our infrastructure. Public Nostr relays are the transport and they're easily swappable — if a relay censors you, use a different one or run your own.
+
+## How a message travels
+
+### Sending
+1. You type a message and hit send.
+2. The client looks up the recipient's device record on Nostr by their Bitcoin address (same query used by the one-shot composer).
+3. Every returned record is **BIP-322 verified** against the claimed address — a malicious relay cannot forge a device record without breaking BIP-322.
+4. The client seals a standard OC Lock envelope to the verified recipient device_pk (and a self-addressed copy so your other devices can sync).
+5. The envelope is wrapped in a Nostr kind-1059 event signed by an **ephemeral Schnorr key** the client generates just for this send and discards. The relay sees:
+   - a throwaway sender pubkey
+   - the recipient's stable chat pubkey (as a `p` tag)
+   - an opaque base64 blob (the sealed envelope)
+6. The wrap is published to the default relay pool.
+
+### Receiving
+1. Your device subscribes to kind-1059 events tagged with your chat pubkey.
+2. For each event, the client base64-decodes the content, parses the envelope, validates its structure, and calls `unseal()` with your local device secret.
+3. If the envelope was authenticated (BIP-322 signed), the sender's address is verifiable. If it wasn't (sender had no wallet), the message is shown as unauthenticated — decryptable but with no proof of authorship.
+4. The plaintext is written to local IndexedDB along with metadata (thread_id, timestamps, byte size) and the UI picks it up on the next tick.
+
+### Thread identity
+A thread id is `sha256("oc-lock/chat/thread/v1|" + min(addrA, addrB) + "|" + max(addrA, addrB))`. Deterministic on both sides without negotiation.
+
+*For an end-to-end security walkthrough of the whole app — identity exposure, device keys, relays, share URLs, recommended postures — see [`/lock/security`](/lock/security).*
+
+## Trust model
+
+| Adversary | What they can learn | What they cannot learn |
+|---|---|---|
+| Relay operator | You have a device record. Someone sent your chat pubkey an opaque blob. | Who sent it. What it says. Which conversation it belongs to. |
+| Network observer (ISP) | You speak WebSocket to public Nostr relays. | Same guarantees as above — TLS hides content from the wire. |
+| Stolen unlocked device | Full history. | Same as any chat app — mitigation is passphrase-lock your device when idle (auto after 15 min). |
+| Stolen locked device | Local ciphertext + plaintext history cache. | *Still* needs the passphrase to unlock device_sk and continue receiving. Prior decrypted plaintext is recoverable iff the attacker breaks your passphrase. |
+| Malicious relay | Can censor your messages (block publish/delivery). | Cannot forge a message from someone else — BIP-322 signatures are verified client-side. Cannot read content. |
+| Malicious recipient device record | — | Forged records fail BIP-322 verification and are rejected before encryption. |
+
+## Tradeoffs
+
+Honest summary:
+
+- **Forward secrecy is coarse-grained.** Per-message ephemeral X25519 keys (inherited from the envelope format) give message-level forward secrecy at send time, but there's no Signal-style ratchet. If someone compromises your device_sk, *all* currently-held messages encrypted to it become readable. Mitigation: rotate your device_sk periodically.
+- **No "typing" indicators, no read receipts.** These are metadata leaks; we haven't added them.
+- **Delivery isn't guaranteed if every relay drops you.** Relays have their own retention and admission policies. We publish to 4 by default; in practice you're always reachable on at least one.
+- **History lives in each browser.** The sender's client gift-wraps a self-addressed copy to every device record published under their own address, so a message sent from browser-A also lands on browser-B *going forward*. But there's no server-side scrollback — a *newly registered* device starts with an empty inbox and only picks up messages still cached on the relays (typically days to weeks).
+- **Group DMs are not in v1.** Adding groups properly means sender keys, group state events, and a membership change protocol. 1:1 works today; groups will land later.
+- **No chain payments gating chat messages.** We deliberately kept payment-mode out of chat — Bitcoin transactions per message is absurd. If you want a payment precondition *for starting a thread*, use the OrangeCheck stake gate (sybil filter) instead.
+
+## Storage model
+
+| Store | Purpose | Encrypted at rest? |
+|---|---|---|
+| `devices` | Device keys | Yes, if you passphrase-encrypt the device |
+| `chat_messages` | Per-message plaintext + metadata | No — relies on device + OS encryption |
+| `chat_cursors` | Per-thread "last read" timestamp | No |
+
+Wiping a thread locally removes every row tagged with that thread_id but does not propagate anywhere — the underlying Nostr events on relays are untouched. Relays expire events according to their own policies (typically days to weeks).
+
+## Privacy properties summarized
+
+- **Sender unlinkability at the relay:** fresh ephemeral Schnorr pubkey per message; the relay sees a different sender every time.
+- **Recipient linkability at the relay:** the recipient's chat pubkey is stable, because it's derived deterministically from their device_sk. This is a knowable cost — you need a stable address for mail to reach you.
+- **No metadata to central server:** there isn't one.
+- **Sender authentication is E2E:** BIP-322 signatures are verified against the sender's claimed Bitcoin address, client-side. The relay cannot forge them.
+
+If sender-identifying metadata even at the relay is unacceptable, sign messages from a **fresh Bitcoin address with no transaction history**. You lose the identity-binding signal that makes Lock valuable, but you get true sender anonymity.
+
+## Note to self
+
+You can start a thread with your own Bitcoin address. The client seals to your own device_pk, the subscription loops the gift-wrap back, and it lands in a thread labeled **note to self**. Every device you've registered under the same address receives the message, so this doubles as an end-to-end-encrypted cross-browser clipboard. Same crypto path — nothing special in the protocol.
+
+## Opting out
+
+Chat is not a distinct product inside Lock — it's the auto-delivery transport every OC Lock envelope can ride. When you send a message in the unified `/app` inbox, the same envelope is published as a Nostr gift-wrap (for automatic delivery) AND made available as a share URL / `.lock` file / QR on the resulting bubble (for out-of-band hand-off). Recipients with a Lock device get it automatically; anyone else can still decrypt the URL. Closing the tab stops the subscription; opening `/app` again with an unlocked device resumes it.
+
+## What's next
+
+- Groups (sender-keys model, proper ratchet)
+- Typing indicators and read receipts (opt-in per thread, since these leak metadata)
+- Media attachments (reusing the OC Lock archive format)
+- Mobile push via a user-operated relay
+
+See [`/reference/faq`](/reference/faq) for quick answers about the chat flow.

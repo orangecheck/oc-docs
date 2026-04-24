@@ -1,0 +1,148 @@
+export const metadata = {
+    title: 'Quickstart — OC Agent',
+    description: 'Install @orangecheck/agent-signer and issue your first delegation in five minutes.',
+};
+
+# Quickstart
+
+Five minutes from nothing to a signed delegation, an exercised action, and a verified result.
+
+## Install
+
+```bash
+npm i @orangecheck/agent-core @orangecheck/agent-signer
+```
+
+Optional:
+- `@orangecheck/wallet-adapter` — browser Bitcoin wallets (UniSat / Xverse / Leather)
+- `@orangecheck/stamp-ots` — OpenTimestamps anchoring
+- `@orangecheck/agent-mcp` — stamp MCP tool invocations as agent-actions
+- `@orangecheck/agent-cli` — `oc-agent` shell for verify / inspect / canonicalize / scope checks
+
+## 1. Delegate
+
+The principal creates a delegation. `signMessage` is any function that returns a BIP-322 base64 signature of the given string (in a browser, `@orangecheck/wallet-adapter` provides one).
+
+```ts
+import { createDelegation } from '@orangecheck/agent-signer';
+
+const delegation = await createDelegation({
+    principal: {
+        address: 'bc1qprincipal…',
+        signMessage: async (msg) => wallet.signMessage(msg),
+    },
+    agentAddress: 'bc1qagent…',
+    scopes: [
+        'lock:seal(recipient=bc1qalice)',
+        'stamp:sign(mime=text/markdown)',
+    ],
+    ttlMs: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
+// delegation is a self-contained envelope; stringify and ship it
+const encoded = JSON.stringify(delegation);
+```
+
+Send `encoded` to the agent — over OC Lock, email, MCP, whatever transport fits. The agent stores it.
+
+## 2. Act
+
+The agent produces an action envelope citing the delegation.
+
+```ts
+import { signAsAgent } from '@orangecheck/agent-signer';
+
+const content = new TextEncoder().encode('hello world');
+const action = await signAsAgent({
+    agent: {
+        address: 'bc1qagent…',
+        signMessage: async (msg) => agentKey.signBip322(msg),
+    },
+    delegation,
+    content,
+    mime: 'text/plain',
+    scopeExercised: 'lock:seal(recipient=bc1qalice)',
+});
+```
+
+Every action is:
+
+- a strict extension of an [OC Stamp](https://stamp.ochk.io) envelope (so stamp verifiers keep working),
+- signed by the agent's Bitcoin address (non-repudiable),
+- bound to the delegation by id (no cross-delegation replay),
+- scope-constrained (verifiers enforce sub-scope containment).
+
+## 3. Verify
+
+Any counterparty — auditor, recipient, the principal themselves — runs the verification algorithm offline.
+
+```ts
+import { verifyAction } from '@orangecheck/agent-core';
+import { Verifier as Bip322 } from 'bip322-js';
+
+const result = await verifyAction({
+    action,
+    delegation,
+    verifyBip322: async (msg, sig, addr) => Bip322.verifySignature(addr, msg, sig),
+});
+
+if (!result.ok) {
+    console.log(`REJECTED: ${result.code} — ${result.message}`);
+} else {
+    console.log(`OK: principal ${delegation.principal.address} authorized agent ${delegation.agent.address}`);
+    console.log(`  scope exercised: ${result.scopeExercised}`);
+    console.log(`  content hash:    ${action.content.hash}`);
+}
+```
+
+## 4. Revoke (optional)
+
+If you need to burn the delegation early:
+
+```ts
+import { revoke } from '@orangecheck/agent-signer';
+import { stampCommit } from '@orangecheck/stamp-ots'; // optional anchoring
+
+const rev = await revoke({
+    signer: principal,  // or agent, if delegation.revocation.holders includes 'agent'
+    delegation,
+    reason: 'agent key rotated',
+});
+
+// Anchor for priority ordering (optional but recommended):
+rev.ots = await stampCommit(rev.id);
+
+// Publish to Nostr kind-30085 (optional but recommended):
+await nostr.publish({
+    kind: 30085,
+    tags: [
+        ['d', 'oc-agent-rev:' + rev.id],
+        ['delegation', rev.delegation_id],
+        ['signer_addr', rev.signer.address],
+    ],
+    content: JSON.stringify(rev),
+});
+```
+
+A verifier passing `revocations: [rev]` to `verifyAction()` will compare its effective time (OTS anchor if present, else `signed_at`) against the action's and return `E_REVOKED` if the revocation was effective first.
+
+## From the shell
+
+The CLI mirrors the library for ops work and CI:
+
+```bash
+npx @orangecheck/agent-cli verify delegation.json
+npx @orangecheck/agent-cli inspect action.json
+npx @orangecheck/agent-cli canonical revocation.json
+npx @orangecheck/agent-cli scope 'ln:send(max_sats<=1000,node=03abc)'
+npx @orangecheck/agent-cli subscope 'ln:send(max_sats<=1000)' 'ln:send(max_sats=500)'
+```
+
+Exit codes: `0` = verified / admitted, `1` = any rejection. Every command has `--json` for script-friendly output.
+
+## Next steps
+
+- Learn the [scope grammar](/agent/scopes) — what the 8 MVP scopes express, how sub-scope containment works, how to write constraints.
+- Try the live [playground](/playground) — the same library, in your browser.
+- Read the [protocol walkthrough](/agent/protocol) for a diagram-first view of the three envelopes.
+- Skim the [security posture](/agent/security) before trusting a production delegation.

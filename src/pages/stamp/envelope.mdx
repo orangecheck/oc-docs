@@ -1,0 +1,132 @@
+export const meta = {
+    title: 'Envelope format — OC Stamp docs',
+    description: 'Field-by-field reference for the .stamp wire format.',
+};
+
+# Envelope format
+
+A stamp is a single canonical JSON object, referred to by file extension `.stamp` and MIME `application/vnd.oc-stamp+json`. It is self-contained: transport is the user's choice (URL fragment, email, IPFS, Nostr, QR, paper).
+
+## Wire schema
+
+```json
+{
+  "v": 1,
+  "kind": "stamp",
+  "id": "f0dd79a528ab2c756c1ba1aa5f350c4fdd1073e90ae447bd9438f6a7794e1485",
+
+  "content": {
+    "hash": "sha256:a4c8f7d2…",
+    "length": 12843,
+    "mime": "text/markdown",
+    "ref": null
+  },
+
+  "signer": {
+    "address": "bc1qalice…",
+    "alg": "bip322"
+  },
+
+  "signed_at": "2026-04-24T18:30:00Z",
+
+  "stake": {
+    "attestation_id": "9e3f4a2b1c0d8e7f…",
+    "sats_bonded": 500000,
+    "days_unspent": 180
+  },
+
+  "ots": {
+    "status": "confirmed",
+    "proof": "<base64 OTS proof>",
+    "calendars": ["https://alice.btc.calendar.opentimestamps.org"],
+    "block_height": 890123,
+    "block_hash": "0000…a0b1",
+    "upgraded_at": "2026-04-24T19:04:11Z"
+  },
+
+  "sig": {
+    "alg": "bip322",
+    "pubkey": "bc1qalice…",
+    "value": "<base64 BIP-322 signature>"
+  }
+}
+```
+
+## Fields
+
+| Field | Rule |
+|---|---|
+| `v` | Integer. Current version is `1`. Verifiers MUST reject unknown versions. |
+| `kind` | MUST equal `"stamp"`. Reserved for future sub-kinds. |
+| `id` | 64 lowercase hex chars. MUST equal `H(canonical_message)`. |
+
+### `content`
+
+| Field | Rule |
+|---|---|
+| `hash` | MUST begin with `sha256:` followed by 64 lowercase hex. Must match `content_hash` in the canonical message. |
+| `length` | Non-negative integer. Byte length of the content. |
+| `mime` | RFC 6838 media type. `application/octet-stream` if unknown. |
+| `ref` | Optional pointer — `null`, `ipfs://…`, `https://…`, or `magnet:`. **Not cryptographic.** Authenticity of bytes is proved by `hash`. |
+
+### `signer`
+
+| Field | Rule |
+|---|---|
+| `address` | Mainnet Bitcoin address (P2WPKH, P2TR, or P2PKH). MUST equal `address` in canonical message. |
+| `alg` | MUST equal `"bip322"` in v1. |
+
+### `signed_at`
+
+ISO 8601 UTC. MUST match the canonical message. **Self-declared** — the signer's claim. Only the OTS anchor proves the id existed *before* a specific block.
+
+### `stake` (optional)
+
+| Field | Rule |
+|---|---|
+| `attestation_id` | SHA-256 hex of an OrangeCheck canonical message signed by `signer.address`. |
+| `sats_bonded` | Non-negative integer. **Self-declared** — a verifier who cares about stake MUST re-resolve via OrangeCheck. |
+| `days_unspent` | Non-negative integer. Same. |
+
+### `ots` (optional)
+
+| Field | Rule |
+|---|---|
+| `status` | `"pending"` or `"confirmed"`. |
+| `proof` | Base64-encoded OpenTimestamps proof. Opaque at this layer. |
+| `calendars` | Array of calendar URLs the proof came from. |
+| `block_height` | Bitcoin block height. `null` if pending. |
+| `block_hash` | Lowercase hex. `null` if pending. |
+| `upgraded_at` | ISO 8601 UTC of the upgrade. `null` if pending. |
+
+### `sig`
+
+| Field | Rule |
+|---|---|
+| `alg` | MUST equal `"bip322"` in v1. |
+| `pubkey` | MUST equal `signer.address`. |
+| `value` | Base64 BIP-322 signature by `signer.address` over the **hex-encoded** `id` (64 ASCII bytes). |
+
+## The signing domain
+
+BIP-322 signs the **hex form** of `id` (64 ASCII bytes), not the raw 32 bytes. Hex is chosen so the signed message is legible in wallet UIs — a user signing through UniSat, Xverse, Leather, or Sparrow sees something they can read aloud.
+
+The id commits transitively to every field in the canonical message via `id = H(canonical_message)`.
+
+## What is NOT in the signed domain
+
+- `ots` — OTS proofs are appended after signing; upgrade is cryptographically independent.
+- `content.ref` — a convenience pointer, not a commitment.
+
+Any modification of a signed-domain field (address, content.hash, content.length, content.mime, signed_at, or stake) invalidates the id and the signature. Tamper-evidence is transitive via the id.
+
+## Canonicalization
+
+Per [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785) — lexicographically sorted keys at every level, no insignificant whitespace, LF-terminated.
+
+Unlike OC Lock (which needs a custom sort rule for `recipients[]`), OC Stamp envelopes have no array field requiring stable per-element sorting. RFC 8785 alone is sufficient.
+
+## File extension + MIME
+
+- `.stamp`
+- `application/vnd.oc-stamp+json` (self-allocated, not IANA-registered).

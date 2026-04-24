@@ -1,0 +1,123 @@
+export const metadata = {
+    title: 'Specification — OC Agent v1',
+    description: 'Normative specification. Delegation, agent-action, revocation envelopes. Scope grammar. Verification algorithm. Error codes.',
+};
+
+# Specification
+
+The normative v1 specification lives in the [`oc-agent-protocol`](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md) repository. This page is a shortened reference for implementers who already understand the protocol. Consult the upstream SPEC.md for the complete text, notation, test vectors, and compliance checklist.
+
+## Envelope family
+
+| Envelope | `kind` | Nostr kind | File ext |
+|---|---|---|---|
+| Delegation | `agent-delegation` | 30083 | `.delegation` |
+| Agent-action | `agent-action` | 30084 *(shared with OC Stamp)* | `.action` |
+| Revocation | `agent-revocation` | 30085 | `.revocation` |
+
+## Delegation canonical message (§SPEC 4.1)
+
+```
+oc-agent:delegation:v1
+principal: <btc_address>
+agent: <btc_address>
+scopes: <scope_1>,<scope_2>,…
+bond_sats: <non-negative integer>
+bond_attestation: <64-hex | "none">
+issued_at: <ISO 8601 UTC>
+expires_at: <ISO 8601 UTC>
+nonce: <32-hex>
+```
+
+Each line LF-terminated; no trailing LF after `nonce`. Scopes are serialized in **sorted order** (lexicographic byte order) and joined by a single ASCII comma. Envelope id = `sha256(canonical_message_bytes)` rendered as lowercase hex.
+
+## Agent-action canonical message (§SPEC 5.1)
+
+```
+oc-agent:action:v1
+address: <agent_btc_address>
+content_hash: sha256:<64-hex>
+content_length: <positive integer>
+content_mime: <RFC 6838 media type>
+signed_at: <ISO 8601 UTC>
+delegation_id: <64-hex>
+scope_exercised: <scope string>
+```
+
+A strict extension of OC Stamp's canonical message. OC Stamp verifiers that treat unknown-field additions tolerantly (as the spec requires) correctly verify authorship and priority; authority verification is additive.
+
+## Revocation canonical message (§SPEC 9.1)
+
+```
+oc-agent:revocation:v1
+address: <signer_btc_address>
+delegation_id: <64-hex>
+reason: <ASCII, max 128 bytes, "" if omitted>
+signed_at: <ISO 8601 UTC>
+```
+
+## Signing
+
+All three envelopes sign the **hex-encoded ASCII id** (64 bytes) via BIP-322 under the appropriate signer's Bitcoin address:
+
+- Delegation → principal's address.
+- Agent-action → agent's address.
+- Revocation → signer's address (must be in `delegation.revocation.holders`).
+
+## Scope grammar
+
+See [scope grammar](/agent/scopes) for the detailed walkthrough.
+
+```
+scope         := product ":" verb [ "(" constraint-list ")" ]
+constraint    := key op value
+op            := "=" | "!=" | "<" | "<=" | ">" | ">=" | "*"
+```
+
+MVP registry: `lock:seal`, `lock:chat`, `stamp:sign`, `vote:cast`, `nostr:publish`, `http:request`, `ln:send`, `mcp:invoke`.
+
+## Verification algorithm (§SPEC 8)
+
+```
+verify(D):
+  1. v == 1 else E_UNSUPPORTED_VERSION
+  2. shape check else E_MALFORMED
+  3. reconstruct canonical → id' == D.id else E_BAD_ID
+  4. scopes parse + validate else E_BAD_SCOPE_GRAMMAR
+  5. BIP-322(D.principal, D.id) verifies else E_BAD_SIG
+  6. now ∈ [issued_at, expires_at) else E_NOT_YET_VALID / E_EXPIRED
+  7. no effective revocation targeting D.id else E_REVOKED
+
+verify(A, D):
+  8. verify(D) clean
+  9. base stamp checks on A else E_BAD_ACTION_STAMP
+ 10. A.delegation_id == D.id else E_DELEGATION_MISMATCH
+ 11. A.signer.address == D.agent.address else E_AGENT_MISMATCH
+ 12. A.signed_at ∈ [D.issued_at, D.expires_at) else E_OUT_OF_WINDOW
+ 13. A.scope_exercised ⊆ some scope in D.scopes else E_SCOPE_DENIED
+
+optional bond check:
+ 14. D.bond non-null else E_NO_BOND
+ 15. D.bond.sats >= threshold else E_BOND_UNMET
+ 16. resolve(D.bond.attestation_id) still valid else E_BOND_UNVERIFIED
+```
+
+## Error codes (§SPEC 11)
+
+`E_UNSUPPORTED_VERSION` · `E_MALFORMED` · `E_BAD_ID` · `E_BAD_SIG` · `E_BAD_SCOPE_GRAMMAR` · `E_NOT_YET_VALID` · `E_EXPIRED` · `E_REVOKED` · `E_DELEGATION_MISMATCH` · `E_AGENT_MISMATCH` · `E_OUT_OF_WINDOW` · `E_SCOPE_DENIED` · `E_BAD_ACTION_STAMP` · `E_NO_BOND` · `E_BOND_UNMET` · `E_BOND_UNVERIFIED` · `E_REVOKER_UNAUTHORIZED` · `E_CALENDAR_UNREACHABLE`
+
+## Canonicalization (§SPEC 6)
+
+- RFC 8785 JSON canonicalization (lexicographic key sort; no insignificant whitespace; `\uXXXX` only for control chars and `"` / `\`).
+- Arrays preserve order **except** the top-level `scopes` field of a delegation, which MUST be sorted lexicographically to match the canonical-message serialization.
+- Constraints within a scope string MUST be sorted by key for canonical form.
+
+## Versioning
+
+`envelope.v` is an integer. Future incompatible changes increment it. Unknown-field tolerance handles minor additions.
+
+## Where to go from here
+
+- [Scope grammar](/agent/scopes) for the full BNF and the sub-scope decision procedure.
+- [Test vectors](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors) for cross-implementation conformance.
+- [`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core) for the reference TypeScript implementation.

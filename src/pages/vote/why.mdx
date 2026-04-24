@@ -1,0 +1,37 @@
+# why vote
+
+Every open community in 2026 — Nostr relays, DAOs, grant committees, Bitcoin protocol debates, forum moderation bodies — eventually runs into the same problem: **"how do we take a group decision without a token, without a KYC vendor, and without trusting a tallier?"**
+
+Existing systems fail at least one of the five gatekeeping questions:
+
+| system | bot-resistant | weighted | offline-tally | secret ballot | no token / no KYC |
+|---|---|---|---|---|---|
+| google forms | ✗ | ✗ | ✗ | ✗ | ✓ |
+| snapshot | ✗ | ✓ | partial | ✗ | ✗ (needs a token) |
+| helios | ✓ | = | ✓ | ✓ | ✗ (needs authority) |
+| gitcoin passport | ✓ | ✓ | partial | ✗ | partial (stamps ≈ KYC) |
+| NIP-88 polls | ✗ | ✗ | ✓ | ✗ | ✓ |
+| **oc vote** | ✓ | ✓ | ✓ | ✓ (opt-in) | ✓ |
+
+## the one claim
+
+Bitcoin UTXOs are the only credible, chain-neutral, time-aware weight function that doesn't require minting anything. A voter's weight is a function of the sats they hold at a declared block height. An attacker manufacturing 10,000 fake voters with 100k sats aged 30 days pays real opportunity cost. An honest voter pays nothing.
+
+**This property is uniquely Bitcoin.** Ed25519 gets you a signed ballot but nothing to weight it with. GitHub stars are forgeable. ERC-20 balances require minting a token, which is what Snapshot does and why every community that uses it needs its own token. Proof-of-humanity requires an iris scanner or a video call.
+
+If you remove the UTXO-weight primitive, nothing else OC Vote offers makes sense as a standalone protocol. That's the thesis.
+
+## the full rationale
+
+The complete hypothesis-stress-test lives in [`oc-vote-protocol/WHY.md`](https://github.com/orangecheck/oc-vote-protocol/blob/main/WHY.md). It walks 13 load-bearing claims — from "one address = one ballot is enforceable without a server" to "secret ballots achievable with creator-commit-reveal" to "the Ed25519 substitution test" — and stress-tests each against alternatives. If you're evaluating whether this protocol fits your use case, read that document before the spec.
+
+## what v0 does not solve
+
+- **Receipt-freeness / coercion resistance.** After secret-mode reveal, ballots are publicly linkable. Full coercion resistance requires a homomorphic scheme (Helios-style). Out of scope for v0.
+- **Threshold reveal.** Only creator-held reveal in v0. tlock / drand threshold reveal is future work.
+- **Delegation / liquid democracy.** Not attempted. Possible as a v1 extension.
+- **Quadratic voting.** Deferred to a registry-based `weight_mode`.
+- **Post-quantum.** secp256k1 and X25519 both break under a PQ-capable adversary.
+- **Sovereign elections.** This is a signaling primitive, not a replacement for statutory voting.
+
+These are explicit non-goals, not things we hope to sneak in later. See [security](/vote/security).

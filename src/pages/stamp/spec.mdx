@@ -1,0 +1,127 @@
+export const meta = {
+    title: 'Specification — OC Stamp docs',
+    description: 'Summary of the normative v1 spec. The authoritative copy lives in the spec repo.',
+};
+
+# Specification
+
+The authoritative, normative spec is [`SPEC.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md) in the `oc-stamp-protocol` repo. This page is a summary keyed to the same section numbers so you can navigate between them.
+
+## Shape
+
+- **§0 Notation** — `H()`, `BIP322()`, canonical JSON, ISO 8601 UTC.
+- **§1 Actors** — signer, verifier, aggregator (optional), calendar, directory (optional).
+- **§2 Identities** — signer = Bitcoin address (P2WPKH, P2TR, P2PKH). Optional `stake.attestation_id` points at an OrangeCheck attestation.
+- **§3 Canonical message** — six lines, LF-separated, no trailing LF, `oc-stamp:v1` as domain separator.
+- **§4 Envelope format** — `.stamp` / `application/vnd.oc-stamp+json`.
+- **§5 Canonicalization** — RFC 8785 JSON canonicalization.
+- **§6 OpenTimestamps integration** — submit → pending → upgrade → confirmed.
+- **§7 Nostr directory** — kind-30083 (optional).
+- **§8 Verification algorithm** — seven steps.
+- **§10 Errors** — nine codes, all prefixed `E_`.
+- **§11 Security model** — what OC Stamp proves / does not prove.
+- **§12 Compliance checklist** — twelve boxes.
+
+## Canonical message (§3)
+
+The exact bytes the signer signs via BIP-322:
+
+```
+oc-stamp:v1
+address: <btc_address>
+content_hash: sha256:<64-hex>
+content_length: <positive integer, decimal>
+content_mime: <RFC 6838 media type>
+signed_at: <ISO 8601 UTC>
+```
+
+Each line terminated by single LF (`0x0a`), no trailing LF after `signed_at`. The first line is the literal 11-byte string `oc-stamp:v1` — a domain separator.
+
+## Envelope format (§4)
+
+```json
+{
+  "v": 1,
+  "kind": "stamp",
+  "id": "<hex of sha256(canonical_message)>",
+  "content": {
+    "hash": "sha256:<64-hex>",
+    "length": 12843,
+    "mime": "text/markdown",
+    "ref": "ipfs://…" | "https://…" | null
+  },
+  "signer": { "address": "bc1q…", "alg": "bip322" },
+  "signed_at": "2026-04-24T18:30:00Z",
+  "stake": null | {
+    "attestation_id": "<64-hex>",
+    "sats_bonded": 500000,
+    "days_unspent": 180
+  },
+  "ots": null | {
+    "status": "pending" | "confirmed",
+    "proof": "<base64 OTS proof>",
+    "calendars": ["https://…"],
+    "block_height": 890123 | null,
+    "block_hash": "<64-hex>" | null,
+    "upgraded_at": "<ISO 8601 UTC>" | null
+  },
+  "sig": {
+    "alg": "bip322",
+    "pubkey": "<must equal signer.address>",
+    "value": "<base64 BIP-322 signature over hex(id)>"
+  }
+}
+```
+
+See [envelope format](/stamp/envelope) for field-by-field rules.
+
+## Verification (§8)
+
+```
+1. Version check       — reject unknown v.                      → E_UNSUPPORTED_VERSION
+2. Shape check         — required fields, types, patterns.      → E_MALFORMED
+3. Canonical + id      — reconstruct, hash, compare.            → E_BAD_ID
+4. Signature verify    — BIP-322 over hex(id).                  → E_BAD_SIG
+5. Anchor verify       — walk OTS proof to Bitcoin header.      → E_BAD_ANCHOR / E_NO_ANCHOR
+6. Content bytes       — optional, hash and compare.            → E_BAD_CONTENT
+7. Stake check         — optional, re-resolve attestation.      → E_STAKE_UNMET
+```
+
+A minimal verifier skips steps 5, 6, 7 and reports "authentic but not anchored / content not checked." That's the right mode for preview UIs that only care about authorship.
+
+Full verification runs all seven and requires a block-headers source (full node, SPV client, or a pre-computed snapshot). **No ochk.io endpoint is required.**
+
+## Errors (§10)
+
+| Code | Meaning |
+|---|---|
+| `E_UNSUPPORTED_VERSION` | Envelope `v` is unknown. |
+| `E_MALFORMED` | Invalid shape / field types / required fields. |
+| `E_BAD_ID` | Reconstructed canonical does not hash to declared `id`. |
+| `E_BAD_SIG` | BIP-322 signature did not verify. |
+| `E_BAD_ANCHOR` | OTS proof does not chain to declared Bitcoin block. |
+| `E_NO_ANCHOR` | Policy requires confirmed anchor; envelope has pending or missing `ots`. |
+| `E_BAD_CONTENT` | Content bytes hash does not match `content.hash`. |
+| `E_STAKE_UNMET` | Signer's attestation does not meet caller threshold. |
+| `E_CALENDAR_UNREACHABLE` | Upgrade required a calendar fetch that failed. |
+
+## Compliance checklist (§12)
+
+A client is OC Stamp v1 compliant if and only if:
+
+- Produces canonical messages byte-for-byte per §3.1 for identical inputs.
+- Computes `id = H(canonical_message)` and serializes as lowercase hex.
+- Produces envelopes with all required fields per §4.1.
+- Signs the **hex form** of `id` via BIP-322 (§4.5).
+- Canonicalizes envelopes per §5 (RFC 8785).
+- Submits `id` (raw 32 bytes) to OTS calendars per §6.1.
+- Parses and upgrades OTS proofs per §6.2.
+- Verifies OTS anchor against Bitcoin block headers per §6.3 when `status === "confirmed"`.
+- Verifies sender BIP-322 signatures before trusting envelope contents.
+- Produces error codes per §10.
+- Rejects unknown `v`; preserves unknown fields on relay.
+- Passes every committed test vector in [`test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors).
+
+## Read the full spec
+
+[`oc-stamp-protocol/SPEC.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md) — 16 sections, ~500 lines of normative prose.

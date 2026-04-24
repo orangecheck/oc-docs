@@ -1,0 +1,117 @@
+# api
+
+The web UI is convenience. The curl output is the authoritative result.
+
+## http
+
+```
+GET /api/tally?poll=<64-char hex poll_id>
+```
+
+Fetches the poll from the default Nostr relay set, pulls every matching ballot, verifies every BIP-322 signature, resolves the snapshot block, looks up UTXOs from mempool.space, runs the pure tally function, and returns JSON.
+
+**200 tallied:**
+
+```json
+{
+  "poll_id": "3054…",
+  "state": "tallied",
+  "snapshot_block": 900412,
+  "turnout": { "voters": 47, "weight": 2814300000 },
+  "tallies": { "split_a": 812300000, "split_b": 1102900000, "split_c": 899100000 },
+  "ballot_count": 47
+}
+```
+
+**200 awaiting_reveal (secret-mode poll pre-close):**
+
+```json
+{ "poll_id": "cc27…", "state": "awaiting_reveal" }
+```
+
+**4xx:**
+
+- `400` — poll query param missing or not 64 hex.
+- `404` — poll not found on any default relay.
+- `422` — poll event content did not match poll_id (relay corruption).
+
+Response is cached for 60 seconds at the edge. Live tallies on the poll page recompute client-side against the same function.
+
+## library
+
+```bash
+npm i @orangecheck/vote-core
+```
+
+Full API surface:
+
+```ts
+import {
+  // canonicalization
+  canonicalize, canonicalBytes,
+  // ids (content-addressed, SHA-256 of canonical bytes with sig.value = "")
+  pollId, ballotId, revealId,
+  // secret-mode commit
+  commit, buildCommitMessage,
+  // weight computation
+  voterWeight, ageDays, qualifyingUtxos, totalQualifyingSats, isSupportedMode,
+  // the tally
+  tally,
+  // types
+  type Poll, type Ballot, type Reveal, type TallyResult, type Utxo,
+} from '@orangecheck/vote-core';
+```
+
+### example: build and sign a poll
+
+```ts
+import { pollId } from '@orangecheck/vote-core';
+
+const draft: Poll = {
+  v: 0, kind: 'oc-vote/poll',
+  creator: 'bc1q…',
+  question: 'Should we ship?',
+  options: [{ id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' }],
+  deadline: '2026-05-08T00:00:00Z',
+  snapshot_block: 'deadline',
+  weight_mode: 'sats', weight_params: null,
+  min_sats: 100_000, min_days: 30,
+  mode: 'public', reveal_pk: null,
+  tiebreak: 'latest', notes: null,
+  created_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+  sig: { alg: 'bip322', pubkey: 'bc1q…', value: '' },
+};
+
+const id = pollId(draft);
+// ask wallet to BIP-322 sign `id`, then set draft.sig.value = <signature>
+```
+
+### example: tally
+
+```ts
+import { tally } from '@orangecheck/vote-core';
+
+const result = await tally({
+  poll,
+  ballots,
+  utxosAt: (addr, snapshotHeight) => myUtxoSource.fetch(addr, snapshotHeight),
+  skipSignatures: false,
+  verifyBip322: async (address, message, signatureB64) => {
+    const { Verifier } = await import('bip322-js');
+    return Verifier.verifySignature(address, message, signatureB64);
+  },
+});
+```
+
+The library is **pure**. Same inputs → byte-identical output across implementations. 28/28 tests pass against the canonical fixtures in [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors).
+
+## dispute resolution
+
+If the vote.ochk.io page tally disagrees with yours:
+
+```bash
+npx -y @orangecheck/vote-cli tally <poll_id>
+# or: git clone oc-vote-protocol && implement tally() yourself
+```
+
+Whoever matches the canonical fixtures + the spec is correct. The web page is a convenience over the same function any client can run.

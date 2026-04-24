@@ -6,6 +6,7 @@ import { OcSessionProvider } from '@orangecheck/auth-client';
 import { DocsLayout } from '@/components/docs/DocsLayout';
 import { LayoutFooter } from '@/components/layout/LayoutFooter';
 import { LayoutHeader } from '@/components/layout/LayoutHeader';
+import { LayoutSubHeader } from '@/components/layout/LayoutSubHeader';
 import { useMDXComponents } from '@/components/layout/MdxComponents';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 
@@ -23,6 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <OcSessionProvider>
                 <MDXProvider components={components}>
                     <LayoutHeader />
+                    <LayoutSubHeader />
                     <main className="min-h-[calc(100vh-3rem)] py-8">
                         <DocsLayout>
                             <Component {...pageProps} />

@@ -539,6 +539,18 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
+"@orangecheck/auth-client@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-0.1.0.tgz#88bbbac852f6a3856f1d8e3a5f5be7966253bcbe"
+  integrity sha512-PB59Lmd6WNSMk0tc5hdmwAOfNqUwmzuBl4+3i/3pT8iN+MRSCxxWwSLiMIOVKQtuWhSnbc2rFk+GZkfHxPXkjA==
+
+"@orangecheck/auth-core@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-0.1.0.tgz#758da64f299ed770b599d45d8dadd8ac54c6fc1b"
+  integrity sha512-+0IKcI1xP3anpNrEYo+92zhf0fp1iiNVetzEvfgDDg+vu2SRFyU9aN4FF5XgCBSPK/LJC4JaAZyWW0dIZ+lQXA==
+  dependencies:
+    jose "^6.2.2"
+
 "@radix-ui/primitive@1.1.3":
   version "1.1.3"
   resolved "https://registry.npmjs.org/@radix-ui/primitive/-/primitive-1.1.3.tgz#e2dbc13bdc5e4168f4334f75832d7bdd3e2de5ba"
@@ -2553,6 +2565,11 @@ jiti@^2.6.1:
   version "2.6.1"
   resolved "https://registry.npmjs.org/jiti/-/jiti-2.6.1.tgz#178ef2fc9a1a594248c20627cd820187a4d78d92"
   integrity sha512-ekilCSN1jwRvIbgeg/57YFh8qQDNbwDb9xT/qu2DAHbFFZUicIl4ygVaAvzveMhMVr3LnpSKTNnwt8PoOfmKhQ==
+
+jose@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.npmjs.org/jose/-/jose-6.2.2.tgz#d6b5279b89b3e88d531c202e3fbe351f39a44aac"
+  integrity sha512-d7kPDd34KO/YnzaDOlikGpOurfF0ByC2sEV4cANCtdqLlTfBlw2p14O/5d/zv40gJPbIQxfES3nSx1/oYNyuZQ==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"

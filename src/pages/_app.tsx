@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 
 import { MDXProvider } from '@mdx-js/react';
+import { OcSessionProvider } from '@orangecheck/auth-client';
 
 import { DocsLayout } from '@/components/docs/DocsLayout';
 import { LayoutFooter } from '@/components/layout/LayoutFooter';
@@ -19,15 +20,17 @@ export default function App({ Component, pageProps }: AppProps) {
             enableSystem={false}
             disableTransitionOnChange
         >
-            <MDXProvider components={components}>
-                <LayoutHeader />
-                <main className="min-h-[calc(100vh-3rem)] py-8">
-                    <DocsLayout>
-                        <Component {...pageProps} />
-                    </DocsLayout>
-                </main>
-                <LayoutFooter />
-            </MDXProvider>
+            <OcSessionProvider config={{ authOrigin: 'https://attest.ochk.io' }}>
+                <MDXProvider components={components}>
+                    <LayoutHeader />
+                    <main className="min-h-[calc(100vh-3rem)] py-8">
+                        <DocsLayout>
+                            <Component {...pageProps} />
+                        </DocsLayout>
+                    </main>
+                    <LayoutFooter />
+                </MDXProvider>
+            </OcSessionProvider>
         </ThemeProvider>
     );
 }

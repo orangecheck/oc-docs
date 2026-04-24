@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import { cn } from '@/lib/utils/utils';
 
+import { HeaderAccount } from '@/components/layout/HeaderAccount';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const PROTOCOLS = [
@@ -64,6 +65,7 @@ export function LayoutHeader() {
                     >
                         ochk.io ↗
                     </a>
+                    <HeaderAccount />
                     <ThemeToggle />
                 </div>
             </div>

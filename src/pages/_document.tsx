@@ -27,7 +27,7 @@ export default function Document() {
                 <meta name="theme-color" content="#f97316" />
                 <meta name="color-scheme" content="dark light" />
             </Head>
-            <body className="dark">
+            <body>
                 <Main />
                 <NextScript />
             </body>

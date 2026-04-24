@@ -1,0 +1,147 @@
+export const metadata = {
+    title: 'Sybil-filtered Nostr relay',
+    description:
+        'Drop the oc-strfry plugin into a Nostr relay to reject events from unvetted pubkeys.',
+};
+
+# Sybil-filtered Nostr relay
+
+Reject Nostr events from pubkeys that don't have an OrangeCheck proof meeting
+your thresholds. Ships as a Strfry write-policy plugin.
+
+## Install
+
+```bash
+yarn global add @orangecheck/relay-filter
+# `oc-strfry` is now on PATH
+```
+
+## Strfry setup
+
+[Strfry](https://github.com/hoytech/strfry) is the most widely-deployed relay
+implementation. Its write-policy plugin protocol is exactly what `oc-strfry`
+speaks.
+
+### Configure
+
+```conf
+# strfry.conf
+writePolicy = {
+  plugin = "/usr/local/bin/oc-strfry"
+}
+```
+
+### Pass options via environment
+
+In your Strfry unit file (systemd, docker-compose, or whatever):
+
+```ini
+[Service]
+Environment="OC_MIN_SATS=100000"
+Environment="OC_MIN_DAYS=30"
+Environment="OC_ALLOW_KINDS=0,3,10002"
+Environment="OC_ALLOW_PUBKEYS=abc123...,def456..."
+ExecStart=/usr/bin/strfry relay
+```
+
+### Full env var reference
+
+| Env var            | Default      | Purpose                                                 |
+| ------------------ | ------------ | ------------------------------------------------------- |
+| `OC_MIN_SATS`      | `0`          | Minimum bonded sats                                     |
+| `OC_MIN_DAYS`      | `0`          | Minimum days unspent                                    |
+| `OC_ALLOW_KINDS`   | `0,3,10002`  | Kinds that bypass (profile, contacts, relay list)       |
+| `OC_ALLOW_PUBKEYS` | _none_       | Comma-separated hex pubkeys that bypass (e.g. operator) |
+| `OC_RELAYS`        | SDK defaults | Discovery relays for lookups                            |
+| `OC_FAIL_OPEN`     | `false`      | `true` to allow on lookup failure                       |
+| `OC_CACHE_TTL_MS`  | `60000`      | In-process cache TTL                                    |
+| `OC_LOG`           | `true`       | Emit one decision per line on stderr                    |
+
+### Docker compose
+
+```yaml
+services:
+    strfry:
+        image: strfry/strfry:latest
+        volumes:
+            - ./strfry.conf:/etc/strfry.conf:ro
+            - strfry-db:/var/lib/strfry
+        environment:
+            - OC_MIN_SATS=100000
+            - OC_MIN_DAYS=30
+            - OC_ALLOW_KINDS=0,3,10002
+        command: ['/usr/bin/npx', '--yes', '@orangecheck/relay-filter']
+        ports:
+            - '7777:7777'
+```
+
+## Why bypass kinds 0, 3, 10002
+
+- **Kind 0** — profile metadata. Users need this to publish their npub before
+  they can create an OrangeCheck proof.
+- **Kind 3** — contact lists.
+- **Kind 10002** — relay list metadata.
+
+These are bootstrap events. Gating them creates a chicken-and-egg problem.
+Everything else (notes, reactions, DMs, zaps, OrangeCheck attestations
+themselves) goes through the gate.
+
+## Custom relay — nostr-tools
+
+If you run your own relay in JS:
+
+```ts
+import { filterEvent } from '@orangecheck/relay-filter';
+import { verifyEvent } from 'nostr-tools';
+
+async function handleEvent(socket: WebSocket, event: Event) {
+    if (!verifyEvent(event)) {
+        socket.send(
+            JSON.stringify(['OK', event.id, false, 'invalid signature'])
+        );
+        return;
+    }
+
+    const decision = await filterEvent(event, {
+        minSats: 100_000,
+        minDays: 30,
+        allowKinds: [0, 3, 10002],
+        allowPubkeys: [OPERATOR_PUBKEY],
+    });
+
+    if (decision.action === 'reject') {
+        socket.send(JSON.stringify(['OK', event.id, false, decision.message]));
+        return;
+    }
+
+    await store.put(event);
+    socket.send(JSON.stringify(['OK', event.id, true, '']));
+}
+```
+
+## Tuning
+
+- **Cache TTL** — default 60 s, matches `/api/check`. Increase to 5 minutes for
+  busy relays; the tradeoff is slightly stale bond state.
+- **Concurrency** — the filter runs serialised per inbound event. If events are
+  backing up, consider horizontal-scaling the relay rather than parallelising
+  the filter.
+- **Discovery relays** — `OC_RELAYS` overrides the Nostr relays the filter
+  queries to find a pubkey's attestation. Set this to include your own relay so
+  you see proofs published locally.
+
+## What clients see when rejected
+
+```
+['OK', '<event_id>', false, 'orangecheck: below threshold (min_sats=100000)']
+```
+
+Clients SHOULD display this message to the user. Good client UX tells the user
+"this relay requires X sats bonded — create an attestation at ochk.io/create".
+
+## Further
+
+- [`@orangecheck/relay-filter` reference](/sdks)
+- [Nostr NIP spec](https://github.com/orangecheck/oc-protocol)
+- [Security implications](/ecosystem/security) — threat model for publishers and
+  verifiers.

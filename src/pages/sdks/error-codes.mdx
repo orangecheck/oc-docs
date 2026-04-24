@@ -1,0 +1,129 @@
+export const metadata = {
+    title: 'Status & error codes',
+    description:
+        'Every reason string `/api/check`, `/api/verify`, and the SDKs can return — with what it means and what to tell the user.',
+};
+
+# Status & error codes
+
+Every verification path — hosted API, SDKs, CLI — returns results as a flat list
+of **status codes**. Success codes (`sig_ok_bip322`, `bond_confirmed`) sit
+alongside failure codes (`sig_invalid`, `expired`) in the same shape, so your
+gate can log one canonical stream instead of branching on `ok: true | false`.
+
+This page is the **single source of truth**. If you see a code that isn't here,
+it's a bug — open an issue.
+
+## The response shape
+
+All three surfaces return the same envelope:
+
+```json
+{
+    "ok": true,
+    "codes": ["sig_ok_bip322", "bond_confirmed"],
+    "address": "bc1q...",
+    "metrics": { "sats_bonded": 125000, "days_unspent": 47, "score": 30.12 }
+}
+```
+
+`ok: true` iff **every** signature code is a success AND thresholds are met.
+`codes[]` is the ordered list of everything the verifier observed — always
+present, even on success.
+
+## Signature codes
+
+| Code                     | Severity   | Meaning                                                                                   | What to tell the user                                                                                                                                                                              |
+| ------------------------ | ---------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sig_ok_bip322`          | ✅ success | BIP-322 signature valid against the declared address.                                     | —                                                                                                                                                                                                  |
+| `sig_ok_legacy`          | ✅ success | Legacy `signmessage` signature valid (P2PKH addresses only).                              | —                                                                                                                                                                                                  |
+| `sig_invalid`            | ❌ error   | Signature does not match message + address.                                               | "Check you copied the full canonical message. Check your wallet is on the right account — this is the #1 cause. For SegWit/Taproot addresses you need BIP-322; Electrum does not support BIP-322." |
+| `sig_unsupported_script` | ❌ error   | Wallet produced a legacy signature for a SegWit/Taproot address.                          | "Use a BIP-322-capable wallet (Sparrow, Bitcoin Core, UniSat, Xverse) or switch to a P2PKH address (`1…`)."                                                                                        |
+| `invalid_scheme`         | ❌ error   | `scheme` was neither `bip322` nor `legacy`.                                               | "Use a supported signing scheme."                                                                                                                                                                  |
+| `decode_error`           | ❌ error   | Canonical message could not be parsed — malformed header, wrong line endings, bad base64. | "Copy the full canonical message from Step 2 without modification. LF line endings only, one trailing newline."                                                                                    |
+| `invalid_attestation_id` | ❌ error   | `attestation_id` does not equal `sha256(message)`.                                        | "This attestation has been tampered with. Refuse it."                                                                                                                                              |
+
+## Bond / chain-state codes
+
+| Code                | Severity   | Meaning                                                                                 | What to tell the user                                                      |
+| ------------------- | ---------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `bond_confirmed`    | ✅ success | Confirmed UTXOs found at the address; `sats_bonded` and `days_unspent` are derivable.   | —                                                                          |
+| `bond_zero`         | ⚠ warn     | Address has no confirmed UTXOs. Signature is still valid — the bond just doesn't exist. | "Send sats to this address and wait for one confirmation before retrying." |
+| `bond_pending`      | ℹ info     | Address has only unconfirmed transactions.                                              | "Wait for the first confirmation (≈10 min)."                               |
+| `bond_insufficient` | ❌ error   | Declared `bond:` extension exceeds the confirmed balance.                               | "Lower your declared bond, or fund the address up to the declared amount." |
+
+## Policy / threshold codes (returned by `/api/check`)
+
+These are emitted **in addition to** the signature/bond codes above, when an
+`/api/check` call has threshold parameters (`min_sats`, `min_days`).
+
+| Code             | Severity | Meaning                    |
+| ---------------- | -------- | -------------------------- |
+| `below_min_sats` | ❌ error | `sats_bonded < min_sats`.  |
+| `below_min_days` | ❌ error | `days_unspent < min_days`. |
+
+When `/api/check` returns `ok: false`, these appear under a separate `reasons`
+key so your error handler can switch on the cause:
+
+```json
+{
+    "ok": false,
+    "sats": 50000,
+    "days": 12,
+    "reasons": ["below_min_sats", "below_min_days"]
+}
+```
+
+## Context codes
+
+| Code               | Severity | Meaning                                                                                                       | What to tell the user                                                                                  |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `aud_mismatch`     | ⚠ warn   | `audience` in the signed message doesn't match what the verifier expected.                                    | Usually means the signature was made for a different host — verify-intentional or refuse, your choice. |
+| `expired`          | ❌ error | `expires_at` has passed (relevant for signed-challenge auth, not attestations — attestations have no expiry). | "Your challenge has expired. Request a fresh one."                                                     |
+| `network_testmode` | ⚠ warn   | Signature is on testnet or signet.                                                                            | "Test networks can't be verified in production. Use mainnet."                                          |
+| `bad_request`      | ❌ error | Structural problem with the request body — missing fields, wrong types.                                       | "Check your request shape against the docs."                                                           |
+
+## Programmatic access
+
+The full table above is shipped as a typed record in the JS SDK:
+
+```ts
+import type { StatusCode } from '@orangecheck/sdk';
+
+import { STATUS_META } from '@orangecheck/sdk';
+
+const meta = STATUS_META['sig_invalid'];
+// → { label: 'Signature verification failed', detail: '...', severity: 'error' }
+```
+
+Use `STATUS_META[code].label` for short headlines and `.detail` for the verbose
+user-facing message. The `severity` field
+(`'success' | 'info' | 'warn' | 'error'`) lets your UI apply the right visual
+treatment without branching on string keys.
+
+The Python SDK exposes an equivalent `STATUS_META` dict.
+
+## HTTP status vs. status code
+
+The HTTP status says whether the request was processable; the `codes[]` field
+says what the verification actually found. Do not conflate them.
+
+| HTTP  | Meaning                                                                               |
+| ----- | ------------------------------------------------------------------------------------- |
+| `200` | Request was valid and the verifier ran. `ok` and `codes` tell you what happened.      |
+| `400` | Request shape was wrong — missing `addr`, malformed JSON, etc. `codes` may be absent. |
+| `401` | `/api/auth/*` rejected the session (e.g. `not_authenticated`).                        |
+| `403` | Cross-site POST to a browser-only endpoint.                                           |
+| `404` | `/api/check` subject lookup returned no attestation.                                  |
+| `429` | Rate limit hit. Retry after `Retry-After`.                                            |
+| `500` | Verifier crashed. Open an issue.                                                      |
+
+## Further
+
+- [`/api/check` reference](/attest/api) — the main consumer of these codes.
+- [`/api/verify` reference](/attest/api) — raw verification, returns the same
+  shape.
+- [Verification concept](/attest/verification) — the algorithm that produces
+  these codes.
+- [Security implications](/ecosystem/security) — what to do when specific codes
+  appear.

@@ -133,6 +133,16 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'Guide: sign in with Bitcoin',
                 blurb: 'Signed-challenge session auth end to end.',
             },
+            {
+                href: '/attest/guides/nostr-relay',
+                label: 'Guide: sybil-filter a Nostr relay',
+                blurb: 'Drop a Strfry plugin into your relay; reject events from unproofed npubs.',
+            },
+            {
+                href: '/attest/guides/self-hosting',
+                label: 'Guide: self-host the verifier',
+                blurb: 'Run the whole stack on your own Postgres + Vercel / Docker / VM.',
+            },
         ],
     },
     {
@@ -263,6 +273,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/sdks/wallet-adapter',
                 label: '@orangecheck/wallet-adapter',
                 blurb: 'Normalize UniSat / Xverse / Leather / Alby behind one sign API.',
+            },
+            {
+                href: '/sdks/error-codes',
+                label: 'Status & error codes',
+                blurb: 'Every reason string `/api/check` and the SDKs can return.',
             },
         ],
     },

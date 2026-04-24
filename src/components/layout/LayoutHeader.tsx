@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 
 import { cn } from '@/lib/utils/utils';
 
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+
 const PROTOCOLS = [
     { href: '/attest', label: 'Attest' },
     { href: '/lock', label: 'Lock' },
@@ -53,14 +55,17 @@ export function LayoutHeader() {
                     })}
                 </nav>
 
-                <a
-                    href="https://ochk.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground font-mono text-[11px] tracking-widest uppercase"
-                >
-                    ochk.io ↗
-                </a>
+                <div className="flex items-center gap-2">
+                    <a
+                        href="https://ochk.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground hidden font-mono text-[11px] tracking-widest uppercase sm:inline"
+                    >
+                        ochk.io ↗
+                    </a>
+                    <ThemeToggle />
+                </div>
             </div>
         </header>
     );

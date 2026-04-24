@@ -1,0 +1,114 @@
+export const metadata = {
+    title: 'BIP-322 signing',
+    description:
+        'Every OrangeCheck sibling signs the canonical message via BIP-322. Why not legacy signmessage. Which wallets support it.',
+};
+
+# BIP-322 signing
+
+Every OrangeCheck sibling signs the canonical message via
+[BIP-322](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki)
+("Generic Signed Message Format"). This page explains why that specific scheme,
+what wallets support it, and how to validate a signature in the two reference
+languages.
+
+## Why BIP-322 specifically
+
+The older scheme — Bitcoin Core's legacy `signmessage` RPC, circa 2012 — only
+works for P2PKH addresses (`1…` on mainnet, `m…`/`n…` on testnet). It doesn't
+handle SegWit (`bc1q…`), Taproot (`bc1p…`), or P2SH wrappers.
+
+BIP-322 fixes this: it specifies a signing scheme that works for every standard
+script type, including the ones you'll actually see in 2026 wallets. It does
+this by building a virtual "to-sign" transaction that spends a virtual
+"to-spend" transaction, and signing the to-sign with the key that controls the
+address.
+
+If BIP-322 hadn't existed, OrangeCheck would have had to invent something like
+it. Since it does exist and has real wallet support, we use it.
+
+## What the wallet signs
+
+The wallet signs the **byte-exact canonical message** (see
+[canonical message](/ecosystem/canonical-message)). The wallet does not sign a
+hash of the message, does not strip whitespace, does not trim trailing newlines
+— it signs the raw bytes you pass it.
+
+This is critical: any canonicalization or trimming the wallet does would cause
+the signature to validate against different bytes than the verifier uses when
+recomputing the attestation ID, and the whole chain breaks.
+
+## Wallet support matrix
+
+| Wallet                                        | Type              | BIP-322 support                                                   |
+| --------------------------------------------- | ----------------- | ----------------------------------------------------------------- |
+| [UniSat](https://unisat.io)                   | browser extension | ✅ all address types                                              |
+| [Xverse](https://xverse.app)                  | browser + mobile  | ✅ all address types                                              |
+| [Leather](https://leather.io)                 | browser           | ✅ all address types                                              |
+| [Alby](https://getalby.com)                   | browser           | ✅ all address types                                              |
+| [Sparrow](https://sparrowwallet.com)          | desktop           | ✅ via "Sign message" (right-click an address)                    |
+| [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | ⚠ BIP-322 for P2WPKH / P2TR via `signmessage` — version-dependent |
+| [Electrum](https://electrum.org)              | desktop           | ❌ legacy scheme only (no BIP-322 for SegWit)                     |
+| Hardware wallets (Coldcard / Trezor / Ledger) | HW                | ⚠ via PSBT flow — not a one-click signing experience              |
+
+If your wallet isn't on the list, the canonical test is: does signing a message
+produce an output that [`bip322-js`](https://www.npmjs.com/package/bip322-js)
+accepts? If yes, it works.
+
+## Error: `sig_unsupported_script`
+
+A common failure mode: the wallet produces a _legacy_ signature for a SegWit or
+Taproot address. Legacy signatures only validate for P2PKH, so the verifier
+correctly refuses them.
+
+Fix: use a BIP-322-capable wallet (see above), or switch to a P2PKH address
+(`1…` on mainnet) if your wallet only supports the legacy scheme.
+
+## Verifying a BIP-322 signature
+
+### TypeScript
+
+```ts
+import { Verifier } from 'bip322-js';
+
+const valid = Verifier.verifySignature(
+    address, // bc1q... or bc1p... or 1...
+    canonicalMsg, // exact bytes the wallet signed
+    signatureBase64
+);
+```
+
+`bip322-js` wraps the audited `bitcoinjs-lib` signature check. It's what
+`@orangecheck/sdk` uses internally.
+
+### Python
+
+```python
+from orangecheck import verify_bip322_signature
+
+valid = verify_bip322_signature(address, canonical_msg, signature_base64)
+```
+
+The Python SDK bridges the Rust-backed
+[`bip322`](https://pypi.org/project/bip322/) package, which in turn wraps
+`bitcoin` + `secp256k1` — the same audited crates the Rust Bitcoin ecosystem
+runs on. Install the verification path with:
+
+```bash
+pip install 'orangecheck[verify]'
+```
+
+## Signatures are base64, not hex
+
+Every reference SDK accepts **base64-encoded** BIP-322 "simple" signatures. Some
+wallets hand you hex by default; convert to base64 before passing it to the
+verifier. The TypeScript SDK auto-detects hex and converts; the Python SDK is
+strict.
+
+## See also
+
+- [Canonical message](/ecosystem/canonical-message) — what the wallet signs
+- [OC Attest — verification](/attest/verification) — the full verification
+  algorithm
+- [`@orangecheck/wallet-adapter`](/sdks/wallet-adapter) — one `sign(message)`
+  API across UniSat / Xverse / Leather / Alby

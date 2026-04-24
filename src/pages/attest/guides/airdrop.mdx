@@ -1,0 +1,126 @@
+export const metadata = {
+    title: 'Guide: filter an airdrop',
+    description:
+        'Turn a candidate list into a sybil-resistant allowlist using OC Attest. Bulk-check via the CLI or the SDK.',
+};
+
+# Filter an airdrop
+
+Airdrops attract sybil farms at industrial scale. OC Attest lets you filter
+candidate addresses down to those with non-trivial bonded stake, raising the
+per-sybil cost from free to real Bitcoin.
+
+## The pattern
+
+1. You start with a candidate list — addresses that completed some action (held
+   an NFT, joined a Discord, signed a petition).
+2. Before distributing, filter the list by requiring each candidate to have an
+   OC Attest proof that meets your threshold.
+3. Only addresses that pass get on the final allowlist.
+
+## Install
+
+```bash
+npm i -g @orangecheck/airdrop-gate
+```
+
+## CLI mode
+
+```bash
+oc-airdrop filter \
+    --input candidates.txt \
+    --min-sats 100000 \
+    --min-days 90 \
+    --output allowlist.txt
+```
+
+`candidates.txt` is one Bitcoin address per line. The tool queries every address
+against the hosted verifier (with automatic retry + caching) and writes out the
+subset that passed.
+
+```bash
+oc-airdrop filter \
+    --input candidates.txt \
+    --min-sats 100000 \
+    --min-days 90 \
+    --format json \
+    > allowlist.json
+```
+
+`--format json` emits the full per-candidate result so you can keep a record of
+each threshold check.
+
+## Programmatic mode
+
+```ts
+import { filterCandidates } from '@orangecheck/airdrop-gate';
+
+const candidates = ['bc1qalice...', 'bc1qbob...', 'bc1qcarol...'];
+
+const result = await filterCandidates({
+    addresses: candidates,
+    minSats: 100_000,
+    minDays: 90,
+    concurrency: 8,
+});
+
+console.log(result.passed); // array of addresses that met threshold
+console.log(result.failed); // array of { address, reasons } for rejects
+```
+
+`concurrency` tunes parallel request count. Default 4; raise it if you control
+the verifier, keep it modest on the hosted API.
+
+## Choosing thresholds
+
+The math on sybil cost:
+
+- An attacker with `N × min_sats` bitcoin can spin up `N` passing sybils (one
+  per address).
+- They pay **opportunity cost** equal to the Bitcoin HODL return forgone during
+  `min_days`.
+
+Concrete rules of thumb:
+
+| Airdrop value per claim  | Suggested min_sats | Suggested min_days |
+| ------------------------ | ------------------ | ------------------ |
+| $5 ("welcome nudge")     | 10k                | 30                 |
+| $50 ("community reward") | 100k               | 60                 |
+| $500 ("meaningful")      | 1M                 | 90                 |
+| $5,000+ ("significant")  | 10M                | 180                |
+
+These are **not** the answer. They're starting points. Pair them with other
+signals (OC Stamp for commit history, BrightID for humanness, your own activity
+metrics) for anything above the "welcome nudge" tier.
+
+## Pitfalls
+
+### Sybil wealth at scale
+
+A single whale with 100M sats can produce 100 sybils at `min_sats = 1_000_000`.
+OC Attest raises the cost; it does not eliminate it. For one-person-one-claim
+guarantees you need an independent personhood signal on top (World ID,
+BrightID). See [Security — sybil at the economic floor](/ecosystem/security).
+
+### Rate limits
+
+The hosted API allows 60 req/min per IP. For lists larger than a few thousand
+addresses, either:
+
+- Self-host the verifier (no rate limit).
+- Run the CLI with `--concurrency 8` and a long timeline.
+- Contact us for a higher-tier hosted key.
+
+### Front-running
+
+If your airdrop is known and claims are open-ended, sybils can race. Make claims
+**address-specific** (the claimant proves they control each address on the
+allowlist via BIP-322) rather than open to anyone with knowledge of the list.
+
+## See also
+
+- [**OC Attest scoring**](/attest/scoring) — raw metrics, not the `score_v0`
+  number
+- [**`@orangecheck/airdrop-gate`**](/sdks) — full package reference
+- [**Security — sybil at the economic floor**](/ecosystem/security#threats-to-the-verifier)
+  — choosing thresholds against attacker payoff

@@ -1,0 +1,180 @@
+export const metadata = {
+    title: '@orangecheck/gate',
+    description:
+        'Drop-in sybil-gate middleware for Express, Next.js, Fastify, Hono, and Cloudflare Workers.',
+};
+
+# `@orangecheck/gate`
+
+Drop-in sybil-gate middleware for HTTP frameworks. Wraps `@orangecheck/sdk`'s
+`check()` in adapters for the five most common Node / edge runtimes.
+
+## Install
+
+```bash
+npm i @orangecheck/gate
+```
+
+## Express / Connect
+
+```ts
+import { ocGate } from '@orangecheck/gate';
+import express from 'express';
+
+const app = express();
+
+app.post(
+    '/post',
+    ocGate({
+        minSats: 100_000,
+        minDays: 30,
+        address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+    }),
+    (_req, res) => res.json({ ok: true })
+);
+```
+
+## Next.js — Pages Router
+
+```ts
+import { ocGateNextPages } from '@orangecheck/gate';
+
+export default ocGateNextPages(
+    {
+        minSats: 100_000,
+        address: {
+            from: (req) => (req.headers['x-bitcoin-address'] as string) ?? '',
+        },
+    },
+    async (req, res) => {
+        res.json({ ok: true });
+    }
+);
+```
+
+## Next.js — App Router
+
+```ts
+import { ocGateNextApp } from '@orangecheck/gate';
+
+export const POST = ocGateNextApp(
+    {
+        minSats: 100_000,
+        address: { from: (req) => req.headers.get('x-bitcoin-address') ?? '' },
+    },
+    async (req) => {
+        return Response.json({ ok: true });
+    }
+);
+```
+
+## Fastify
+
+```ts
+import { ocGateFastify } from '@orangecheck/gate';
+import Fastify from 'fastify';
+
+const app = Fastify();
+
+app.addHook(
+    'preHandler',
+    ocGateFastify({
+        minSats: 100_000,
+        address: {
+            from: (req) => (req.headers['x-bitcoin-address'] as string) ?? '',
+        },
+    })
+);
+
+app.post('/post', async () => ({ ok: true }));
+```
+
+## Hono / Cloudflare Workers / Bun
+
+```ts
+import { ocGateHono } from '@orangecheck/gate';
+import { Hono } from 'hono';
+
+const app = new Hono();
+
+app.post(
+    '/post',
+    ocGateHono({
+        minSats: 100_000,
+        address: { from: (c) => c.req.header('x-bitcoin-address') ?? '' },
+    }),
+    (c) => c.json({ ok: true })
+);
+```
+
+## Options
+
+```ts
+interface OcGateOptions {
+    // Threshold policy — match your use case
+    minSats?: number;
+    minDays?: number;
+
+    // Where to find the address (required)
+    address: { from: (req) => string };
+
+    // Custom behavior on block (default: 403 with JSON)
+    onBlocked?: (req, res, result) => void;
+
+    // Cache check results in-process (default: 60_000 ms)
+    cacheTtl?: number;
+
+    // Override the verifier endpoint (default: hosted at ochk.io)
+    apiBase?: string;
+
+    // Or skip the HTTP hop entirely — use the local SDK
+    useLocal?: boolean;
+}
+```
+
+## What it does
+
+On every request:
+
+1. Extracts the address via `address.from(req)`.
+2. Calls `/api/check?addr=...&min_sats=...&min_days=...` (or the local SDK if
+   `useLocal: true`).
+3. Caches results for `cacheTtl` (default 60 s) — rapid retries don't hit
+   upstream.
+4. On pass: `next()` / calls the handler.
+5. On fail: 403 with JSON body, or your `onBlocked` callback.
+
+## Trust model
+
+The gate trusts that the address came from a trusted source. If
+`address.from(req)` pulls from an unauthenticated header, the caller can lie
+about which address they control. For that, pair the gate with
+[Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) so the address comes
+from a signed session cookie.
+
+## Self-hosted verifier
+
+```ts
+ocGate({
+    minSats: 100_000,
+    address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+    apiBase: 'https://attest.internal.example',
+});
+```
+
+Or use the local SDK — no HTTP hop, no network dependency:
+
+```ts
+ocGate({
+    minSats: 100_000,
+    address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+    useLocal: true,
+});
+```
+
+## See also
+
+- [**Guide: gate an Express route**](/attest/guides/express) — step-by-step
+  walkthrough
+- [**`@orangecheck/sdk`**](/sdks/javascript) — the underlying `check()` call
+- [**OC Attest — HTTP API**](/attest/api) — what the hosted endpoint returns

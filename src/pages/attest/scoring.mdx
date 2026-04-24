@@ -1,0 +1,113 @@
+export const metadata = {
+    title: 'OC Attest — scoring',
+    description:
+        'sats_bonded, days_unspent, score_v0. Advisory only. Raw metrics are the authoritative signal.',
+};
+
+# Scoring
+
+OC Attest returns three metrics with every verification. They come from live
+chain state — the signer doesn't control them at signing time.
+
+## The three metrics
+
+| Metric         | Meaning                       | How it's derived                                                                                                                                                    |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sats_bonded`  | Integer satoshis              | Sum of confirmed, unspent UTXO values at the address — or, if the `bond:` extension is present in the signed message, exactly that declared value (surplus ignored) |
+| `days_unspent` | Integer days                  | Days since the earliest confirmation time among the bonded UTXOs                                                                                                    |
+| `score`        | Reference `score_v0` (number) | Formula below; advisory only                                                                                                                                        |
+
+These are recomputed from live chain state on every verify call. The signed
+canonical message does NOT carry these values authoritatively — if it did, a
+signer could lie.
+
+## `score_v0` — the reference algorithm
+
+```
+score_v0 = round(ln(1 + sats_bonded) * (1 + days_unspent / 30) * 100) / 100
+```
+
+Two examples:
+
+| sats_bonded | days_unspent | score_v0 |
+| ----------- | ------------ | -------- |
+| 125,000     | 47           | 30.12    |
+| 50,000      | 12           | 15.15    |
+| 100,000     | 90           | 46.05    |
+
+`score_v0` is the **only** scoring algorithm the protocol registers. It's a
+coarse, protocol-registered default that's useful for UI badges and
+cross-service comparability. It is NOT the right answer for gating.
+
+## Why score is advisory
+
+The score collapses two independent signals (capital committed, time committed)
+into one number with a specific opinion about how to weight them. That opinion
+is fine for a "platinum / gold / silver" badge; it's wrong for gating decisions
+that actually depend on capital vs. time differently.
+
+**Gate on raw metrics instead.** Your policy layer knows what you need:
+
+```ts
+// For a forum: any commitment at all.
+const ok = sats_bonded >= 10_000 && days_unspent >= 30;
+
+// For an airdrop: serious capital.
+const ok = sats_bonded >= 1_000_000 && days_unspent >= 90;
+
+// For a governance vote: weight by time-weighted capital.
+const weight = sats_bonded * Math.min(days_unspent, 365);
+```
+
+`score_v0` is returned in every response so UIs can render "43" without
+reimplementing the formula. Gates should ignore it.
+
+## Tier labels (UI convenience)
+
+The reference SDKs expose a `computeTier()` helper that returns a coarse-grained
+label for visual display:
+
+| Tier       | Minimum sats | Minimum days |
+| ---------- | ------------ | ------------ |
+| `platinum` | 10,000,000   | 365          |
+| `gold`     | 1,000,000    | 180          |
+| `silver`   | 100,000      | 90           |
+| `bronze`   | 10,000       | 30           |
+| `none`     | otherwise    |              |
+
+Tier thresholds are **a suggestion, not protocol**. A platform's "Gold" doesn't
+necessarily mean another platform's. Don't gate governance weight on tier
+labels.
+
+## Edge cases
+
+- **`sats_bonded == 0`** → status code `bond_zero`. The signature is still valid
+  cryptographically; the chain state just shows no bond right now. Default
+  verifier behavior returns `ok: true` with `bond_zero` in the codes — policy
+  layers decide what zero bond means.
+- **Unconfirmed deposits** → `bond_pending`. Unconfirmed UTXOs never count
+  toward `sats_bonded`.
+- **Spent UTXOs** → not counted. When the signer spends, the proof's
+  `sats_bonded` drops on the next verify.
+- **Missing `bond:` on a large wallet** → confirmed balance is used. Signers
+  holding more than they want to "bond" should use the `bond:` extension to pin
+  intent.
+- **Multiple UTXOs, one old and one new** → `days_unspent` is computed from the
+  oldest-first greedy selection against the declared bond (or over the full
+  confirmed set if no bond is declared).
+
+## Your own algorithm
+
+If your use case needs a custom score — e.g., time-weighted capital with a
+logarithmic cap — compute it from the raw metrics. Do NOT try to "register" it
+as a new protocol score. The protocol deliberately ships one reference algorithm
+and lets every RP pick their own policy.
+
+## See also
+
+- [**Verification**](/attest/verification) — the full algorithm that produces
+  these metrics
+- [**HTTP API** — `/api/check`](/attest/api) — where to pass thresholds and get
+  metrics back
+- [**Security — sybil at the economic floor**](/ecosystem/security#threats-to-the-verifier)
+  — choosing thresholds

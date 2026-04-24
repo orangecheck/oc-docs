@@ -1,0 +1,157 @@
+export const metadata = {
+    title: 'OC Stamp — use cases',
+    description:
+        'Concrete patterns for OC Stamp — release signing, long-form provenance, legal self-notarization, DAO proposals, sybil-gated content.',
+};
+
+# Use cases
+
+## Release / commit signing
+
+Give every tagged release a Stamp envelope committed to the release artifact.
+Anyone downloading later can verify both authorship (signer's Bitcoin address)
+and priority (Bitcoin block at time of release).
+
+```bash
+# Pseudocode for a git-stamp plugin
+tar czf release.tar.gz ./dist/
+oc-stamp sign --content release.tar.gz --signer bc1qalice... > release.stamp
+oc-stamp anchor release.stamp > release.stamp.anchored
+git tag v1.2.3 -m "v1.2.3 release"
+```
+
+Distribute `release.tar.gz`, `release.stamp.anchored`, and the git tag together.
+Downstream consumers:
+
+```bash
+oc-stamp verify --content release.tar.gz --envelope release.stamp.anchored
+# ✓ signed by bc1qalice… at 2026-04-24T06:47Z
+# ✓ anchored in Bitcoin block 820472 (depth 6+)
+# ✓ content hash matches
+```
+
+Better than PGP keysigning because there's no keyserver rot — the Bitcoin
+address is the canonical identifier, checkable forever.
+
+## Long-form publishing
+
+Writer publishes an article at time T. Wants later-provable "I wrote this before
+X happened" without relying on a centralized blog platform or social-media
+timestamp.
+
+```ts
+const article = await fs.readFile('./post.md');
+const env = await stamp({
+    content: article,
+    mime: 'text/markdown',
+    signer: { address: writerAddress, signMessage: walletSign },
+});
+env.ots = await submitToCalendars(env.id);
+// Later:
+env.ots = await upgradeProof(env.ots, env.id);
+await fs.writeFile('./post.stamp', JSON.stringify(env));
+```
+
+Publish the article wherever (RSS, IPFS, Substack, personal blog). The `.stamp`
+file is a separate self-contained proof that anyone can check against the
+content. No reliance on the hosting platform.
+
+## Legal self-notarization
+
+An agreement between two parties. Both sign the same content. Both stamps anchor
+to Bitcoin within the same window. No notary, no centralized service.
+
+```ts
+// Alice signs
+const aliceStamp = await stamp({
+    content: agreementBytes,
+    mime: 'application/pdf',
+    signer: { address: aliceAddr, signMessage: aliceWallet.sign },
+});
+
+// Bob signs the same content
+const bobStamp = await stamp({
+    content: agreementBytes,
+    mime: 'application/pdf',
+    signer: { address: bobAddr, signMessage: bobWallet.sign },
+});
+
+// Both anchor
+aliceStamp.ots = await submitToCalendars(aliceStamp.id);
+bobStamp.ots = await submitToCalendars(bobStamp.id);
+
+// Store: agreement.pdf + alice.stamp + bob.stamp
+```
+
+A third party verifying both stamps knows:
+
+- Both addresses signed the same content (content hashes match).
+- Both signings predate the anchor block.
+- Neither party can later deny their signature (it's cryptographic).
+
+If jurisdictional enforcement matters, this is the _proof layer_ — you still
+need a legal framework that accepts cryptographic evidence.
+
+## DAO proposal authorship
+
+DAO proposals are often submitted via a wallet that's not the proposer's actual
+identity (e.g., a multisig, a delegate wallet). Stamp separates
+proposer-identity from submitter-identity:
+
+```ts
+// Proposer signs the proposal content
+const proposalStamp = await stamp({
+    content: proposalBytes,
+    mime: 'text/markdown',
+    signer: { address: proposerAddr, signMessage: proposerWallet.sign },
+    attest_ref: proposerAttestationId, // for "stake at signing"
+});
+
+// Then whoever has submit rights posts the proposal + the stamp on-chain
+```
+
+Voters verifying the proposal see both the on-chain submitter AND the
+cryptographic authorship chain back to the proposer's Bitcoin address.
+
+## Sybil-gated content feeds
+
+Embed an OC Attest reference in every Stamp envelope. Feed aggregators can then
+filter posts by signer stake:
+
+```ts
+const post = await stamp({
+    content: postBytes,
+    mime: 'text/markdown',
+    signer: { address: authorAddr, signMessage: authorWallet.sign },
+    attest_ref: authorAttestationId,
+});
+
+// Aggregator:
+for (const incoming of feed) {
+    const env = JSON.parse(incoming.content);
+    if (!env.attest_ref) continue;
+    const check = await fetch(
+        `/api/check?id=${env.attest_ref}&min_sats=100000&min_days=30`
+    ).then((r) => r.json());
+    if (check.ok) showPost(env, postBytes);
+}
+```
+
+Low-stake posts filter out at the firehose level; high-stake posts get shown.
+Combines the authorship + timestamp guarantees of Stamp with the
+sybil-resistance of Attest.
+
+## When Stamp is NOT the right tool
+
+- **You need privacy.** Stamp envelopes are public, anchored to a public chain.
+  Use authenticated encryption (OC Lock) instead.
+- **You need continuous signing** (streaming logs, per-keystroke provenance).
+  Stamp is one-envelope-per-event; wrong granularity.
+- **You need proof-of-delivery.** Stamp proves "this was signed before X"; it
+  doesn't prove "this was seen by Y." Separate concerns.
+
+## See also
+
+- [**How it works**](/stamp/how-it-works) — the sign + anchor flow
+- [**OpenTimestamps anchor**](/stamp/ots-anchor) — the anchor step in detail
+- [**OC Attest reference**](/attest) — the `attest_ref` field

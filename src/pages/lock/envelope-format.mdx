@@ -1,0 +1,114 @@
+export const metadata = {
+    title: 'OC Lock — envelope format',
+    description:
+        'The JSON shape of an OC Lock envelope, its canonicalization rule, and the fields every recipient must validate.',
+};
+
+# Envelope format
+
+OC Lock envelopes are JSON. They canonicalize via
+[RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) (JSON Canonicalization
+Scheme) with one spec-specific rule: the `recipients[]` array is sorted by
+`device_id` lexicographically.
+
+## Shape
+
+```json
+{
+    "id": "<32-byte envelope id, base64url>",
+    "version": "oc-lock/v0",
+    "sender": {
+        "address": "bc1qalice...",
+        "scheme": "bip322"
+    },
+    "ephemeral_pk": "<32-byte X25519 public key, base64url>",
+    "recipients": [
+        {
+            "address": "bc1qbob...",
+            "device_id": "<16 bytes, hex>",
+            "wrapped_key": "<AES-GCM(sym_key, nonce, ...), base64url>"
+        },
+        {
+            "address": "bc1qcarol...",
+            "device_id": "<16 bytes, hex>",
+            "wrapped_key": "<...>"
+        }
+    ],
+    "ciphertext": "<AES-GCM ciphertext + auth tag, base64url>",
+    "nonce": "<12-byte AES-GCM nonce, base64url>",
+    "aad_hash": "<sha256 of any associated-data string, hex>",
+    "issued_at": "2026-04-24T06:47:29.977Z",
+    "sig": "<BIP-322 base64 signature over the canonicalized envelope>"
+}
+```
+
+## Canonicalization
+
+The `sig` field is BIP-322 over the RFC-8785 canonical bytes of the envelope
+**with `sig` emptied** (set to `""`). Canonicalization:
+
+1. Strip the `sig` field (treat as `""`).
+2. Sort `recipients[]` by `device_id` lexicographically.
+3. Apply RFC-8785 to the resulting object.
+4. SHA-256 the bytes; that's the envelope `id`.
+5. BIP-322-sign the canonical bytes with the sender's Bitcoin address.
+
+Re-insert the signature before serializing for transport.
+
+## Field semantics
+
+| Field            | Why                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | Content-addressed identifier. Used as the AEAD nonce salt and the HKDF info string's seed.                                |
+| `version`        | `oc-lock/v0` — any change in field order or canonicalization rule requires a new version literal.                         |
+| `sender.address` | The Bitcoin address that signed the envelope via BIP-322.                                                                 |
+| `sender.scheme`  | `bip322` or `legacy` — only `bip322` is accepted in v0.                                                                   |
+| `ephemeral_pk`   | 32-byte X25519 public key, freshly generated for this envelope. The private key is discarded after sealing.               |
+| `recipients[]`   | Each recipient gets a `wrapped_key` — the symmetric AES key encrypted to their device. Sorted by `device_id`.             |
+| `ciphertext`     | AES-256-GCM over the plaintext with associated-data `id` and the per-envelope nonce.                                      |
+| `nonce`          | 12-byte AES-GCM nonce. Fresh per envelope.                                                                                |
+| `aad_hash`       | SHA-256 of any plaintext "associated data" a sender wants to commit to (e.g., a subject line). Optional; empty if unused. |
+| `issued_at`      | ISO 8601 millisecond timestamp. Used for replay-window checks.                                                            |
+| `sig`            | BIP-322 signature binding the envelope to the sender's Bitcoin address.                                                   |
+
+## Validation checklist
+
+A recipient validating an envelope MUST:
+
+1. Check `version === "oc-lock/v0"`. Reject other versions.
+2. Canonicalize the envelope (strip `sig`, sort recipients, RFC-8785).
+3. Verify `id === base64url(sha256(canonical_bytes))`.
+4. Verify the BIP-322 signature over the canonical bytes against
+   `sender.address`.
+5. Find the recipient entry whose `device_id` matches the local device.
+6. Recompute the HKDF symmetric key from `X25519(local_device_sk, ephemeral_pk)`
+   and `id`.
+7. Decrypt `wrapped_key` with AES-GCM to recover the envelope's symmetric key.
+8. Decrypt `ciphertext` with the envelope's symmetric key, `nonce`, and AAD
+   `id`.
+
+Skipping any step breaks the security model.
+
+## AAD and subject lines
+
+The `aad_hash` field commits to associated data that the sender wants bound to
+the ciphertext. Example: a subject line that shows in an inbox UI. The sender
+passes the plaintext subject alongside the ciphertext; the recipient recomputes
+its SHA-256 and checks against `aad_hash`. If the subject has been tampered
+with, decryption fails with a GCM auth-tag mismatch.
+
+## Canonical-bytes test vectors
+
+`oc-lock-protocol/conformance/` ships fixtures for the canonicalization rule —
+given a JSON object, what are the canonical bytes? The reference impl in
+`@orangecheck/lock-core` passes those vectors on every CI push. See
+[conformance vectors](/ecosystem/conformance).
+
+## See also
+
+- [**How it works**](/lock/how-it-works) — the four-step flow that produces this
+  envelope
+- [**Device keys**](/lock/device-keys) — the X25519 keys the
+  `recipients[].device_pk` points at
+- [**Canonical message format**](/ecosystem/canonical-message) — the line-format
+  cousin used by other OrangeCheck protocols

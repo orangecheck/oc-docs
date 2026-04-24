@@ -1,0 +1,191 @@
+export const metadata = {
+    title: 'orangecheck (Python SDK)',
+    description:
+        'Python SDK for the OrangeCheck ecosystem. Same surface as TypeScript, same conformance vectors.',
+};
+
+# `orangecheck` (Python)
+
+The Python twin of `@orangecheck/sdk`. Same canonical messages, same attestation
+IDs, same conformance vectors. A message built in TypeScript and a message built
+in Python for the same inputs are byte-identical.
+
+## Install
+
+```bash
+pip install orangecheck
+# with local BIP-322 verification (Rust-backed via the bip322 extra):
+pip install 'orangecheck[verify]'
+```
+
+Python 3.10+. Runs on Linux, macOS, Windows.
+
+## Core exports
+
+```python
+from orangecheck import (
+    # High-level
+    check,
+    verify,
+
+    # Canonical message primitives
+    build_canonical_message,
+    attestation_id,
+    format_identities,
+    parse_identities,
+    score_v0,
+
+    # Challenge flow
+    challenge_issue,
+    challenge_verify,
+
+    # Types
+    IdentityBinding,
+    VerifyOutcome,
+    StatusCode,
+)
+
+# Optional — available when installed with 'orangecheck[verify]'
+from orangecheck import verify_bip322_signature
+```
+
+## `check()`
+
+```python
+result = await check(
+    addr='bc1q...',
+    min_sats=100_000,
+    min_days=30,
+)
+
+if result.ok:
+    print(result.sats, result.days, result.score)
+```
+
+Accepts `addr`, `id`, or `identity={...}` — one of the three. Applies
+thresholds. Same return shape as the hosted `/api/check`.
+
+## `verify()`
+
+```python
+outcome = await verify(
+    addr='bc1q...',
+    msg=canonical_message,
+    sig=signature_base64,
+    scheme='bip322',
+    test_mode=False,
+)
+
+if outcome.ok:
+    print(outcome.metrics.sats_bonded, outcome.metrics.days_unspent)
+```
+
+With the `[verify]` extra installed, the BIP-322 check is fully local (via the
+Rust-backed `bip322` package, which wraps the audited `bitcoin`
+
+- `secp256k1` crates). Without it, verification falls back to the hosted API.
+
+## Canonical message
+
+```python
+msg = build_canonical_message(
+    address='bc1qalice...',
+    identities=[
+        IdentityBinding(protocol='github', identifier='alice'),
+        IdentityBinding(protocol='nostr', identifier='npub1alice...'),
+    ],
+    extensions={},
+    nonce='a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5',
+    issued_at='2026-04-24T06:47:29.977Z',
+)
+
+aid = attestation_id(msg)
+```
+
+Byte-identical to the TypeScript SDK's `buildCanonicalMessage()`. Same sort
+order, same line endings, same hash.
+
+## Scoring
+
+```python
+score = score_v0(sats_bonded=125_000, days_unspent=47)
+# → 30.12
+```
+
+Reference score only; raw metrics are the authoritative signal.
+
+## Framework integration
+
+### Django
+
+```python
+from django.http import JsonResponse
+from orangecheck import check
+
+async def gated_view(request):
+    addr = request.session.get('verified_address', '')
+    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    if not r.ok:
+        return JsonResponse({'error': 'gated', 'reasons': r.reasons}, status=403)
+    # proceed
+    return JsonResponse({'ok': True})
+```
+
+### FastAPI
+
+```python
+from fastapi import Depends, HTTPException
+from orangecheck import check
+
+async def require_stake(addr: str):
+    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    if not r.ok:
+        raise HTTPException(status_code=403, detail=r.reasons)
+    return addr
+
+@app.post('/post')
+async def post(addr: str = Depends(require_stake)):
+    return {'ok': True}
+```
+
+### Flask
+
+```python
+from flask import request, jsonify
+from orangecheck import check
+
+@app.post('/post')
+async def post():
+    addr = request.headers.get('X-Bitcoin-Address', '')
+    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    if not r.ok:
+        return jsonify(error='gated', reasons=r.reasons), 403
+    return jsonify(ok=True)
+```
+
+## Conformance
+
+The package ships a pytest suite that loads the canonical fixtures from
+`oc-protocol/conformance/vectors/` (vendored) and asserts byte-identical output
+to the TypeScript SDK. CI fails on drift.
+
+## Naming conventions
+
+Python uses `snake_case` where TypeScript uses `camelCase`:
+
+| TypeScript                          | Python                                |
+| ----------------------------------- | ------------------------------------- |
+| `minSats`, `minDays`                | `min_sats`, `min_days`                |
+| `attestationId`                     | `attestation_id`                      |
+| `issueChallenge`, `verifyChallenge` | `challenge_issue`, `challenge_verify` |
+| `buildCanonicalMessage`             | `build_canonical_message`             |
+
+Each follows its language's idioms. The underlying behavior is identical.
+
+## See also
+
+- [**`@orangecheck/sdk`**](/sdks/javascript) — the TypeScript twin
+- [**Canonical message format**](/ecosystem/canonical-message)
+- [**BIP-322 signing**](/ecosystem/bip322) — how the `[verify]` extra wires into
+  the Rust crate
+- [**Conformance vectors**](/ecosystem/conformance)

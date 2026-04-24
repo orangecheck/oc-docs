@@ -1,0 +1,93 @@
+export const metadata = {
+    title: 'Conformance vectors',
+    description:
+        'Cross-implementation test suites that prove reference SDKs produce byte-identical output. CI-enforced.',
+};
+
+# Conformance vectors
+
+Every sibling protocol ships **normative test vectors** in its `oc-*-protocol`
+repo. The reference implementations (TypeScript + Python) vendor those vectors
+into their test suites and run them on every CI push. Any drift between the spec
+and the implementations is a CI failure.
+
+This page describes the pattern. Per-protocol vector details live in the
+protocol's own repo.
+
+## Why conformance vectors
+
+The attestation ID is a content hash of the canonical message. Two
+implementations that agree on the inputs but disagree on the canonical bytes
+produce different IDs — which breaks Nostr discovery, verifier trust, and every
+downstream protocol that references an attestation.
+
+Conformance vectors pin the bytes. Each vector is a triple
+`(inputs, expected_bytes, expected_id)`. A passing run proves the implementation
+produces the same bytes and the same hash as the spec.
+
+## Vector set per protocol
+
+| Protocol  | Spec repo path                                                                                             | # vectors          | Location in impl                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------- |
+| OC Attest | [`oc-protocol/conformance/vectors/`](https://github.com/orangecheck/oc-protocol/tree/main/conformance)     | 23 (`tv01`–`tv23`) | `sdk/src/__tests__/vectors/`, `sdk-py/tests/vectors/` |
+| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors) | 5 (`v01`–`v05`)    | `vote-core/src/__tests__/vectors/`                    |
+| OC Lock   | `oc-lock-protocol/conformance/`                                                                            | —                  | `lock-core/src/__tests__/`                            |
+| OC Stamp  | `oc-stamp-protocol/conformance/`                                                                           | —                  | `stamp-core/src/__tests__/`                           |
+
+## Vector categories (OC Attest example)
+
+The 23 OC Attest vectors are organized by test category:
+
+| Category            | Count | What they pin                                                 |
+| ------------------- | ----- | ------------------------------------------------------------- |
+| `canonical_message` | 9     | Byte-exact canonical-message output for a given input set     |
+| `identities_format` | 1     | Identity-list sort order and escape rules                     |
+| `attestation_id`    | 2     | `sha256(canonical_bytes)` matches                             |
+| `score_v0`          | 4     | Scoring formula output (`tv10`–`tv13`)                        |
+| `reject`            | 4     | MUST-reject cases — malformed identifiers, wrong header, etc. |
+| `bip322_signature`  | 3     | Real BIP-322 signatures against fixed addresses               |
+
+The categories exist so a developer debugging a specific failure can skim to the
+relevant block rather than re-reading all 23.
+
+## How the CI gate works
+
+Each reference SDK has a `test:conformance` target (or a dedicated test file)
+that loads the vendored vector JSON and asserts every expected output. A typical
+flow:
+
+```bash
+cd packages/sdk      && yarn test   # TS passes all 23 vectors
+cd packages/sdk-py   && pytest      # Python passes all 23 vectors
+```
+
+If either fails, the PR is blocked. If both pass, byte-identity between the two
+implementations is proven (modulo floating-point edge cases in `score_v0`, which
+are handled with a tolerance of 0.01).
+
+Cross-impl drift is prevented by a **third** CI job in `oc-packages`: after both
+suites pass, a diff job fetches `oc-protocol/main/conformance/` and compares it
+against what's vendored in each SDK. If the vendored copy is out of date, CI
+fails and the SDK must re-vendor.
+
+## Adding a vector
+
+For a new OC Attest category:
+
+1. Write the vector JSON in `oc-protocol/conformance/vectors/tvXX.json`
+   following the existing shape. The script at
+   `oc-protocol/conformance/generate.mjs` helps if the vector is derivable from
+   a reference calculation.
+2. Regenerate `oc-protocol/conformance/index.json` (the file listing).
+3. Update `oc-packages/sdk/src/__tests__/vectors/` and
+   `oc-packages/sdk-py/tests/vectors/` to vendor the new file.
+4. Both impls must pass the new vector before merging.
+
+Specs that add a new MUST-reject case should include a vector in the `reject`
+category so the behavior is pinned.
+
+## See also
+
+- [Canonical message](/ecosystem/canonical-message) — what the bytes look like
+- [`@orangecheck/sdk`](/sdks/javascript) — TypeScript implementation
+- [`orangecheck` (Python)](/sdks/python) — Python implementation

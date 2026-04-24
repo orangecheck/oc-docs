@@ -1,0 +1,141 @@
+export const metadata = {
+    title: '@orangecheck/cli',
+    description:
+        'oc shell — check / verify / create / challenge / discover from your terminal or a shell script.',
+};
+
+# `@orangecheck/cli`
+
+`oc` shell tool. Every OC Attest primitive, scriptable, with sensible exit
+codes.
+
+## Install
+
+```bash
+npm i -g @orangecheck/cli
+# or one-shot
+npx -y @orangecheck/cli --help
+```
+
+Node 20+.
+
+## Commands
+
+### `oc check`
+
+Sybil-gate check against an address.
+
+```bash
+oc check --addr bc1q... --min-sats 100000 --min-days 30
+# ✓ pass
+#   sats:  125,000
+#   days:  47
+#   score: 30.12
+```
+
+Exit code 0 on pass, 2 on fail, 1 on error.
+
+With `--json`:
+
+```bash
+oc check --addr bc1q... --min-sats 100000 --min-days 30 --json
+# {"ok":true,"sats":125000,"days":47,"score":30.12,"attestation_id":"a3f5b8c2...","identities":[…]}
+```
+
+Also accepts `--id <hex>` and `--identity protocol:identifier`.
+
+### `oc verify`
+
+Raw attestation verification against `(addr, msg, sig)`.
+
+```bash
+oc verify --addr bc1q... --msg "$(cat ./msg.txt)" --sig "AUBH…"
+# ✓ valid
+#   codes: sig_ok_bip322, bond_confirmed
+#   sats:  125000
+#   days:  47
+```
+
+Or read from a file:
+
+```bash
+echo '{"addr":"bc1q...","msg":"...","sig":"..."}' | oc verify --file - --json
+```
+
+### `oc create`
+
+Interactive wizard to build a canonical message.
+
+```bash
+oc create \
+    --addr bc1q... \
+    --identity github:alice \
+    --identity nostr:npub1... \
+    --purpose "forum-post" \
+    --ttl 0
+# (prints the canonical message — sign it with your wallet and pass to oc verify)
+```
+
+### `oc challenge`
+
+Signed-challenge auth primitive.
+
+```bash
+# Issue
+oc challenge issue --addr bc1q... --audience https://example.com --purpose login
+# → JSON with message + nonce + expiresAt
+
+# Verify
+oc challenge verify \
+    --msg "$(cat ./msg.txt)" \
+    --sig "AUBH..." \
+    --expected-nonce a3f5b8c2... \
+    --expected-audience https://example.com \
+    --expected-purpose login
+```
+
+### `oc discover`
+
+Query Nostr for attestations.
+
+```bash
+oc discover --addr bc1q...
+# lists all attestations published to the default relay set
+
+oc discover --identity github:alice --json
+# returns the full envelope array
+```
+
+## Scripting patterns
+
+### Shell pipeline — filter a list of addresses
+
+```bash
+while read addr; do
+    if oc check --addr "$addr" --min-sats 100000 --min-days 30 --json \
+        | jq -e '.ok' >/dev/null; then
+        echo "$addr"  # passed
+    fi
+done < candidates.txt > allowlist.txt
+```
+
+### Cron probe — page on low stake
+
+```bash
+# /etc/crontab
+* * * * * oc check --addr bc1q... --min-sats 10000000 --json \
+    | jq -e '.ok' >/dev/null \
+    || pagerduty-trigger.sh "OC Attest threshold breached"
+```
+
+## Global options
+
+- `--json` — machine-readable output on every command
+- `--relays wss://...,wss://...` — override the default Nostr relay set
+- `--api-base https://...` — override the hosted verifier
+- `--testnet` / `--signet` — set network mode
+
+## See also
+
+- [**OC Attest — HTTP API**](/attest/api) — what the CLI wraps
+- [**`@orangecheck/sdk`**](/sdks/javascript) — programmatic equivalent

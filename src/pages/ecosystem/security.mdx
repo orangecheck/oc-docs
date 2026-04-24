@@ -1,0 +1,166 @@
+export const metadata = {
+    title: 'Shared security model',
+    description:
+        'The threat model every OrangeCheck protocol inherits. What Bitcoin stake proofs protect against. What they do NOT.',
+};
+
+# Shared security model
+
+Every OrangeCheck sibling inherits the same foundational security properties and
+the same limitations. This page is the shared threat model. Protocol-specific
+concerns (Lock's envelope authentication, Stamp's OTS anchor verification,
+Vote's ballot-commitment mode) are covered in each protocol's own docs.
+
+**Read this before shipping anything.** The protocols are strong when used in
+the scenarios they were designed for and weak everywhere else.
+
+## TL;DR
+
+- A Bitcoin stake proof proves the signer **controls a Bitcoin address** and
+  **has held N sats for N days**.
+- It **does not prove personhood**, **does not prove handle ownership**, **does
+  not resist chain analysis**, and **does not hide the signer's on-chain
+  activity**.
+- For high-stakes use cases (payroll, governance final decisions, payments),
+  Bitcoin stake is a signal in a larger decision — not the whole decision.
+
+## What a stake proof reveals (publicly, forever)
+
+Any OrangeCheck proof that's been published — to Nostr, embedded in a Stamp
+envelope, attached to a Vote ballot — is a **public cryptographic artifact**
+linking:
+
+| Revealed                               | Meaning                                                                                             |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| The Bitcoin address                    | Every tx history, balance, and linked UTXO is now visible under the handle(s) asserted in the proof |
+| `sats_bonded`                          | Public wealth signal — the chain shows how much you hold at this address                            |
+| `days_unspent`                         | Cold-storage signal — how long the UTXO has been idle                                               |
+| Every handle in the `identities:` list | Cross-platform correlation vector — the same real identity across all bound handles                 |
+
+You cannot un-publish. Nostr events replicate across independent relays;
+individual relay deletions don't remove them from the ecosystem.
+
+## Threats to the signer
+
+### Chain analysis and pseudonymity loss
+
+Publishing an attestation binds your Bitcoin address to your handles. Chain
+analysis firms can then:
+
+- Cluster co-spending inputs to link adjacent addresses in the same wallet
+- Estimate total wallet size beyond just the bonded UTXO
+- Correlate with exchange deposit/withdrawal patterns
+
+**Mitigation**: use a **dedicated attestation address** funded from a CoinJoin
+output or an isolated input. Treat it as burnt-for-publicity from day one.
+
+### Wealth advertisement ("wrench attack")
+
+`sats_bonded` is a public number. Combined with a real-name handle it gives
+attackers a list of wealthy targets by handle.
+
+**Mitigation**: keep bonds modest; prefer pseudonymous handles; don't bind
+geographic identifiers to material balances.
+
+### Cross-platform correlation
+
+Binding multiple handles in one signed message is a stronger correlation than
+any of them alone. Third parties can dox or target from the union.
+
+**Mitigation**: publish separate proofs for separate personas (different
+addresses, different handle sets).
+
+### Key loss or theft
+
+The proof is valid at signing time. If your keys are later stolen, the attacker
+can sign _new_ proofs binding new handles to your address. There is no
+protocol-level revocation; the only "revoke" is to spend the bonded UTXO (which
+also requires the keys).
+
+**Mitigation**: hardware wallet. Backup seed phrase. Treat your
+attestation-signing key as a hot wallet for signing and cold wallet for storage.
+
+## Threats to the verifier
+
+### Relay censorship / partition
+
+Discovering proofs via a single Nostr relay lets that relay hide events or serve
+partitioned views.
+
+**Mitigation**: query **≥3 relays** from independent operators. The reference
+SDKs default to four.
+
+### Stale chain state
+
+A signed proof reflects balance at signing time. By the time a verifier checks,
+the UTXO may have been spent.
+
+**Mitigation**: always re-derive `sats_bonded` / `days_unspent` from **live
+chain state**, never from the signed message itself. The `check()` and
+`verify()` SDK functions do this by default.
+
+### BIP-322 implementation bugs
+
+Incorrect hashing, signature-format mishandling, or incomplete script-type
+coverage can silently accept invalid signatures.
+
+**Mitigation**: use well-tested primitives — `bip322-js` in TypeScript, the
+Rust-backed `bip322` crate in Python. Run the
+[conformance vectors](/ecosystem/conformance) before any release.
+
+### Self-asserted handle spoofing
+
+The identities list is self-asserted at signing time. Nothing in the signature
+proves the signer actually controls `github:alice`.
+
+**Mitigation**: verify handle ownership **out-of-band**. The reference SDKs ship
+helpers for Nostr (signed event containing attestation_id), GitHub (gist /
+repo), and DNS (well-known file + TXT record).
+
+### Sybil at the economic floor
+
+An attacker with `N × min_sats` can produce `N` valid proofs from `N` addresses.
+Stake raises the cost of sybils; it does not eliminate them.
+
+**Mitigation**: choose `min_sats` and `min_days` thresholds such that
+`N × min_sats` exceeds the attacker's expected payoff at scale.
+
+## What OrangeCheck does NOT protect against
+
+| Not protected               | Why                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| Proof of personhood         | Address control is not humanness. One person can hold many addresses; one address can be shared. |
+| Proof of uniqueness         | A wealthy attacker can split a bond into many smaller bonds.                                     |
+| Handle ownership            | Self-asserted. Verify out-of-band.                                                               |
+| Chain analysis              | Bitcoin is transparent; this protocol publishes on top of it.                                    |
+| Physical coercion           | Anyone with your keys can sign anything you can.                                                 |
+| Compromised wallet software | A malicious wallet could sign different bytes than what you see.                                 |
+| Zero-knowledge claims       | OrangeCheck proofs are public by design. ZK variants are future research.                        |
+
+## Per-protocol security pages
+
+Each sibling has its own protocol-specific security page:
+
+- **OC Attest** — sybil-at-scale economics, score-choice tradeoffs
+- **OC Lock** — envelope authentication, device-key rotation, sealed-message
+  re-encryption attacks
+- **OC Stamp** — OTS anchor verification, pre-anchor spoofing window,
+  calendar-operator trust
+- **OC Vote** — ballot-commitment mode, weight-mode selection under sybil
+  assumption, tally-operator determinism
+
+Each links back to this page for the shared layer.
+
+## Reporting a vulnerability
+
+Security issues in a **spec** go to the protocol's repo:
+
+- [`oc-protocol/security/advisories`](https://github.com/orangecheck/oc-protocol/security/advisories)
+- [`oc-lock-protocol/security/advisories`](https://github.com/orangecheck/oc-lock-protocol/security/advisories)
+- [`oc-stamp-protocol/security/advisories`](https://github.com/orangecheck/oc-stamp-protocol/security/advisories)
+- [`oc-vote-protocol/security/advisories`](https://github.com/orangecheck/oc-vote-protocol/security/advisories)
+
+Reference-implementation bugs go to
+[`oc-packages/security/advisories`](https://github.com/orangecheck/oc-packages/security/advisories).
+
+Do not open public issues for exploitable bugs.

@@ -1,0 +1,137 @@
+export const metadata = {
+    title: '@orangecheck/wallet-adapter',
+    description:
+        'One sign(message) API across UniSat, Xverse, Leather, Alby. Plus a copy-paste fallback for Sparrow / Bitcoin Core / hardware wallets.',
+};
+
+# `@orangecheck/wallet-adapter`
+
+Normalize every browser Bitcoin wallet into a single `sign(message)` call. Wrap
+the differences in error handling, address-consistency checks, and a copy-paste
+fallback.
+
+## Install
+
+```bash
+npm i @orangecheck/wallet-adapter
+```
+
+Browser-only. Not for Node / server use.
+
+## The one-line call
+
+```ts
+import { detectWallet, sign } from '@orangecheck/wallet-adapter';
+
+const wallet = await detectWallet(); // returns the first installed adapter
+
+const signature = await sign({
+    wallet,
+    address: 'bc1qalice...',
+    message: canonicalMessage,
+    scheme: 'bip322',
+});
+```
+
+The adapter:
+
+1. Connects to the wallet extension if not already connected.
+2. Asks the wallet which account is active.
+3. **Fails fast** if the active account is not `bc1qalice...` (the #1 cause of
+   `sig_invalid` in production — wrong active account).
+4. Calls the wallet's signing method with the right scheme.
+5. Returns a base64 BIP-322 signature, normalized across wallets.
+
+## Supported wallets
+
+| Wallet  | Detection                                | Active-account check      | BIP-322              |
+| ------- | ---------------------------------------- | ------------------------- | -------------------- |
+| UniSat  | `window.unisat`                          | `requestAccounts()`       | ✅ all address types |
+| Xverse  | `window.XverseProviders.BitcoinProvider` | `getAddresses()`          | ✅ all address types |
+| Leather | `window.LeatherProvider`                 | `request('getAddresses')` | ✅ all address types |
+| Alby    | `window.nostr` + BIP-322 extension       | Alby's BIP-322 bridge     | ✅ all address types |
+
+## Copy-paste fallback
+
+For users on Sparrow, Bitcoin Core, Electrum, or hardware wallets (no browser
+extension), the adapter exposes a two-step fallback UI:
+
+```tsx
+import { PasteSignatureFlow } from '@orangecheck/wallet-adapter/react';
+
+<PasteSignatureFlow
+    message={canonicalMessage}
+    address={userAddress}
+    onSigned={(signature) => submit(signature)}
+/>;
+```
+
+Renders:
+
+1. A textarea showing the canonical message + a "copy" button.
+2. Instructions for popular desktop wallets ("In Sparrow, right-click the
+   address → Sign Message → paste").
+3. A paste target for the returned signature.
+
+No difference in security — the canonical message is the same; only the UX
+changes.
+
+## React components
+
+```tsx
+import { OcWalletButton } from '@orangecheck/wallet-adapter/react';
+
+<OcWalletButton
+    address={userAddress}
+    message={canonicalMessage}
+    onSigned={(signature) => submit(signature)}
+    onError={(err) => showToast(err.message)}
+/>;
+```
+
+Handles everything: wallet detection, connection, active-account check, signing,
+fallback for users without a wallet extension.
+
+## Active-account detection (why it matters)
+
+The **#1** cause of `sig_invalid` errors in production is a user whose wallet is
+active on a different account than the one they're trying to sign for. The
+signature is valid — for the wrong address. The verifier correctly refuses it.
+
+The adapter's `sign()` catches this before the signing modal ever opens:
+
+```ts
+const active = await wallet.getActiveAddress();
+if (active !== address) {
+    throw new WrongAccountError(
+        `Wallet is on ${active}, but we asked to sign for ${address}. ` +
+            'Switch accounts in the extension, then retry.'
+    );
+}
+```
+
+This single check saves hours of "why doesn't this work?" in onboarding.
+
+## Error types
+
+```ts
+import {
+    BIP322NotSupportedError,
+    SigningRejectedError,
+    UnsupportedSchemeError,
+    WalletConnectionDeniedError,
+    WalletNotDetectedError,
+    WrongAccountError,
+} from '@orangecheck/wallet-adapter';
+```
+
+Each carries an actionable message plus a `code` field your UI can pattern-match
+on.
+
+## See also
+
+- [**BIP-322 signing**](/ecosystem/bip322) — wallet support matrix
+- [**Sign in with Bitcoin**](/attest/guides/sign-in-with-bitcoin) — the flow
+  this adapter is designed for
+- [**`@orangecheck/react`**](/sdks/react) — components that compose on top of
+  this adapter

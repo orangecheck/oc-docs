@@ -1,0 +1,152 @@
+export const metadata = {
+    title: 'Guide: gate an Express route',
+    description:
+        'Drop-in OC Attest middleware in 10 lines. Works with Express, Connect, and any Node HTTP framework.',
+};
+
+# Gate an Express route
+
+Ten lines, no SDK gymnastics. The `@orangecheck/gate` package ships a middleware
+factory that does the whole verify-and-threshold cycle for you.
+
+## Install
+
+```bash
+npm i @orangecheck/gate
+```
+
+## Minimal example
+
+```ts
+import { ocGate } from '@orangecheck/gate';
+import express from 'express';
+
+const app = express();
+
+app.post(
+    '/post',
+    ocGate({
+        minSats: 100_000,
+        minDays: 30,
+        address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+    }),
+    (_req, res) => res.json({ ok: true, posted: true })
+);
+
+app.listen(3000);
+```
+
+What happens on a request:
+
+1. The middleware extracts the address from wherever you pointed it (a header, a
+   cookie, a session, a query param — your call).
+2. It calls out to `/api/check?addr=<addr>&min_sats=100000&min_days=30` (or a
+   local verifier if you configured one).
+3. On pass: request proceeds to your handler.
+4. On fail: returns `403` with a JSON body explaining which threshold didn't
+   meet.
+
+## Address sources
+
+Pick one based on your trust model:
+
+```ts
+// From a header (cheap, trust the client)
+address: {
+    from: (req) => req.get('x-bitcoin-address') ?? '';
+}
+
+// From a signed session cookie (trustworthy, uses /api/auth/signin)
+address: {
+    from: (req) => req.session?.verifiedAddress ?? '';
+}
+
+// From the query string
+address: {
+    from: (req) => String(req.query.addr ?? '');
+}
+
+// From the body
+address: {
+    from: (req) => String(req.body?.addr ?? '');
+}
+```
+
+> **Warning.** Reading the address from a header / cookie / query without a
+> signed-challenge step means you're trusting the caller to tell you who they
+> are. For low-stakes gates (public forum, throttling) this is fine. For
+> anything where the cost of impersonation is real, pair this guide with
+> [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) so the address
+> comes from a session cookie you issued.
+
+## Custom rejection response
+
+```ts
+app.post(
+    '/post',
+    ocGate({
+        minSats: 100_000,
+        minDays: 30,
+        address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+        onBlocked: (req, res, result) => {
+            res.status(403).json({
+                error: 'not enough stake',
+                requires: { sats: 100_000, days: 30 },
+                you_have: { sats: result.sats, days: result.days },
+            });
+        },
+    }),
+    handler
+);
+```
+
+`result` is the full `/api/check` response, so you can tailor the error body to
+your use case (redirect to a "how to bond" page, send back a call-to-action,
+etc.).
+
+## Caching
+
+`ocGate` respects the hosted API's 60-second cache by default. For busier
+deployments, pass `cacheTtl: <ms>` to memoize verifier results in-process so
+rapid retries don't hit the upstream API.
+
+## Self-hosted verifier
+
+Point the gate at your own verifier:
+
+```ts
+ocGate({
+    minSats: 100_000,
+    address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
+    apiBase: 'https://attest.internal.example',
+});
+```
+
+Or skip the HTTP hop entirely and use the local SDK:
+
+```ts
+import { check } from '@orangecheck/sdk';
+
+app.post('/post', async (req, res, next) => {
+    const addr = req.get('x-bitcoin-address') ?? '';
+    const result = await check({
+        addr,
+        minSats: 100_000,
+        minDays: 30,
+    });
+    if (!result.ok) return res.status(403).json({ reasons: result.reasons });
+    next();
+});
+```
+
+The SDK does all the work in-process — Nostr lookup, BIP-322 verification,
+Esplora fetch, threshold check. No round-trip to any OrangeCheck-operated
+server.
+
+## See also
+
+- [**HTTP API — `/api/check`**](/attest/api) — what the gate calls
+- [**Sign in with Bitcoin**](/attest/guides/sign-in-with-bitcoin) — for when you
+  need a trusted address, not a self-reported one
+- [**`@orangecheck/gate`**](/sdks/gate) — full package reference with Next /
+  Fastify / Hono adapters

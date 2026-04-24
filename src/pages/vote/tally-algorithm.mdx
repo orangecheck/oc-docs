@@ -1,0 +1,143 @@
+export const metadata = {
+    title: 'OC Vote — tally algorithm',
+    description:
+        'The deterministic pure function that turns (poll, ballots, chain-snapshot) into a tally.',
+};
+
+# Tally algorithm
+
+`tally()` is a pure function. Given the same (poll, ballots, chain snapshot),
+every correct implementation returns the same result — byte-for-byte. This is
+the property that makes OC Vote trust-minimized: anyone can re-run the tally and
+check.
+
+## Signature
+
+```ts
+function tally(opts: {
+    poll: Poll;
+    ballots: Ballot[];
+    utxosAt: (address: string, blockHeight: number) => Promise<Utxo[]>;
+    revealedOptions?: Record<BallotId, OptionIndex>; // for secret-mode polls
+    verifyBip322?: (msg: string, sig: string, addr: string) => Promise<boolean>;
+    skipSignatures?: boolean; // for offline / cached-signature re-tallies
+}): Promise<TallyResult>;
+```
+
+The function is async only because `utxosAt` is async. Everything else is
+deterministic synchronous computation.
+
+## Steps
+
+### 1. Verify the poll
+
+- Recompute `poll.id = sha256(canonical_bytes(poll with sig=""))`. Reject if it
+  doesn't match what's claimed.
+- Verify `poll.sig` is a valid BIP-322 signature from `poll.creator.address`
+  over the canonical bytes.
+- Reject if `poll.version !== "oc-vote/v0"`.
+
+### 2. Verify each ballot
+
+For each ballot in the input:
+
+- Reject if the ballot's poll_id doesn't match this poll.
+- Reject if the ballot's signature doesn't verify.
+- Reject if the ballot was issued after `poll.closes_at`.
+- If `weight_mode === 'secret'`, verify the commitment matches the revealed
+  option when available.
+
+Invalid ballots are **silently dropped** (not failing the whole tally). This is
+important: a tally-operator can't DoS the tally by submitting a bad ballot.
+
+### 3. Fetch snapshot UTXOs
+
+For each unique voter address, call `utxosAt(address, poll.snapshot_block)` to
+get the voter's UTXOs at the declared block height.
+
+This is the ONLY network-dependent step. A caller with an offline chain snapshot
+(e.g., a compact block-filter database) can supply their own `utxosAt`
+implementation and compute the tally fully offline.
+
+### 4. Compute per-voter weight
+
+Applying the selected [weight mode](/vote/weight-modes):
+
+```
+for voter in unique_voters_with_valid_ballots:
+    weight[voter] = compute_weight(utxos[voter], poll.weight_mode, poll.params)
+```
+
+### 5. Handle vote changes
+
+If a voter has multiple valid ballots for the same poll, only the **latest** (by
+`issued_at`) is counted. Earlier ballots are discarded. This is tested by
+conformance vector `v04`.
+
+### 6. Sum into options
+
+```
+for voter in voters_with_latest_ballot:
+    choice = latest_ballot[voter].option_index
+    option_totals[choice] += weight[voter]
+```
+
+### 7. Declare winner
+
+The option with the highest total wins. Ties are broken deterministically by
+option index (lowest index wins). This makes the result reproducible across
+implementations without a tiebreak convention debate.
+
+## Output shape
+
+```json
+{
+    "poll_id": "<content hash>",
+    "option_totals": {
+        "Keep current": 10000000,
+        "Midnight": 30000000,
+        "Abstain": 0
+    },
+    "winner": "Midnight",
+    "total_weight": 40000000,
+    "valid_ballots": 2,
+    "invalid_ballots": 0,
+    "voter_count": 2
+}
+```
+
+Every field is byte-deterministic given the same inputs. Two independent
+implementations that disagree on any field have a bug.
+
+## Conformance
+
+The 5 canonical vectors in `oc-vote-protocol/test-vectors/`:
+
+| Vector | What it pins                                                                         |
+| ------ | ------------------------------------------------------------------------------------ |
+| `v01`  | Minimal public poll — 3 options, 2 voters, `one_per_address`                         |
+| `v02`  | Sats-weighted with dust floor                                                        |
+| `v03`  | `sats_days` with per-UTXO cap                                                        |
+| `v04`  | Vote-change semantics — voter submits two ballots, only the later counts             |
+| `v05`  | Secret ballot — commit-reveal, partial reveal, correct handling of un-revealed votes |
+
+`@orangecheck/vote-core` passes all 5 on every CI run. A reimplementation in
+another language is conformant iff it also passes all 5.
+
+## Edge cases
+
+- **Voter has no UTXOs at snapshot.** Weight = 0. Ballot is technically valid
+  (signature verifies) but contributes nothing.
+- **Poll closes mid-tally.** Ballots `issued_at > poll.closes_at` are rejected
+  during ballot verification, so by tally time there are no "race" ballots.
+- **Two ballots from same voter with same `issued_at`.** Use `ballot.id`
+  (content hash) as the tiebreaker — lexicographically smaller wins.
+- **Zero valid ballots.** Tally returns zero weights, `winner = null`,
+  `voter_count = 0`.
+
+## See also
+
+- [**Weight modes**](/vote/weight-modes) — the formulas `tally()` applies
+- [**OC Vote overview**](/vote) — when each mode fits
+- [**Conformance vectors**](/ecosystem/conformance) — how we prove the algorithm
+  is deterministic across impls

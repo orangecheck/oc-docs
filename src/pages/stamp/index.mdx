@@ -1,0 +1,91 @@
+export const metadata = {
+    title: 'OC Stamp',
+    description:
+        'Bitcoin-block-anchored signed statements. Authorship via BIP-322, priority via OpenTimestamps. Offline-verifiable forever.',
+};
+
+# OC Stamp
+
+**Sign anything. Anchor the moment to Bitcoin.** OC Stamp binds three things
+into one envelope: authorship (BIP-322 signature from a Bitcoin address),
+priority (an OpenTimestamps proof chained to a specific Bitcoin block header),
+and optionally stake at signing (an OC Attest attestation reference). The result
+is a self-contained `.stamp` envelope that anyone can verify offline, forever,
+without calling ochk.io.
+
+## Who this replaces
+
+OC Stamp was built to be better than the adjacent-and-broken incumbents:
+
+| Incumbent                  | Problem OC Stamp solves                                                  |
+| -------------------------- | ------------------------------------------------------------------------ |
+| PGP / GPG signatures       | No block-level priority anchor. Keyserver rot. Web of trust is a tarpit. |
+| OpenTimestamps alone       | Proves timestamp only. Says nothing about authorship.                    |
+| C2PA / content credentials | x509-based vendor PKI. Trust hierarchy reintroduces gatekeepers.         |
+| EVM notarization contracts | Wrong chain. Per-stamp gas. Subject to reorg.                            |
+
+Stamp borrows the best bits — OTS for anchoring, BIP-322 for authorship — and
+nothing else.
+
+## Use cases
+
+- **Release / commit signing** via a `git-stamp` plugin (one stamp per release
+  tag, anchored before public announcement).
+- **Long-form publishing** (authorship + "written before X happened").
+- **Legal self-notarization** (no third-party notary; Bitcoin block time is the
+  witness).
+- **DAO proposal authorship** (the signer of record is cryptographically bound,
+  not just the wallet that submitted the tx).
+- **Sybil-gated content feeds** (combined with an OC Attest reference for
+  stake-at-signing).
+
+## What it proves
+
+A valid Stamp envelope proves:
+
+1. **Authorship.** The envelope was signed (via BIP-322) by the holder of a
+   specific Bitcoin address.
+2. **Priority.** The envelope's ID was committed to a specific Bitcoin block by
+   a specific height — so it could not have been fabricated after that block.
+3. **Optional stake.** If the envelope references an OC Attest attestation,
+   verifiers can resolve the signer's sats-bonded × days-unspent at the moment
+   of signing.
+
+## What it does NOT prove
+
+- **Humanness.** Same as every other OrangeCheck protocol.
+- **Exclusivity.** Someone with the same key can produce multiple stamps for
+  conflicting content. Priority is per-stamp, not per-signer.
+- **Non-repudiation at the application layer.** The cryptographic proof is
+  solid; what the signer meant by it is still a judgment call.
+
+## Section contents
+
+- [**How it works**](/stamp/how-it-works) — sign + anchor in two steps
+- [**OpenTimestamps anchor**](/stamp/ots-anchor) — how `@orangecheck/stamp-ots`
+  bridges OTS proofs
+- [**Use cases**](/stamp/use-cases) — concrete patterns with code
+
+## Packages
+
+- `@orangecheck/stamp-core` — canonical message, envelope format, `stamp()`,
+  `verify()`
+- `@orangecheck/stamp-ots` — OpenTimestamps calendar client + proof helpers
+
+See [SDK overview](/sdks).
+
+## Shared ecosystem concepts
+
+- [Canonical message format](/ecosystem/canonical-message)
+- [BIP-322 signing](/ecosystem/bip322)
+- [Nostr kind-30078](/ecosystem/nostr-kind-30078) — where published stamps live
+- [Conformance vectors](/ecosystem/conformance)
+- [Security model](/ecosystem/security)
+
+## Spec + implementation
+
+- Normative spec:
+  [`oc-stamp-protocol/SPEC.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md)
+- Reference impl: `@orangecheck/stamp-core`, `stamp-ots` in
+  [`oc-packages`](https://github.com/orangecheck/oc-packages)
+- Reference site: `stamp.ochk.io`

@@ -1,0 +1,72 @@
+export const metadata = {
+    title: 'OC Vote',
+    description:
+        'Stake-weighted, sybil-resistant polls on Bitcoin. Three canonical weight modes. Offline-tallyable.',
+};
+
+# OC Vote
+
+**Stake-weighted, sybil-resistant polls on Bitcoin.** OC Vote lets you run a
+poll whose outcome depends on how much Bitcoin each voter holds (optionally
+weighted by time held). The tally is deterministic, pure, and
+cross-implementation testable — there is one correct answer for any poll
+
+- ballot set, and every reference impl produces it.
+
+## What it gives you
+
+- **Three canonical weight modes** — `one_per_address`, `sats`, `sats_days` —
+  chosen per-poll at creation time.
+- **Deterministic tally** — a pure function from (poll, ballots, chain-snapshot)
+  to a tally result. No ordering ambiguity.
+- **Offline-tallyable** — anyone holding the poll + ballots + a Bitcoin chain
+  snapshot for the relevant block height can recompute the tally from scratch.
+- **Optional secret-mode ballots** — commit-reveal for cases where plaintext
+  votes would bias later voters.
+- **Transport-agnostic** — polls and ballots are signed JSON blobs. Publish via
+  Nostr, HTTP, email, whatever.
+
+## What it does NOT solve
+
+- **Proof of personhood.** Stake weighting is the wrong tool for
+  one-human-one-vote. Use World ID or BrightID for that.
+- **Adversarial chain-state hiding.** Voters prove they hold UTXOs via an
+  on-chain snapshot at a fixed block height. If your voters move coins before
+  the snapshot, they can unstake. Pick the snapshot carefully.
+- **Coercion resistance.** Plaintext and commit-reveal ballots both leak the
+  voter's choice under coercion (plaintext immediately; commit-reveal at reveal
+  time). For coercion-resistant e-voting, the research literature has much more
+  careful constructions — OC Vote is not one of them.
+
+## Section contents
+
+- [**Weight modes**](/vote/weight-modes) — `one_per_address`, `sats`,
+  `sats_days`
+- [**Tally algorithm**](/vote/tally-algorithm) — the deterministic pure function
+
+## Packages
+
+- `@orangecheck/vote-core` — reference implementation, canonicalization,
+  `tally()`
+- `@orangecheck/vote-cli` — shell interface for tallying, verifying, inspecting
+  polls
+
+See [SDK overview](/sdks).
+
+## Shared ecosystem concepts
+
+- [Canonical message format](/ecosystem/canonical-message) — what polls and
+  ballots are signed as
+- [BIP-322 signing](/ecosystem/bip322) — how voters sign ballots
+- [Conformance vectors](/ecosystem/conformance) — `v01`–`v05` test fixtures
+- [Security model](/ecosystem/security)
+
+## Spec + implementation
+
+- Normative spec:
+  [`oc-vote-protocol`](https://github.com/orangecheck/oc-vote-protocol)
+  (CC-BY-4.0)
+- Reference impl: `@orangecheck/vote-core`, `vote-cli` in
+  [`oc-packages`](https://github.com/orangecheck/oc-packages)
+- Conformance vectors: 5 fixtures covering minimal public poll, sats weighting,
+  `sats_days` with cap, vote-change semantics, secret-ballot commit-reveal

@@ -1,0 +1,134 @@
+export const metadata = {
+    title: 'OC Stamp — how it works',
+    description: 'Sign + anchor. Two steps, one self-contained envelope.',
+};
+
+# How OC Stamp works
+
+Two steps. First you sign. Then you anchor.
+
+## 1. Sign
+
+```ts
+import { stamp } from '@orangecheck/stamp-core';
+
+const env = await stamp({
+    content: new TextEncoder().encode('release: v1.2.3 signed by Alice'),
+    mime: 'text/plain',
+    signer: {
+        address: 'bc1qalice...',
+        signMessage: async (m) => walletSignBIP322(m),
+    },
+    // Optional — reference an OC Attest attestation for "stake at signing"
+    attest_ref:
+        'a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1',
+});
+```
+
+`stamp()` builds a [canonical message](/ecosystem/canonical-message) with header
+`oc-stamp`, the SHA-256 of `content`, the MIME type, the signer's address, and —
+if provided — the Attest reference. The wallet signs the canonical bytes via
+[BIP-322](/ecosystem/bip322).
+
+The envelope is a JSON blob:
+
+```json
+{
+    "id": "<sha256 of canonical message, base64url>",
+    "version": "oc-stamp/v0",
+    "signer": {
+        "address": "bc1qalice...",
+        "scheme": "bip322"
+    },
+    "content_hash": "<sha256 of content bytes, hex>",
+    "mime": "text/plain",
+    "attest_ref": "a3f5b8c2...",
+    "issued_at": "2026-04-24T06:47:29.977Z",
+    "sig": "<BIP-322 signature, base64>",
+    "ots": null
+}
+```
+
+The content itself is NOT included in the envelope — only its hash. You ship the
+envelope alongside the content (archive, filesystem, HTTP, whatever). A verifier
+re-hashes the content and checks against `content_hash` to prove the envelope
+commits to the same bytes.
+
+This is intentional: envelopes stay small (~500 bytes) regardless of content
+size. A 4 GB video gets the same envelope a 40-byte string does.
+
+## 2. Anchor
+
+```ts
+import { submitToCalendars, upgradeProof } from '@orangecheck/stamp-ots';
+
+// Submit the envelope id to OpenTimestamps calendars
+env.ots = await submitToCalendars(env.id);
+// env.ots is now a "pending" OTS proof
+```
+
+`submitToCalendars()` POSTs the envelope's `id` bytes to one or more OTS
+calendars (`alice.btc.calendar.opentimestamps.org`,
+`bob.btc.calendar.opentimestamps.org`, etc.). The calendars batch many digests
+into a Merkle tree and publish the tree root to Bitcoin. At this point the proof
+is **pending** — you have a receipt that says "your digest is in a batch" but
+the batch hasn't hit the chain yet.
+
+Once a Bitcoin block confirms, the proof can be **upgraded**:
+
+```ts
+// Minutes to hours later:
+env.ots = await upgradeProof(env.ots, env.id);
+// env.ots is now a "confirmed" proof chained to a specific Bitcoin block
+```
+
+The upgraded proof contains the Merkle path from your digest to the batch root,
+and the block header that included the batch root. Anyone holding the envelope +
+the proof + any honest Bitcoin node can verify:
+
+- The envelope was signed by the holder of the Bitcoin address (via BIP-322).
+- The envelope's `id` was included in a specific Bitcoin block at a specific
+  height, so it cannot have been fabricated after that block.
+
+## Verify
+
+```ts
+import { verify } from '@orangecheck/stamp-core';
+
+const result = await verify({
+    envelope: env,
+    content: contentBytes, // the raw bytes the envelope commits to
+    verifyBip322: async (msg, sig, addr) => walletVerifyBIP322(msg, sig, addr),
+    verifyOtsAnchor: myAnchorVerifier, // see /stamp/ots-anchor
+});
+
+if (result.ok) {
+    console.log('Author:', result.signer.address);
+    console.log('Content hash matched:', result.content_hash_ok);
+    console.log('Anchored in Bitcoin block:', result.anchor?.block_height);
+    console.log('Attest reference:', result.attest_ref);
+}
+```
+
+`verify()` is pure — it does the crypto and delegates network calls (BIP-322
+verification, OTS anchor resolution) to plug-in functions you provide. This
+keeps the core verifier offline-capable and lets you choose any block-header
+source.
+
+## Without the anchor
+
+A stamp without `ots` is still useful — you have a signed statement binding
+content to an address. You just don't have a time-anchor. Anchor later, or skip
+it entirely if your use case doesn't need priority.
+
+## Publishing optional
+
+Envelopes can be published to [Nostr kind-30078](/ecosystem/nostr-kind-30078)
+with `d` tag `oc-stamp:<id>` for durable public discovery, but it's optional. A
+stamp is a self-contained JSON blob; email it, embed it in a git commit message,
+put it in S3 — it verifies the same way.
+
+## See also
+
+- [**OpenTimestamps anchor**](/stamp/ots-anchor) — the anchor step in detail
+- [**Use cases**](/stamp/use-cases) — concrete patterns with code

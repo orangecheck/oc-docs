@@ -1,0 +1,150 @@
+export const metadata = {
+    title: 'OC Lock — device keys',
+    description:
+        'BIP-322-bound X25519 keys. Generation, binding, publication, revocation, rotation.',
+};
+
+# Device keys
+
+A **device key** is an X25519 keypair that represents one client device (a
+browser, a phone, a desktop) belonging to the holder of a specific Bitcoin
+address. Multiple devices can bind to the same address; envelopes are wrapped to
+every bound device so each can decrypt independently.
+
+## Generate
+
+```ts
+import { generateDeviceKey } from '@orangecheck/lock-device';
+
+const {
+    device_sk, // 32-byte X25519 secret — never leaves this machine
+    device_pk, // 32-byte X25519 public key
+    device_id, // 16 random bytes, hex
+    created_at, // ISO timestamp
+} = generateDeviceKey();
+```
+
+Store `device_sk` in whatever local secure storage your client provides
+(IndexedDB + WebCrypto non-extractable keys in browsers; SecKeyCreateRandomKey
+on iOS; AndroidKeystore on Android).
+
+## Bind to a Bitcoin address
+
+```ts
+import { buildBindingStatement } from '@orangecheck/lock-device';
+
+const statement = buildBindingStatement({
+    address: 'bc1qbob...',
+    device_pk,
+    device_id,
+    created_at,
+});
+
+const signature = await walletSignBIP322(statement);
+```
+
+The statement is a [canonical message](/ecosystem/canonical-message) with header
+`oc-lock-device-binding-v0`. It binds (address, device_id, device_pk) together —
+a verifier who sees the signature and the statement knows that `bc1qbob…` has
+attested that this device_pk is theirs.
+
+## Publish to the Nostr directory
+
+```ts
+import { buildDirectoryEvent, publishToRelays } from '@orangecheck/lock-device';
+
+const event = buildDirectoryEvent({
+    address: 'bc1qbob...',
+    statement,
+    signature,
+});
+
+await publishToRelays(event, DEFAULT_RELAYS);
+```
+
+The event:
+
+- **kind:** 30078 (NIP-78 addressable replaceable)
+- **`d` tag:** `oc-lock:device:<bc1qbob...>` — one device record per Bitcoin
+  address per pubkey
+- **content:** JSON-serialized `{ statement, signature }`
+- **author pubkey:** derived deterministically from `device_sk` via HKDF, so the
+  same device always publishes under the same Nostr pubkey without needing to
+  manage a separate Nostr keypair
+
+Replacing the event (same `d` tag) updates the device record. Useful when
+rotating keys or fixing a mistake.
+
+## Multiple devices per address
+
+Publish one kind-30078 event per device, each with a distinct `d` tag:
+
+- `oc-lock:device:bc1qbob...` — "most recent" device, replaceable
+- Or a content-addressed d-tag per device if you want to keep all historical
+  devices discoverable
+
+The sender queries all events matching `#d:oc-lock:device:bc1qbob…` and wraps
+the envelope for every device it finds. Each device can independently decrypt.
+
+## Revocation
+
+Publish a revocation event:
+
+```ts
+import { buildRevocationStatement } from '@orangecheck/lock-device';
+
+const revocation = buildRevocationStatement({
+    address: 'bc1qbob...',
+    device_id: oldDeviceId,
+    revoked_at: new Date().toISOString(),
+});
+
+const sig = await walletSignBIP322(revocation);
+// Publish as a kind-30078 event with the same d-tag convention
+```
+
+A recipient finding both a binding and a revocation for the same (address,
+device_id) pair MUST treat the device as revoked and refuse to use that
+device_pk for future envelopes.
+
+**Limitation:** Nostr doesn't guarantee all relays have seen the revocation. For
+anything high-stakes, query multiple relays for the most recent event and
+fail-closed if any relay disagrees.
+
+## Rotation
+
+To rotate a device key cleanly:
+
+1. Generate a new device keypair locally.
+2. Publish the new binding event.
+3. Publish a revocation event for the old `device_id`.
+4. (Optional) Re-decrypt historical envelopes with the old key, then securely
+   wipe the old `device_sk`.
+
+For forward secrecy guarantees (old envelopes unrecoverable if old key leaks
+later), don't keep the old `device_sk` after rotation.
+
+## Deterministic Nostr key derivation
+
+The directory event is authored by a Nostr pubkey derived from the device secret
+via HKDF:
+
+```
+nostr_sk = HKDF-SHA256(device_sk, salt="oc-lock-nostr-v0", info="", length=32)
+nostr_pk = secp256k1.getPublicKey(nostr_sk)
+```
+
+This lets the same device publish under the same Nostr pubkey across sessions
+without the user managing a separate Nostr keypair. It also prevents one device
+from spoofing the directory record of another (different device secrets →
+different Nostr pubkeys).
+
+## See also
+
+- [**How it works**](/lock/how-it-works) — the encrypt/decrypt flow these keys
+  feed into
+- [**Envelope format**](/lock/envelope-format) — how recipient device keys show
+  up in the envelope
+- [**Nostr kind-30078**](/ecosystem/nostr-kind-30078) — where directory events
+  live
+- [**Security model**](/ecosystem/security) — device-compromise threat model

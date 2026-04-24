@@ -1,0 +1,147 @@
+export const metadata = {
+    title: 'OC Lock — how it works',
+    description:
+        'Device keys → directory → seal → unseal. The full OC Lock encrypt/decrypt flow.',
+};
+
+# How OC Lock works
+
+Four steps — two recipient-side, two sender-side. End-to-end.
+
+## 1. Recipient registers a device
+
+The recipient generates an X25519 keypair, builds a canonical binding statement,
+and signs it with BIP-322 from their Bitcoin address:
+
+```
+oc-lock-device-binding-v0
+address: bc1qbob...
+device_id: <16 random bytes, hex>
+device_pk: <32-byte X25519 public key, hex>
+created_at: 2026-04-24T06:47:29.977Z
+ack: I bind this device key to this Bitcoin address.
+```
+
+Signature + binding are wrapped as a kind-30078 Nostr event with `d` tag
+`oc-lock:device:<bc1qbob...>` (addressable, replaceable by the same pubkey) and
+published.
+
+Code:
+
+```ts
+import {
+    buildBindingStatement,
+    generateDeviceKey,
+} from '@orangecheck/lock-device';
+
+const { device_sk, device_pk, device_id, created_at } = generateDeviceKey();
+
+const statement = buildBindingStatement({
+    address: 'bc1qbob...',
+    device_pk,
+    device_id,
+    created_at,
+});
+
+const signature = await walletSignBIP322(statement);
+// Publish { statement, signature, ... } as a kind-30078 event
+```
+
+The device secret (`device_sk`) stays on the recipient's device. Never leaves.
+If it does, that device's envelopes are compromised.
+
+## 2. Sender looks up the recipient
+
+```ts
+import { queryDeviceRecord } from '@orangecheck/lock-device';
+
+const record = await queryDeviceRecord('bc1qbob...', relays);
+// record.device_pk is the 32-byte X25519 public key we'll encrypt to.
+// record.signature proves bc1qbob... bound this key.
+```
+
+Before encrypting, the sender SHOULD verify the BIP-322 binding. If the
+signature is bad or the address doesn't match, the record is forged — refuse to
+send.
+
+## 3. Sender seals
+
+```ts
+import { seal } from '@orangecheck/lock-core';
+
+const envelope = await seal({
+    payload: new TextEncoder().encode('hello bob'),
+    sender: {
+        address: 'bc1qalice...',
+        signMessage: async (msg) => walletSignBIP322(msg),
+    },
+    recipients: [
+        {
+            address: record.address,
+            device_id: record.device_id,
+            device_pk: record.device_pk,
+        },
+    ],
+});
+```
+
+Inside `seal()`:
+
+1. Generate an ephemeral X25519 keypair `(eph_sk, eph_pk)` for this envelope.
+2. For each recipient, compute `shared = X25519(eph_sk, recipient.device_pk)`.
+3. Derive the symmetric key:
+   `sym = HKDF-SHA256(shared, salt=envelope_id, info="oc-lock v0")`.
+4. Encrypt the payload: `AES-256-GCM(sym, nonce, plaintext, aad=envelope_id)`.
+5. Wrap the ciphertext + ephemeral public key + per-recipient metadata in a
+   canonicalized JSON envelope.
+6. Sender signs the envelope with BIP-322 (binds the envelope to the sender's
+   Bitcoin address).
+
+The result is a self-contained JSON blob. Send it over any transport.
+
+## 4. Recipient unseals
+
+```ts
+import { unseal } from '@orangecheck/lock-core';
+
+const { payload, sender, matchedDeviceId } = await unseal({
+    envelope,
+    device: { device_id, secretKey: device_sk },
+    verifyBip322: async (msg, sig, addr) => walletVerifyBIP322(msg, sig, addr),
+});
+```
+
+Inside `unseal()`:
+
+1. Find the recipient entry matching the local `device_id`.
+2. Recompute the shared secret: `shared = X25519(device_sk, envelope.eph_pk)`.
+3. Derive `sym = HKDF-SHA256(shared, salt=envelope_id, info="oc-lock v0")`.
+4. Decrypt: `AES-256-GCM(sym, nonce, ciphertext, aad=envelope_id)`.
+5. Verify the sender's BIP-322 signature over the envelope's canonical
+   representation. Reject if invalid.
+
+On success, the recipient gets the plaintext + a verified sender address.
+
+## Why ephemeral sender keys
+
+Each envelope has a fresh `(eph_sk, eph_pk)` pair. The sender discards `eph_sk`
+after sealing. Consequences:
+
+- **Forward secrecy between envelopes.** If the sender's device is later
+  compromised, old envelopes they sent can't be decrypted (the ephemeral secrets
+  are gone).
+- **No sender-key rotation needed.** The sender's Bitcoin address is the
+  long-lived identifier; the X25519 key is throwaway.
+
+There is NOT forward secrecy within a single envelope — if the recipient's
+`device_sk` is compromised, every envelope sent to that device_id is
+decryptable. Rotate device keys if you need that guarantee.
+
+## What's next
+
+- [**Envelope format**](/lock/envelope-format) — the exact JSON shape,
+  canonicalization rule, fields a validator must check
+- [**Device keys**](/lock/device-keys) — generation, binding, revocation,
+  rotation
+- [**Security — OC Lock specifics**](/ecosystem/security) — envelope replay,
+  compromised device recovery, forward secrecy tradeoffs

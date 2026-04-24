@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json.schemastore.org/prettierrc",
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "printWidth": 100,
+    "tabWidth": 4,
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "jsxSingleQuote": false,
+    "endOfLine": "lf",
+    "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+    "importOrder": [
+        "<TYPES>^(node:)",
+        "<TYPES>",
+        "<TYPES>^[.]",
+        "",
+        "<BUILTIN_MODULES>",
+        "",
+        "<THIRD_PARTY_MODULES>",
+        "",
+        "^(@/lib|@/server|@/types)(/.*)$",
+        "",
+        "^(@/components|@/hooks)(/.*)$",
+        "",
+        "^[.]"
+    ],
+    "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+    "importOrderTypeScriptVersion": "5.0.0",
+    "importOrderCaseSensitive": false,
+    "overrides": [
+        {
+            "files": "*.mdx",
+            "options": { "printWidth": 80, "proseWrap": "always" }
+        },
+        {
+            "files": ["*.json", "*.yml", "*.yaml"],
+            "options": { "tabWidth": 4 }
+        }
+    ]
+}

@@ -1,0 +1,126 @@
+export const metadata = {
+    title: 'OC Attest — verification',
+    description:
+        'The exact algorithm a verifier runs. Six deterministic steps — offline-verifiable, with live chain state for metrics.',
+};
+
+# Verification
+
+Given a signed attestation envelope, a verifier runs six deterministic steps.
+Any correctly-implemented verifier produces byte-identical codes and metrics for
+the same inputs — this is proven on every CI run against the
+[conformance vectors](/ecosystem/conformance).
+
+## Steps
+
+### 1. Parse the canonical message
+
+Reject with `decode_error` if:
+
+- Header literal isn't exactly `orangecheck` (or `orangecheck-auth` for the
+  challenge flow)
+- A required field is missing (`address`, `nonce`, `issued_at`, `ack`,
+  `identities`)
+- Line endings aren't LF with exactly one trailing newline
+- Extensions (lines after the core fields, before `ack`) aren't
+  lexicographically sorted by name
+- Any identifier in `identities:` contains a comma, newline, or CR
+
+### 2. Verify the BIP-322 signature
+
+Against the declared address, using [BIP-322](/ecosystem/bip322). Reject with
+`sig_invalid` if the signature doesn't verify, with `sig_unsupported_script` if
+the wallet produced a legacy signature for a SegWit/Taproot address.
+
+### 3. Verify the attestation ID
+
+Compute `sha256(canonical_message_bytes)`. If the caller supplied an
+`attestation_id`, reject with `invalid_attestation_id` if it doesn't match the
+computed hash. If the caller didn't supply one, the computed hash becomes the
+attestation_id.
+
+### 4. Fetch UTXOs for the address
+
+Query a Bitcoin block explorer (mempool.space, blockstream.info, or your own
+Esplora endpoint). Fetch the current unspent-outputs list. The reference SDKs
+retry across multiple explorers if the primary times out.
+
+### 5. Compute metrics
+
+- **`sats_bonded`** — sum of confirmed UTXO values, unless the canonical
+  message's extensions block includes `bond: <integer>`, in which case use
+  exactly that value (capped at the confirmed balance).
+- **`days_unspent`** — floor((now - earliest_confirm_time) / 86400) over the
+  bonded set.
+- **`score`** — `score_v0` applied to the two values above.
+
+Emit `bond_confirmed` if metrics computed cleanly, or `bond_zero` /
+`bond_pending` / `bond_insufficient` as appropriate.
+
+### 6. Apply policy thresholds
+
+If the caller passed `min_sats` and/or `min_days`, compare them against the
+computed metrics. Add `below_min_sats` / `below_min_days` to the codes list on
+failure.
+
+Final `ok` is `true` iff **every signature code is a success AND all thresholds
+are met**. Bond observations (`bond_zero`, `bond_pending`) do NOT set
+`ok: false` on their own — they're observations, not failures. Policy layers
+decide what the observations mean.
+
+## Output shape
+
+```json
+{
+    "ok": true,
+    "codes": ["sig_ok_bip322", "bond_confirmed"],
+    "address": "bc1qalice...",
+    "attestation_id": "a3f5b8c2...",
+    "identities": [{ "protocol": "github", "identifier": "alice" }],
+    "metrics": {
+        "sats_bonded": 125000,
+        "days_unspent": 47,
+        "score": 30.12
+    },
+    "network": "mainnet"
+}
+```
+
+On failure, `ok: false` with `reasons` (for `/api/check`) or just a fuller
+`codes` list (for `/api/verify`). See the
+[status & error codes](/attest/api#status-codes) reference.
+
+## Offline vs. online
+
+Steps 1–3 are **pure cryptographic work**: parsing, hashing, signature
+verification. An air-gapped machine with `bip322-js` (or the Python equivalent)
+and nothing else can perform them.
+
+Steps 4–6 need **live chain state**. A verifier that can reach any
+Esplora-compatible endpoint (public or private) can do them. Steps 4–6 produce
+metrics; step 3 produces the authority.
+
+This separation means a signed proof is **permanently verifiable** — you can
+always re-check it against whatever chain state is current. Proofs don't go
+stale except when the signer spends the bonded UTXOs.
+
+## Caching
+
+- `/api/check` (hosted) caches verification outcomes for **60 seconds**. Bond
+  state changes at Bitcoin's block cadence — 60 s of staleness is well below the
+  block time and well above the noise floor.
+- `/api/verify` (raw verification) returns `no-store`. It's the primitive caches
+  should build on, not the other way around.
+- Clients SHOULD treat metrics as fresh for ~60 s for UX but MUST NOT persist
+  them as authoritative ground truth — always re-verify before any decision
+  that's material.
+
+## See also
+
+- [**Canonical message format**](/ecosystem/canonical-message) — what step 1
+  parses
+- [**BIP-322 signing**](/ecosystem/bip322) — what step 2 verifies
+- [**Conformance vectors**](/ecosystem/conformance) — how we prove the algorithm
+  is deterministic across impls
+- [**Security — threats to the verifier**](/ecosystem/security#threats-to-the-verifier)
+  — wrong-active-account, stale state, relay censorship

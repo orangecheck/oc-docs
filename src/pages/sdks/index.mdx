@@ -1,0 +1,80 @@
+export const metadata = {
+    title: 'SDKs',
+    description:
+        'Every published @orangecheck/* package mapped to which protocol it serves and which stack to pick.',
+};
+
+# SDKs
+
+Every published package in the OrangeCheck ecosystem, with its purpose and the
+protocol(s) it serves. All are MIT-licensed and live in the
+[`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo.
+
+## Core — cross-cutting
+
+Serve every sibling protocol:
+
+| Package                                               | Purpose                                                                                                                                       |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/sdk`](/sdks/javascript)                | Core TypeScript SDK — `check()`, `verify()`, `createAttestation()`, `issueChallenge()`, canonical-message builders, Nostr discovery, scoring. |
+| [`orangecheck` (Python)](/sdks/python)                | Python SDK. Same surface, same conformance vectors.                                                                                           |
+| [`@orangecheck/gate`](/sdks/gate)                     | HTTP middleware for Express / Next / Fastify / Hono / Workers.                                                                                |
+| [`@orangecheck/cli`](/sdks/cli)                       | `oc` shell — check / verify / create / challenge / discover.                                                                                  |
+| [`@orangecheck/react`](/sdks/react)                   | `<OcBadge>`, `<OcGate>`, `<OcChallengeButton>`.                                                                                               |
+| [`@orangecheck/wallet-adapter`](/sdks/wallet-adapter) | One `sign(message)` API across UniSat / Xverse / Leather / Alby.                                                                              |
+| `@orangecheck/relay-filter`                           | Sybil-filter policy for Nostr relays. Strfry plugin + framework-agnostic core.                                                                |
+| `@orangecheck/airdrop-gate`                           | Turn a candidate list into a sybil-resistant allowlist.                                                                                       |
+
+## OC Lock
+
+| Package                    | Purpose                                                                           |
+| -------------------------- | --------------------------------------------------------------------------------- |
+| `@orangecheck/lock-crypto` | X25519 / HKDF-SHA256 / AES-256-GCM primitives. Narrow surface, audited.           |
+| `@orangecheck/lock-core`   | Envelope format, RFC-8785 canonicalization, `seal()`, `unseal()`.                 |
+| `@orangecheck/lock-device` | Device-key generation, BIP-322-bound binding statements, Nostr directory publish. |
+
+## OC Stamp
+
+| Package                   | Purpose                                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `@orangecheck/stamp-core` | Canonical message, envelope format, `stamp()` + `verify()`, optional OC Attest reference. |
+| `@orangecheck/stamp-ots`  | OpenTimestamps calendar client, proof upgrade, pluggable anchor verifier.                 |
+
+## OC Vote
+
+| Package                  | Purpose                                                                                                                    |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `@orangecheck/vote-core` | Reference implementation of oc-vote-protocol — `canonicalize`, `pollId`, `commit`, `voterWeight`, deterministic `tally()`. |
+| `@orangecheck/vote-cli`  | Shell interface to tally / verify / inspect polls.                                                                         |
+
+## Which to install
+
+| You're building…                  | Install                                                       |
+| --------------------------------- | ------------------------------------------------------------- |
+| Gate an HTTP route                | `@orangecheck/gate`                                           |
+| Sign-in-with-Bitcoin flow         | `@orangecheck/sdk` (for `issueChallenge` / `verifyChallenge`) |
+| React app rendering badges        | `@orangecheck/react`                                          |
+| Browser wallet integration        | `@orangecheck/wallet-adapter`                                 |
+| Server-side TypeScript verifier   | `@orangecheck/sdk`                                            |
+| Python / Django / FastAPI service | `orangecheck` (plus `'[verify]'` for local BIP-322 checks)    |
+| Scripts + one-shot checks         | `@orangecheck/cli`                                            |
+| Nostr relay filter                | `@orangecheck/relay-filter`                                   |
+| Airdrop list filter               | `@orangecheck/airdrop-gate`                                   |
+| E2E-encrypted envelopes           | `@orangecheck/lock-core` + `lock-device`                      |
+| Timestamped signed statements     | `@orangecheck/stamp-core` + `stamp-ots`                       |
+| Stake-weighted poll tally         | `@orangecheck/vote-core`                                      |
+
+## Semver
+
+Everything below 1.0. Minor bumps CAN change exported types; patch bumps won't.
+Check the per-package README before upgrading; diff the changelog if something
+looks ambiguous.
+
+## Cross-impl conformance
+
+The TypeScript SDK and the Python SDK ship vendored copies of the same canonical
+test vectors from the protocol repos. CI re-runs both suites on every push and
+fails on drift. This means: a canonical message built in TS and a canonical
+message built in Python for the same inputs are **byte-identical**. Ditto
+attestation IDs, poll IDs, stamp envelope IDs. If you ever observe otherwise,
+it's a bug — please file it.

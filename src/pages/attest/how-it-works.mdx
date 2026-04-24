@@ -1,0 +1,113 @@
+export const metadata = {
+    title: 'How OC Attest works',
+    description:
+        'Sign → publish → verify. The whole OC Attest protocol in one page.',
+};
+
+# How OC Attest works
+
+Three steps. One primitive. Fits on a napkin.
+
+## 1. Sign
+
+The signer builds a [canonical message](/ecosystem/canonical-message) with their
+Bitcoin address, any handles they want to bind, a nonce, and a timestamp:
+
+```
+orangecheck
+identities: github:alice,nostr:npub1alice...
+address: bc1qalice...
+purpose: forum-post
+nonce: a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5
+issued_at: 2026-04-24T06:47:29.977Z
+ack: I attest control of this address and bind it to my identities.
+```
+
+They sign it with their Bitcoin wallet via [BIP-322](/ecosystem/bip322). Output:
+a base64 signature. No transaction, no spending, nothing leaves the wallet.
+
+The content-addressed **attestation_id** is `sha256(canonical_message)` encoded
+as 64 lowercase hex characters.
+
+## 2. Publish
+
+The signed attestation is a self-contained JSON blob:
+
+```json
+{
+    "message": "orangecheck\nidentities: github:alice,nostr:npub1alice...\n...",
+    "signature": "AUBH...",
+    "scheme": "bip322",
+    "address": "bc1qalice...",
+    "attestation_id": "a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+    "identities": [
+        { "protocol": "github", "identifier": "alice" },
+        { "protocol": "nostr", "identifier": "npub1alice..." }
+    ],
+    "issued_at": "2026-04-24T06:47:29.977Z",
+    "verification_url": "https://ochk.io/a/a3f5b8c2..."
+}
+```
+
+This blob is published to [Nostr kind-30078](/ecosystem/nostr-kind-30078) for
+durable public discovery. The `d`-tag is the attestation_id; the `#address` tag
+lets verifiers query by Bitcoin address.
+
+The signer can also share the blob directly (URL, embedded badge, email, QR
+code). Publishing to Nostr is _optional_ — the blob verifies offline regardless.
+
+## 3. Verify
+
+Any verifier does six deterministic steps (full detail on
+[verification](/attest/verification)):
+
+1. Parse the canonical message. Reject if header literals aren't exact or
+   extensions aren't lexicographically sorted.
+2. Verify the BIP-322 signature against the declared address.
+3. Compute `sha256(msg)`; confirm it matches `attestation_id`.
+4. Query public Bitcoin explorers (mempool.space, blockstream.info, or your own
+   Esplora node) for current UTXOs at the address.
+5. Compute `sats_bonded` and `days_unspent` from live chain state — **never
+   trust the values inside the signed message**.
+6. Apply policy thresholds (e.g. `min_sats >= 100_000 && min_days >= 30`) and
+   return pass/fail with metrics.
+
+```bash
+curl "https://ochk.io/api/check?addr=bc1q...&min_sats=100000&min_days=30"
+```
+
+```json
+{
+  "ok": true,
+  "sats": 125000,
+  "days": 47,
+  "score": 30.12,
+  "attestation_id": "a3f5b8c2...",
+  "identities": [...]
+}
+```
+
+That's the whole API surface for most gates. The hosted API at `ochk.io` caches
+results for 60 seconds; self-hosted verifiers can tune their own caching.
+
+## Revocation
+
+There is **no explicit revocation event**. Two paths:
+
+- **Implicit** — spend the bonded UTXOs. Next verification reports `bond_zero`
+  or `bond_insufficient`. Every consumer sees it within a block.
+- **Explicit replacement** — publish a new attestation at a fresh address, or a
+  new event with the same `d`-tag (which replaces the old event per kind-30078
+  semantics).
+
+The chain state is authoritative. Nothing else needs to be.
+
+## What's next
+
+- [**Scoring**](/attest/scoring) — what `sats_bonded`, `days_unspent`, and
+  `score_v0` mean
+- [**Verification**](/attest/verification) — full algorithm, including edge
+  cases
+- [**HTTP API**](/attest/api) — endpoint reference
+- [**Guide: gate an Express route**](/attest/guides/express) — simplest
+  shippable integration

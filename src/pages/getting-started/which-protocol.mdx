@@ -1,0 +1,86 @@
+export const metadata = {
+    title: 'Which protocol do I need?',
+    description:
+        'A short decision tree across OC Attest, Lock, Stamp, Vote, and Agent. Pick the right starting point in under a minute.',
+};
+
+# Which protocol do I need?
+
+A short decision tree. None of these are mutually exclusive — most real
+deployments compose two or three. But start with exactly one.
+
+## Decision tree
+
+```
+Are you asking: "is this user / caller legitimate or a bot?"
+│
+├── YES → OC Attest (sybil resistance via proof of Bitcoin stake)
+│         → /attest
+│
+└── NO → What DO you want?
+          │
+          ├── "I want to send a message only X can read."
+          │   → OC Lock (E2E encryption addressed to a BTC address)
+          │     → /lock
+          │
+          ├── "I want to prove X said Y at time T, permanently."
+          │   → OC Stamp (Bitcoin-block-anchored signed statements)
+          │     → /stamp
+          │
+          ├── "I want a stake-weighted poll that can't be sybil-farmed."
+          │   → OC Vote
+          │     → /vote
+          │
+          └── "I want an agent / bot to sign on my behalf, revocably."
+              → OC Agent (design-state — come back soon)
+                → /agent
+```
+
+## Match by use case
+
+| You're building…                                                             | Pick                                                                             |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| A forum, Nostr relay, airdrop allowlist, dApp gate                           | **OC Attest**                                                                    |
+| A dead-drop / sealed-message box addressed to a BTC address                  | **OC Lock**                                                                      |
+| A commit / release signing flow with durable provenance                      | **OC Stamp**                                                                     |
+| A DAO proposal vote with stake × time weighting                              | **OC Vote**                                                                      |
+| Delegated signing for an automated pipeline                                  | **OC Agent** (watch the space)                                                   |
+| A social network where posts are cryptographically bound to Bitcoin identity | **OC Attest + OC Lock**                                                          |
+| A governance portal where votes are public + weighted by stake               | **OC Vote + OC Attest** (Attest gates who can vote; Vote weights what they cast) |
+| An archive whose entries prove both authorship and timestamp                 | **OC Stamp** (authorship via BIP-322, time via OTS anchor)                       |
+
+## Common patterns
+
+### Attest as the floor
+
+Most deployments use **OC Attest** as a cheap entry gate (e.g. 10 000 sats for
+30 days) and then layer a domain-specific protocol on top. The Attest proof
+filters bots at the door; the upstream protocol handles the actual workflow.
+
+### Stamp + Attest
+
+An OC Stamp envelope can optionally embed an OC Attest `attestation_id` as a
+"stake at signing" signal. This lets anyone verifying the stamp also see how
+much stake the signer held at the moment they signed — useful for review sites,
+audit trails, and reputation systems.
+
+### Vote + Attest
+
+OC Vote's `sats_days` weight mode resolves voter weight directly from the
+signer's Bitcoin UTXOs, which is an Attest-adjacent concept. You don't need an
+Attest attestation to run a Vote poll — but if you want to gate _who can cast a
+ballot at all_, Attest is the door.
+
+## If this still doesn't fit
+
+OrangeCheck isn't the right tool for:
+
+- **Proof of personhood / unique-human guarantees.** None of these protocols
+  prove that a BTC address maps to a unique human. Use
+  [Worldcoin / World ID](https://worldcoin.org),
+  [BrightID](https://brightid.org), or similar.
+- **Private / zero-knowledge stake proofs.** Every OrangeCheck proof is public
+  by design. For privacy-preserving stake signals, look at Sismo or zkBadges.
+- **Generic KYC / compliance.** None of these protocols collect or verify
+  personal information. They prove cryptographic facts about Bitcoin UTXOs and
+  signatures.

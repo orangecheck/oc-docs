@@ -1,0 +1,162 @@
+export const metadata = {
+    title: 'Guide: sign in with Bitcoin',
+    description:
+        'End-to-end signed-challenge session auth. Password-less, custody-free, BIP-322-bound.',
+};
+
+# Sign in with Bitcoin
+
+Password-less auth where the user proves they control a Bitcoin address. The
+session is bound to a BIP-322 signature; there's no account to create, no
+password to forget, no email to phish.
+
+## The flow
+
+```
+┌──────────┐   1. GET  /api/challenge?addr=bc1q…           ┌─────────┐
+│  Client  │ ─────────────────────────────────────────▶    │ Server  │
+│          │                                                │         │
+│          │   ◀──── { message, nonce, expiresAt }          │         │
+│          │                                                │         │
+│          │   2. user signs message in their wallet        │         │
+│          │                                                │         │
+│          │   3. POST /api/auth/signin                     │         │
+│          │        { message, signature, expectedNonce }   │         │
+│          │ ─────────────────────────────────────────▶    │  ← verifies
+│          │                                                │  ← upserts account
+│          │                                                │  ← sets Set-Cookie
+│          │                                                │         │
+│  ◀────────────── { ok: true, account }                    │         │
+└──────────┘                                                └─────────┘
+```
+
+The session cookie is `httpOnly + Secure + SameSite=Lax` with a 30-day Max-Age.
+Subsequent authenticated requests ride the cookie; the server reads
+`req.session.verifiedAddress` as a cryptographically-proven identifier.
+
+## Server implementation
+
+```ts
+import { issueChallenge, verifyChallenge } from '@orangecheck/sdk';
+import express from 'express';
+import session from 'express-session';
+
+const app = express();
+app.use(express.json());
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET!,
+        cookie: {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000,
+        },
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
+// 1. Issue
+app.get('/auth/challenge', (req, res) => {
+    const addr = String(req.query.addr);
+    const c = issueChallenge({
+        address: addr,
+        ttlSeconds: 300,
+        audience: 'https://example.com',
+        purpose: 'login',
+    });
+    req.session.ocNonce = c.nonce;
+    res.json({ message: c.message, nonce: c.nonce, expiresAt: c.expiresAt });
+});
+
+// 2. Verify + open session
+app.post('/auth/signin', async (req, res) => {
+    const result = await verifyChallenge({
+        message: req.body.message,
+        signature: req.body.signature,
+        expectedNonce: req.session.ocNonce,
+        expectedAudience: 'https://example.com',
+        expectedPurpose: 'login',
+    });
+    if (!result.ok)
+        return res.status(401).json({ ok: false, reason: result.reason });
+
+    req.session.verifiedAddress = result.address;
+    delete req.session.ocNonce;
+    res.json({ ok: true, address: result.address });
+});
+```
+
+## Client implementation
+
+With a NIP-07-style Bitcoin wallet extension:
+
+```tsx
+import { useEffect, useState } from 'react';
+
+export function SignIn({ address }: { address: string }) {
+    const [message, setMessage] = useState<string | null>(null);
+    const [nonce, setNonce] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetch(`/auth/challenge?addr=${address}`)
+            .then((r) => r.json())
+            .then(({ message, nonce }) => {
+                setMessage(message);
+                setNonce(nonce);
+            });
+    }, [address]);
+
+    async function handleSign() {
+        if (!message || !nonce) return;
+        // Use @orangecheck/wallet-adapter for cross-wallet signing
+        const signature = await window.unisat.signMessage(
+            message,
+            'bip322-simple'
+        );
+        const r = await fetch('/auth/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, signature, expectedNonce: nonce }),
+        });
+        const body = await r.json();
+        if (body.ok) window.location.href = '/dashboard';
+    }
+
+    return <button onClick={handleSign}>Sign in with Bitcoin</button>;
+}
+```
+
+## Pro tip — wrong-active-account detection
+
+The #1 cause of `sig_invalid` in production: the user's wallet is switched to a
+different account than the one they're trying to sign for. The signature is
+valid — for the wrong address.
+
+Before signing, call the wallet's `requestAccounts()` or `getAddresses()` and
+compare to the address you issued the challenge for. Bail out with a clear error
+if they differ. [`@orangecheck/wallet-adapter`](/sdks/wallet-adapter) does this
+automatically.
+
+## Session hygiene
+
+- **Cookie flags.** `httpOnly + Secure + SameSite=Lax` (or `Strict`). No
+  exceptions in production.
+- **Nonce TTL.** Short — 5 minutes is reasonable. Longer TTLs widen the window
+  for phishing-then-replay.
+- **Audience + purpose.** Must be set on every challenge and checked on verify.
+  Do NOT accept a challenge issued for a different host or different purpose.
+- **Rate limit.** `/challenge` per-IP to prevent enumeration attacks.
+- **CSRF.** State-changing endpoints require the session cookie plus a
+  `Sec-Fetch-Site: same-origin` check (or a CSRF token). SameSite=Lax is not
+  enough on its own for older browsers.
+
+## See also
+
+- [**HTTP API — `/api/challenge`**](/attest/api) — the public primitive this
+  guide wraps
+- [**`@orangecheck/wallet-adapter`**](/sdks/wallet-adapter) — cross-wallet
+  signing + active-account checks
+- [**Security model**](/ecosystem/security) — CSRF, cookie, and replay
+  considerations

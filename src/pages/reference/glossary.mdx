@@ -1,0 +1,200 @@
+export const metadata = {
+    title: 'Glossary',
+    description: 'Every term used across the OrangeCheck ecosystem docs.',
+};
+
+# Glossary
+
+Quick reference for every cross-protocol term.
+
+## Attestation
+
+An **OC Attest** signed envelope. Refers specifically to the OC Attest artifact
+— NOT to OC Lock envelopes, OC Stamp envelopes, or OC Vote ballots (which we
+avoid calling "attestations" to keep the vocabulary clean).
+
+## Attestation ID
+
+`SHA-256(canonical_message)` encoded as 64 lowercase hex characters.
+Content-addressed, deterministic, URL-safe. Two different messages produce
+different IDs.
+
+## BIP-322
+
+[Bitcoin Improvement Proposal 322](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki)
+— the signing scheme every OrangeCheck protocol uses. See
+[BIP-322 signing](/ecosystem/bip322).
+
+## Bond
+
+A declared commitment of sats, expressed via the `bond:` extension inside a
+signed canonical message. Verifiers fail with `bond_insufficient` when the
+confirmed balance drops below the declared bond, and use the declared value (not
+the confirmed balance) as `sats_bonded` for scoring.
+
+## Canonical message
+
+The exact UTF-8 text a Bitcoin wallet signs. Seven core lines for OC Attest, LF
+endings, one trailing LF, optional lexicographically-sorted extensions. Strict
+by design — see [canonical message](/ecosystem/canonical-message).
+
+## CAP (OC Vote)
+
+`cap_sats` / `cap_days` — per-UTXO upper bounds in the `sats_days` weight mode.
+Prevents a single massive or ancient UTXO from dominating a tally.
+
+## Chain analysis
+
+The practice of clustering, tagging, and correlating Bitcoin addresses via
+on-chain heuristics. Publishing an OrangeCheck proof exposes the bonded address
+to chain-analysis linkage. See [security — chain analysis](/ecosystem/security).
+
+## Challenge (signed-challenge auth)
+
+A short-lived message with header `orangecheck-auth` and an explicit
+`expires_at`. The user signs it with BIP-322 to prove address control in real
+time. Distinct from an attestation so a signed challenge can never be confused
+with one.
+
+## Commit (OC Vote secret mode)
+
+`HMAC(secret, pollId || optionIndex)` — a voter's masked choice during the
+commit phase. Revealed in the reveal phase so the poll's tally can count it.
+
+## Conformance vector
+
+A `(inputs, expected_output)` fixture pinned in a protocol's
+`oc-*-protocol/conformance/` directory. Reference implementations are required
+to pass them on every CI run. See [conformance vectors](/ecosystem/conformance).
+
+## CSRF
+
+Cross-Site Request Forgery — when a malicious site tricks a logged-in user's
+browser into sending a request to a different site. Defended via `SameSite=Lax`
+session cookies plus a `Sec-Fetch-Site` / `Origin` check on state-changing auth
+endpoints.
+
+## `days_unspent`
+
+Integer number of days since the earliest confirmation time among the bonded
+UTXOs (or, if `bond:` is present, computed via oldest-first greedy selection).
+Recomputed from live chain state at verification time.
+
+## Device key (OC Lock)
+
+An X25519 keypair representing one client device. Bound to a Bitcoin address via
+a BIP-322-signed binding statement, published to the kind-30078 directory.
+
+## Discovery relay
+
+A Nostr relay queried to find a published artifact (attestation, Lock device
+record, Stamp envelope, Vote poll) by its addressable tags. Default set ships
+with each SDK.
+
+## Envelope (OC Lock / OC Stamp)
+
+A self-contained JSON blob containing the artifact + signature + metadata.
+Verifies offline. Formats are per-protocol.
+
+## Gate
+
+A server-side policy that either passes or rejects a request based on an OC
+Attest proof. `@orangecheck/gate` ships drop-in gates for common Node / edge
+frameworks.
+
+## Handle
+
+A user-facing identifier on an external system — `nostr:npub1…`, `github:alice`,
+`dns:example.com`, `twitter:@alice`, etc. Bound inside the signed message as a
+self-asserted claim.
+
+## Identity binding
+
+A `protocol:identifier` pair bound inside the `identities:` field of an OC
+Attest canonical message. Self-asserted — must be verified out-of-band if
+ownership matters.
+
+## Kind 30078
+
+The Nostr event kind the OrangeCheck ecosystem uses for publishing.
+Parameterized replaceable per
+[NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md)
+(application-specific data). See
+[Nostr kind-30078](/ecosystem/nostr-kind-30078).
+
+## MiCA / VASP / MSB
+
+Regulatory designations for custodial cryptocurrency services: Crypto-Asset
+Service Provider (EU MiCA 2023/1114), Virtual Asset Service Provider (FATF),
+Money Services Business (US BSA 31 USC §5330). OrangeCheck is **none of these**
+— the protocols sign and verify messages; they never custody, transfer, or
+convert assets.
+
+## Nonce (canonical message)
+
+16 random bytes encoded as 32 lowercase hex characters. Prevents replay — a
+signature for one `nonce` cannot be re-used for another.
+
+## OTS (OpenTimestamps)
+
+The protocol OC Stamp uses to anchor envelope IDs to Bitcoin block headers.
+Calendars batch digests into a Merkle tree; the root is committed on-chain;
+clients upgrade pending proofs to confirmed ones.
+
+## Reference score (`score_v0`)
+
+```
+score_v0 = round(ln(1 + sats_bonded) * (1 + days_unspent / 30), 2)
+```
+
+One registered algorithm for OC Attest. Advisory — gates should use raw metrics.
+
+## Relying Party (RP)
+
+The app that consumes a proof and makes a decision. In OrangeCheck, an RP is
+whatever is gating access.
+
+## `sats_bonded`
+
+Integer satoshis — sum of confirmed, unspent UTXO values at the address, or the
+declared `bond:` value if present.
+
+## Scheme
+
+The signature scheme used: `"bip322"` or `"legacy"`. BIP-322 is preferred.
+`legacy` is accepted only for P2PKH addresses.
+
+## Subject
+
+In `/api/check` / `/api/discover`, the thing you're querying about — an address,
+attestation ID, or bound identity. Every endpoint accepts exactly one subject
+per request.
+
+## Tier
+
+A UI convenience for rendering OC Attest proofs. Four tiers: `bronze` (10k ×
+30d), `silver` (100k × 90d), `gold` (1M × 180d), `platinum` (10M × 365d).
+**Thresholds are a suggestion, not protocol.**
+
+## UTXO
+
+Unspent Transaction Output. The atomic unit of Bitcoin balance. An address's
+confirmed UTXOs are what `sats_bonded` sums over.
+
+## Verifier
+
+Any app or server that checks a signature and recomputes metrics. The hosted
+verifier at `ochk.io/api/*` is one; the SDK's `verify()` is another; your own
+server is a third.
+
+## Weight mode (OC Vote)
+
+`one_per_address` / `sats` / `sats_days` — how a ballot resolves to a numeric
+weight in the tally. See [weight modes](/vote/weight-modes).
+
+## Wrench attack
+
+Physical-coercion attack on a cryptocurrency holder. Named after
+[xkcd/538](https://xkcd.com/538/). Relevant because `sats_bonded` is a public
+wealth signal; binding large bonds to real-name handles amplifies the risk. See
+[security — wealth advertisement](/ecosystem/security#threats-to-the-signer).

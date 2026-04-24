@@ -1,0 +1,183 @@
+export const metadata = {
+    title: '@orangecheck/sdk (TypeScript)',
+    description:
+        'The core TypeScript SDK. check, verify, createAttestation, issueChallenge, canonical-message builders, Nostr discovery, scoring.',
+};
+
+# `@orangecheck/sdk`
+
+The core TypeScript SDK. Everything else in the ecosystem imports from here.
+
+## Install
+
+```bash
+npm i @orangecheck/sdk
+```
+
+Zero Node-only dependencies beyond what's listed in `package.json`. Works in
+Node 20+, Deno, Bun, and every modern browser.
+
+## The three load-bearing exports
+
+```ts
+import { check, createAttestation, verify } from '@orangecheck/sdk';
+```
+
+- **`check(params)`** — the sybil-gate primitive. Discovers the most recent
+  attestation for a subject, verifies it, applies thresholds.
+- **`verify(input, opts?)`** — raw attestation verification. BIP-322 + live
+  chain state; no Nostr lookup.
+- **`createAttestation(opts)`** — build a signed envelope from a canonical
+  message + signature.
+
+### `check()`
+
+```ts
+const result = await check({
+    addr: 'bc1q...',        // OR id: '<attestation_id>' OR identity: { protocol, identifier }
+    minSats: 100_000,
+    minDays: 30,
+    relays: [...],          // optional override — defaults to DEFAULT_RELAYS
+    verifyOptions: {},      // optional — passed through to verify()
+});
+
+if (result.ok) {
+    // result.sats, result.days, result.score, result.attestation_id, result.identities
+}
+```
+
+The function fans out to multiple Nostr relays, verifies BIP-322 locally,
+queries Esplora for current chain state, applies thresholds, and returns the
+same shape the hosted `/api/check` returns. No server round-trip required.
+
+### `verify()`
+
+```ts
+const outcome = await verify(
+    {
+        addr: 'bc1q...',
+        msg: canonicalMessage,
+        sig: base64Signature,
+        scheme: 'bip322',
+    },
+    { testMode: false }
+);
+
+// outcome.ok, outcome.codes, outcome.metrics, outcome.identities
+```
+
+Pure cryptographic + chain-state verification. Offline for steps 1–3; needs
+Esplora for steps 4–6. See [Attest verification](/attest/verification).
+
+### `createAttestation()`
+
+```ts
+const envelope = await createAttestation({
+    message: canonicalMessage,
+    signature: base64Signature,
+    scheme: 'bip322',
+    address: 'bc1q...',
+    identities: [{ protocol: 'github', identifier: 'alice' }],
+});
+
+// envelope.attestation_id, envelope.verification_url, …
+```
+
+## Signed-challenge flow
+
+```ts
+import { issueChallenge, verifyChallenge } from '@orangecheck/sdk';
+
+const challenge = issueChallenge({
+    address: 'bc1q...',
+    ttlSeconds: 300,
+    audience: 'https://example.com',
+    purpose: 'login',
+});
+
+// Client signs challenge.message via wallet, POSTs back.
+
+const result = await verifyChallenge({
+    message: challenge.message,
+    signature: base64Signature,
+    expectedNonce: challenge.nonce,
+    expectedAudience: 'https://example.com',
+    expectedPurpose: 'login',
+});
+
+if (result.ok) {
+    // result.address — cryptographically proven
+}
+```
+
+See [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) for the
+end-to-end session flow.
+
+## Lower-level building blocks
+
+Re-exported for integrators who need finer control:
+
+```ts
+import type { StatusCode } from '@orangecheck/sdk';
+
+import {
+    buildCanonicalMessage,
+    computeAllScores,
+    computeScore,
+    createAttestationEnvelope,
+    createAttestationEvent,
+    DEFAULT_RELAYS,
+    discoverAttestations,
+    extractAttestationIdFromUrl,
+    formatIdentities,
+    generateAttestationId,
+    getAttestationsForAddress,
+    getAttestationsForIdentity,
+    getVerificationUrl,
+    parseIdentities,
+    publishToRelays,
+    queryByAddress,
+    queryByAttestationId,
+    queryByIdentity,
+    STATUS_META,
+} from '@orangecheck/sdk';
+
+// Canonical message builders
+
+// Nostr integration
+
+// Discovery helpers
+
+// Scoring
+
+// Human-readable status-code metadata
+```
+
+## Types
+
+```ts
+import type {
+    AttestationEnvelope,
+    Challenge,
+    CheckParams,
+    CheckResult,
+    IdentityBinding,
+    StatusCode,
+    VerifyOutcome,
+} from '@orangecheck/sdk';
+```
+
+## Conformance
+
+Ships vendored canonical-message + attestation-id + scoring + BIP-322
+conformance vectors (`tv01`–`tv23`). `yarn test` runs them all. These are the
+same vectors the Python SDK uses, which is how cross-impl byte identity is
+guaranteed.
+
+## See also
+
+- [**Canonical message format**](/ecosystem/canonical-message)
+- [**BIP-322 signing**](/ecosystem/bip322)
+- [**OC Attest — HTTP API**](/attest/api) — the server-side mirror of this SDK's
+  shape
+- [**`orangecheck` (Python)**](/sdks/python) — the Python twin

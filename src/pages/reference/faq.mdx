@@ -1,0 +1,147 @@
+export const metadata = {
+    title: 'FAQ',
+    description: 'Common questions across the OrangeCheck ecosystem.',
+};
+
+# FAQ
+
+Common questions across all the sibling protocols.
+
+## Do coins move?
+
+No. Nothing in the OrangeCheck ecosystem broadcasts Bitcoin transactions. Every
+protocol signs messages; chain state is **read, not written**. Your funds never
+leave your wallet.
+
+## Is this custodial?
+
+No. No protocol, no reference implementation, and no hosted service in the
+ecosystem requires a third party to hold funds, keys, or signatures. The signed
+message + signature is the artifact; you share it directly.
+
+## Which wallets work?
+
+Anything that signs via BIP-322. Preferred because it works with every address
+type (P2WPKH / P2TR / P2PKH / P2SH).
+
+- **Browser:** UniSat, Xverse, Leather, Alby
+- **Desktop:** Sparrow, Bitcoin Core, Electrum (legacy scheme only for Electrum)
+- **Hardware:** via PSBT flow — Coldcard, Trezor (with limitations), Ledger
+  (limited)
+
+See the [BIP-322 signing](/ecosystem/bip322) page for the full matrix.
+
+## Is OC Attest reputation?
+
+No. Reputation implies social judgment. OC Attest is a cryptographic stake
+receipt — it tells a verifier "this address holds N sats and has held them for N
+days." That's a cost signal, not a reputation score.
+
+Calling it reputation misleads users into expecting social-graph-style trust
+transitivity that isn't there.
+
+## Is OC Attest identity / KYC?
+
+No. An attestation proves address control plus some self-asserted handles.
+That's not proof-of-human, not proof-of-name, not KYC. See
+[compared to alternatives](/getting-started/which-protocol) for the full matrix.
+
+## What prevents forging a proof?
+
+Three layers:
+
+1. **Bitcoin signatures are cryptographically unforgeable.** BIP-322
+   verification is deterministic public-key math.
+2. **Chain state is publicly auditable.** `sats_bonded` and `days_unspent` are
+   recomputed from mempool.space / blockstream.info / your own node on every
+   verify.
+3. **Identity bindings are self-asserted.** Verifiers MUST check handle
+   ownership out-of-band; nothing in the protocol is "trust the claim."
+
+## What if I spend my bonded UTXOs?
+
+The next verify sees `bond_zero` or `bond_insufficient`. That's the revocation
+path — the chain is the authority.
+
+## Can I use a fresh address each time?
+
+Yes, and for privacy-conscious use cases you SHOULD. Publishing a proof
+permanently links the address to the handles you assert. A fresh single-purpose
+address avoids that linkage for your main stack.
+
+## Can a whale game stake-weighted systems?
+
+Yes, at proportional cost. Holding `N × min_sats` lets an attacker produce `N`
+passing sybils. Raise thresholds to raise the cost. Pair with non-economic
+signals (humanness proofs, graph inputs) when one-per-human matters.
+
+See
+[security model — sybil at the economic floor](/ecosystem/security#threats-to-the-verifier).
+
+## Why Bitcoin and not Ethereum?
+
+Bitcoin's opportunity cost is real, measurable, and adversary-agnostic. Ethereum
+gas is volatile; most non-Bitcoin stake proofs involve governance tokens that
+can be inflated or forked. Bitcoin UTXOs give the cleanest economic signal on
+the open internet.
+
+Design rule: _"if a feature works identically on Ed25519, it doesn't belong
+here."_ The Bitcoin economic layer is load-bearing.
+
+## How is OC Attest different from Worldcoin / BrightID?
+
+Worldcoin and BrightID are **proof-of-personhood** protocols — they try to
+answer "is this one unique human?" OC Attest is a **cost filter** — "does this
+address have Bitcoin skin in the game?" Different questions, different
+solutions. They compose well: OC Attest at the entry gate, personhood system
+above it.
+
+## How is OC Attest different from NIP-05?
+
+NIP-05 proves control of a DNS domain via an HTTP lookup. OC Attest proves
+control of a Bitcoin address via a cryptographic signature. Both are
+self-asserted identity primitives for Nostr; Attest adds an economic signal that
+NIP-05 doesn't have.
+
+Use NIP-05 when "which domain is this" matters. Use OC Attest when "has this
+person committed real capital" matters. Stack both for either signal alone.
+
+## Do I have to publish to Nostr?
+
+No — publishing is optional. The attestation envelope is a self-contained JSON
+blob that verifies offline. Publishing just makes it discoverable by address,
+handle, or ID without the caller needing to already have the blob. Same for Lock
+envelopes, Stamp envelopes, and Vote ballots.
+
+## Can I self-host?
+
+Yes. Every protocol's reference implementation is MIT-licensed and runs on your
+infrastructure — no hosted dependency. For OC Attest in particular,
+`@orangecheck/sdk` is a complete local verifier (Nostr query + BIP-322 check +
+Esplora fetch) and needs nothing from ochk.io.
+
+The hosted `ochk.io/api/*` endpoints exist for convenience; none of the
+protocols require them.
+
+## What about privacy-preserving proofs (ZK)?
+
+Out of scope for v0 of every protocol. The address is public by design so any
+verifier can recompute. For privacy, rotate addresses — use a fresh,
+single-purpose address per proof.
+
+ZK-style private-balance proofs are future research. The current family
+prioritizes offline-verifiability and transparency over privacy.
+
+## Why is the protocol header frozen at v0?
+
+Any change to the canonical message format — including adding a version number —
+breaks every existing signature. We picked `orangecheck` / `oc-lock` /
+`oc-stamp` / `oc-vote` as the literal headers so the lack of a version number is
+intentional. v1 will use a different header (e.g., `orangecheck-v1`) and coexist
+with v0 until deprecated.
+
+## Further
+
+- [**Which protocol do I need?**](/getting-started/which-protocol)
+- [**Glossary**](/reference/glossary)
+- [**Shared security model**](/ecosystem/security)

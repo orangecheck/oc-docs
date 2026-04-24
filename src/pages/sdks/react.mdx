@@ -1,0 +1,132 @@
+export const metadata = {
+    title: '@orangecheck/react',
+    description:
+        'React components — <OcBadge>, <OcGate>, <OcChallengeButton>. Client-side primitives on top of @orangecheck/sdk.',
+};
+
+# `@orangecheck/react`
+
+React components for OC Attest. All client-side, built on `@orangecheck/sdk`.
+
+## Install
+
+```bash
+npm i @orangecheck/react @orangecheck/sdk
+```
+
+React 18 or 19. Works with Next.js (Pages + App Router), Vite, Remix, CRA, and
+any standard React toolchain.
+
+## `<OcBadge>`
+
+Render a live proof-of-stake badge for a Bitcoin address.
+
+```tsx
+import { OcBadge } from '@orangecheck/react';
+
+<OcBadge address="bc1qalice..." />;
+```
+
+- Queries Nostr for the most recent attestation at that address.
+- Verifies BIP-322 and fetches current chain state via Esplora.
+- Renders the tier, sats bonded, days unspent, and links to the verification
+  URL.
+- Falls back to a "no proof" skeleton if no attestation is found.
+
+Props:
+
+```ts
+interface OcBadgeProps {
+    address: string;
+    variant?: 'compact' | 'full'; // default 'full'
+    onClick?: (result) => void; // fires when the user clicks the badge
+    relays?: string[]; // custom relay set
+    className?: string;
+}
+```
+
+## `<OcGate>`
+
+Conditionally render children based on the user's stake.
+
+```tsx
+import { OcGate } from '@orangecheck/react';
+
+<OcGate address={userAddress} minSats={100_000} minDays={30}>
+    <PostEditor />
+</OcGate>;
+```
+
+Above the threshold, `<PostEditor>` renders. Below, a default "not-enough-stake"
+placeholder shows (customizable via the `fallback` prop).
+
+> **Warning.** `<OcGate>` is a **UI convenience**, not a security boundary. An
+> adversary bypasses client state trivially. Real access control must happen on
+> the server — use [`@orangecheck/gate`](/sdks/gate) or call `/api/check`
+> directly.
+
+Props:
+
+```ts
+interface OcGateProps {
+    address: string;
+    minSats?: number;
+    minDays?: number;
+    fallback?: React.ReactNode;
+    loading?: React.ReactNode;
+    children: React.ReactNode;
+}
+```
+
+## `<OcChallengeButton>`
+
+Button that kicks off the signed-challenge flow.
+
+```tsx
+import { OcChallengeButton } from '@orangecheck/react';
+
+<OcChallengeButton
+    address={userAddress}
+    audience="https://example.com"
+    purpose="login"
+    onVerified={(result) => {
+        // result.address is cryptographically proven
+        openSession(result.address);
+    }}
+/>;
+```
+
+Handles:
+
+- Fetching the challenge from `/auth/challenge`.
+- Opening the user's connected wallet (UniSat / Xverse / Leather / Alby).
+- Comparing the wallet's active address to the intended address and bailing out
+  if they differ.
+- POSTing the signature to `/auth/verify` (or your custom endpoint).
+
+## Styling
+
+The components ship with zero CSS baggage — they use Tailwind class hooks when
+available and unstyled semantic HTML otherwise. Override with `className` or
+wrap the default markup.
+
+## Typescript types
+
+Every prop and return type is exported:
+
+```ts
+import type {
+    BadgeVariant,
+    OcBadgeProps,
+    OcChallengeButtonProps,
+    OcGateProps,
+} from '@orangecheck/react';
+```
+
+## See also
+
+- [**`@orangecheck/sdk`**](/sdks/javascript) — the underlying logic
+- [**`@orangecheck/wallet-adapter`**](/sdks/wallet-adapter) — cross-wallet
+  signing
+- [**Sign in with Bitcoin**](/attest/guides/sign-in-with-bitcoin) — server-side
+  flow that pairs with `<OcChallengeButton>`

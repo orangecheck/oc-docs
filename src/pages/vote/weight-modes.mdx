@@ -1,0 +1,138 @@
+export const metadata = {
+    title: 'OC Vote — weight modes',
+    description:
+        'one_per_address, sats, sats_days. The three canonical ways to resolve a ballot into a weight.',
+};
+
+# Weight modes
+
+A poll's `weight_mode` determines how each ballot gets weighted in the final
+tally. Three modes ship as canonical; adding a new one requires a protocol
+version bump.
+
+## `one_per_address`
+
+One address, one vote. Ignores stake.
+
+```
+weight(voter) = 1 if voter_has_any_confirmed_utxo else 0
+```
+
+Use when:
+
+- You just want to prevent empty-address spam.
+- Stake isn't relevant to the decision (e.g., "community name change vote" where
+  holdings are a proxy for membership but not weight).
+
+Doesn't use:
+
+- `snapshot.utxos` for weighting (only for the address-liveness check).
+- `min_sats` / `min_days` (they're ignored in this mode).
+
+## `sats`
+
+One satoshi, one vote.
+
+```
+weight(voter) = sum(utxo.value for utxo in snapshot.utxos_for(voter)
+                    if utxo.value >= min_sats and utxo.age_days >= min_days)
+```
+
+`min_sats` is a per-UTXO floor — a voter with many dust UTXOs below threshold
+gets zero weight from those. `min_days` likewise.
+
+Use when:
+
+- Capital commitment is the signal.
+- You don't care about time — ownership right now is enough.
+- You're willing to let whales dominate (sats-weighted polls are plutocratic by
+  construction).
+
+## `sats_days`
+
+Sats × days, with an optional per-UTXO cap.
+
+```
+weight(voter) = sum(min(utxo.value, cap_sats)
+                    * min(utxo.age_days, cap_days)
+                    for utxo in snapshot.utxos_for(voter)
+                    if utxo.value >= min_sats and utxo.age_days >= min_days)
+```
+
+`cap_sats` and `cap_days` bound per-UTXO weight so a single massive old UTXO
+can't dwarf everyone else. Defaults: no cap.
+
+Use when:
+
+- You want time-and-capital commitment to both matter.
+- You want to reward long-term holders over short-term holders of the same
+  capital.
+- You want to prevent someone from buying a giant bag the day before the
+  snapshot and dominating.
+
+This is the mode most applications pick. It's the closest to "who has real skin
+in the game here."
+
+## Choosing per poll
+
+The `weight_mode` is declared in the poll itself (signed by the poll creator).
+It can't be changed after creation — the poll ID is content-addressed, so
+editing it produces a different poll.
+
+Poll creation:
+
+```ts
+import { canonicalize, pollId } from '@orangecheck/vote-core';
+
+const poll = {
+    version: 'oc-vote/v0',
+    title: 'Rename the default theme',
+    options: ['Keep current', 'Call it Midnight', 'Abstain'],
+    weight_mode: 'sats_days',
+    params: {
+        min_sats: 100_000,
+        min_days: 30,
+        cap_sats: 10_000_000, // 0.1 BTC max per UTXO
+        cap_days: 365, // 1 year max per UTXO
+    },
+    snapshot_block: 820_000, // voters prove UTXOs as of this height
+    closes_at: '2026-05-01T00:00:00.000Z',
+    creator: {
+        address: 'bc1qcreator...',
+        scheme: 'bip322',
+    },
+    sig: '<BIP-322 signature by creator over canonical bytes>',
+};
+
+const id = await pollId(poll);
+```
+
+## Example tally
+
+Poll with `sats_days`, `min_sats = 100_000`, `cap_sats = 1_000_000`, two voters:
+
+| Voter | UTXOs at snapshot              | Per-UTXO weight                       | Total      |
+| ----- | ------------------------------ | ------------------------------------- | ---------- |
+| Alice | 1× 500,000 sats, 60 days old   | 500,000 × 60 = 30,000,000             | 30,000,000 |
+| Bob   | 1× 5,000,000 sats, 10 days old | capped to 1,000,000 × 10 = 10,000,000 | 10,000,000 |
+
+If Alice votes "Midnight" and Bob votes "Keep current", `tally()` returns:
+
+```json
+{
+    "Keep current": 10000000,
+    "Midnight": 30000000,
+    "Abstain": 0,
+    "winner": "Midnight"
+}
+```
+
+The cap ensures Bob's single 0.05 BTC UTXO doesn't dwarf Alice's smaller but
+older commitment.
+
+## See also
+
+- [**Tally algorithm**](/vote/tally-algorithm) — the deterministic function
+- [**OC Vote overview**](/vote) — when to pick each mode
+- [**Conformance vectors**](/ecosystem/conformance) — `v02` tests sats mode;
+  `v03` tests `sats_days` with cap

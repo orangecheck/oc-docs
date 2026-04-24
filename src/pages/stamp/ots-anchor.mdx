@@ -1,0 +1,140 @@
+export const metadata = {
+    title: 'OC Stamp — OpenTimestamps anchor',
+    description:
+        'How @orangecheck/stamp-ots bridges OpenTimestamps proofs into a Stamp envelope.',
+};
+
+# OpenTimestamps anchor
+
+OC Stamp envelopes carry an optional `ots` field that anchors the envelope's
+`id` to a Bitcoin block header via
+[OpenTimestamps (OTS)](https://opentimestamps.org). `@orangecheck/stamp-ots` is
+the thin client-side glue.
+
+## What OTS is (one paragraph)
+
+OTS calendars batch many arbitrary-digest timestamp requests into a Merkle tree
+and publish the tree root on-chain via an `OP_RETURN` transaction. A calendar
+hands back a **proof** — a Merkle path from your digest to the tree root, plus a
+reference to the on-chain transaction that committed the root. Anyone with an
+honest Bitcoin node can verify the proof chain and conclude "this digest existed
+before this block."
+
+OTS is calendar-operator-trust-minimized (you can submit to multiple calendars;
+forgery requires block-level collusion), free to use, and widely deployed
+since 2016.
+
+## What `@orangecheck/stamp-ots` does
+
+Four exports cover the whole flow:
+
+- **`submitToCalendars(id, opts)`** — POST an envelope's 32-byte digest to one
+  or more OTS calendars. Returns a pending `OtsProof` you fold into the
+  envelope's `ots` field.
+- **`upgradeProof(proof, id, opts)`** — poll calendars for an upgraded proof
+  once OTS has anchored the batch to a Bitcoin block. Returns a confirmed
+  `OtsProof` when available, or the same pending proof if not yet confirmed.
+- **`createCalendarClient(url)`** — low-level HTTP client implementing the
+  minimal OTS calendar API (`POST /digest`, `GET /timestamp/<hex>`).
+- **`makeAnchorVerifier({ walkProof, headerSource })`** — adapter that turns a
+  proof-parser plus a block-header source into the `verifyOtsAnchor` function
+  `stamp-core.verify()` wants.
+
+## Submit
+
+```ts
+import { submitToCalendars } from '@orangecheck/stamp-ots';
+
+env.ots = await submitToCalendars(env.id, {
+    calendars: [
+        'https://alice.btc.calendar.opentimestamps.org',
+        'https://bob.btc.calendar.opentimestamps.org',
+    ],
+});
+```
+
+The returned proof is **pending**: the calendar has accepted your digest but the
+OTS batch for the next hour (or whatever the calendar's cadence is) hasn't yet
+been anchored to Bitcoin. The envelope is still useful at this point — it proves
+authorship — it just doesn't have a time anchor yet.
+
+Submit to **at least two** calendars operated by different parties. If one
+calendar goes dark before anchoring, the second one's receipt still lets you
+upgrade.
+
+## Upgrade
+
+```ts
+import { upgradeProof } from '@orangecheck/stamp-ots';
+
+// Poll until confirmed. Typically minutes to hours.
+env.ots = await upgradeProof(env.ots, env.id);
+```
+
+`upgradeProof()` asks each calendar "has the batch containing my digest been
+anchored yet?" When the answer is yes, the calendar returns the Merkle path from
+your digest to the batch root plus the Bitcoin tx that committed the root. At
+this point the proof is **confirmed** and independently verifiable against any
+Bitcoin node.
+
+Cache the upgraded proof. Once the chain has confirmed, the proof never changes
+— you can verify it offline forever.
+
+## Verify
+
+OTS proofs contain a binary Merkle-walk format that's non-trivial to parse.
+`@orangecheck/stamp-ots` doesn't ship a full parser — it's a lot of code for a
+narrow use case. Instead, it exposes an adapter:
+
+```ts
+import { makeAnchorVerifier } from '@orangecheck/stamp-ots';
+import * as ots from 'javascript-opentimestamps'; // full parser, separate lib
+
+const verifyOtsAnchor = makeAnchorVerifier({
+    walkProof: (bytes) => ots.parse(bytes), // your proof parser
+    headerSource: async (blockHeight) => fetchHeader(blockHeight), // your block-header source
+});
+
+// Feed into stamp-core.verify()
+const result = await verify({
+    envelope,
+    content,
+    verifyBip322,
+    verifyOtsAnchor,
+});
+```
+
+This lets consumers pick their own proof parser (we recommend
+[`javascript-opentimestamps`](https://github.com/opentimestamps/javascript-opentimestamps))
+and their own block-header source (a local Bitcoin node, an Esplora mirror, a
+light-client SPV header chain — your call). The result is the same: a verifier
+that's fully offline-capable once it has the block header.
+
+## Offline verification
+
+Given the envelope, the content, an upgraded OTS proof, and a cached
+block-header database, a verifier can confirm the stamp without any network
+call. This matters for:
+
+- Air-gapped archives.
+- Historical records (you want to verify a 2030 stamp in 2050 without trusting
+  whatever OTS calendar operators happen to exist then).
+- Adversarial environments where upstream calendars might be censored.
+
+## What could go wrong
+
+- **Calendar disappears before anchoring.** Mitigation: submit to ≥2 independent
+  calendars.
+- **Calendar anchors but lies about the path.** Mitigation: the proof chain is
+  cryptographically self-checking against the Bitcoin header. A dishonest
+  calendar can't fake the path; they can only refuse to publish.
+- **Bitcoin block reorgs deeper than the anchor.** Mitigation: wait for ≥6
+  confirmations before treating a stamp as permanent. OTS proofs still verify;
+  you just care about rollback risk for whatever you're doing.
+
+## See also
+
+- [**How it works**](/stamp/how-it-works) — where `ots` fits in the envelope
+  flow
+- [**Use cases**](/stamp/use-cases) — when anchoring matters (release signing,
+  publishing) and when it doesn't

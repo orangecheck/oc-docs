@@ -1,0 +1,81 @@
+export const metadata = {
+    title: 'OC Agent',
+    description:
+        'Agent-authorization records bound to a Bitcoin address. Design-state — spec in flight.',
+};
+
+# OC Agent
+
+**Design-state.** OC Agent is the planned sibling for delegating signing
+authority to a non-human agent — a script, a bot, an automated pipeline, an LLM
+— such that the agent can act on behalf of a Bitcoin-address-bound identity
+within explicit, revocable limits.
+
+The spec is in flight at
+[`github.com/orangecheck/oc-agent-protocol`](https://github.com/orangecheck/oc-agent-protocol)
+(private until v0.1 is drafted). No packages are published yet.
+
+## Why
+
+As more of the ecosystem runs through automated pipelines (CI signing releases,
+bots replying on Nostr, agents making trades), the "signer is a human with a
+hardware wallet" assumption breaks. OC Agent is the protocol for "this automated
+thing is authorized to sign within these limits, revocably, bound to my Bitcoin
+identity."
+
+## What it will do
+
+High-level sketch (subject to change):
+
+1. A principal (Bitcoin address holder) generates an **agent keypair** (likely
+   Ed25519 or Schnorr — TBD).
+2. They build a **delegation record** declaring:
+    - Which agent public key is authorized
+    - What _scopes_ it can sign for (e.g., "OC Stamp envelopes with
+      MIME=text/markdown", "OC Vote ballots for poll_id X")
+    - An expiry timestamp
+    - A revocation list or mechanism
+3. The principal signs the delegation record via BIP-322 from their Bitcoin
+   address.
+4. The agent, in operation, produces signed artifacts that carry a reference to
+   the delegation record. Verifiers resolve the chain: agent-sig-on-artifact →
+   delegation-sig-on-record → BIP-322 root.
+
+## What it won't do
+
+- **Grant the agent access to the principal's Bitcoin key.** The principal's key
+  stays put. The agent only gets the delegation record
+    - its own key.
+- **Enable the agent to issue new delegations.** Delegation is not transitively
+  re-delegatable in v0. (Maybe later. Maybe never.)
+- **Replace existing identity-and-access-management systems.** OC Agent is for
+  decentralized, Bitcoin-identity-bound use cases. OAuth is fine for the
+  centralized ones.
+
+## Open questions
+
+- Delegation record format: RFC-8785 canonicalized JSON (like OC Lock), or
+  line-format canonical message (like Attest / Stamp / Vote)?
+- Scoping grammar: per-protocol allowlist, free-form URI pattern match, or
+  something else?
+- Revocation channel: on-chain OP_RETURN, Nostr kind-30078 revocation event,
+  out-of-band webhook?
+- Agent keypair type: Ed25519 (simpler, not Bitcoin-native) or Schnorr (matches
+  Nostr/Taproot, easier integration)?
+
+If you have opinions on these, open an issue on the spec repo once it goes
+public, or email `hello@ochk.io`.
+
+## Timeline
+
+No public timeline yet. The priority order for the ecosystem is: finish OC Stamp
+polish → finish OC Vote tooling → draft OC Agent v0. Expect this page to become
+a real docs section sometime in H2 2026 at the earliest.
+
+## See also
+
+- [**Which protocol do I need?**](/getting-started/which-protocol) — current
+  options today
+- [**OC Attest**](/attest) — the base layer the delegation chain terminates at
+- [**Security model**](/ecosystem/security) — threat model framework the Agent
+  spec will inherit

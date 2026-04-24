@@ -1,0 +1,123 @@
+export const metadata = {
+    title: 'Nostr kind-30078',
+    description:
+        'How every OrangeCheck protocol publishes its artifacts on Nostr using NIP-78 parameterized-replaceable addressable events.',
+};
+
+# Nostr kind-30078
+
+Every OrangeCheck sibling publishes its public artifacts — attestations, device
+records, stamps, vote ballots — as
+[NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md)
+parameterized-replaceable addressable events at kind `30078`.
+
+## Why kind-30078
+
+NIP-78 is the "application-specific data" event kind. It's designed precisely
+for what we need:
+
+- **Addressable** — `(pubkey, kind, d)` uniquely identifies an event across all
+  relays. Republishing with the same `d` tag replaces the old version.
+- **No reserved format** — the `content` field is application-defined, and we
+  fill it with the JSON envelope each protocol specifies.
+- **First-class in every Nostr client** — no custom relay patches required.
+
+We considered minting a fresh NIP for OrangeCheck, but nothing in our use-case
+needed new event-kind semantics. Using 30078 means every off-the-shelf Nostr
+relay (`damus.io`, `primal.net`, `nos.lol`, `snort.social`, etc.) stores and
+serves our events.
+
+## The d-tag convention
+
+Every protocol reserves a `d`-tag prefix so events from different siblings don't
+collide:
+
+| Protocol                | `d` tag format                                                    |
+| ----------------------- | ----------------------------------------------------------------- |
+| OC Attest               | `<attestation_id>` (64-char hex SHA-256 of the canonical message) |
+| OC Lock (device record) | `oc-lock:device:<btc_address>`                                    |
+| OC Stamp                | `oc-stamp:<envelope_id>`                                          |
+| OC Vote (poll)          | `oc-vote:poll:<poll_id>`                                          |
+| OC Vote (ballot)        | `oc-vote:ballot:<ballot_id>`                                      |
+
+The relay doesn't care — `d` is just a string. The convention matters so that
+discovery queries (`#d: oc-stamp:*`) can narrow by protocol without enumerating
+every event kind.
+
+## Required tags per protocol
+
+Each sibling's spec defines which tags MUST appear on its events. Common ones
+across OC Attest:
+
+| Tag       | Purpose                                                          |
+| --------- | ---------------------------------------------------------------- |
+| `d`       | Attestation ID — the addressable identifier                      |
+| `address` | Bitcoin address the attestation is for                           |
+| `scheme`  | `bip322` or `legacy`                                             |
+| `i`       | One per identity binding, formatted as `<protocol>:<identifier>` |
+| `expires` | ISO timestamp (optional)                                         |
+
+Tags enable secondary-index queries. `#address:bc1q…` is how verifiers find an
+attestation when the caller knows the address but not the ID.
+
+## Author pubkey — real npub vs. ephemeral
+
+OrangeCheck events are authored by one of two key types:
+
+- **Real Nostr pubkey** — when the user has a NIP-07 extension installed (nos2x,
+  Alby, etc.), we sign with their actual key so they can find their own events
+  in their Nostr client's history.
+- **Ephemeral key** — when there's no NIP-07, the SDK generates a fresh BIP-340
+  Schnorr keypair per publish, signs the event, and throws the key away. The
+  event is still valid (relays check only that the signature matches the
+  pubkey); the pubkey is just a throwaway.
+
+In both cases, the **attestation inside the event's `content` is
+cryptographically bound to the Bitcoin address** via BIP-322. Who authored the
+Nostr event is independent from who controls the Bitcoin address. The inner
+attestation is what matters.
+
+## Reading events
+
+Any Nostr client or relay library works. With
+[nostr-tools](https://github.com/nbd-wtf/nostr-tools):
+
+```ts
+import { Relay } from 'nostr-tools/relay';
+
+const relay = await Relay.connect('wss://relay.damus.io');
+const sub = relay.subscribe([{ kinds: [30078], '#address': ['bc1qalice…'] }], {
+    onevent(event) {
+        // event.content is the attestation envelope as JSON
+        const envelope = JSON.parse(event.content);
+        // Verify locally — see /attest/verification
+    },
+});
+```
+
+`@orangecheck/sdk` wraps this with `getAttestationsForAddress()` and
+`queryByAttestationId()`, fanning out to multiple relays and deduplicating.
+
+## Default relay set
+
+The reference SDKs default to a small set of stable public relays:
+
+- `wss://relay.damus.io`
+- `wss://relay.nostr.band`
+- `wss://nos.lol`
+- `wss://relay.snort.social`
+
+Override with `relays: [...]` on any SDK call. For production deployments you
+SHOULD query ≥3 distinct relay operators — a single slow or partitioned relay
+shouldn't break discovery.
+
+## See also
+
+- [Canonical message](/ecosystem/canonical-message) — what goes inside the
+  `content` field
+- [BIP-322 signing](/ecosystem/bip322) — what ties the Nostr event to the
+  Bitcoin address
+- [OC Attest — verification](/attest/verification) — what to do with a
+  discovered event
+- [Security — relay censorship](/ecosystem/security#relay-censorship) — why
+  multi-relay queries matter

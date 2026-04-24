@@ -1,0 +1,86 @@
+export const metadata = {
+    title: 'OC Lock',
+    description:
+        'End-to-end encryption addressed to a Bitcoin address. Sealed envelopes, BIP-322-bound device keys, Nostr-published directory.',
+};
+
+# OC Lock
+
+**End-to-end encryption addressed to a Bitcoin address.** Seal a payload so only
+the holder of a specific Bitcoin address can open it. No centralized key server,
+no account, no message broker — the Bitcoin address is the identity and Nostr is
+the directory.
+
+## How it composes
+
+1. **Recipient** generates an X25519 device keypair and binds the public key to
+   their Bitcoin address via a BIP-322 signature, then publishes the binding to
+   the [Nostr kind-30078 directory](/ecosystem/nostr-kind-30078).
+2. **Sender** looks up the recipient's device keys by Bitcoin address, encrypts
+   a payload via X25519 ECDH → HKDF-SHA256 → AES-256-GCM, and wraps the
+   ciphertext in a JSON envelope.
+3. **Recipient** reads the envelope, decrypts with their device secret, verifies
+   the inner BIP-322 binding, and gets the plaintext.
+
+Anyone can inspect the envelope; only registered device keys can decrypt it.
+Anyone can verify the sender's BIP-322 signature; no-one can forge it without
+the sender's key.
+
+## What OC Lock IS
+
+- A protocol for addressing encrypted messages to a Bitcoin address.
+- Non-custodial — no server holds any key material.
+- Permissionless — anyone can publish a device record for their own address;
+  anyone can send an envelope to anyone who has.
+- Offline-verifiable — envelopes are self-contained JSON; no network round-trip
+  required to decrypt.
+
+## What OC Lock is NOT
+
+- **A messenger.** OC Lock is a protocol; there's no inbox, no threading, no
+  read receipts. Build those on top.
+- **A PKI.** There's no authority, no revocation list, no trust hierarchy.
+  Revocation is explicit: the recipient publishes a revocation event for a
+  compromised device.
+- **A proof-of-personhood.** Like OC Attest, OC Lock proves control of a key,
+  not control of a human.
+- **Forward secrecy by default.** Envelopes use per-recipient ECDH; if a device
+  secret is later compromised, previously-received envelopes can be decrypted.
+  For forward secrecy, rotate device keys frequently.
+
+## Section contents
+
+- [**How it works**](/lock/how-it-works) — the full encrypt/decrypt flow
+- [**Envelope format**](/lock/envelope-format) — canonicalized JSON shape
+- [**Device keys**](/lock/device-keys) — X25519 keys bound to a Bitcoin address
+  via BIP-322
+
+## Packages
+
+- `@orangecheck/lock-crypto` — narrow crypto primitives (X25519, HKDF, AES-GCM)
+- `@orangecheck/lock-core` — envelope format, `seal()`, `unseal()`,
+  canonicalization
+- `@orangecheck/lock-device` — device-key management + Nostr directory
+  publication
+
+See [SDK overview](/sdks) for the package map.
+
+## Shared ecosystem concepts
+
+Read these first if you haven't:
+
+- [Canonical message format](/ecosystem/canonical-message) — used for the
+  device-binding signature
+- [BIP-322 signing](/ecosystem/bip322) — how device keys are bound to Bitcoin
+  addresses
+- [Nostr kind-30078](/ecosystem/nostr-kind-30078) — where device records are
+  published
+- [Security model](/ecosystem/security) — threat model
+
+## Spec + implementation
+
+- Normative spec:
+  [`oc-lock-protocol/SPEC.md`](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md)
+- Reference impl: `@orangecheck/lock-core`, `lock-crypto`, `lock-device` in
+  [`oc-packages`](https://github.com/orangecheck/oc-packages)
+- Reference site: [`lock.ochk.io`](https://lock.ochk.io)

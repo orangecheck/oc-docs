@@ -1,0 +1,206 @@
+export const metadata = {
+    title: 'OC Attest — HTTP API',
+    description:
+        'Every hosted endpoint at ochk.io that the OC Attest protocol exposes. check, verify, challenge, discover.',
+};
+
+# OC Attest HTTP API
+
+The hosted API at `https://ochk.io/api/*` is a **reference deployment** of OC
+Attest. Self-hosted verifiers provide the same endpoints. Every route is
+documented here.
+
+Rate limits are per-IP; 60 req/min for read endpoints, 20 req/min for auth
+endpoints. Response shape is stable; new optional fields may be added, existing
+fields will not change meaning.
+
+## `GET /api/check`
+
+The load-bearing sybil-gate primitive. One call, one answer.
+
+### Request
+
+```
+GET /api/check?addr=bc1q...&min_sats=100000&min_days=30
+GET /api/check?id=<attestation_id>&min_sats=100000
+GET /api/check?identity=github:alice&min_sats=50000
+```
+
+| Param      | Required         | Notes                                      |
+| ---------- | ---------------- | ------------------------------------------ |
+| `addr`     | at least one of… | Bitcoin address                            |
+| `id`       | …these three     | Attestation ID (64-char hex)               |
+| `identity` |                  | `protocol:identifier`, e.g. `github:alice` |
+| `min_sats` | optional         | Integer; default 0                         |
+| `min_days` | optional         | Integer; default 0                         |
+
+### Response — 200
+
+```json
+{
+    "ok": true,
+    "sats": 125000,
+    "days": 47,
+    "score": 30.12,
+    "attestation_id": "a3f5b8c2...",
+    "address": "bc1q...",
+    "identities": [{ "protocol": "github", "identifier": "alice" }],
+    "network": "mainnet"
+}
+```
+
+### Response — below threshold (200, `ok: false`)
+
+```json
+{
+  "ok": false,
+  "sats": 50000,
+  "days": 12,
+  "score": 15.15,
+  "attestation_id": "a3f5b8c2...",
+  "address": "bc1q...",
+  "identities": [...],
+  "network": "mainnet",
+  "reasons": ["below_min_sats", "below_min_days"]
+}
+```
+
+### Response — not found (404)
+
+```json
+{ "ok": false, "reasons": ["not_found"] }
+```
+
+Cached 60 s by default.
+
+## `POST /api/verify`
+
+Raw attestation verification — no relay lookup, no thresholds. Give it
+`(addr, msg, sig)`, get back full codes + metrics.
+
+### Request
+
+```json
+{
+    "addr": "bc1q...",
+    "msg": "orangecheck\nidentities: ...\n...",
+    "sig": "AUBH...",
+    "scheme": "bip322"
+}
+```
+
+### Response — 200
+
+Same shape as `/api/check` without the policy fields. No cache.
+
+## `/api/challenge`
+
+Signed-challenge auth — prove control of an address in real-time.
+
+### `GET /api/challenge?addr=bc1q…&audience=https://example.com&purpose=login`
+
+Issue a short-lived message for the user to sign.
+
+Response:
+
+```json
+{
+    "message": "orangecheck-auth\n...",
+    "nonce": "a3f5b8c2...",
+    "expiresAt": "2026-04-24T07:00:00.000Z"
+}
+```
+
+### `POST /api/challenge`
+
+Verify a signed response.
+
+```json
+{
+    "message": "orangecheck-auth\n...",
+    "signature": "AUBH...",
+    "expectedNonce": "a3f5b8c2...",
+    "expectedAudience": "https://example.com",
+    "expectedPurpose": "login"
+}
+```
+
+Response: `{ ok: true, address: "bc1q..." }` on success,
+`{ ok: false, reason: "invalid_challenge" }` otherwise.
+
+The public primitive is deliberately generic — no session cookies, no account
+side effects. The caller is responsible for nonce replay prevention. If you want
+the session-aware variant, see
+[Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin).
+
+## `GET /api/discover`
+
+List attestations for a subject — returns the full envelope array from Nostr.
+
+```
+GET /api/discover?addr=bc1q...
+GET /api/discover?id=<attestation_id>
+GET /api/discover?identity=github:alice
+```
+
+Response:
+
+```json
+{
+    "count": 2,
+    "total": 2,
+    "attestations": [
+        /* AttestationEnvelope[] */
+    ]
+}
+```
+
+Use this when you need to see historical attestations for an address, not just
+"does the latest meet thresholds." Goes out to Nostr relays on every call — no
+cache.
+
+## Status codes
+
+| Code                     | Severity | Meaning                                     |
+| ------------------------ | -------- | ------------------------------------------- |
+| `sig_ok_bip322`          | success  | BIP-322 signature verified                  |
+| `sig_ok_legacy`          | success  | Legacy signmessage verified (P2PKH only)    |
+| `sig_invalid`            | error    | Signature does not match                    |
+| `sig_unsupported_script` | error    | Legacy sig for SegWit address               |
+| `invalid_scheme`         | error    | `scheme` field unknown                      |
+| `decode_error`           | error    | Canonical message malformed                 |
+| `invalid_attestation_id` | error    | Claimed ID doesn't match sha256(msg)        |
+| `bond_confirmed`         | success  | Chain lookup returned usable metrics        |
+| `bond_zero`              | warn     | Address holds no confirmed UTXOs            |
+| `bond_pending`           | info     | Only unconfirmed UTXOs found                |
+| `bond_insufficient`      | error    | `bond:` extension exceeds confirmed balance |
+| `below_min_sats`         | error    | Policy threshold — `/api/check` only        |
+| `below_min_days`         | error    | Policy threshold — `/api/check` only        |
+| `aud_mismatch`           | warn     | Signed audience ≠ expected (challenge flow) |
+| `expired`                | error    | Challenge TTL exceeded                      |
+| `network_testmode`       | warn     | Signature is on testnet/signet              |
+| `bad_request`            | error    | Structural problem with request body        |
+
+## HTTP status vs. status code
+
+The HTTP status tells you the request was processable; the `codes` / `reasons`
+fields tell you what the verification found. Don't conflate them.
+
+| HTTP | Meaning                                                  |
+| ---- | -------------------------------------------------------- |
+| 200  | Request was valid and the verifier ran                   |
+| 400  | Request shape was wrong (missing `addr`, malformed JSON) |
+| 401  | `/api/auth/*` session rejected                           |
+| 403  | Cross-site POST to a browser-only endpoint               |
+| 404  | `/api/check` subject not found                           |
+| 429  | Rate limit exceeded                                      |
+| 500  | Verifier crashed — file a bug                            |
+
+## See also
+
+- [**Verification**](/attest/verification) — what the server actually does with
+  your request
+- [**Sign in with Bitcoin**](/attest/guides/sign-in-with-bitcoin) —
+  session-aware auth flow built on `/api/challenge`
+- [**`@orangecheck/sdk`**](/sdks/javascript) — the typed client for every
+  endpoint here

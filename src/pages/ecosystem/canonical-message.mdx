@@ -1,0 +1,114 @@
+export const metadata = {
+    title: 'The canonical message',
+    description:
+        'Every OrangeCheck sibling signs a canonical message in the same shape. Strict by design — no whitespace negotiations, no ordering ambiguity.',
+};
+
+# The canonical message
+
+Every protocol in the OrangeCheck family signs a **canonical message** — a
+deterministic UTF-8 text blob that the wallet feeds to BIP-322. The same shape
+is reused across Attest, Lock, Stamp, and Vote (Agent will follow). By
+specifying the bytes exactly, two independent implementations produce
+byte-identical messages and therefore byte-identical attestation IDs.
+
+## Shape
+
+```
+<protocol-header>
+<field-1>: <value>
+<field-2>: <value>
+…
+<extension>: <value>
+<ack>: <value>
+```
+
+Per-protocol specifics — header literal, required fields, allowed extensions —
+live in the `oc-*-protocol` spec repos. The **grammar** is shared and covered
+here.
+
+## Invariants
+
+| Rule                                                                                          | Why                                                                                                   |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **UTF-8 only.** No BOM.                                                                       | Deterministic encoding.                                                                               |
+| **LF line endings.** One trailing `\n`. No CRLF.                                              | Any variation changes the SHA-256 and therefore the attestation ID.                                   |
+| **Header is the first line literal**, e.g. `orangecheck` for Attest, `oc-lock` for Lock, etc. | The header is how verifiers decide which parser to run.                                               |
+| **Fields are `name: value` with exactly one space after the colon.**                          | No `name:value`, no tabs, no double spaces.                                                           |
+| **Extensions are lexicographically sorted by name.**                                          | Two implementations adding the same extensions in different orders must still produce the same bytes. |
+| **Identifier lists are comma-separated with no space** (`nostr:npub1…,github:alice`).         | Identifiers MUST NOT contain a comma (enforced by schema).                                            |
+| **Timestamps are ISO 8601 with millisecond precision**, ending in `Z`.                        | Example: `2026-04-24T06:47:29.977Z`.                                                                  |
+| **Nonces are 32 lowercase hex characters** (16 random bytes).                                 | Case-sensitive — `ABCDEF` is rejected.                                                                |
+
+Any deviation — extra whitespace, wrong newline style, unsorted extensions,
+capital hex in a nonce — makes verification fail with `decode_error`. This is
+intentional. A forgiving parser would let two implementations produce
+attestations with the same inputs but different IDs.
+
+## Example (OC Attest)
+
+```
+orangecheck
+identities: github:alice,nostr:npub1alice...
+address: bc1qalice...
+purpose: forum-post
+nonce: a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5
+issued_at: 2026-04-24T06:47:29.977Z
+ack: I attest control of this address and bind it to my identities.
+```
+
+Seven lines. One trailing newline. That's the whole thing.
+
+## Per-protocol headers
+
+| Protocol                          | Header literal                                                        |
+| --------------------------------- | --------------------------------------------------------------------- |
+| OC Attest (the default)           | `orangecheck`                                                         |
+| OC Attest challenge flow          | `orangecheck-auth` (shorter-lived, audience + expiry fields required) |
+| OC Lock device binding            | `oc-lock-device-binding-v0`                                           |
+| OC Lock envelope canonicalization | (RFC-8785 over JSON — not a line-format message)                      |
+| OC Stamp                          | `oc-stamp`                                                            |
+| OC Vote poll / ballot             | `oc-vote`                                                             |
+
+Lock's envelope format is the outlier — it canonicalizes a JSON structure via
+RFC-8785 rather than producing a newline-delimited text blob. The reason is that
+Lock envelopes carry binary AES-GCM ciphertext, which doesn't fit cleanly into a
+line-format. Every OTHER sibling uses the text canonical message.
+
+## Versioning
+
+The header literal is **frozen at v0**. Any change to the format — new required
+field, different whitespace rule, anything — requires a new header (e.g.
+`orangecheck-v1`) and breaks every existing signature.
+
+This is why the v0 header doesn't include a version number: adding one later
+would have been a breaking change anyway.
+
+## Why strict canonicalization matters
+
+The attestation ID is `sha256(canonical_message_bytes)`. Two implementations
+that agree on the inputs but disagree on the bytes produce different IDs. That
+breaks:
+
+- Nostr discovery — events are addressed by the `d` tag, which contains the
+  attestation ID.
+- Conformance testing — the whole point of the
+  [conformance vectors](/ecosystem/conformance) is to lock the format
+  byte-by-byte.
+- Trust — a gate that re-hashes the message and gets a different ID than the
+  attestation claims has to reject it as tampered.
+
+## Implementations
+
+- **TypeScript** — `buildCanonicalMessage()` in `@orangecheck/sdk/canonical`.
+- **Python** — `build_canonical_message()` in the `orangecheck` package.
+
+Both ship with the same vendored conformance vectors and a CI job that fails if
+either drifts from `oc-protocol/conformance/vectors/`.
+
+## See also
+
+- [BIP-322 signing](/ecosystem/bip322) — what the wallet actually signs
+- [Conformance vectors](/ecosystem/conformance) — how we prove the two impls
+  agree
+- [OC Attest: verification](/attest/verification) — what a verifier must check

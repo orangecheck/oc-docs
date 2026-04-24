@@ -81,9 +81,8 @@ if outcome.ok:
 ```
 
 With the `[verify]` extra installed, the BIP-322 check is fully local (via the
-Rust-backed `bip322` package, which wraps the audited `bitcoin`
-
-- `secp256k1` crates). Without it, verification falls back to the hosted API.
+Rust-backed `bip322` package, which wraps the audited `bitcoin` and `secp256k1`
+crates). Without it, verification falls back to the hosted API.
 
 ## Canonical message
 

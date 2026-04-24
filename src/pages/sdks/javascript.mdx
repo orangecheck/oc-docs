@@ -115,42 +115,57 @@ end-to-end session flow.
 
 ## Lower-level building blocks
 
-Re-exported for integrators who need finer control:
+Re-exported for integrators who need finer control. Grouped by purpose:
+
+### Canonical message builders
 
 ```ts
-import type { StatusCode } from '@orangecheck/sdk';
-
 import {
     buildCanonicalMessage,
-    computeAllScores,
-    computeScore,
     createAttestationEnvelope,
-    createAttestationEvent,
-    DEFAULT_RELAYS,
-    discoverAttestations,
-    extractAttestationIdFromUrl,
     formatIdentities,
     generateAttestationId,
-    getAttestationsForAddress,
-    getAttestationsForIdentity,
-    getVerificationUrl,
     parseIdentities,
+} from '@orangecheck/sdk';
+```
+
+### Nostr integration
+
+```ts
+import {
+    createAttestationEvent,
+    DEFAULT_RELAYS,
     publishToRelays,
     queryByAddress,
     queryByAttestationId,
     queryByIdentity,
-    STATUS_META,
 } from '@orangecheck/sdk';
+```
 
-// Canonical message builders
+### Discovery helpers
 
-// Nostr integration
+```ts
+import {
+    discoverAttestations,
+    extractAttestationIdFromUrl,
+    getAttestationsForAddress,
+    getAttestationsForIdentity,
+    getVerificationUrl,
+} from '@orangecheck/sdk';
+```
 
-// Discovery helpers
+### Scoring
 
-// Scoring
+```ts
+import { computeAllScores, computeScore } from '@orangecheck/sdk';
+```
 
-// Human-readable status-code metadata
+### Human-readable status-code metadata
+
+```ts
+import type { StatusCode } from '@orangecheck/sdk';
+
+import { STATUS_META } from '@orangecheck/sdk';
 ```
 
 ## Types

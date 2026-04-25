@@ -416,7 +416,7 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'reference',
         label: 'Reference',
-        blurb: 'Glossary, FAQ, changelog, everything else.',
+        blurb: 'Glossary, FAQ, error codes, everything else.',
         items: [
             {
                 href: '/reference/faq',

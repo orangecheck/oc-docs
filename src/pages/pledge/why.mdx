@@ -1,0 +1,119 @@
+export const metadata = {
+    title: 'Why OC Pledge',
+    description:
+        'The other five OrangeCheck primitives describe the present. Pledge is the only one that projects commitment forward — without custody, without slashing, without an aggregated reputation score.',
+};
+
+# Why OC Pledge
+
+The other five OrangeCheck primitives all describe **present-state**:
+
+- **OC Attest** — *I have stake now.*
+- **OC Lock** — *I can receive now.*
+- **OC Vote** — *I chose now.*
+- **OC Stamp** — *I said this now.*
+- **OC Agent** — *I authorize now.*
+
+None of them project commitment **forward**. None lets a sovereign actor stake
+their word against a future-verifiable proposition with a bond that has
+teeth through public record, not custody.
+
+That gap is what the modern web fills with captured intermediaries: notaries,
+escrow agents, SLA attorneys, auditors, credit agencies, rating firms,
+preregistration registries, delivery-tracking vendors, review platforms,
+contract-management SaaS, insurance underwriters. Each is solving a variant
+of *"someone staked their word on a future claim, here's the mechanism to
+check later."*
+
+Pledge is the sovereign version. It does not replace every function those
+intermediaries serve — it does not enforce physical-world obligations through
+state power — but for any commitment whose outcome is computable from public
+state (chain state, Nostr events, HTTP responses, DNS records, OC Stamp
+envelopes, OC Vote outcomes, counterparty signatures), it replaces the
+intermediary with a protocol.
+
+## Why this is Bitcoin-load-bearing
+
+Standard test: *if this works identically on Ed25519, it doesn't belong here*.
+Pledge survives the test on three grounds simultaneously:
+
+1. **Universal stake oracle.** The bond must be real and universally
+   observable. OrangeCheck's `sats × days` is the only credibly-neutral
+   economic signal on the open internet. Ed25519 has no economic layer.
+2. **Non-malleable time.** Resolution deadlines expressed as block heights
+   use Bitcoin block headers as the neutral time primitive. No other chain
+   is credibly neutral over long horizons; L2s and altcoins introduce
+   operator trust or reorg risk.
+3. **Universally-observable identity namespace.** The public ledger of
+   kept-and-broken pledges attaches to Bitcoin addresses, which are a
+   globally enumerable namespace with no registrar. Pseudonymous Ed25519
+   keys have no economic or temporal grounding to attach that ledger to.
+
+Strip any of the three and the primitive degrades to a known, commoditized,
+already-failed design — PGP, x509, OAuth claims, EAS attestations. Keep all
+three and it's a thing no other stack can ship without rebuilding the first
+five primitives first.
+
+## What we explicitly refused
+
+The full argument for each refusal lives in
+[`WHY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/WHY.md);
+the short version:
+
+- **No `self_proof` resolution mechanism.** Pledges whose truth cannot be
+  checked from public state are not pledges — they are claims. The protocol
+  refuses them at envelope-construction time.
+- **No slashing.** There is no mechanism by which a protocol actor seizes
+  bonded sats. Ever. The bond is an economic *signal*; its only function is
+  to make the attached public record meaningful. A slashing mechanism would
+  require custody, which the entire OrangeCheck family refuses.
+- **No aggregated reputation score.** Same discipline OrangeCheck follows
+  with `sats_bonded` and `days_unspent` vs. `score_v0`. The protocol ships
+  raw metrics (`pledgesSworn`, `outcomesFor`, `bondInFlight`) and refuses
+  to ship a reference score at all. There is no natural scoring function
+  that doesn't embed strong policy opinions; any shipped score will be
+  misused as canonical.
+- **No revocation.** A pledge you can walk back is not a pledge. A swearer
+  can publish an [abandonment envelope](/pledge/state-machine), but it
+  counts as `broken`. No "honorable exit" — preempts the race-to-abandon
+  attack where swearers dodge a foreseeable break by abandoning early.
+- **No pledge chains in v0.1.** The pattern of "this pledge's resolution
+  triggers that pledge's resolution" is interesting and we expect to ship
+  it post-v1 once we observe what real-world patterns demand it.
+- **No bonded voter sets for dispute resolution in v0.1.** v0.1 ships with
+  a named address list for `vote_resolves`. Bonded voters is a v0.2
+  enhancement once real dispute volume exists.
+
+## What we kept from each adjacent system
+
+- **From DocuSign / contract-management SaaS:** the user-facing artifact —
+  a single document with two signatures and a public timestamp — but
+  reframed as a self-contained envelope verifiable from any web page, not
+  a vendor's PDF render.
+- **From smart-contract escrow:** the deterministic-resolution discipline.
+  Pledge mechanisms must be pure functions of public state. We dropped the
+  custody.
+- **From prediction markets:** the bilateral-counterparty pattern. Two
+  swearers can make opposing pledges with `counterparty_signs` resolution
+  and treat the outcome as a wager. The protocol does not route payouts —
+  parties settle out-of-band.
+- **From academic preregistration registries:** the "publish-by-deadline"
+  shape. Pledge handles this via `stamp_published` resolution. No
+  registrar to capture the namespace.
+- **From SLA contracts:** the periodic-acknowledgement shape via
+  `counterparty_signs` outcomes signed by the customer at period end.
+- **From OrangeCheck itself:** the *raw-metrics-over-aggregated-scores*
+  discipline, the *no-custody-ever* posture, the canonical-message format,
+  and the offline-verifiability goal.
+
+## Closing note
+
+Pledge is the sixth and final primitive. The family is now closed: six
+verbs of sovereign sociality (*am, whisper, decide, declare, delegate,
+swear*), each a present- or future-tense statement a Bitcoin address can
+make to the open internet, each verifiable from public state alone, none
+custodial.
+
+If you find a seventh verb that meets all three Bitcoin-load-bearing
+conditions and the no-custody discipline, open an issue. We expect that
+list to stay at six.

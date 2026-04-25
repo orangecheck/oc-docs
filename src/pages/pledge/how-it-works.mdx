@@ -1,0 +1,153 @@
+export const metadata = {
+    title: 'OC Pledge — How it works',
+    description:
+        'The canonical pledge message, the seven resolution mechanisms, the outcome envelope, and the abandonment envelope. Three artifacts, one signed lifecycle.',
+};
+
+# How OC Pledge works
+
+Three signed artifacts, byte-identical across implementations:
+
+1. **Pledge envelope** — the swearer's commitment. BIP-322-signed.
+2. **Outcome envelope** — the resolution. Either deterministic (no
+   signature) or signed by a designated resolver.
+3. **Abandonment envelope** *(optional)* — the swearer's pre-resolution
+   admission of break. Counts as `broken` in the public ledger.
+
+## The canonical pledge message
+
+The bytes the swearer signs are deterministic and human-readable. The user
+must be able to read them in their wallet's signing prompt and understand
+what they're committing to.
+
+```
+oc-pledge/v1
+swearer: bc1qexampleaddress…
+proposition: I will publish my Q3 results by block 920000.
+resolution:
+  mechanism: stamp_published
+  query: content_hash:sha256:7d…
+resolves_at:
+  block: 920000
+expires_at: 2026-08-01T00:00:00Z
+bond:
+  attestation_id: 84ad…
+  min_sats: 1000000
+  min_days: 90
+counterparty: null
+dispute:
+  mechanism: null
+  params: null
+remediation: breach_recorded
+sworn_at: 2026-04-25T15:00:00Z
+nonce: 7af3b2c149e87fa1c6d2eb5403f8a0d9
+```
+
+Canonical-serialization rules (see
+[SPEC §3](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md)):
+UTF-8, LF only, no trailing whitespace, exact field order, decimal integers
+without leading zeros, ISO-8601 UTC `Z` timestamps, addresses in their
+canonical bech32 / legacy form. **Byte-exact serialization is a conformance
+requirement.**
+
+```
+pledge_id := sha256(canonical_message_bytes)   // hex-lowercase
+```
+
+## The seven resolution mechanisms
+
+Fixed at v0.1. No extensions without working integrator code demonstrating
+the need.
+
+| Mechanism             | Resolution outcome is computed from…                    | Determines outcome offline? |
+| --------------------- | ------------------------------------------------------- | --------------------------- |
+| `chain_state`         | Bitcoin RPC against a small canonical DSL               | yes                         |
+| `counterparty_signs`  | a BIP-322 signature from the named counterparty         | no — needs resolver         |
+| `nostr_event_exists`  | a Nostr query against ≥ 2 relays from the default set   | yes                         |
+| `stamp_published`     | a lookup of a specific OC Stamp envelope by hash or id  | yes                         |
+| `http_get_hash`       | SHA-256 of the response body of a specified URL         | yes                         |
+| `dns_record`          | a DoH query for a specified record from a resolver set  | yes                         |
+| `vote_resolves`       | the tally of a named OC Vote poll above a threshold     | no — needs resolver         |
+
+Every mechanism produces a deterministic boolean outcome given fixed public
+state. The SDK refuses any combination that can't.
+
+There is no `self_proof` mechanism. This is a deliberate refusal — see
+[Why](/pledge/why) and the
+[REGISTRY](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md)
+for the long argument.
+
+Full grammar for each: [Resolution grammar](/pledge/resolution-grammar).
+
+## The outcome envelope
+
+Paired with the pledge, published as a Nostr kind-30078 replaceable event
+under d-tag `oc-pledge-outcome:<pledge_id>`.
+
+```
+oc-pledge-outcome/v1
+pledge_id: <sha256 of pledge canonical message>
+outcome: kept | broken | expired_unresolved | disputed
+resolved_at: <ISO-8601 UTC>
+resolved_by: <address | 'deterministic'>
+evidence:
+  mechanism: <same as pledge>
+  result: <canonical query output>
+  witness: <chain_height + chain_hash | nostr_event_id | http_response_hash | dns_response | counterparty_sig | vote_poll_id>
+dispute_window_ends_at: <ISO-8601 UTC>
+sig: <base64 BIP-322 from resolved_by | empty if deterministic>
+```
+
+For deterministic mechanisms — `chain_state`, `nostr_event_exists`,
+`stamp_published`, `http_get_hash`, `dns_record` — **every verifier
+independently produces the byte-identical outcome envelope**. No resolver
+is required and `sig` is empty. This is the property that makes Pledge
+gas-free: anyone can resolve, no one needs permission.
+
+For `counterparty_signs` and `vote_resolves`, the outcome requires a
+BIP-322 signature from the named resolver. Absence of that signature within
+`expires_at` → `expired_unresolved`.
+
+A `disputed` outcome is produced when a contradictory outcome envelope is
+published within the dispute window. Disputed pledges stay disputed until
+the named dispute mechanism resolves them, or time out to
+`expired_unresolved`.
+
+## The abandonment envelope
+
+A swearer who wants to exit gracefully publishes:
+
+```
+oc-pledge-abandonment/v1
+pledge_id: <sha256>
+abandoned_at: <ISO-8601 UTC>
+reason: <single-line, max 280 chars>
+sig: <base64 BIP-322 from swearer>
+```
+
+**Abandonment counts as `broken` in the public ledger.** No "honorable exit"
+classification. The reason field is informational; the ledger is binary.
+This is a pressure-tested decision — any "honorable abandonment" status
+creates a race-to-abandon attack where swearers dodge foreseeable failures
+by admitting them slightly earlier.
+
+## How the outcome is found
+
+Verifiers query Nostr by d-tag pattern:
+
+- `oc-pledge:<pledge_id>` — the pledge
+- `oc-pledge-outcome:<pledge_id>` — the outcome
+- `oc-pledge-abandonment:<pledge_id>` — the abandonment
+
+Default relay set is reused from OC Lock; integrators can override. A
+client-side verifier MUST consult ≥ 2 relays before declaring a missing
+outcome a true absence.
+
+## See also
+
+- [State machine](/pledge/state-machine) — `pending → resolvable → kept |
+  broken | disputed | expired_unresolved`.
+- [Resolution grammar](/pledge/resolution-grammar) — full DSL per mechanism.
+- [Composition with the family](/pledge/composition) — Stamp, Vote, Agent,
+  Lock integrations.
+- [Specification](/pledge/spec) — normative rules.

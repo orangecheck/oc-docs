@@ -1,0 +1,70 @@
+export const metadata = {
+    title: 'OC Pledge — Specification',
+    description:
+        'Normative pointer page. The full SPEC, NIP, REGISTRY, WHY, and SECURITY documents live in the oc-pledge-protocol repo. 28 conformance vectors are required-pass for any conforming implementation.',
+};
+
+# Specification
+
+The normative spec is one repo, four documents, twenty-eight conformance
+vectors:
+
+| Document                                                                                                                   | What it covers                                                  |
+| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [`SPEC.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md)                                           | Normative rules — canonical message, envelopes, state machine, errors |
+| [`PROTOCOL.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/PROTOCOL.md)                                   | Flow diagrams, discovery patterns, relay semantics              |
+| [`NIP_ORANGECHECK_PLEDGE.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/NIP_ORANGECHECK_PLEDGE.md)        | Nostr kind-30078 d-tag namespaces + discovery filters           |
+| [`REGISTRY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md)                                   | Resolution mechanisms, extension policy, change process         |
+| [`WHY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/WHY.md)                                             | Design rationale + the rejected-design log                      |
+| [`SECURITY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SECURITY.md)                                   | Threat model, verifier obligations, mitigations                 |
+| [`/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)                               | 28 conformance vectors — required-pass for any impl             |
+| [`/examples/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/examples)                                       | Three runnable example envelopes                                |
+
+License: spec **CC-BY-4.0**, examples **MIT**.
+
+## Conformance vectors
+
+Twenty-eight vectors at v0.1:
+
+| Group                                | Vectors | Coverage                                                                  |
+| ------------------------------------ | ------- | ------------------------------------------------------------------------- |
+| Resolution mechanisms                | v01–v07 | One happy-path vector per mechanism (`chain_state` … `vote_resolves`)     |
+| Agent delegation                     | v08     | Pledge signed by an agent under `pledge:create` delegation scope          |
+| Edge cases                           | v09–v10 | `resolves_at == expires_at`, same-block resolve                           |
+| Outcome envelope shapes              | v11–v16 | One per mechanism — deterministic and resolver-signed                     |
+| Abandonment                          | v17     | Abandonment envelope, classification = broken                             |
+| Bond verification                    | v18–v20 | Valid, invalid, and spent-mid-pledge                                      |
+| Bilateral consistency                | v21–v22 | Both parties consistent vs contradictory                                  |
+| State-machine transitions            | v23–v27 | All 5 transition classes from §2.4 of the brief                           |
+| Malformed-input rejection            | v28     | Empty `nonce` — implementation MUST reject before computing canonical    |
+
+Every vector is a `(inputs, expected_outputs)` JSON tuple. Implementations
+ship a harness that runs all vectors and reports pass/fail. **CI must run
+the harness; a new implementation joins the family by passing all
+vectors byte-identically.**
+
+The TypeScript and Python SDKs are required to produce **byte-identical**
+canonical messages, ids, and signatures. Same discipline `orangecheck`
+and `@orangecheck/sdk` already follow.
+
+## Versioning policy
+
+The canonical message header `oc-pledge/v1` commits incompatible changes
+to explicit version bumps. Adding a new resolution mechanism is a MINOR
+version (existing pledges still verify); changing field order or
+serialization is MAJOR (existing pledges may need re-canonicalization
+in clients).
+
+The protocol freezes the canonical-message format at `v1.0.0` once GA
+criteria are met (see
+[CHANGELOG](https://github.com/orangecheck/oc-pledge-protocol/blob/main/CHANGELOG.md)).
+Future MINOR bumps add fields without breaking existing verifiers; future
+MAJOR bumps require coordinated upgrade across the family.
+
+## See also
+
+- [How it works](/pledge/how-it-works) — narrative companion to SPEC §3–§5
+- [Resolution grammar](/pledge/resolution-grammar) — narrative companion
+  to SPEC §3.4 and REGISTRY §6
+- [State machine](/pledge/state-machine) — narrative companion to SPEC §4
+- [Security posture](/pledge/security) — narrative companion to SECURITY.md

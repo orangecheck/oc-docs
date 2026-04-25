@@ -367,6 +367,63 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'pledge',
+        label: 'OC Pledge',
+        blurb: 'Forward-looking commitment primitive. Pledge your word. Bond your stake. Anyone verifies the outcome.',
+        items: [
+            {
+                href: '/pledge',
+                label: 'Overview',
+                blurb: 'Pledge your word to Bitcoin. Six verbs of sovereign sociality — Pledge is *swear*.',
+            },
+            {
+                href: '/pledge/why',
+                label: 'Why OC Pledge',
+                blurb: 'No custody, no slashing, no aggregated reputation — enforcement by exposure only.',
+            },
+            {
+                href: '/pledge/quickstart',
+                label: 'Quickstart',
+                blurb: 'Swear a pledge, publish, and verify the outcome end-to-end.',
+            },
+            {
+                href: '/pledge/how-it-works',
+                label: 'How it works',
+                blurb: 'The canonical message, the seven resolution mechanisms, the outcome envelope.',
+            },
+            {
+                href: '/pledge/resolution-grammar',
+                label: 'Resolution grammar',
+                blurb: 'chain_state, counterparty_signs, nostr_event_exists, stamp_published, http_get_hash, dns_record, vote_resolves.',
+            },
+            {
+                href: '/pledge/state-machine',
+                label: 'State machine',
+                blurb: 'pending → resolvable → kept | broken | disputed | expired_unresolved.',
+            },
+            {
+                href: '/pledge/enforcement-by-exposure',
+                label: 'Enforcement by exposure',
+                blurb: "Why bonds are signals, not stake to seize — and why that's the right call.",
+            },
+            {
+                href: '/pledge/composition',
+                label: 'Composition with the family',
+                blurb: 'Stamp as resolution, Vote as dispute, Agent as delegated swearer.',
+            },
+            {
+                href: '/pledge/security',
+                label: 'Security posture',
+                blurb: 'Address linkability, dispute-gaming, bond-draining attacks, mitigations.',
+            },
+            {
+                href: '/pledge/spec',
+                label: 'Specification',
+                blurb: 'Normative rules; reference impls must pass the 28 conformance vectors.',
+            },
+        ],
+    },
+    {
         slug: 'sdks',
         label: 'SDKs',
         blurb: 'Drop-in packages for every protocol.',

@@ -1,0 +1,112 @@
+export const metadata = {
+    title: 'OC Pledge — Enforcement by exposure',
+    description:
+        'Why bonds are signals, not stake to seize. Why broken pledges are public records, not slashable balances. Why no-custody is the only correct call.',
+};
+
+# Enforcement by exposure
+
+The bond on a pledge is **never** held by the protocol. Funds never move.
+There is no mechanism by which any actor — protocol, swearer, counterparty,
+voter, oracle — can seize bonded sats. **Ever.**
+
+This is the core ethos call. Read the next three paragraphs twice.
+
+## Why no slashing
+
+Slashing requires custody. To seize bonded sats on a broken pledge, the
+sats must be locked somewhere from which a contract can take them. That's
+either:
+
+1. **A multisig escrow** controlled by the protocol or a designated agent.
+   Reintroduces a captured intermediary — exactly the thing the
+   OrangeCheck family exists to remove.
+2. **An on-chain covenant (DLC, BIP-118).** Research-stage; the
+   primitives needed for trustless contingent payments are not deployed
+   on Bitcoin mainnet at v0.1 of OC Pledge. Re-evaluate at v2.
+3. **A bonded sidechain or L2.** Different trust assumptions, not credibly
+   neutral over long horizons, breaks the "Bitcoin-load-bearing" test.
+
+None of those is acceptable for the OrangeCheck family. So the bond
+serves a different purpose: it's a **signal** about the swearer's
+seriousness, **not** a stake to be seized.
+
+## What bonds do instead
+
+A pledge with a 100k-sat × 90-day bond *says*: "I have committed real
+opportunity cost to this. If I break the pledge, the public record of
+that break attaches to the same Bitcoin address that holds the bond."
+
+The teeth are not in losing the bond. The teeth are in:
+
+1. **The public record.** A broken pledge is queryable forever via
+   `outcomesFor(address)`. Gates, forums, relays, airdrops, DAOs, and any
+   other verifier can refuse to interact with addresses that have broken
+   pledges in a recent window.
+2. **The economic continuity.** The address that broke the pledge is
+   the same address whose `sats × days` Continues to age. Honest signers
+   accumulate kept-pledge history alongside their stake. A new address
+   has no history; an old address with broken pledges has worse-than-no
+   history.
+3. **The composition surface.** The
+   [OrangeCheck gate](/sdks/gate) `pledgeHistory` predicate makes "no
+   broken pledges in the last 180 days" a one-line gate config. Once
+   that's deployed at scale, breaking a pledge has a real cost — *not*
+   in seized sats, but in lost access to gated surfaces.
+
+## Why this is sufficient teeth
+
+The objection is always: "but what stops a sybil from breaking pledges
+and walking away?"
+
+Three answers:
+
+1. **The bond's opportunity cost is real even if it isn't seized.**
+   100k sats × 90 days *of unspent UTXO* is a measurable economic cost
+   borne by the swearer regardless of outcome. The bond doesn't have to
+   be seized to be expensive — holding it across the pledge term is the
+   expense.
+2. **Breaking a pledge attaches to an address.** A sybil burns one
+   address per broken pledge. Each address requires fresh stake to bond
+   the next pledge, paid in real opportunity cost. Sybil scale is bounded
+   by stake-economic constraints, not by anything the protocol does
+   actively.
+3. **The default is composition with OrangeCheck Attest.** Most gates
+   already require an attestation; layering "kept-pledge history" on top
+   raises the cost of the next sybil identity by orders of magnitude
+   versus a captive-platform reputation system that grants free
+   re-registration.
+
+The full discipline: the protocol doesn't *do* anything to broken
+pledges. It only *exposes* them. Every verifier composes their own
+policy from the raw exposure.
+
+## Comparison to slashing-based designs
+
+| System              | Where bond lives             | Who seizes on break                | What gets seized     |
+| ------------------- | ---------------------------- | ---------------------------------- | -------------------- |
+| OC Pledge           | Swearer's wallet, unlocked   | No one. Ever.                      | Nothing — record only |
+| Cosmos slashing     | Validator stake on the chain | Protocol slashing module           | Locked stake          |
+| EigenLayer AVS      | Restaked ETH                 | AVS slasher                        | Restaked stake        |
+| EAS + custody escrow| Multisig on Ethereum         | Designated arbiter                 | Escrowed funds       |
+| Smart contract      | Locked in contract           | Contract execution                 | Locked balance       |
+
+OC Pledge sits alone in the "no one seizes anything" column. That's the
+point.
+
+## What this rules out
+
+A swearer who genuinely doesn't care about exposure — a throwaway address,
+a defunct identity, a sybil — can break pledges with zero direct cost
+beyond the opportunity cost of the bond itself. **That's by design.** OC
+Pledge is the right primitive for the addresses that *do* care about
+their public history; for the addresses that don't, no amount of
+slashing would make them care, and the slashing infrastructure would just
+add custody risk for the addresses that do.
+
+## See also
+
+- [Why OC Pledge](/pledge/why) — the design rejections in detail
+- [Security posture](/pledge/security) — bond-draining attacks, dispute-gaming
+- [Composition with the family](/pledge/composition) — how `pledgeHistory`
+  predicates compose with `ocGate`

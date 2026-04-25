@@ -1,0 +1,130 @@
+export const metadata = {
+    title: 'OC Pledge — Composition with the family',
+    description:
+        'How OC Pledge composes with the other five OrangeCheck primitives. Gate predicates, agent-delegated pledges, stamp-resolved pledges, vote-resolved disputes, and confidential counterparty negotiation via Lock.',
+};
+
+# Composition with the family
+
+OC Pledge is designed to compose with every other primitive. Each pattern
+below is one config block away from any existing OrangeCheck deployment.
+
+## Gate predicates — `ocGate({ pledgeHistory })`
+
+The marquee composition. Extend any `@orangecheck/gate` config with a
+`pledgeHistory` predicate:
+
+```ts
+import { ocGate } from '@orangecheck/gate';
+
+ocGate({
+    minSats: 100_000,
+    minDays: 30,
+    pledgeHistory: {
+        minKept: 5,                    // ≥ 5 kept pledges ever
+        maxBrokenSince: '180d',        // 0 broken in last 180 days
+        minBondInFlight: 100_000,      // currently bonded ≥ 100k sats
+        minBondKeptLifetime: 1_000_000 // cumulative bond on kept pledges ≥ 1M sats
+    },
+});
+```
+
+All sub-options are independent and composable. Any subset can be
+specified. Example shapes from the brief:
+
+| Use case                                       | Config sketch                                                                |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| Nostr relay — high-trust posters               | `minKept: 10, maxBrokenSince: '365d', minBondInFlight: 100_000`              |
+| Airdrop — exclude shallow sybils               | `pledgeHistory: { minBondKeptLifetime: 1_000_000 }` *(at min 180-day age)*   |
+| Forum tier — bronze / silver / gold            | bronze: attestation only · silver: `minKept: 3` · gold: `minKept: 10, maxBrokenSince: '180d'` |
+
+Pressure-test new gate-config shapes against the brief's three scenarios
+before shipping. If a real shape can't be expressed, the gate API needs
+to grow before the gate ships.
+
+## Stamp as resolution — `stamp_published`
+
+The canonical way to pledge "I will publish X by time T":
+
+```ts
+const { envelope, pledge_id } = await createPledge({
+    swearer: 'bc1q…',
+    proposition: 'I will publish my Q3 results by 2026-08-01.',
+    resolution: { mechanism: 'stamp_published', query: 'content_hash:sha256:7d…' },
+    resolves_at: { time: '2026-08-01T00:00:00Z' },
+    // …bond, expires_at, etc.
+});
+```
+
+At resolution, the verifier looks up the stamp via the Stamp NIP's
+kind-30078 directory. If a valid stamp with the declared `content_hash`
+exists and was signed by the swearer, the pledge resolves `kept`. No
+resolver signature required — fully deterministic.
+
+## Vote as dispute resolution — `vote_resolves`
+
+Pledge's `dispute.mechanism` can invoke an OC Vote with a pre-specified
+voter set and threshold:
+
+```ts
+dispute: {
+    mechanism: 'vote_resolves',
+    params: 'poll_id=84ad…,option=kept,threshold=0.66',
+},
+```
+
+The OC Vote poll uses standard
+[weight modes](/vote/weight-modes) and a deterministic
+[tally](/vote/tally-algorithm); the dispute resolves `kept` if the poll
+crosses the threshold for the `kept` option, `broken` otherwise.
+
+## Agent-delegated pledges
+
+A principal can delegate `pledge:create` scope to an agent under
+[OC Agent](/agent). The agent signs the pledge envelope; the canonical
+message records the principal as the swearer and the delegation id in
+the optional `via_delegation` field.
+
+```ts
+// Principal mints a delegation:
+const delegation = await signDelegation({
+    principal: 'bc1qprincipal…',
+    agent: 'bc1qagent…',
+    scopes: ['pledge:create(max_bond_sats<=10_000_000,min_days<=180)'],
+    expiresAt: Date.now() + 365 * 24 * 3600 * 1000,
+    sign: walletSign,
+});
+
+// Agent later swears a pledge under that delegation:
+const { envelope } = await createPledge({
+    swearer: 'bc1qprincipal…',
+    via_delegation: delegation.id,
+    // …
+});
+const signed = await signPledge({ envelope, sign: agentSign });
+```
+
+The pledge counts against the **principal's** history, not the agent's.
+Scope-grammar extensions for `pledge:create` are coordinated with the
+[OC Agent spec](/agent/scopes).
+
+## Lock for private counterparty negotiation
+
+A bilateral pledge often has confidential negotiation before the public
+swearing. Counterparties can use [OC Lock](/lock) to seal envelopes
+addressed to each other's Bitcoin addresses, hash out terms privately,
+then publish the agreed pledge envelope to Nostr. Pure usage pattern —
+no protocol-level coupling.
+
+## What does NOT compose
+
+- **No automatic payouts.** OC Pledge can be *used* in a prediction-market
+  shape (two parties swear opposite propositions, `counterparty_signs`
+  resolution), but the protocol does not route value. Settlement is
+  out-of-band — Lightning, on-chain, or off-rail.
+- **No pledge chains in v0.1.** "This pledge's resolution triggers that
+  pledge's resolution" is interesting and deferred to post-v1 once we
+  observe what real-world demand exists.
+- **No cross-protocol aggregated reputation.** Same discipline OrangeCheck
+  applies to `score_v0` — the protocol ships raw metrics; aggregation is
+  the platform's call.

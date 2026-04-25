@@ -1,0 +1,157 @@
+export const metadata = {
+    title: 'OC Pledge — Security posture',
+    description:
+        'Threat model: address linkability through pledge history, dispute-gaming via contradictory outcome envelopes, bond-draining attacks, race-to-abandon. Mitigations + verifier obligations.',
+};
+
+# Security posture
+
+This page is the verifier-and-integrator threat model. For the family-wide
+threat framework see
+[`/ecosystem/security`](/ecosystem/security); this file covers
+the pledge-specific layer.
+
+The full normative threat list lives in
+[`SECURITY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SECURITY.md).
+
+## What a valid pledge cryptographically proves
+
+A `kept` outcome envelope, when verified end-to-end, gives the verifier:
+
+1. **A specific Bitcoin address committed.** BIP-322 signature over the
+   canonical message, re-checkable byte-exact.
+2. **The proposition resolved as kept under public state.** Outcome
+   envelope's evidence section is byte-recomputable from chain / Nostr /
+   HTTP / DNS / Stamp / Vote / counterparty inputs.
+3. **A bond was in scope at swearing time.** OrangeCheck attestation
+   referenced in the pledge can be re-resolved against current chain
+   state.
+
+A `broken` or `expired_unresolved` outcome proves the inverse —
+specifically, that the proposition did not resolve as the swearer
+committed.
+
+## What it does NOT prove
+
+- **Personhood.** The address may be one human, ten humans, or zero.
+- **Legal enforceability.** The protocol produces evidence admissible
+  in jurisdictions that recognize digital signatures. It does not produce
+  judgments and does not replace courts.
+- **Future intent.** A swearer who has kept ten pledges may break the
+  eleventh. Pledge history is descriptive, not predictive.
+- **Bond solvency at resolve time.** The bond's attestation is
+  re-derivable, but the swearer can spend the bonded UTXO mid-pledge
+  (see [Bond-draining](#bond-draining-attacks) below).
+
+## Threat model
+
+### Address linkability through pledge history
+
+Publishing a pledge attaches a pledge id to a Bitcoin address. Repeated
+pledges from the same address build a clusterable on-chain trail. Privacy
+implications:
+
+- Adversaries that already chain-cluster the address learn nothing new
+  cryptographically.
+- Adversaries that *don't* chain-cluster but *do* observe the pledge
+  history learn the swearer is interacting with the protocol — which
+  may be sensitive in some contexts.
+
+**Mitigation.** Use a fresh address per context. The economic cost of
+holding `sats × days` per address is real, but per-context unlinkability
+is achievable. Consider this an explicit privacy-vs-cost trade-off.
+
+### Dispute-gaming via contradictory outcome envelopes
+
+For deterministic mechanisms, a malicious resolver could publish an
+incorrect outcome envelope, hoping a verifier reads only that and not
+the public state. A second observer notices and publishes a correct
+contradicting envelope; the pledge enters `disputed`.
+
+**Mitigation.** Verifiers MUST recompute deterministic outcomes from
+public state — never trust a published outcome envelope's `result` field
+without re-verifying against the witness. The protocol surfaces
+`E_OUTCOME_RESULT_MISMATCH` for this case.
+
+### Bond-draining attacks
+
+The swearer can spend the bonded UTXO mid-pledge. The OrangeCheck
+attestation referenced in the bond becomes invalid (UTXO is spent;
+`days_unspent` falls to zero on the new UTXO).
+
+**Protocol behavior.** This is *not* automatic reclassification. Per
+[SPEC §8](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md),
+the verifier surfaces `E_BOND_SPENT` as an error code; the integrator
+chooses policy. Strict policies treat a spent bond as automatic break;
+lenient policies treat it as informational. Refusing automatic
+reclassification preserves the
+[no-slashing rule](/pledge/enforcement-by-exposure) — the protocol never
+*does* anything to a swearer's status; it only *exposes* the facts.
+
+**Operationally,** a swearer who spends the bond mid-pledge is functionally
+breaking the pledge. Any reasonable verifier policy will treat them that
+way. The protocol just doesn't enforce it on their behalf.
+
+### Race-to-abandon
+
+A swearer foreseeing a break could publish an
+[abandonment envelope](/pledge/state-machine) immediately before the
+foreseeable break to dodge the `broken` classification.
+
+**Mitigation.** Abandonment counts as `broken`. There is no separate
+"honorable exit" status. The protocol records the swearer's honesty
+(they admitted the break rather than hiding it) but does not reward it
+with a different ledger classification.
+
+### Counterparty silence on `counterparty_signs`
+
+A counterparty who refuses to sign the outcome envelope causes the
+pledge to resolve `expired_unresolved` rather than `broken`.
+
+**Mitigation.** `expired_unresolved` is a third outcome class, queryable
+separately. Verifiers building gates can compose any policy they want —
+count `expired_unresolved` as broken for some address classes, ignore
+it for others. This was an explicit design call (see
+[State machine](/pledge/state-machine)) — conflating expiration with
+breaking would let lazy counterparties break pledges by silence.
+
+### HTTP non-determinism on `http_get_hash`
+
+Network conditions, geo-routing, A/B tests, and CDN behaviors can produce
+different responses to the same URL. Strict-determinism is impossible
+for arbitrary HTTP.
+
+**Mitigation.** The SDK requires three independent HTTP fetches and
+takes the majority. Disagreements that cannot be resolved by majority
+fall back to `disputed`. This is documented as a non-strict-determinism
+exception in
+[SPEC §3.4.5](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md);
+integrators choosing `http_get_hash` accept the trade-off.
+
+## Verifier obligations
+
+A correct verifier MUST:
+
+1. **Re-derive the bond** from current chain state — do not trust the
+   pledge's declared `min_sats` / `min_days`.
+2. **Re-execute the resolution** for deterministic mechanisms — do not
+   trust a published outcome envelope's result field without re-checking.
+3. **Validate the BIP-322 signature** byte-exact against the canonical
+   message.
+4. **Consult ≥ 2 Nostr relays** before declaring an outcome envelope
+   absent.
+5. **Honor the dispute window** — outcomes are not final until the
+   window passes without contradiction.
+
+A correct verifier SHOULD:
+
+- Cache verification results for the lifetime of the chain snapshot used.
+- Re-resolve on every gate hit if the gate is real-time.
+- Log the snapshot block hash + height alongside every accepted
+  verification so audits can reproduce the decision.
+
+## Reporting
+
+Security issues that may affect verifiers or the reference impl:
+**security@ochk.io**. Do not open a public issue for a verifier-impacting
+bug.

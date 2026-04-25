@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck documentation',
     description:
-        'Unified docs for the OrangeCheck ecosystem — OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent. Shared concepts up top, protocol-specific sections below.',
+        'Unified docs for the OrangeCheck ecosystem — OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent, OC Pledge. Shared concepts up top, protocol-specific sections below.',
 };
 
 # Overview
@@ -14,16 +14,19 @@ layer once; each protocol adds a small sibling-specific layer on top.
 
 ## The family
 
-| Protocol                 | What it does                                                                                                                      | Status  |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **[OC Attest](/attest)** | Sybil resistance via proof of Bitcoin stake. Sign one message; any verifier can check that you've held N sats for N days.         | live    |
-| **[OC Lock](/lock)**     | End-to-end encryption addressed to a Bitcoin address. Sealed envelopes that only the key-holder of a specific address can unseal. | live    |
-| **[OC Stamp](/stamp)**   | Bitcoin-block-anchored signed statements. BIP-322 + OpenTimestamps. Immutable authorship + priority.                              | live    |
-| **[OC Vote](/vote)**     | Stake-weighted sybil-resistant polls. Three canonical weight modes. Deterministic, cross-impl-testable tally.                     | live    |
-| **[OC Agent](/agent)**   | Bitcoin-identity-bound delegation authority. Scoped rights, bonded to sats, revocable on-demand. Every agent action is signed.    | live    |
+Six verbs of sovereign sociality: *am, whisper, decide, declare, delegate, swear*.
+
+| Protocol                 | Verb     | What it does                                                                                                                      | Status |
+| ------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| **[OC Attest](/attest)** | am       | Sybil resistance via proof of Bitcoin stake. Sign one message; any verifier can check that you've held N sats for N days.         | live   |
+| **[OC Lock](/lock)**     | whisper  | End-to-end encryption addressed to a Bitcoin address. Sealed envelopes that only the key-holder of a specific address can unseal. | live   |
+| **[OC Vote](/vote)**     | decide   | Stake-weighted sybil-resistant polls. Three canonical weight modes. Deterministic, cross-impl-testable tally.                     | live   |
+| **[OC Stamp](/stamp)**   | declare  | Bitcoin-block-anchored signed statements. BIP-322 + OpenTimestamps. Immutable authorship + priority.                              | live   |
+| **[OC Agent](/agent)**   | delegate | Bitcoin-identity-bound delegation authority. Scoped rights, bonded to sats, revocable on-demand. Every agent action is signed.    | live   |
+| **[OC Pledge](/pledge)** | swear    | Forward-looking commitment primitive. BIP-322-signed declarations about future-verifiable propositions, bonded to an OC Attest.   | live   |
 
 OC Attest is the **base layer** — every other sibling can optionally reference
-an Attest proof as a "stake at signing" signal. The other four siblings are
+an Attest proof as a "stake at signing" signal. The other five siblings are
 **peers**: none depends on the others at the protocol level.
 
 ## How these docs are organized
@@ -50,6 +53,8 @@ an Attest proof as a "stake at signing" signal. The other four siblings are
 | OC Lock spec              | [`oc-lock-protocol`](https://github.com/orangecheck/oc-lock-protocol)                                        |
 | OC Stamp spec             | [`oc-stamp-protocol`](https://github.com/orangecheck/oc-stamp-protocol)                                      |
 | OC Vote spec              | [`oc-vote-protocol`](https://github.com/orangecheck/oc-vote-protocol)                                        |
+| OC Agent spec             | [`oc-agent-protocol`](https://github.com/orangecheck/oc-agent-protocol)                                      |
+| OC Pledge spec            | [`oc-pledge-protocol`](https://github.com/orangecheck/oc-pledge-protocol)                                    |
 | This site                 | `oc-docs`                                                                                                    |
 
 ## Conventions

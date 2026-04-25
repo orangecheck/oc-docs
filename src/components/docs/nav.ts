@@ -327,13 +327,12 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'agent',
         label: 'OC Agent',
-        blurb: "Agent-authorization records bound to a signer's Bitcoin address.",
+        blurb: "Bitcoin-identity-bound delegation authority. Scoped, revocable, signed.",
         items: [
             {
                 href: '/agent',
                 label: 'Overview',
-                blurb: 'Design-state. What Agent will be, what it will not replace.',
-                badge: 'design',
+                blurb: 'Every agent gets a Bitcoin address. Every action, signed.',
             },
             {
                 href: '/agent/why',

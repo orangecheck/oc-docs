@@ -20,7 +20,7 @@ layer once; each protocol adds a small sibling-specific layer on top.
 | **[OC Lock](/lock)**     | End-to-end encryption addressed to a Bitcoin address. Sealed envelopes that only the key-holder of a specific address can unseal. | live    |
 | **[OC Stamp](/stamp)**   | Bitcoin-block-anchored signed statements. BIP-322 + OpenTimestamps. Immutable authorship + priority.                              | preview |
 | **[OC Vote](/vote)**     | Stake-weighted sybil-resistant polls. Three canonical weight modes. Deterministic, cross-impl-testable tally.                     | live    |
-| **[OC Agent](/agent)**   | Agent-authorization records bound to a signer's Bitcoin address.                                                                  | design  |
+| **[OC Agent](/agent)**   | Bitcoin-identity-bound delegation authority. Scoped rights, bonded to sats, revocable on-demand. Every agent action is signed.    | live    |
 
 OC Attest is the **base layer** — every other sibling can optionally reference
 an Attest proof as a "stake at signing" signal. The other four siblings are

@@ -50,10 +50,24 @@ the sender's key.
 
 ## Section contents
 
-- [**How it works**](/lock/how-it-works) — the full encrypt/decrypt flow
-- [**Envelope format**](/lock/envelope-format) — canonicalized JSON shape
+- [**Why OC Lock**](/lock/why) — the v1 postmortem; what went wrong and what v2
+  fixes.
+- [**Quickstart**](/lock/quickstart) — seal your first vault in five minutes.
+- [**How it works**](/lock/how-it-works) — device keys → directory → seal →
+  unseal.
+- [**Protocol walkthrough**](/lock/protocol) — narrative tour of the flows.
+- [**Envelope format**](/lock/envelope-format) — canonical JSON, byte-identical
+  across clients.
+- [**Envelope reference**](/lock/envelope) — per-field semantics, error cases,
+  validation rules.
 - [**Device keys**](/lock/device-keys) — X25519 keys bound to a Bitcoin address
-  via BIP-322
+  via BIP-322.
+- [**Chat transport**](/lock/chat) — how sealed envelopes move across Nostr
+  relays and out-of-band channels.
+- [**Security posture**](/lock/security) — what breaks, what leaks, and what
+  an attacker must pay.
+- [**Specification**](/lock/spec) — normative rules, canonicalization, error
+  codes.
 
 ## Packages
 

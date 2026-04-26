@@ -16,6 +16,7 @@ const PROTOCOLS = [
     { href: '/stamp', label: 'Stamp' },
     { href: '/vote', label: 'Vote' },
     { href: '/agent', label: 'Agent' },
+    { href: '/pledge', label: 'Pledge' },
 ];
 
 function isActive(pathname: string, href: string): boolean {

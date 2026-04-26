@@ -96,14 +96,11 @@ const ENTRIES: SwitcherEntry[] = [
 
 export interface EcosystemSwitcherProps {
     current: EcosystemSlug;
-    /** Render a compact icon-only trigger (used on narrow viewports). */
-    compact?: boolean;
     className?: string;
 }
 
 export function EcosystemSwitcher({
     current,
-    compact = false,
     className,
 }: EcosystemSwitcherProps) {
     const [open, setOpen] = useState(false);
@@ -133,16 +130,17 @@ export function EcosystemSwitcher({
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={open}
+                aria-label="Switch OrangeCheck product"
+                title="Switch product"
                 onClick={() => setOpen((v) => !v)}
                 className={
-                    'font-display inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-semibold tracking-widest uppercase transition-colors ' +
+                    'inline-flex items-center gap-1 px-2 py-1 transition-colors ' +
                     (open
                         ? 'text-foreground'
                         : 'text-muted-foreground hover:text-foreground')
                 }
             >
                 <Boxes className="h-3.5 w-3.5" />
-                {!compact && <span>switch</span>}
                 <ChevronDown
                     className={
                         'h-3 w-3 transition-transform ' + (open ? 'rotate-180' : '')

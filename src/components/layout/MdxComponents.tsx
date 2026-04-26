@@ -1,12 +1,36 @@
 import type { MDXComponents } from 'mdx/types';
 
 import NextLink from 'next/link';
-import React from 'react';
+import React, { isValidElement } from 'react';
 
+import { Mermaid } from '@/components/docs/Mermaid';
 import { cn } from '@/lib/utils/utils';
 
 // MDX content is constrained by DocsLayout's center column; no wrapper.
 const MDXWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
+/**
+ * Pull the raw text out of an MDX `<pre><code>…</code></pre>` block. MDX
+ * gives us a `<code>` element whose `children` is either a string or an
+ * array of strings (when the highlighter splits tokens). Either way we
+ * just want the source for the Mermaid renderer.
+ */
+function readCodeSource(child: React.ReactNode): string | null {
+    if (!isValidElement(child)) return null;
+    const props = child.props as { children?: React.ReactNode };
+    const c = props.children;
+    if (typeof c === 'string') return c;
+    if (Array.isArray(c)) return c.filter((x) => typeof x === 'string').join('');
+    return null;
+}
+
+function getCodeLang(child: React.ReactNode): string | null {
+    if (!isValidElement(child)) return null;
+    const props = child.props as { className?: string };
+    const cls = props.className || '';
+    const m = cls.match(/language-([a-zA-Z0-9_-]+)/);
+    return m ? m[1] : null;
+}
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
@@ -54,15 +78,26 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 {...props}
             />
         ),
-        pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
-            <pre
-                className={cn(
-                    'bg-muted mb-5 overflow-x-auto rounded-lg p-4 text-sm',
-                    props.className
-                )}
-                {...props}
-            />
-        ),
+        pre: (props: React.HTMLAttributes<HTMLPreElement>) => {
+            // MDX wraps every fenced code block in <pre><code class="language-…">.
+            // Intercept ```mermaid``` fences and render them as proper diagrams
+            // — ASCII art is for grep, not docs.
+            const child = React.Children.toArray(props.children)[0];
+            const lang = getCodeLang(child);
+            if (lang === 'mermaid') {
+                const src = readCodeSource(child);
+                if (src) return <Mermaid chart={src} />;
+            }
+            return (
+                <pre
+                    className={cn(
+                        'bg-muted mb-5 overflow-x-auto rounded-lg p-4 text-sm',
+                        props.className
+                    )}
+                    {...props}
+                />
+            );
+        },
         blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
             // NOTE: `{...props}` is critical — without it, children is dropped
             // and every `>` blockquote renders as an empty styled box. This

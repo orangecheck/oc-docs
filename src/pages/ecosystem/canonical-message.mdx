@@ -8,9 +8,9 @@ export const metadata = {
 
 Every protocol in the OrangeCheck family signs a **canonical message** — a
 deterministic UTF-8 text blob that the wallet feeds to BIP-322. The same shape
-is reused across Attest, Lock, Stamp, and Vote (Agent will follow). By
-specifying the bytes exactly, two independent implementations produce
-byte-identical messages and therefore byte-identical attestation IDs.
+is reused across Attest, Lock, Stamp, Vote, Agent, and Pledge. By specifying
+the bytes exactly, two independent implementations produce byte-identical
+messages and therefore byte-identical attestation IDs.
 
 ## Shape
 
@@ -69,6 +69,8 @@ Seven lines. One trailing newline. That's the whole thing.
 | OC Lock envelope canonicalization | (RFC-8785 over JSON — not a line-format message)                      |
 | OC Stamp                          | `oc-stamp`                                                            |
 | OC Vote poll / ballot             | `oc-vote`                                                             |
+| OC Agent delegation / act         | `oc-agent`                                                            |
+| OC Pledge declaration / outcome   | `oc-pledge`                                                           |
 
 Lock's envelope format is the outlier — it canonicalizes a JSON structure via
 RFC-8785 rather than producing a newline-delimited text blob. The reason is that

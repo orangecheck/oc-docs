@@ -47,6 +47,20 @@ Serve every sibling protocol:
 | `@orangecheck/vote-core` | Reference implementation of oc-vote-protocol — `canonicalize`, `pollId`, `commit`, `voterWeight`, deterministic `tally()`. |
 | `@orangecheck/vote-cli`  | Shell interface to tally / verify / inspect polls.                                                                         |
 
+## OC Agent
+
+| Package                   | Purpose                                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `@orangecheck/agent-core` | Delegation envelope, scope grammar, `delegate()`, `act()`, `verifyAct()`, revocation lookup.             |
+| `@orangecheck/agent-cli`  | Shell interface to issue / revoke / inspect delegations.                                                 |
+
+## OC Pledge
+
+| Package                    | Purpose                                                                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `@orangecheck/pledge-core` | Pledge envelope, claim grammar, outcome canonicalization, `pledge()`, `attest()`, `dispute()`, deterministic state-machine eval. |
+| `@orangecheck/pledge-cli`  | Shell interface to make / attest / dispute / resolve pledges.                                                                    |
+
 ## Which to install
 
 | You're building…                  | Install                                                       |
@@ -63,6 +77,8 @@ Serve every sibling protocol:
 | E2E-encrypted envelopes           | `@orangecheck/lock-core` + `lock-device`                      |
 | Timestamped signed statements     | `@orangecheck/stamp-core` + `stamp-ots`                       |
 | Stake-weighted poll tally         | `@orangecheck/vote-core`                                      |
+| Scoped, bonded delegated signing  | `@orangecheck/agent-core`                                     |
+| Bonded commitments / future claims | `@orangecheck/pledge-core`                                   |
 
 ## Semver
 

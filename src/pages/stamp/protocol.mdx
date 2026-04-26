@@ -14,17 +14,21 @@ Narrative companion to the [spec](/stamp/spec). If you want the normative rules,
 
 ## The mental model
 
-```
-  wallet          ─ BIP-322 sign ──→   canonical message
-    │                                    │
-    │                                    │  H(bytes) = id
-    │                                    ▼
-    │              ─ submit ──→   OTS calendar(s)
-    │                                    │
-    │                                    │  pending proof
-    │                                    │  (~1h later → confirmed)
-    ▼                                    ▼
-  .stamp envelope (JSON, self-contained) ←─ anchor to Bitcoin block
+```mermaid
+flowchart LR
+    W["Wallet"] -->|BIP-322 sign| M["canonical message"]
+    M -->|H(bytes) = id| ID["envelope id"]
+    ID -->|submit| OTS[("OTS calendar(s)")]
+    OTS -->|pending proof| P["pending"]
+    P -.~1h later.-> CONF["confirmed<br/>(Merkle path<br/>to block header)"]
+    M --> ENV[(".stamp envelope<br/>JSON, self-contained")]
+    CONF -->|upgrade ots.proof| ENV
+    ENV --> BC["Bitcoin block<br/>anchor"]
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    class W,M,ID,P,CONF,BC base;
+    class OTS,ENV store;
 ```
 
 Every stamp is **one signing ceremony, one calendar submission, one later upgrade**. The envelope is self-contained: canonical message, BIP-322 signature, OTS proof, optional stake context. Verification is a pure function of envelope + Bitcoin headers.

@@ -11,29 +11,22 @@ deployments compose two or three. But start with exactly one.
 
 ## Decision tree
 
-```
-Are you asking: "is this user / caller legitimate or a bot?"
-│
-├── YES → OC Attest (sybil resistance via proof of Bitcoin stake)
-│         → /attest
-│
-└── NO → What DO you want?
-          │
-          ├── "I want to send a message only X can read."
-          │   → OC Lock (E2E encryption addressed to a BTC address)
-          │     → /lock
-          │
-          ├── "I want to prove X said Y at time T, permanently."
-          │   → OC Stamp (Bitcoin-block-anchored signed statements)
-          │     → /stamp
-          │
-          ├── "I want a stake-weighted poll that can't be sybil-farmed."
-          │   → OC Vote
-          │     → /vote
-          │
-          └── "I want an agent / bot to sign on my behalf, revocably."
-              → OC Agent (scoped, bonded, revocable delegations)
-                → /agent
+```mermaid
+flowchart TD
+    Q0["Is this user / caller<br/>legitimate or a bot?"]
+    Q0 -- "yes — sybil filter" --> ATTEST["<b>OC Attest</b><br/>proof of Bitcoin stake<br/><i>/attest</i>"]
+    Q0 -- "no — what do you want?" --> Q1{What do you want to do?}
+
+    Q1 -- "send a message<br/>only X can read" --> LOCK["<b>OC Lock</b><br/>E2E encryption addressed<br/>to a Bitcoin address<br/><i>/lock</i>"]
+    Q1 -- "prove X said Y<br/>at time T, permanently" --> STAMP["<b>OC Stamp</b><br/>Bitcoin-block-anchored<br/>signed statements<br/><i>/stamp</i>"]
+    Q1 -- "stake-weighted poll<br/>that can't be sybil-farmed" --> VOTE["<b>OC Vote</b><br/>three weight modes,<br/>deterministic tally<br/><i>/vote</i>"]
+    Q1 -- "agent / bot signs<br/>on my behalf, revocably" --> AGENT["<b>OC Agent</b><br/>scoped, bonded,<br/>revocable delegations<br/><i>/agent</i>"]
+    Q1 -- "swear word against a<br/>future-verifiable claim" --> PLEDGE["<b>OC Pledge</b><br/>bonded commitments,<br/>enforced by exposure<br/><i>/pledge</i>"]
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef question fill:#18181b,stroke:#52525b,color:#fafafa;
+    class ATTEST,LOCK,STAMP,VOTE,AGENT,PLEDGE base;
+    class Q0,Q1 question;
 ```
 
 ## Match by use case

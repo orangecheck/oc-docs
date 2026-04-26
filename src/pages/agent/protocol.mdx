@@ -66,34 +66,22 @@ Revocations are OTS-anchored when possible, so their effective time is provable 
 
 ## Flow 1 — delegate, act, verify
 
-```
-┌──────────┐      delegation envelope               ┌─────────┐
-│ Principal│───── (BIP-322 by principal) ──────────>│  Agent  │
-│  Wallet  │     carries scopes + expiry + bond     │ Process │
-└────┬─────┘                                        └────┬────┘
-     │                                                   │
-     │   publish Nostr kind-30083 (optional, public)     │
-     ├──────────────────────────────────────────────>    │
-     │                                                   │
-     │                                            action │
-     │                                    (BIP-322 by    │
-     │                                       agent,      │
-     │                                   cites delegation│
-     │                                          id)      │
-     │                                                   ▼
-     │                                             ┌──────────┐
-     │                                             │ Verifier │
-     │                                             │ (offline)│
-     │                                             └──────────┘
-     │                                                   │
-     │   (verifier fetches delegation from Nostr         │
-     │    by delegation_id if not bundled with action)   │
-     │                                                   │
-     │   run §SPEC 8.1–8.3 with envelope + headers      │
-     │                                                   │
-     ▼                                                   ▼
- bond attestation                                  OK { principal, agent,
- (re-resolved on-chain if caller cares)              scope, content, anchor }
+```mermaid
+sequenceDiagram
+    autonumber
+    participant P as Principal wallet<br/>(bc1qprincipal…)
+    participant A as Agent process<br/>(bc1qagent…)
+    participant N as Nostr<br/>kind-30083
+    participant V as Verifier<br/>(offline)
+    participant C as Bitcoin chain<br/>(bond + OTS)
+
+    P->>A: delegation envelope<br/>(BIP-322 by principal · scopes · expiry · bond)
+    P->>N: publish delegation (optional, public)
+    A->>A: compose content, hash, anchor (optional OTS)
+    A->>V: agent-action envelope<br/>(BIP-322 by agent · cites delegation_id)
+    V->>N: fetch delegation by id (if not bundled)
+    V->>C: re-resolve bond attestation<br/>(if caller cares)
+    V-->>A: OK { principal, agent, scope, content, anchor }
 ```
 
 1. Principal picks scopes.
@@ -105,31 +93,29 @@ Revocations are OTS-anchored when possible, so their effective time is provable 
 
 ## Flow 2 — revocation and priority
 
-```
-   ┌──────────┐  time →
-t0 │          │
-   │ Principal│──── delegate ────>───┐
-   │          │                      │                 relays +
-   └──────────┘                      │               OTS calendars
-                                     │                   ↓
-                                ┌────┴────┐         ┌─────────┐
-t1                              │ Agent   │────── action ────>│
-                                │ signs   │       (anchored at│
-                                │ action  │           block X)│
-                                └────┬────┘         └─────────┘
-                                     │
-                                     │
-   ┌──────────┐                      │
-t2 │ Principal│──── revoke ────>─────┼─── anchored at block Y │
-   │          │                      │                        │
-   └──────────┘                      │                        ▼
-                                     │              ┌──────────────┐
-                                     │              │   Verifier   │
-                                     │              │              │
-                                     │              │ X < Y ? OK.  │
-                                     │              │ X ≥ Y ? REVOKED
-                                     │              │  — reject.   │
-                                     │              └──────────────┘
+```mermaid
+flowchart LR
+    subgraph T0[t0 — delegate]
+        P0["Principal"] -->|BIP-322 delegate| D[("delegation<br/>envelope")]
+    end
+    subgraph T1[t1 — act]
+        D --> A1["Agent"]
+        A1 -->|action signed,<br/>OTS-anchored at <b>block X</b>| ACT[("action<br/>envelope")]
+    end
+    subgraph T2[t2 — revoke]
+        P2["Principal"] -->|BIP-322 revoke,<br/>OTS-anchored at <b>block Y</b>| REV[("revocation<br/>envelope")]
+    end
+    ACT --> V{Verifier<br/>compares anchors}
+    REV --> V
+    V -->|X &lt; Y| OK["✓ action stands"]
+    V -->|X ≥ Y| BAD["✗ post-revocation —<br/>reject"]
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef bad  fill:#0a0a0a,stroke:#dc2626,stroke-width:2px,color:#fafafa;
+    classDef ok   fill:#0a0a0a,stroke:#16a34a,stroke-width:2px,color:#fafafa;
+    class P0,P2,A1,V base;
+    class OK ok;
+    class BAD bad;
 ```
 
 The verifier compares the action's OTS anchor block to the revocation's. If the action predates the revocation, it stands. If the action isn't OTS-anchored but a revocation exists that predates its declared `signed_at`, the verifier treats the action as suspect — the agent's "I signed this before you revoked" claim is not provable against Bitcoin.

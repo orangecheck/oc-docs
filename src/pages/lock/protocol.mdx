@@ -21,12 +21,19 @@ v2 makes the boring choice: **treat Bitcoin as an identity system, not an access
 
 ## The mental model
 
-```
-  wallet ──sign binding──► browser ──publish──► nostr directory
-                             │
-                             └── (X25519 device key)
-                                             │
-  sender's browser ──ECDH──► content key ──encrypt──► .lock envelope
+```mermaid
+flowchart LR
+    W["Wallet<br/>(BIP-322)"] -->|sign device binding| B["Browser"]
+    B -->|publish kind-30078| N[("Nostr directory")]
+    B --> K["X25519 device key<br/>(in IndexedDB)"]
+    S["Sender's browser"] -->|fetch device key| N
+    S -->|ECDH → content key| E["encrypt"]
+    E --> L[(".lock envelope")]
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    class W,B,S,E base;
+    class N,K,L store;
 ```
 
 Every user does exactly one "hard" thing, only once: sign a BIP-322 message that binds a browser-generated X25519 key to their Bitcoin address. After that, sending and receiving are one click.

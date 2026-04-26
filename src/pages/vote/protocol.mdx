@@ -9,32 +9,18 @@ Narrative companion to the [spec](/vote/spec). Five flows, concrete scenarios, r
 
 ## mental model
 
-```
-  ┌──────────┐                                ┌──────────────┐
-  │ Creator  │──── signs poll (BIP-322) ────→│   Nostr      │
-  │          │    publishes kind 30080        │  directory   │
-  └──────────┘                                │              │
-                                              │ 30080 poll   │
-  ┌──────────┐                                │ 30081 ballot │
-  │ Voter A  │──── signs ballot (BIP-322) ──→│ 30082 reveal │
-  │ Voter B  │    publishes kind 30081        │              │
-  │ Voter C  │    (replaceable per voter)     │              │
-  └──────────┘                                └──────────────┘
-                                                      │
-                                                      │ anyone pulls
-                                                      ↓
-                                              ┌───────────────┐
-                                              │   Observer    │
-                                              │   tallier     │
-                                              └───────────────┘
-                                                      │
-                                                      │ + UTXO state
-                                                      │   at snapshot
-                                                      ↓
-                                              ┌───────────────┐
-                                              │ Deterministic │
-                                              │    tally      │
-                                              └───────────────┘
+```mermaid
+flowchart LR
+    C["Creator"] -->|signs poll · BIP-322<br/>publishes kind 30080| N[("Nostr directory<br/>30080 poll<br/>30081 ballot<br/>30082 reveal")]
+    V["Voters<br/>A · B · C"] -->|signs ballot · BIP-322<br/>publishes kind 30081<br/>(replaceable per voter)| N
+    N -->|anyone pulls| O["Observer / tallier"]
+    U[("UTXO state<br/>at snapshot block")] --> T
+    O --> T["Deterministic tally"]
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    class C,V,O,T base;
+    class N,U store;
 ```
 
 Every actor has one job. The creator publishes a poll. The voter publishes a ballot. The observer runs a function. Nobody trusts anybody; the math holds.
@@ -98,8 +84,10 @@ The CLI pulls the poll + ballots from his own relay set, verifies every signatur
 
 ## how this composes with the family
 
-- **OrangeCheck** — voters may reference an existing OC attestation in `ballot.attestation_id` as a client hint. Authoritative check is always the UTXO snapshot.
+- **OC Attest** — voters may reference an existing attestation in `ballot.attestation_id` as a client hint. Authoritative check is always the UTXO snapshot.
 - **OC Lock** — every secret-mode ballot is an OC Lock envelope addressed to the poll's `reveal_pk`. The envelope format is unchanged.
-- **OC Vote** — produces a signal. That signal can feed back into either primitive.
+- **OC Stamp** — a `vote_resolves` envelope can be stamped + OTS-anchored to give the resolved tally durable Bitcoin-block priority for archival.
+- **OC Agent** — a principal can grant `vote:cast(poll_id=…)` scope to a delegated agent; the agent's signed ballot counts against the principal's address.
+- **OC Pledge** — a pledge can defer its dispute resolution to an OC Vote with a pre-specified voter set + threshold via the `vote_resolves` mechanism. The vote becomes the authoritative resolver.
 
-Three primitives, one substrate, zero tokens.
+Six verbs of sovereign sociality — Vote is **decide**. Compose freely; no protocol depends on another at the wire level.

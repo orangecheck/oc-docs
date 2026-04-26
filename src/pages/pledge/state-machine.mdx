@@ -24,38 +24,34 @@ with the same inputs produce the same classification. This is a
 
 ## Transitions
 
-```
-sworn ──────► pending
-                │
-                │ now ≥ resolves_at
-                ▼
-            resolvable ───── outcome envelope published & verified ──► kept | broken
-                │                                                       (after dispute window)
-                │ now ≥ expires_at && no outcome
-                ▼
-        expired_unresolved
+```mermaid
+stateDiagram-v2
+    [*] --> pending: sworn
+    pending --> resolvable: now ≥ resolves_at
+    pending --> broken: abandonment<br/>envelope
+    resolvable --> kept: outcome verified<br/>(after dispute window)
+    resolvable --> broken: outcome verified<br/>(after dispute window)
+    resolvable --> disputed: contradictory<br/>outcome envelope
+    resolvable --> expired_unresolved: now ≥ expires_at<br/>no outcome
+    disputed --> kept: dispute mechanism resolves
+    disputed --> broken: dispute mechanism resolves
+    disputed --> expired_unresolved: no resolution<br/>by expires_at
+    kept --> [*]
+    broken --> [*]
+    expired_unresolved --> [*]
+
+    classDef good fill:#0a0a0a,stroke:#16a34a,stroke-width:2px,color:#fafafa
+    classDef bad fill:#0a0a0a,stroke:#dc2626,stroke-width:2px,color:#fafafa
+    classDef neutral fill:#0a0a0a,stroke:#71717a,stroke-width:2px,color:#fafafa
+    class kept good
+    class broken,disputed bad
+    class expired_unresolved neutral
 ```
 
-Plus the abandonment branch:
-
-```
-pending  ── abandonment envelope published ──►  broken
-                                                (no separate "abandoned" state)
-```
-
-Plus the dispute branch:
-
-```
-resolvable ── outcome envelope #1 ──► (within dispute window, pending)
-                                       │
-                                       │ outcome envelope #2 contradicts
-                                       ▼
-                                    disputed ── dispute mechanism resolves ──► kept | broken
-                                       │
-                                       │ no resolution by expires_at
-                                       ▼
-                              expired_unresolved
-```
+**Abandonment counts as broken** — there is no separate abandoned state.
+Refusing the "honorable exit" classification preempts the
+race-to-abandon attack where swearers dodge a foreseeable break by
+admitting it slightly earlier.
 
 ## What "verified" means in `resolvable → kept|broken`
 

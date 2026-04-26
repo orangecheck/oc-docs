@@ -12,22 +12,19 @@ password to forget, no email to phish.
 
 ## The flow
 
-```
-┌──────────┐   1. GET  /api/challenge?addr=bc1q…           ┌─────────┐
-│  Client  │ ─────────────────────────────────────────▶    │ Server  │
-│          │                                                │         │
-│          │   ◀──── { message, nonce, expiresAt }          │         │
-│          │                                                │         │
-│          │   2. user signs message in their wallet        │         │
-│          │                                                │         │
-│          │   3. POST /api/auth/signin                     │         │
-│          │        { message, signature, expectedNonce }   │         │
-│          │ ─────────────────────────────────────────▶    │  ← verifies
-│          │                                                │  ← upserts account
-│          │                                                │  ← sets Set-Cookie
-│          │                                                │         │
-│  ◀────────────── { ok: true, account }                    │         │
-└──────────┘                                                └─────────┘
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant W as Wallet<br/>(BIP-322)
+    participant S as Server
+    C->>S: GET /api/challenge?addr=bc1q…
+    S-->>C: { message, nonce, expiresAt }
+    C->>W: user signs canonical message
+    W-->>C: signature
+    C->>S: POST /api/auth/signin<br/>{ message, signature, expectedNonce }
+    S->>S: verify BIP-322 · upsert account · mint cookie
+    S-->>C: 200 { ok, account }<br/>Set-Cookie: oc_session=…
 ```
 
 The session cookie is `httpOnly + Secure + SameSite=Lax` with a 30-day Max-Age.

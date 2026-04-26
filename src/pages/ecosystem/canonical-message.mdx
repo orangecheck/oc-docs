@@ -65,18 +65,18 @@ Each header is a **literal first-line domain separator**. A signature produced
 under one header cannot be replayed against another protocol's verifier — the
 prefix is part of the bytes the wallet signed.
 
-| Protocol                            | Header literal              |
-| ----------------------------------- | --------------------------- |
-| OC Attest (default)                 | `orangecheck`               |
-| OC Attest (challenge / auth flow)   | `orangecheck-auth`          |
-| OC Lock device binding              | `oc-lock:device-bind:v2`    |
-| OC Stamp envelope                   | `oc-stamp:v1`               |
-| OC Agent delegation                 | `oc-agent:delegation:v1`    |
-| OC Agent action                     | `oc-agent:action:v1`        |
-| OC Agent revocation                 | `oc-agent:revocation:v1`    |
-| OC Pledge                           | `oc-pledge/v1`              |
-| OC Pledge outcome                   | `oc-pledge-outcome/v1`      |
-| OC Pledge abandonment               | `oc-pledge-abandonment/v1`  |
+| Protocol                          | Header literal             |
+| --------------------------------- | -------------------------- |
+| OC Attest (default)               | `orangecheck`              |
+| OC Attest (challenge / auth flow) | `orangecheck-auth`         |
+| OC Lock device binding            | `oc-lock:device-bind:v2`   |
+| OC Stamp envelope                 | `oc-stamp:v1`              |
+| OC Agent delegation               | `oc-agent:delegation:v1`   |
+| OC Agent action                   | `oc-agent:action:v1`       |
+| OC Agent revocation               | `oc-agent:revocation:v1`   |
+| OC Pledge                         | `oc-pledge/v1`             |
+| OC Pledge outcome                 | `oc-pledge-outcome/v1`     |
+| OC Pledge abandonment             | `oc-pledge-abandonment/v1` |
 
 ### Two sibling protocols don't use the line format
 
@@ -124,18 +124,18 @@ Each protocol's reference core ships its own canonical-message builder. They all
 follow the same shape rules described above; the per-protocol code is a thin
 shim that prepends the header literal and validates the per-protocol field set.
 
-| Protocol  | TypeScript core              | Python core (where shipped)  |
-| --------- | ---------------------------- | ---------------------------- |
-| OC Attest | `@orangecheck/sdk` (umbrella) + `@orangecheck/attest-core` | `orangecheck` (PyPI) |
-| OC Lock   | `@orangecheck/lock-core`     | —                            |
-| OC Stamp  | `@orangecheck/stamp-core`    | `orangecheck-stamp` (PyPI)   |
-| OC Vote   | `@orangecheck/vote-core`     | —                            |
-| OC Agent  | `@orangecheck/agent-core`    | —                            |
-| OC Pledge | `@orangecheck/pledge-core`   | —                            |
+| Protocol  | TypeScript core                                            | Python core (where shipped) |
+| --------- | ---------------------------------------------------------- | --------------------------- |
+| OC Attest | `@orangecheck/sdk` (umbrella) + `@orangecheck/attest-core` | `orangecheck` (PyPI)        |
+| OC Lock   | `@orangecheck/lock-core`                                   | —                           |
+| OC Stamp  | `@orangecheck/stamp-core`                                  | `orangecheck-stamp` (PyPI)  |
+| OC Vote   | `@orangecheck/vote-core`                                   | —                           |
+| OC Agent  | `@orangecheck/agent-core`                                  | —                           |
+| OC Pledge | `@orangecheck/pledge-core`                                 | —                           |
 
 Every core vendors its protocol's `test-vectors/*.json` from the matching
-`oc-*-protocol` repo and runs them on every CI push, so canonical-message
-drift between spec and impl is caught before publish.
+`oc-*-protocol` repo and runs them on every CI push, so canonical-message drift
+between spec and impl is caught before publish.
 
 ## See also
 

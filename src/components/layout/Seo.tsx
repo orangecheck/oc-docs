@@ -32,9 +32,7 @@ export function Seo(props: SEOProps) {
             />
             <meta key="og:site_name" property="og:site_name" content={meta.openGraph.siteName} />
             {ogImage && <meta key="og:image" property="og:image" content={ogImage.url} />}
-            {ogImage && (
-                <meta key="og:image:type" property="og:image:type" content="image/png" />
-            )}
+            {ogImage && <meta key="og:image:type" property="og:image:type" content="image/png" />}
             {ogImage && (
                 <meta
                     key="og:image:width"

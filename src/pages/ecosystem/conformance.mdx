@@ -29,21 +29,20 @@ produces the same bytes and the same hash as the spec.
 
 Every spec repo ships its vectors under `test-vectors/` (the family standard).
 OC Attest, the progenitor spec, additionally mirrors them under
-`conformance/vectors/` for backward compatibility — both directories contain
-the same files.
+`conformance/vectors/` for backward compatibility — both directories contain the
+same files.
 
-| Protocol  | Spec repo path                                                                                                          | # vectors           |
-| --------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| OC Attest | [`oc-attest-protocol/test-vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/test-vectors)          | 23 (`tv01`–`tv23`)  |
-| OC Lock   | [`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)              | 4 (`v01`–`v04`)     |
-| OC Stamp  | [`oc-stamp-protocol/test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors)            | 5 (`v01`–`v05`)     |
-| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)              | 5 (`v01`–`v05`)     |
-| OC Agent  | [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors)            | 5 (`v01`–`v05`)     |
-| OC Pledge | [`oc-pledge-protocol/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)          | 28 (`v01`–`v28`)    |
+| Protocol  | Spec repo path                                                                                                 | # vectors          |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------ |
+| OC Attest | [`oc-attest-protocol/test-vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/test-vectors) | 23 (`tv01`–`tv23`) |
+| OC Lock   | [`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)     | 4 (`v01`–`v04`)    |
+| OC Stamp  | [`oc-stamp-protocol/test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors)   | 5 (`v01`–`v05`)    |
+| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)     | 5 (`v01`–`v05`)    |
+| OC Agent  | [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors)   | 5 (`v01`–`v05`)    |
+| OC Pledge | [`oc-pledge-protocol/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors) | 28 (`v01`–`v28`)   |
 
-Each protocol's reference core (`@orangecheck/<verb>-core`) vendors the
-matching `test-vectors/` directory verbatim and runs every vector on each CI
-push.
+Each protocol's reference core (`@orangecheck/<verb>-core`) vendors the matching
+`test-vectors/` directory verbatim and runs every vector on each CI push.
 
 ## Vector categories (OC Attest example)
 
@@ -92,12 +91,12 @@ For any sibling protocol, the flow is the same:
 2. Update the spec's `test-vectors/index.json` (or `README.md` listing) so
    tooling can discover the new file.
 3. Re-vendor the directory into the matching reference core (`oc-packages/
-   <verb>-core/src/__tests__/vectors/`) and run the test suite locally.
+    <verb>-core/src/__tests__/vectors/`) and run the test suite locally.
 4. The new vector must pass before the spec PR merges; the core PR re-vendoring
    the spec's `test-vectors/` is paired with the spec PR.
 
-Specs that add a new MUST-reject case should include a vector in the
-spec's reject category so the behavior is pinned.
+Specs that add a new MUST-reject case should include a vector in the spec's
+reject category so the behavior is pinned.
 
 ## See also
 

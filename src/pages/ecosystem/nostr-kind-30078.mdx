@@ -20,17 +20,17 @@ authoritative roll-up.
 
 ## Kind registry
 
-| Kind    | Owner            | Purpose                                                                                  |
-| ------- | ---------------- | ---------------------------------------------------------------------------------------- |
-| `30078` | OC Attest        | Attestation envelope (the original family event kind)                                    |
-| `30078` | OC Lock          | Device record (binds an X25519 device key to a Bitcoin address)                          |
-| `30078` | OC Pledge        | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)       |
-| `30080` | OC Vote          | Poll                                                                                     |
-| `30081` | OC Vote          | Ballot                                                                                   |
-| `30082` | OC Vote          | Reveal (secret-mode tally)                                                               |
-| `30083` | OC Agent         | Agent delegation                                                                         |
-| `30084` | OC Stamp         | Stamp envelope (also: OC Agent **action** envelopes share this transport, disambiguated by inner `kind` field) |
-| `30085` | OC Agent         | Agent revocation                                                                         |
+| Kind    | Owner     | Purpose                                                                                                        |
+| ------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| `30078` | OC Attest | Attestation envelope (the original family event kind)                                                          |
+| `30078` | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                                |
+| `30078` | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                             |
+| `30080` | OC Vote   | Poll                                                                                                           |
+| `30081` | OC Vote   | Ballot                                                                                                         |
+| `30082` | OC Vote   | Reveal (secret-mode tally)                                                                                     |
+| `30083` | OC Agent  | Agent delegation                                                                                               |
+| `30084` | OC Stamp  | Stamp envelope (also: OC Agent **action** envelopes share this transport, disambiguated by inner `kind` field) |
+| `30085` | OC Agent  | Agent revocation                                                                                               |
 
 If you're allocating a new kind for a new sibling, claim the next unused number
 (currently `30086`) and update the registry in `oc-agent-protocol/SPEC.md`.
@@ -58,20 +58,20 @@ post-filter on the `d` tag.
 Each protocol reserves a `d`-tag namespace so events from different siblings
 don't collide on overlapping kinds.
 
-| Protocol  | Kind    | `d` tag format                                       |
-| --------- | ------- | ---------------------------------------------------- |
-| OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)             |
+| Protocol  | Kind    | `d` tag format                                                            |
+| --------- | ------- | ------------------------------------------------------------------------- |
+| OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)                                  |
 | OC Lock   | `30078` | `oc-lock:device:<btc_address>` (or `<addr>:<device_id>` for multi-device) |
-| OC Pledge | `30078` | `oc-pledge:<pledge_id>`                              |
-| OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                      |
-| OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                  |
-| OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                             |
-| OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                   |
-| OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                           |
-| OC Agent  | `30083` | `oc-agent:delegation:<delegation_id>`                |
-| OC Stamp  | `30084` | `oc-stamp:<envelope_id>`                             |
-| OC Agent  | `30084` | `oc-agent:action:<action_id>` (action envelopes ride OC Stamp's kind) |
-| OC Agent  | `30085` | `oc-agent:revocation:<revocation_id>`                |
+| OC Pledge | `30078` | `oc-pledge:<pledge_id>`                                                   |
+| OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                                           |
+| OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                                       |
+| OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                                                  |
+| OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                                        |
+| OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                                                |
+| OC Agent  | `30083` | `oc-agent:delegation:<delegation_id>`                                     |
+| OC Stamp  | `30084` | `oc-stamp:<envelope_id>`                                                  |
+| OC Agent  | `30084` | `oc-agent:action:<action_id>` (action envelopes ride OC Stamp's kind)     |
+| OC Agent  | `30085` | `oc-agent:revocation:<revocation_id>`                                     |
 
 The relay doesn't enforce any of this — `d` is just a string. The convention
 matters so that discovery queries (`#d: oc-stamp:*`, `#d: oc-vote:poll:*`) can
@@ -84,9 +84,9 @@ exist to enable secondary-index discovery without parsing the JSON `content`.
 
 **Common across all protocols:**
 
-| Tag    | Value                                       |
-| ------ | ------------------------------------------- |
-| `d`    | The addressable identifier (per table above) |
+| Tag | Value                                        |
+| --- | -------------------------------------------- |
+| `d` | The addressable identifier (per table above) |
 
 **OC Attest example:**
 
@@ -143,10 +143,14 @@ const sub = relay.subscribe([{ kinds: [30078], '#address': ['bc1qalice…'] }], 
 });
 
 // Find an OC Vote poll by id
-relay.subscribe([{ kinds: [30080], '#d': ['oc-vote:poll:<poll_id>'] }], { /*…*/ });
+relay.subscribe([{ kinds: [30080], '#d': ['oc-vote:poll:<poll_id>'] }], {
+    /*…*/
+});
 
 // Find every OC Stamp by a specific signer
-relay.subscribe([{ kinds: [30084], '#address': ['bc1qsigner…'] }], { /*…*/ });
+relay.subscribe([{ kinds: [30084], '#address': ['bc1qsigner…'] }], {
+    /*…*/
+});
 ```
 
 Each protocol's reference core wraps these queries with typed helpers
@@ -170,6 +174,9 @@ for why this matters.
 
 ## See also
 
-- [Canonical message](/ecosystem/canonical-message) — what goes inside each event's `content` field
-- [BIP-322 signing](/ecosystem/bip322) — what ties the Nostr event to the Bitcoin address
-- [Security model](/ecosystem/security) — relay assumptions and partition mitigation
+- [Canonical message](/ecosystem/canonical-message) — what goes inside each
+  event's `content` field
+- [BIP-322 signing](/ecosystem/bip322) — what ties the Nostr event to the
+  Bitcoin address
+- [Security model](/ecosystem/security) — relay assumptions and partition
+  mitigation

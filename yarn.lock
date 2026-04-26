@@ -603,10 +603,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-0.1.0.tgz#88bbbac852f6a3856f1d8e3a5f5be7966253bcbe"
-  integrity sha512-PB59Lmd6WNSMk0tc5hdmwAOfNqUwmzuBl4+3i/3pT8iN+MRSCxxWwSLiMIOVKQtuWhSnbc2rFk+GZkfHxPXkjA==
+"@orangecheck/auth-client@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-0.4.0.tgz#11a5eaaee3661d676aed01b84d7033bd85beebfe"
+  integrity sha512-vGb8EhaGjHwuJnx6eUu7Z0TuLv++/EDP5+2Zn0LAI4H1X98gY+SgLoamf7Xk4nvr+q7ML4fUMlw4vrABSMG4vA==
 
 "@orangecheck/auth-core@^0.1.0":
   version "0.1.0"

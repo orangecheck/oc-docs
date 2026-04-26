@@ -122,7 +122,7 @@ Honest summary:
 - **Forward secrecy is coarse-grained.** Per-message ephemeral X25519 keys
   (inherited from the envelope format) give message-level forward secrecy at
   send time, but there's no Signal-style ratchet. If someone compromises your
-  device_sk, _all_ currently-held messages encrypted to it become readable.
+  device*sk, \_all* currently-held messages encrypted to it become readable.
   Mitigation: rotate your device_sk periodically.
 - **No "typing" indicators, no read receipts.** These are metadata leaks; we
   haven't added them.

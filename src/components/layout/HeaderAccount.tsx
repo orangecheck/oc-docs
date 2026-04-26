@@ -1,6 +1,7 @@
 'use client';
 
 import { useOcSession } from '@orangecheck/auth-client';
+import { LogOut } from 'lucide-react';
 
 function shortenAddress(addr: string): string {
     if (addr.length <= 12) return addr;
@@ -8,9 +9,10 @@ function shortenAddress(addr: string): string {
 }
 
 /**
- * Mirror of ochk.io / attest.ochk.io HeaderAccount — same pattern, same
- * shape. When a user signs in on any ochk.io subdomain, docs.ochk.io
- * reflects that immediately via the Domain=.ochk.io cookie.
+ * Family-consistent account slot. Same shape on every ochk.io subdomain:
+ *
+ *   unauthenticated → "sign in" link
+ *   authenticated   → <addr-chip>  ⎋  (LogOut icon, no redundant word)
  */
 export function HeaderAccount() {
     const { status, account, signInUrl, signOut } = useOcSession();
@@ -29,23 +31,22 @@ export function HeaderAccount() {
     }
 
     return (
-        <div className="flex items-center gap-2 border-l pl-3">
+        <div className="flex items-center gap-1.5 border-l pl-2">
             <a
                 href="https://ochk.io/dashboard"
-                className="text-muted-foreground hover:text-foreground font-mono text-[12px] tracking-tight transition-colors"
                 title={account.address}
+                className="bg-muted/40 hover:bg-muted text-foreground inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[11px] tabular-nums transition-colors"
             >
                 {shortenAddress(account.address)}
             </a>
             <button
                 type="button"
-                onClick={() => {
-                    void signOut();
-                }}
+                onClick={() => void signOut()}
                 aria-label="Sign out"
-                className="text-muted-foreground hover:text-foreground font-mono text-[11px] tracking-wider uppercase transition-colors"
+                title="Sign out"
+                className="text-muted-foreground hover:text-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
             >
-                sign out
+                <LogOut className="h-3.5 w-3.5" />
             </button>
         </div>
     );

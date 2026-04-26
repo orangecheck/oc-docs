@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { cn } from '@/lib/utils/utils';
 
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
+import { LogoMark } from '@/components/layout/LogoMark';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const PROTOCOLS = [
@@ -32,9 +33,10 @@ export function LayoutHeader() {
             <div className="container flex h-12 items-center justify-between gap-4">
                 <Link
                     href="/"
-                    className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight"
+                    className="group flex items-center gap-2 transition-opacity hover:opacity-80"
                 >
-                    <span>
+                    <LogoMark size={20} />
+                    <span className="font-display text-base font-bold tracking-tight">
                         oc&middot;<span className="text-primary">docs</span>
                     </span>
                 </Link>
@@ -59,16 +61,16 @@ export function LayoutHeader() {
                     })}
                 </nav>
 
-                <div className="flex items-center gap-2">
-                    <a
-                        href="https://ochk.io"
-                        className="text-muted-foreground hover:text-foreground hidden font-mono text-[11px] tracking-widest uppercase sm:inline"
-                    >
-                        ochk.io
-                    </a>
-                    <EcosystemSwitcher current="docs" />
-                    <HeaderAccount />
-                    <ThemeToggle />
+                <div className="flex items-center gap-1">
+                    <div className="hidden md:block">
+                        <EcosystemSwitcher current="docs" />
+                    </div>
+                    <div className="hidden md:flex">
+                        <HeaderAccount />
+                    </div>
+                    <div className="hidden md:block">
+                        <ThemeToggle />
+                    </div>
                 </div>
             </div>
         </header>

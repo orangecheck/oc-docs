@@ -29,6 +29,43 @@ OC Attest is the **base layer** — every other sibling can optionally reference
 an Attest proof as a "stake at signing" signal. The other five siblings are
 **peers**: none depends on the others at the protocol level.
 
+## How they compose
+
+```mermaid
+flowchart TB
+    subgraph PEERS [" "]
+        direction LR
+        LOCK["<b>OC Lock</b><br/><i>whisper</i>"]
+        STAMP["<b>OC Stamp</b><br/><i>declare</i>"]
+        VOTE["<b>OC Vote</b><br/><i>decide</i>"]
+        AGENT["<b>OC Agent</b><br/><i>delegate</i>"]
+        PLEDGE["<b>OC Pledge</b><br/><i>swear</i>"]
+    end
+    ATTEST["<b>OC Attest</b><br/><i>am · base layer</i><br/>proof of bitcoin stake"]
+
+    LOCK -->|optional gate| ATTEST
+    STAMP -->|stake at signing| ATTEST
+    VOTE -->|ballot weight| ATTEST
+    AGENT -->|bond| ATTEST
+    PLEDGE -->|bond| ATTEST
+    PLEDGE -->|resolution mechanism| STAMP
+    PLEDGE -.->|dispute mechanism| VOTE
+    AGENT -->|every action anchored| STAMP
+
+    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
+    classDef peer fill:#18181b,stroke:#52525b,color:#fafafa;
+    classDef invisible fill:transparent,stroke:transparent;
+    class ATTEST base;
+    class LOCK,STAMP,VOTE,AGENT,PLEDGE peer;
+    class PEERS invisible;
+```
+
+Eight real composition arrows across six protocols: every peer can pin its
+artifacts to Attest stake; Pledge resolves through Stamp and disputes through
+Vote; every Agent action is itself a Stamp. None of these compositions is
+required — but each one is what turns six small protocols into a single
+substrate.
+
 ## How these docs are organized
 
 - **[Getting started](/getting-started/which-protocol)** — land here first.

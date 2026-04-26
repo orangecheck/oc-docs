@@ -26,6 +26,14 @@ function loadMermaid(): Promise<typeof import('mermaid').default> {
     if (!mermaidLoader) {
         mermaidLoader = import('mermaid').then((m) => {
             const mermaid = m.default;
+            const text = '#fafafa';
+            const muted = '#a1a1aa';
+            const line = '#71717a';
+            const orange = '#f97316';
+            const bg0 = '#0a0a0a';
+            const bg1 = '#18181b';
+            const bg2 = '#27272a';
+            const border = '#3f3f46';
             mermaid.initialize({
                 startOnLoad: false,
                 theme: 'base',
@@ -33,20 +41,62 @@ function loadMermaid(): Promise<typeof import('mermaid').default> {
                 fontFamily:
                     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
                 themeVariables: {
+                    // generic
                     background: 'transparent',
-                    primaryColor: '#1f1f1f',
-                    primaryTextColor: '#fafafa',
-                    primaryBorderColor: '#f97316',
-                    lineColor: '#71717a',
-                    secondaryColor: '#27272a',
-                    tertiaryColor: '#18181b',
-                    nodeBorder: '#f97316',
-                    clusterBkg: '#0a0a0a',
-                    clusterBorder: '#3f3f46',
-                    titleColor: '#fafafa',
-                    edgeLabelBackground: '#0a0a0a',
                     fontSize: '13px',
+                    textColor: text,
+                    mainBkg: bg1,
+                    secondBkg: bg2,
+                    tertiaryColor: bg0,
+
+                    // primary / secondary / tertiary node tiers
+                    primaryColor: bg1,
+                    primaryTextColor: text,
+                    primaryBorderColor: orange,
+                    secondaryColor: bg2,
+                    secondaryTextColor: text,
+                    secondaryBorderColor: border,
+                    tertiaryTextColor: text,
+                    tertiaryBorderColor: border,
+
+                    // edges, clusters, edge labels
+                    lineColor: line,
+                    edgeLabelBackground: bg0,
+                    nodeBorder: orange,
+                    clusterBkg: bg0,
+                    clusterBorder: border,
+                    titleColor: text,
+
+                    // notes
+                    noteBkgColor: bg2,
+                    noteTextColor: text,
+                    noteBorderColor: border,
+
+                    // sequence diagram (was unstyled — base theme defaulted to dark
+                    // text on light bg, illegible on our dark page)
+                    actorBkg: bg1,
+                    actorBorder: orange,
+                    actorTextColor: text,
+                    actorLineColor: line,
+                    signalColor: text,
+                    signalTextColor: text,
+                    labelBoxBkgColor: bg2,
+                    labelBoxBorderColor: border,
+                    labelTextColor: text,
+                    loopTextColor: text,
+                    activationBkgColor: border,
+                    activationBorderColor: line,
+                    sequenceNumberColor: bg0,
+                    altBackground: bg0,
                 },
+                themeCSS: `
+                    .nodeLabel, .nodeLabel p, .label foreignObject div { color: ${text} !important; }
+                    .edgeLabel, .edgeLabel p, .edgeLabel rect { color: ${text} !important; background-color: ${bg0} !important; fill: ${bg0} !important; }
+                    .messageText, .actor text, .loopText, .noteText, .labelText { fill: ${text} !important; }
+                    .actor { stroke: ${orange} !important; }
+                    .messageLine0, .messageLine1 { stroke: ${muted} !important; }
+                    .cluster rect { fill: ${bg0} !important; stroke: ${border} !important; }
+                `,
                 flowchart: { htmlLabels: true, curve: 'basis', padding: 12 },
                 sequence: { actorMargin: 50, mirrorActors: false },
             });

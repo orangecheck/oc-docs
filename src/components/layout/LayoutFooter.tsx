@@ -9,9 +9,10 @@ interface FooterLink {
 const PROTOCOLS: FooterLink[] = [
     { href: '/attest', label: 'oc·attest' },
     { href: '/lock', label: 'oc·lock' },
-    { href: '/stamp', label: 'oc·stamp' },
     { href: '/vote', label: 'oc·vote' },
+    { href: '/stamp', label: 'oc·stamp' },
     { href: '/agent', label: 'oc·agent' },
+    { href: '/pledge', label: 'oc·pledge' },
 ];
 
 const DOCS: FooterLink[] = [
@@ -28,9 +29,10 @@ const ECOSYSTEM: FooterLink[] = [
     { href: 'https://ochk.io', label: 'ochk.io — umbrella' },
     { href: 'https://attest.ochk.io', label: 'attest.ochk.io' },
     { href: 'https://lock.ochk.io', label: 'lock.ochk.io' },
-    { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io' },
     { href: 'https://vote.ochk.io', label: 'vote.ochk.io' },
+    { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io' },
     { href: 'https://agent.ochk.io', label: 'agent.ochk.io' },
+    { href: 'https://pledge.ochk.io', label: 'pledge.ochk.io' },
     {
         href: 'https://github.com/orangecheck',
         label: 'github org',
@@ -68,7 +70,7 @@ export function LayoutFooter() {
                         </div>
                         <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
                             Unified documentation for the OrangeCheck ecosystem — Attest, Lock,
-                            Stamp, Vote, Agent. Shared concepts written once, cross-linked
+                            Vote, Stamp, Agent, Pledge. Shared concepts written once, cross-linked
                             everywhere.
                         </p>
                         <div className="text-muted-foreground flex gap-2 font-mono text-[10px] tracking-widest uppercase">
@@ -111,11 +113,39 @@ export function LayoutFooter() {
                     </div>
                 </div>
 
-                <div className="text-muted-foreground mt-10 flex flex-col items-start justify-between gap-2 border-t pt-6 font-mono text-[11px] sm:flex-row sm:items-center">
-                    <span>© {new Date().getFullYear()} orangecheck · mit + cc-by-4.0</span>
-                    <span className="inline-flex items-center gap-1.5">
+                <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t pt-6 font-mono text-[11px] tracking-widest uppercase sm:flex-row sm:items-center">
+                    <span className="text-muted-foreground">
+                        © {new Date().getFullYear()} orangecheck · mit + cc-by-4.0
+                    </span>
+                    <div className="text-muted-foreground/80 flex flex-wrap items-center gap-x-4 gap-y-1">
+                        <a
+                            href="https://ochk.io/privacy"
+                            className="hover:text-foreground transition-colors"
+                        >
+                            privacy
+                        </a>
+                        <a
+                            href="https://ochk.io/terms"
+                            className="hover:text-foreground transition-colors"
+                        >
+                            terms
+                        </a>
+                        <a
+                            href="https://ochk.io/security"
+                            className="hover:text-foreground transition-colors"
+                        >
+                            security
+                        </a>
+                        <a
+                            href="https://ochk.io/contact"
+                            className="hover:text-foreground transition-colors"
+                        >
+                            contact
+                        </a>
+                    </div>
+                    <span className="text-muted-foreground inline-flex items-center gap-1.5">
                         <span className="text-primary text-[13px] leading-none">₿</span>
-                        <span className="tracking-widest uppercase">built with bitcoin</span>
+                        <span>built with bitcoin</span>
                     </span>
                 </div>
             </div>

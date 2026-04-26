@@ -75,17 +75,9 @@ export default function handler() {
                             stroke="#f97316"
                             strokeWidth="6"
                         />
-                        <text
-                            x="50"
-                            y="64"
-                            textAnchor="middle"
-                            fontSize="44"
-                            fontWeight="700"
-                            fontFamily="monospace"
-                            fill="#f97316"
-                        >
-                            {'{·}'}
-                        </text>
+                        <rect x="22" y="34" width="56" height="6" rx="3" fill="#f97316" />
+                        <rect x="22" y="48" width="44" height="6" rx="3" fill="#f97316" />
+                        <rect x="22" y="62" width="50" height="6" rx="3" fill="#f97316" />
                     </svg>
                 </div>
 

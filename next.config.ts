@@ -5,6 +5,10 @@ import createMDX from '@next/mdx';
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
+    // @orangecheck/ui ships an ESM bundle with `import 'next/link'`; without
+    // transpile next's bare-specifier resolution fails (no exports map).
+    transpilePackages: ['@orangecheck/ui'],
+
     async headers() {
         return [
             {

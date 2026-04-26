@@ -5,8 +5,9 @@ import { useRouter } from 'next/router';
 
 import { cn } from '@/lib/utils/utils';
 
+import { EcosystemSwitcher } from '@orangecheck/ui';
+
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
-import { EcosystemSwitcher } from '@/components/layout/EcosystemSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const PROTOCOLS = [

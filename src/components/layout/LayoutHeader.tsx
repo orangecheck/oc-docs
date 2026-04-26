@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { cn } from '@/lib/utils/utils';
 
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
+import { EcosystemSwitcher } from '@/components/layout/EcosystemSwitcher';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const PROTOCOLS = [
@@ -62,6 +63,7 @@ export function LayoutHeader() {
                     >
                         ochk.io
                     </a>
+                    <EcosystemSwitcher current="docs" />
                     <HeaderAccount />
                     <ThemeToggle />
                 </div>

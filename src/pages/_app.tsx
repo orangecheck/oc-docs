@@ -9,6 +9,7 @@ import { LayoutHeader } from '@/components/layout/LayoutHeader';
 import { LayoutSubHeader } from '@/components/layout/LayoutSubHeader';
 import { useMDXComponents } from '@/components/layout/MdxComponents';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
+import { ThemeBridge } from '@/components/layout/ThemeBridge';
 
 import '@/styles/globals.css';
 
@@ -21,6 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
             enableSystem={false}
             disableTransitionOnChange
         >
+                <ThemeBridge />
             <OcSessionProvider>
                 <MDXProvider components={components}>
                     <LayoutHeader />

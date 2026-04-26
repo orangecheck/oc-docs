@@ -17,8 +17,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://docs.ochk.io';
 const SITE_NAME = 'OrangeCheck docs';
 const DEFAULT_TITLE = 'OrangeCheck documentation';
 const DEFAULT_DESCRIPTION =
-    'Documentation for the OrangeCheck ecosystem — OC Attest (sybil resistance), OC Lock (E2E encryption), OC Stamp (timestamp anchoring), OC Vote (stake-weighted polls), OC Agent (agent authorization).';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+    'The OrangeCheck handbook. Six verbs — am, whisper, decide, declare, delegate, swear — mapped to identity, confidentiality, legitimacy, provenance, authority, commitment. Six composable protocols on Bitcoin: OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent, OC Pledge. BIP-322 + Nostr kind-30078 + OpenTimestamps. Every artifact verifies offline, forever.';
+const DEFAULT_OG_IMAGE = `${SITE_URL}/api/og`;
 
 export function generateMetaTags(config: SEOConfig = {}) {
     const {

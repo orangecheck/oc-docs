@@ -24,7 +24,8 @@ A valid Agent action envelope proves three things cryptographically:
    `ln:send(max_sats<=1000,node=03abc…)`; the verifier matches the action
    against the granted scope set deterministically.
 3. **The delegation is not revoked and not expired.** Revocation is advertised
-   via Nostr kind-30078; expiry is a plain timestamp in the delegation record.
+   via [Nostr kind-30085](/ecosystem/nostr-kind-30078); expiry is a plain
+   timestamp in the delegation record.
 
 And optionally, with an Attest reference:
 
@@ -88,8 +89,9 @@ Agent inherits the same plumbing every OrangeCheck protocol uses:
 - [Canonical message format](/ecosystem/canonical-message) — the delegation
   record is a canonical message.
 - [BIP-322 signing](/ecosystem/bip322) — the principal's delegation signature.
-- [Nostr kind-30078](/ecosystem/nostr-kind-30078) — where published delegations
-  and revocations live.
+- [Nostr publication](/ecosystem/nostr-kind-30078) — published delegations live
+  on kind-30083; revocations on kind-30085; agent-action envelopes share the
+  OC Stamp transport on kind-30084.
 - [Conformance vectors](/ecosystem/conformance) — the cross-impl test suite.
 - [Security model](/ecosystem/security) — shared threat framework.
 

@@ -1,171 +1,105 @@
 export const metadata = {
     title: 'Quickstart',
-    description: 'A running OrangeCheck integration in under five minutes.',
+    description:
+        'Pick a protocol, jump to its quickstart. Six protocols, six landing pages, each one a self-contained five-minute integration.',
 };
 
 # Quickstart
 
-Pick a protocol. Pick a task. Ship.
+Six verbs, six quickstarts. Pick the one that matches what you're trying to ship
+and jump straight to it — each protocol's quickstart is self-contained, runs on
+its own packages, and gets you to a verified artifact in five minutes.
 
-Every quickstart below uses only shipped, MIT-licensed packages — no hosted API
-dependency, no signup, no key material leaves your machine.
-
-## OC Attest — gate an HTTP route
-
-```bash
-npm i @orangecheck/gate
-```
-
-```ts
-import { ocGate } from '@orangecheck/gate';
-import express from 'express';
-
-const app = express();
-
-app.post(
-    '/post',
-    ocGate({
-        minSats: 10_000,
-        minDays: 30,
-        address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
-    }),
-    (_req, res) => res.json({ ok: true })
-);
-
-app.listen(3000);
-```
-
-The gate fetches the most recent attestation for the address, verifies the
-BIP-322 signature, recomputes `sats_bonded` and `days_unspent` from live chain
-state, and passes or rejects. If you pair it with
-[Sign-in-with-Bitcoin](/attest/guides/sign-in-with-bitcoin) you don't need the
-caller to provide the address at all — the session cookie carries it.
-
-See the full [Attest guide](/attest).
+> **Not sure which one?** Read [Which protocol do I need?](/getting-started/which-protocol)
+> for a one-page decision tree, or [Ecosystem — shared concepts](/ecosystem) for
+> the plumbing every protocol shares (canonical message, BIP-322, Nostr
+> kind-30078).
 
 ---
 
-## OC Lock — encrypt a message to a Bitcoin address
+## OC Attest — _am_
 
-```bash
-npm i @orangecheck/lock-core
-```
+**Sybil resistance via proof of Bitcoin stake.** Reach for this when you need to
+gate something — a route, an airdrop, a Nostr relay, a forum signup — on a
+credible economic cost, without running KYC.
 
-```ts
-import { seal, unseal } from '@orangecheck/lock-core';
-
-// Sender: encrypt a payload addressed to bc1qbob…
-const envelope = await seal({
-    payload: new TextEncoder().encode('hello'),
-    sender: {
-        address: 'bc1qalice…',
-        signMessage: async (m) => walletSignBIP322(m),
-    },
-    recipients: [{ address: 'bc1qbob…', device_id: '…', device_pk: '…' }],
-});
-
-// Recipient: decrypt once you have the right device secret
-const { payload } = await unseal({
-    envelope,
-    device: { device_id: '…', secretKey: deviceSecret },
-    verifyBip322: async (msg, sig, addr) => {
-        /* your verifier */
-    },
-});
-```
-
-The envelope is a JSON blob. Send it over any transport. See the full
-[Lock guide](/lock).
+- → [**Speedrun: gate an Express route**](/attest/guides/express) — drop-in
+  middleware, ten lines.
+- [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) · [Filter an airdrop](/attest/guides/airdrop) · [Sybil-filter a Nostr relay](/attest/guides/nostr-relay)
+- [OC Attest section overview](/attest) · [HTTP API](/attest/api)
 
 ---
 
-## OC Stamp — sign and anchor a statement to a Bitcoin block
+## OC Lock — _whisper_
 
-```bash
-npm i @orangecheck/stamp-core @orangecheck/stamp-ots
-```
+**End-to-end encryption addressed to a Bitcoin address.** Reach for this when
+you need to send a sealed payload to whoever currently controls a specific BTC
+address — no centralized key server, no account, no broker.
 
-```ts
-import { stamp, verify } from '@orangecheck/stamp-core';
-import { submitToCalendars, upgradeProof } from '@orangecheck/stamp-ots';
-
-// Produce a signed envelope
-const env = await stamp({
-    content: new TextEncoder().encode('v1.2.3 release notes…'),
-    mime: 'text/plain',
-    signer: {
-        address: 'bc1qalice…',
-        signMessage: async (m) => walletSignBIP322(m),
-    },
-});
-
-// Anchor it to Bitcoin via OpenTimestamps
-env.ots = await submitToCalendars(env.id);
-
-// Later, once OTS upgrades the proof:
-env.ots = await upgradeProof(env.ots, env.id);
-```
-
-See the full [Stamp guide](/stamp).
+- → [**Lock quickstart**](/lock/quickstart) — register a device, seal an envelope,
+  unseal it on the other side.
+- [Lock section overview](/lock)
 
 ---
 
-## OC Vote — tally a poll
+## OC Stamp — _declare_
 
-```bash
-npm i -g @orangecheck/vote-cli
-```
+**BIP-322 authorship + Bitcoin-block-anchored priority.** Reach for this when
+you need to prove that *you* said *this* *no later than* a specific Bitcoin
+block. Replaces PGP + OpenTimestamps + C2PA in one self-contained envelope.
 
-```bash
-# Pull a poll + ballots from any transport (Nostr, HTTP, file),
-# then compute the deterministic tally.
-oc-vote tally ./poll.json --ballots ./ballots.ndjson
-```
-
-See the full [Vote guide](/vote).
+- → [**Stamp quickstart**](/stamp/quickstart) — sign and verify a stamp in 60
+  seconds, hosted client or SDK.
+- [Stamp section overview](/stamp)
 
 ---
 
-## OC Agent
+## OC Vote — _decide_
 
-```bash
-yarn add @orangecheck/agent-core @orangecheck/agent-signer
-```
+**Stake-weighted, sybil-resistant polls.** Reach for this when you need a
+deterministic, cross-impl-testable tally where weight comes from Bitcoin (one
+address, sats, or sats × days), not from a captured registry.
 
-```ts
-import { verifyAction } from '@orangecheck/agent-core';
-import { mintActionEnvelope, signDelegation } from '@orangecheck/agent-signer';
-
-// Principal mints a scoped, time-bounded delegation.
-const delegation = await signDelegation({
-    principal: 'bc1q…principal…',
-    agent: 'bc1q…agent…',
-    scopes: [
-        'stamp:sign(mime=text/markdown)',
-        'lock:seal(recipient=bc1q…alice)',
-    ],
-    expiresAt: Date.now() + 30 * 24 * 3600 * 1000,
-    sign: walletSign,
-});
-
-// Agent signs an action that cites the delegation.
-const action = await mintActionEnvelope({
-    delegation,
-    payload: stampedReleaseNotes,
-    sign: agentSign,
-});
-
-// Anyone downstream verifies: agent → delegation → BIP-322 root.
-const ok = await verifyAction(action, { delegation });
-```
-
-See the [Agent quickstart](/agent/quickstart) for revocation, the full scope
-grammar, and a worked example using `@orangecheck/agent-cli`.
+- → [**Vote quickstart**](/vote/quickstart) — create a poll, cast a ballot,
+  verify the tally.
+- [Vote section overview](/vote)
 
 ---
 
-## Next steps
+## OC Agent — _delegate_
 
-- [Which protocol do I need?](/getting-started/which-protocol) — decision tree
-- [Ecosystem — shared concepts](/ecosystem) — how the plumbing works
-- [SDK overview](/sdks) — every published package at a glance
+**Scoped, revocable signing authority bound to a Bitcoin address.** Reach for
+this when you need to delegate signing to a script, bot, or pipeline within a
+narrow scope — without handing it your principal key.
+
+- → [**Agent quickstart**](/agent/quickstart) — mint a delegation, sign an
+  action, verify the chain back to the BIP-322 root.
+- [Agent section overview](/agent)
+
+---
+
+## OC Pledge — _swear_
+
+**Bonded forward-looking commitments.** Reach for this when you need to swear
+something is true *now* about a *future* outcome, with stake on the line and
+public exposure as the enforcement mechanism (never custody, never slashing).
+
+- → [**Pledge quickstart**](/pledge/quickstart) — install the SDK, construct a
+  pledge, sign with a wallet, publish.
+- [Pledge section overview](/pledge)
+
+---
+
+## What every quickstart shares
+
+Every protocol in the family is built on the same primitive: a BIP-322 signature
+from a Bitcoin address over a canonical, human-readable message. Learn that one
+shape and the rest of the family pattern-matches.
+
+- [Canonical message format](/ecosystem/canonical-message)
+- [BIP-322 signing](/ecosystem/bip322)
+- [Nostr kind-30078](/ecosystem/nostr-kind-30078)
+- [Conformance vectors](/ecosystem/conformance)
+- [Security model](/ecosystem/security)
+- [SDKs at a glance](/sdks) — every published `@orangecheck/*` package, what it
+  does, and which protocol it belongs to.

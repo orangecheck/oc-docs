@@ -8,6 +8,7 @@ import { LayoutFooter } from '@/components/layout/LayoutFooter';
 import { LayoutHeader } from '@/components/layout/LayoutHeader';
 import { LayoutSubHeader } from '@/components/layout/LayoutSubHeader';
 import { useMDXComponents } from '@/components/layout/MdxComponents';
+import { Seo } from '@/components/layout/Seo';
 import { ThemeBridge } from '@/components/layout/ThemeBridge';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 
@@ -23,6 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
             disableTransitionOnChange
         >
             <ThemeBridge />
+            <Seo />
             <OcSessionProvider>
                 <MDXProvider components={components}>
                     <LayoutHeader />

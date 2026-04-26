@@ -1,10 +1,15 @@
 import { Head, Html, Main, NextScript } from 'next/document';
 
-// Plausible analytics — privacy-first, no cookies, GDPR-clean. Override by
-// setting NEXT_PUBLIC_PLAUSIBLE_DOMAIN in the deploy env.
+// Plausible analytics — privacy-first, no cookies, GDPR-clean. Every
+// site in the family reports under one Plausible property
+// (`data-domain="ochk.io"`); the actual hostname (`docs.ochk.io`,
+// `lock.ochk.io`, ...) is captured by Plausible's standard event payload
+// so per-subdomain breakdowns are a dashboard filter away. Override the
+// site rollup target via NEXT_PUBLIC_PLAUSIBLE_DOMAIN if a deploy needs
+// to report somewhere else (e.g. a separate property).
 const DOMAIN_RE = /^[a-z0-9][a-z0-9.-]{0,253}$/i;
 const SAFE_URL_RE = /^https:\/\/[a-z0-9.-]+(:\d+)?(\/[\w./+%@~,!$&'()*-]*)?$/i;
-const RAW_PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'docs.ochk.io';
+const RAW_PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'ochk.io';
 const RAW_PLAUSIBLE_SRC =
     process.env.NEXT_PUBLIC_PLAUSIBLE_SRC ??
     'https://plausible.io/js/script.hash.outbound-links.pageview-props.tagged-events.js';

@@ -318,9 +318,10 @@ could exfiltrate your device secret next time you load the page. Mitigations:
 - Verify the TLS certificate chain (Let's Encrypt R12 issuer, SAN includes
   `lock.ochk.io`).
 - Use the app over HTTPS only; never accept a certificate warning.
-- Consider self-hosting from the
-  [`oc-lock-web`](https://github.com/orangecheck/oc-lock-web) source for
-  high-value scenarios.
+- For high-value scenarios where trusting `lock.ochk.io` is unacceptable, build
+  your own client against the open-source
+  [`@orangecheck/lock-*`](https://www.npmjs.com/org/orangecheck) packages — the
+  protocol is fully specified and the cores ship test vectors.
 
 ### Wallet extension
 

@@ -133,14 +133,17 @@ yarn add @orangecheck/agent-core @orangecheck/agent-signer
 ```
 
 ```ts
-import { signDelegation, mintActionEnvelope } from '@orangecheck/agent-signer';
 import { verifyAction } from '@orangecheck/agent-core';
+import { mintActionEnvelope, signDelegation } from '@orangecheck/agent-signer';
 
 // Principal mints a scoped, time-bounded delegation.
 const delegation = await signDelegation({
     principal: 'bc1q…principal…',
     agent: 'bc1q…agent…',
-    scopes: ['stamp:sign(mime=text/markdown)', 'lock:seal(recipient=bc1q…alice)'],
+    scopes: [
+        'stamp:sign(mime=text/markdown)',
+        'lock:seal(recipient=bc1q…alice)',
+    ],
     expiresAt: Date.now() + 30 * 24 * 3600 * 1000,
     sign: walletSign,
 });
@@ -156,8 +159,8 @@ const action = await mintActionEnvelope({
 const ok = await verifyAction(action, { delegation });
 ```
 
-See the [Agent quickstart](/agent/quickstart) for revocation, the full
-scope grammar, and a worked example using `@orangecheck/agent-cli`.
+See the [Agent quickstart](/agent/quickstart) for revocation, the full scope
+grammar, and a worked example using `@orangecheck/agent-cli`.
 
 ---
 

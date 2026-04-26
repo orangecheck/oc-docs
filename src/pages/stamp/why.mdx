@@ -1,60 +1,89 @@
 export const metadata = {
     title: 'Why OC Stamp exists',
-    description: 'The short answer: the open web has no durable, permissionless, identity-bearing provenance primitive a normal user can create with a wallet they already own.',
+    description:
+        'The short answer: the open web has no durable, permissionless, identity-bearing provenance primitive a normal user can create with a wallet they already own.',
 };
 
 export const meta = {
     title: 'Why OC Stamp — OC Stamp docs',
-    description: 'Design rationale, hypothesis-by-hypothesis. Why the open web needed this primitive.',
+    description:
+        'Design rationale, hypothesis-by-hypothesis. Why the open web needed this primitive.',
 };
 
 # Why OC Stamp exists
 
-> The short answer: the open web has no durable, permissionless, identity-bearing provenance primitive a normal user can create with a wallet they already own. Every adjacent system falls short on at least one of (authorship, priority, stake, openness, verifiability). OC Stamp exists to close that gap by composing three primitives the OrangeCheck ecosystem already ships.
+> The short answer: the open web has no durable, permissionless,
+> identity-bearing provenance primitive a normal user can create with a wallet
+> they already own. Every adjacent system falls short on at least one of
+> (authorship, priority, stake, openness, verifiability). OC Stamp exists to
+> close that gap by composing three primitives the OrangeCheck ecosystem already
+> ships.
 
-This is the summary page. The long-form rationale — twelve numbered hypotheses, each with Claim / Adversarial test / Verdict — lives in [`WHY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md) in the spec repo.
+This is the summary page. The long-form rationale — twelve numbered hypotheses,
+each with Claim / Adversarial test / Verdict — lives in
+[`WHY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md) in
+the spec repo.
 
 ## The gap
 
-> "Did a human sign this? When? With what skin in the game? Can I verify it a decade from now without a vendor?"
+> "Did a human sign this? When? With what skin in the game? Can I verify it a
+> decade from now without a vendor?"
 
 No single incumbent answers all four:
 
-| System                     | Authorship | Priority | Stake | Offline-verifiable | Permissionless |
-|----------------------------|:----------:|:--------:|:-----:|:-----------------:|:--------------:|
-| PGP                        | ✓          | ✗        | ✗     | ~                 | ~              |
-| OpenTimestamps alone       | ✗          | ✓        | ✗     | ✓                 | ✓              |
-| C2PA / Content Credentials | ✓          | ✗        | ✗     | x509 dep          | ✗              |
-| Nostr kind-1               | npub       | ✗        | ✗     | ~                 | ✓              |
-| EAS (Ethereum)             | ✓          | ETH      | token | ✗ (RPC)           | ✓              |
-| **OC Stamp**               | ✓ (btc)    | ✓ (btc)  | ✓ (oc)| ✓                 | ✓              |
+| System                     | Authorship | Priority | Stake  | Offline-verifiable | Permissionless |
+| -------------------------- | :--------: | :------: | :----: | :----------------: | :------------: |
+| PGP                        |     ✓      |    ✗     |   ✗    |         ~          |       ~        |
+| OpenTimestamps alone       |     ✗      |    ✓     |   ✗    |         ✓          |       ✓        |
+| C2PA / Content Credentials |     ✓      |    ✗     |   ✗    |      x509 dep      |       ✗        |
+| Nostr kind-1               |    npub    |    ✗     |   ✗    |         ~          |       ✓        |
+| EAS (Ethereum)             |     ✓      |   ETH    | token  |      ✗ (RPC)       |       ✓        |
+| **OC Stamp**               |  ✓ (btc)   | ✓ (btc)  | ✓ (oc) |         ✓          |       ✓        |
 
 ## What OC Stamp composes
 
 - **BIP-322** for authorship — every major Bitcoin wallet supports it.
 - **OpenTimestamps** for priority — we depend on it; we do not rebuild it.
-- **OrangeCheck** for stake — `sats_bonded × days_unspent` as an economic signal baked into the envelope.
-- **Nostr** (kind-30083) for durable public discovery — optional, and no relay is load-bearing for verification.
+- **OrangeCheck** for stake — `sats_bonded × days_unspent` as an economic signal
+  baked into the envelope.
+- **Nostr** (kind-30083) for durable public discovery — optional, and no relay
+  is load-bearing for verification.
 
 ## The Ed25519 substitution test
 
-Every mechanism must pass this test: **if the feature works identically on Ed25519 and doesn't require Bitcoin, it doesn't belong here.**
+Every mechanism must pass this test: **if the feature works identically on
+Ed25519 and doesn't require Bitcoin, it doesn't belong here.**
 
-- **Authorship via BIP-322**: requires a Bitcoin address's private key. Substituting Ed25519 loses the identity continuity with OrangeCheck attestations and OC Lock device records.
-- **Priority via OpenTimestamps Bitcoin anchor**: Bitcoin's block header is the priority oracle. No other chain has its settlement assurance at comparable cost.
-- **Stake via OrangeCheck**: sats-bonded × days-unspent is an economic signal that exists only because Bitcoin's UTXO model exists.
+- **Authorship via BIP-322**: requires a Bitcoin address's private key.
+  Substituting Ed25519 loses the identity continuity with OrangeCheck
+  attestations and OC Lock device records.
+- **Priority via OpenTimestamps Bitcoin anchor**: Bitcoin's block header is the
+  priority oracle. No other chain has its settlement assurance at comparable
+  cost.
+- **Stake via OrangeCheck**: sats-bonded × days-unspent is an economic signal
+  that exists only because Bitcoin's UTXO model exists.
 
-Strip any one and OC Stamp degrades into a commoditized primitive — PGP (authorship alone), OTS alone (priority alone), or an EVM timestamp (wrong chain, gas per stamp).
+Strip any one and OC Stamp degrades into a commoditized primitive — PGP
+(authorship alone), OTS alone (priority alone), or an EVM timestamp (wrong
+chain, gas per stamp).
 
 ## Why not each incumbent?
 
-- **PGP** has authorship but no priority anchor and a keyserver model every security review has ripped apart for twenty years.
-- **OpenTimestamps alone** has priority but is identity-naked — it commits to a hash, not to a signer.
-- **C2PA** is structurally wrong for the open web — anchored in x509 run by Adobe, Microsoft, and a handful of CAs. Fine for Adobe → Nikon → NYT; wrong for independent bloggers and OSS commit signers.
-- **Nostr kind-1** events have npub authorship but no chain anchor and no economic layer.
-- **EAS** on Ethereum needs an RPC to verify (degrades offline) and gas fees per stamp.
+- **PGP** has authorship but no priority anchor and a keyserver model every
+  security review has ripped apart for twenty years.
+- **OpenTimestamps alone** has priority but is identity-naked — it commits to a
+  hash, not to a signer.
+- **C2PA** is structurally wrong for the open web — anchored in x509 run by
+  Adobe, Microsoft, and a handful of CAs. Fine for Adobe → Nikon → NYT; wrong
+  for independent bloggers and OSS commit signers.
+- **Nostr kind-1** events have npub authorship but no chain anchor and no
+  economic layer.
+- **EAS** on Ethereum needs an RPC to verify (degrades offline) and gas fees per
+  stamp.
 
-See [`WHY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md) for the full twelve-hypothesis analysis.
+See
+[`WHY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md)
+for the full twelve-hypothesis analysis.
 
 ## Design rules that survived
 
@@ -74,8 +103,11 @@ See [`WHY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md
 - Post-quantum authenticity. secp256k1 and SHA-256 have finite lifetimes.
 - Multi-signer stamps. Single signer per envelope in v1.
 - Revocation. A retract-stamp is publishable but not standardized.
-- Confidential content. Seal with [OC Lock](https://lock.ochk.io), then stamp the sealed hash.
+- Confidential content. Seal with [OC Lock](https://lock.ochk.io), then stamp
+  the sealed hash.
 - Batched witness stamps. Deferred to v2.
 - Anchor-reorg handling. v1 trusts OTS calendar confirmation depth.
 
-See [`WHY.md §"What v1 explicitly does NOT solve"`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md#what-v1-explicitly-does-not-solve) for the full list.
+See
+[`WHY.md §"What v1 explicitly does NOT solve"`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/WHY.md#what-v1-explicitly-does-not-solve)
+for the full list.

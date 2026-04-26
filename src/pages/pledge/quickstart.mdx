@@ -19,8 +19,8 @@ yarn add @orangecheck/pledge @orangecheck/auth-client
 The SDK reaches `v0.1.0-beta` shortly. While it ships, the protocol spec is
 already
 [frozen](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md)
-and 28 conformance vectors are public — any conforming implementation
-(yours included) will produce byte-identical canonical messages.
+and 28 conformance vectors are public — any conforming implementation (yours
+included) will produce byte-identical canonical messages.
 
 ## 2. Construct a pledge
 
@@ -44,10 +44,10 @@ const { envelope, canonical_message, pledge_id } = await createPledge({
 });
 ```
 
-The SDK refuses any combination that can't resolve to a deterministic
-boolean — for example a `proposition` paired with a non-existent
-mechanism, a `resolves_at` past `expires_at`, or an `attestation_id` the
-SDK can't verify exists.
+The SDK refuses any combination that can't resolve to a deterministic boolean —
+for example a `proposition` paired with a non-existent mechanism, a
+`resolves_at` past `expires_at`, or an `attestation_id` the SDK can't verify
+exists.
 
 ## 3. Sign with the wallet
 
@@ -75,7 +75,7 @@ const { event_id } = await publish(signed);
 ## 5. Verify the outcome
 
 ```ts
-import { resolvePledge, verify, getState } from '@orangecheck/pledge';
+import { getState, resolvePledge, verify } from '@orangecheck/pledge';
 
 // At any time after `resolves_at`:
 const outcome = await resolvePledge({ envelope: signed });
@@ -89,18 +89,18 @@ const state = getState(signed, outcome, Date.now());
 ```
 
 For deterministic mechanisms (`chain_state`, `nostr_event_exists`,
-`stamp_published`, `http_get_hash`, `dns_record`), every observer with
-access to the same public state produces the byte-identical outcome
-envelope — **no resolver is required**.
+`stamp_published`, `http_get_hash`, `dns_record`), every observer with access to
+the same public state produces the byte-identical outcome envelope — **no
+resolver is required**.
 
-For `counterparty_signs` and `vote_resolves`, the outcome envelope must
-be signed by the designated resolver. Absence of that signature within
-`expires_at` resolves the pledge to `expired_unresolved`.
+For `counterparty_signs` and `vote_resolves`, the outcome envelope must be
+signed by the designated resolver. Absence of that signature within `expires_at`
+resolves the pledge to `expired_unresolved`.
 
 ## 6. Show the public history
 
 ```ts
-import { pledgesSworn, outcomesFor, bondInFlight } from '@orangecheck/pledge';
+import { bondInFlight, outcomesFor, pledgesSworn } from '@orangecheck/pledge';
 
 const ids = await pledgesSworn('bc1q…');
 const outcomes = await outcomesFor('bc1q…');
@@ -108,16 +108,14 @@ const inFlight = await bondInFlight('bc1q…');
 ```
 
 These are **raw metrics**. The protocol ships no aggregated score and no
-reference reputation function — by design. Platforms compute derived
-policies from raw queries; that's the
-[composition surface](/pledge/composition).
+reference reputation function — by design. Platforms compute derived policies
+from raw queries; that's the [composition surface](/pledge/composition).
 
 ## What's next
 
 - [How it works](/pledge/how-it-works) — the canonical message, the seven
   resolution mechanisms, the outcome envelope shape
-- [Resolution grammar](/pledge/resolution-grammar) — every mechanism in
-  detail
+- [Resolution grammar](/pledge/resolution-grammar) — every mechanism in detail
 - [Composition with the family](/pledge/composition) — gate predicates,
   agent-delegated pledges, vote-resolved disputes
 - [Specification](/pledge/spec) — normative rules + 28 conformance vectors

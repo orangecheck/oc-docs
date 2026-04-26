@@ -1,23 +1,36 @@
 export const metadata = {
     title: 'Quickstart · OC Lock',
-    description: 'Register a device, seal an envelope, open an envelope — in under a minute.',
+    description:
+        'Register a device, seal an envelope, open an envelope — in under a minute.',
 };
 
 # Quickstart
 
-Three things to do — in order, once. After this, sending and receiving are one click.
+Three things to do — in order, once. After this, sending and receiving are one
+click.
 
 ## 1. Register your device
 
-Visit [/app](https://lock.ochk.io/app) in a browser, enter your Bitcoin address, pick your wallet (UniSat, Xverse, Leather — or paste a signature from any signmessage-capable wallet), and sign the binding statement. The browser stores a 32-byte X25519 secret in IndexedDB and publishes a public kind-30078 event to four Nostr relays.
+Visit [/app](https://lock.ochk.io/app) in a browser, enter your Bitcoin address,
+pick your wallet (UniSat, Xverse, Leather — or paste a signature from any
+signmessage-capable wallet), and sign the binding statement. The browser stores
+a 32-byte X25519 secret in IndexedDB and publishes a public kind-30078 event to
+four Nostr relays.
 
 You never do this step again for this address in this browser.
 
 ## 2. Send a message
 
-On [/app](https://lock.ochk.io/app), click **+ new** and paste the recipient's Bitcoin address. The thread opens. Type a message or attach files and press **send**. The app looks up the recipient on Nostr, verifies the BIP-322 binding on their device record, seals the envelope, publishes a gift-wrap so the recipient's inbox auto-delivers, and exposes a share URL / `.lock` / QR on the resulting bubble so you can also hand the envelope off out-of-band any time.
+On [/app](https://lock.ochk.io/app), click **+ new** and paste the recipient's
+Bitcoin address. The thread opens. Type a message or attach files and press
+**send**. The app looks up the recipient on Nostr, verifies the BIP-322 binding
+on their device record, seals the envelope, publishes a gift-wrap so the
+recipient's inbox auto-delivers, and exposes a share URL / `.lock` / QR on the
+resulting bubble so you can also hand the envelope off out-of-band any time.
 
-Every sent message is a sealed vault by definition — same crypto, same identity binding, same envelope structure. The URL encodes the full envelope in its fragment, so nothing touches a server.
+Every sent message is a sealed vault by definition — same crypto, same identity
+binding, same envelope structure. The URL encodes the full envelope in its
+fragment, so nothing touches a server.
 
 ```
 https://oc-lock-web.vercel.app/unlock#eyJ2Ijoy…
@@ -39,11 +52,17 @@ Total on-screen time: < 3 seconds.
 
 ## 4. Hand off an envelope
 
-Every sent bubble exposes three affordances: **copy url**, **download .lock**, **show qr**. Same envelope, three ways to deliver it out-of-band if the Nostr auto-delivery isn't convenient (counterpart isn't on Lock yet, in-person hand-off, air-gapped recipient). See [chat transport](/lock/chat) for the full delivery model and [security implications](/lock/security) for the trust model.
+Every sent bubble exposes three affordances: **copy url**, **download .lock**,
+**show qr**. Same envelope, three ways to deliver it out-of-band if the Nostr
+auto-delivery isn't convenient (counterpart isn't on Lock yet, in-person
+hand-off, air-gapped recipient). See [chat transport](/lock/chat) for the full
+delivery model and [security implications](/lock/security) for the trust model.
 
 ## Using the SDK
 
-If you want to embed OC Lock in another app — Node, a browser extension, a Nostr client — the three packages are published from the [`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo.
+If you want to embed OC Lock in another app — Node, a browser extension, a Nostr
+client — the three packages are published from the
+[`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo.
 
 ```bash
 yarn add @orangecheck/lock-core @orangecheck/lock-crypto @orangecheck/lock-device
@@ -61,9 +80,7 @@ const envelope = await seal({
         address: 'bc1qalice…',
         signMessage: async (msg) => walletSignBIP322(msg),
     },
-    recipients: [
-        { address: 'bc1qbob…', device_id: '…', device_pk: '…' },
-    ],
+    recipients: [{ address: 'bc1qbob…', device_id: '…', device_pk: '…' }],
 });
 ```
 
@@ -113,8 +130,8 @@ const event = finalizeDeviceEvent({
 Need a sybil filter on your inbox? Gate unseal on an OrangeCheck check:
 
 ```ts
-import { check } from '@orangecheck/sdk';
 import { unseal } from '@orangecheck/lock-core/seal';
+import { check } from '@orangecheck/sdk';
 
 const ok = await check({
     addr: envelope.from.address,

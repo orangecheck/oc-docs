@@ -20,8 +20,9 @@ A valid Agent action envelope proves three things cryptographically:
 1. **The action was issued under a valid delegation.** The delegation is
    BIP-322-signed by the principal's Bitcoin address.
 2. **The action is within the granted scope.** Scopes are declarative strings
-   like `lock:seal(recipient=bc1qalice)` or `ln:send(max_sats<=1000,node=03abc…)`;
-   the verifier matches the action against the granted scope set deterministically.
+   like `lock:seal(recipient=bc1qalice)` or
+   `ln:send(max_sats<=1000,node=03abc…)`; the verifier matches the action
+   against the granted scope set deterministically.
 3. **The delegation is not revoked and not expired.** Revocation is advertised
    via Nostr kind-30078; expiry is a plain timestamp in the delegation record.
 
@@ -43,15 +44,14 @@ And optionally, with an Attest reference:
 
 ## Who this is NOT for
 
-- **Transferring the principal's Bitcoin key.** The principal's key never
-  leaves their wallet. The agent holds only the delegation record and its own
-  keypair.
-- **Transitive re-delegation.** An agent cannot issue sub-delegations in v0.
-  If you need an agent to delegate further, re-mint a delegation from the
-  principal that targets the sub-agent.
+- **Transferring the principal's Bitcoin key.** The principal's key never leaves
+  their wallet. The agent holds only the delegation record and its own keypair.
+- **Transitive re-delegation.** An agent cannot issue sub-delegations in v0. If
+  you need an agent to delegate further, re-mint a delegation from the principal
+  that targets the sub-agent.
 - **Replacing centralized IAM.** OAuth + role-based access is fine when there's
-  a central operator. OC Agent is the answer when the identity root is a
-  Bitcoin address, not an issuer.
+  a central operator. OC Agent is the answer when the identity root is a Bitcoin
+  address, not an issuer.
 
 ## Section contents
 
@@ -59,10 +59,10 @@ And optionally, with an Attest reference:
   delegation, what the alternatives can't do.
 - [**Quickstart**](/agent/quickstart) — mint a delegation, sign an action,
   verify it downstream. Five minutes.
-- [**Protocol walkthrough**](/agent/protocol) — the three envelopes
-  (delegation, action, revocation), the two canonical flows, diagrams.
-- [**Scope grammar**](/agent/scopes) — BNF, sub-scope containment,
-  constraint semantics, the 8 MVP scopes.
+- [**Protocol walkthrough**](/agent/protocol) — the three envelopes (delegation,
+  action, revocation), the two canonical flows, diagrams.
+- [**Scope grammar**](/agent/scopes) — BNF, sub-scope containment, constraint
+  semantics, the 8 MVP scopes.
 - [**Security posture**](/agent/security) — revocation timing, blast radius,
   what scopes cannot constrain.
 - [**Specification**](/agent/spec) — normative rules; the reference impls in
@@ -72,12 +72,12 @@ And optionally, with an Attest reference:
 
 - `@orangecheck/agent-core` — canonical delegation + action envelope format,
   scope parser, verifier.
-- `@orangecheck/agent-signer` — helpers for signing delegations (principal)
-  and actions (agent).
-- `@orangecheck/agent-cli` — `oc-agent` shell for minting / revoking /
-  verifying envelopes.
-- `@orangecheck/agent-mcp` — Model Context Protocol bridge so LLM toolchains
-  can produce agent-signed tool calls directly.
+- `@orangecheck/agent-signer` — helpers for signing delegations (principal) and
+  actions (agent).
+- `@orangecheck/agent-cli` — `oc-agent` shell for minting / revoking / verifying
+  envelopes.
+- `@orangecheck/agent-mcp` — Model Context Protocol bridge so LLM toolchains can
+  produce agent-signed tool calls directly.
 
 See [SDK overview](/sdks).
 
@@ -98,6 +98,5 @@ Agent inherits the same plumbing every OrangeCheck protocol uses:
 - Normative spec:
   [`oc-agent-protocol/SPEC.md`](https://github.com/orangecheck/oc-agent-protocol)
 - Reference impls: `@orangecheck/agent-core`, `agent-signer`, `agent-cli`,
-  `agent-mcp` in
-  [`oc-packages`](https://github.com/orangecheck/oc-packages)
+  `agent-mcp` in [`oc-packages`](https://github.com/orangecheck/oc-packages)
 - Reference site: `agent.ochk.io`

@@ -1,11 +1,10 @@
 'use client';
 
+import { EcosystemSwitcher } from '@orangecheck/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { cn } from '@/lib/utils/utils';
-
-import { EcosystemSwitcher } from '@orangecheck/ui';
 
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -35,7 +34,9 @@ export function LayoutHeader() {
                     href="/"
                     className="flex items-center gap-2 font-mono text-sm font-bold tracking-tight"
                 >
-                    <span>oc&middot;<span className="text-primary">docs</span></span>
+                    <span>
+                        oc&middot;<span className="text-primary">docs</span>
+                    </span>
                 </Link>
 
                 <nav className="hidden items-center gap-1 md:flex">

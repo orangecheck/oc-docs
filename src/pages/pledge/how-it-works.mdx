@@ -9,16 +9,16 @@ export const metadata = {
 Three signed artifacts, byte-identical across implementations:
 
 1. **Pledge envelope** — the swearer's commitment. BIP-322-signed.
-2. **Outcome envelope** — the resolution. Either deterministic (no
-   signature) or signed by a designated resolver.
-3. **Abandonment envelope** *(optional)* — the swearer's pre-resolution
+2. **Outcome envelope** — the resolution. Either deterministic (no signature) or
+   signed by a designated resolver.
+3. **Abandonment envelope** _(optional)_ — the swearer's pre-resolution
    admission of break. Counts as `broken` in the public ledger.
 
 ## The canonical pledge message
 
-The bytes the swearer signs are deterministic and human-readable. The user
-must be able to read them in their wallet's signing prompt and understand
-what they're committing to.
+The bytes the swearer signs are deterministic and human-readable. The user must
+be able to read them in their wallet's signing prompt and understand what
+they're committing to.
 
 ```
 oc-pledge/v1
@@ -46,9 +46,8 @@ nonce: 7af3b2c149e87fa1c6d2eb5403f8a0d9
 Canonical-serialization rules (see
 [SPEC §3](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md)):
 UTF-8, LF only, no trailing whitespace, exact field order, decimal integers
-without leading zeros, ISO-8601 UTC `Z` timestamps, addresses in their
-canonical bech32 / legacy form. **Byte-exact serialization is a conformance
-requirement.**
+without leading zeros, ISO-8601 UTC `Z` timestamps, addresses in their canonical
+bech32 / legacy form. **Byte-exact serialization is a conformance requirement.**
 
 ```
 pledge_id := sha256(canonical_message_bytes)   // hex-lowercase
@@ -56,18 +55,18 @@ pledge_id := sha256(canonical_message_bytes)   // hex-lowercase
 
 ## The seven resolution mechanisms
 
-Fixed at v0.1. No extensions without working integrator code demonstrating
-the need.
+Fixed at v0.1. No extensions without working integrator code demonstrating the
+need.
 
-| Mechanism             | Resolution outcome is computed from…                    | Determines outcome offline? |
-| --------------------- | ------------------------------------------------------- | --------------------------- |
-| `chain_state`         | Bitcoin RPC against a small canonical DSL               | yes                         |
-| `counterparty_signs`  | a BIP-322 signature from the named counterparty         | no — needs resolver         |
-| `nostr_event_exists`  | a Nostr query against ≥ 2 relays from the default set   | yes                         |
-| `stamp_published`     | a lookup of a specific OC Stamp envelope by hash or id  | yes                         |
-| `http_get_hash`       | SHA-256 of the response body of a specified URL         | yes                         |
-| `dns_record`          | a DoH query for a specified record from a resolver set  | yes                         |
-| `vote_resolves`       | the tally of a named OC Vote poll above a threshold     | no — needs resolver         |
+| Mechanism            | Resolution outcome is computed from…                   | Determines outcome offline? |
+| -------------------- | ------------------------------------------------------ | --------------------------- |
+| `chain_state`        | Bitcoin RPC against a small canonical DSL              | yes                         |
+| `counterparty_signs` | a BIP-322 signature from the named counterparty        | no — needs resolver         |
+| `nostr_event_exists` | a Nostr query against ≥ 2 relays from the default set  | yes                         |
+| `stamp_published`    | a lookup of a specific OC Stamp envelope by hash or id | yes                         |
+| `http_get_hash`      | SHA-256 of the response body of a specified URL        | yes                         |
+| `dns_record`         | a DoH query for a specified record from a resolver set | yes                         |
+| `vote_resolves`      | the tally of a named OC Vote poll above a threshold    | no — needs resolver         |
 
 Every mechanism produces a deterministic boolean outcome given fixed public
 state. The SDK refuses any combination that can't.
@@ -81,8 +80,8 @@ Full grammar for each: [Resolution grammar](/pledge/resolution-grammar).
 
 ## The outcome envelope
 
-Paired with the pledge, published as a Nostr kind-30078 replaceable event
-under d-tag `oc-pledge-outcome:<pledge_id>`.
+Paired with the pledge, published as a Nostr kind-30078 replaceable event under
+d-tag `oc-pledge-outcome:<pledge_id>`.
 
 ```
 oc-pledge-outcome/v1
@@ -100,18 +99,17 @@ sig: <base64 BIP-322 from resolved_by | empty if deterministic>
 
 For deterministic mechanisms — `chain_state`, `nostr_event_exists`,
 `stamp_published`, `http_get_hash`, `dns_record` — **every verifier
-independently produces the byte-identical outcome envelope**. No resolver
-is required and `sig` is empty. This is the property that makes Pledge
-gas-free: anyone can resolve, no one needs permission.
+independently produces the byte-identical outcome envelope**. No resolver is
+required and `sig` is empty. This is the property that makes Pledge gas-free:
+anyone can resolve, no one needs permission.
 
-For `counterparty_signs` and `vote_resolves`, the outcome requires a
-BIP-322 signature from the named resolver. Absence of that signature within
-`expires_at` → `expired_unresolved`.
+For `counterparty_signs` and `vote_resolves`, the outcome requires a BIP-322
+signature from the named resolver. Absence of that signature within `expires_at`
+→ `expired_unresolved`.
 
 A `disputed` outcome is produced when a contradictory outcome envelope is
-published within the dispute window. Disputed pledges stay disputed until
-the named dispute mechanism resolves them, or time out to
-`expired_unresolved`.
+published within the dispute window. Disputed pledges stay disputed until the
+named dispute mechanism resolves them, or time out to `expired_unresolved`.
 
 ## The abandonment envelope
 
@@ -126,10 +124,10 @@ sig: <base64 BIP-322 from swearer>
 ```
 
 **Abandonment counts as `broken` in the public ledger.** No "honorable exit"
-classification. The reason field is informational; the ledger is binary.
-This is a pressure-tested decision — any "honorable abandonment" status
-creates a race-to-abandon attack where swearers dodge foreseeable failures
-by admitting them slightly earlier.
+classification. The reason field is informational; the ledger is binary. This is
+a pressure-tested decision — any "honorable abandonment" status creates a
+race-to-abandon attack where swearers dodge foreseeable failures by admitting
+them slightly earlier.
 
 ## How the outcome is found
 
@@ -140,14 +138,14 @@ Verifiers query Nostr by d-tag pattern:
 - `oc-pledge-abandonment:<pledge_id>` — the abandonment
 
 Default relay set is reused from OC Lock; integrators can override. A
-client-side verifier MUST consult ≥ 2 relays before declaring a missing
-outcome a true absence.
+client-side verifier MUST consult ≥ 2 relays before declaring a missing outcome
+a true absence.
 
 ## See also
 
-- [State machine](/pledge/state-machine) — `pending → resolvable → kept |
-  broken | disputed | expired_unresolved`.
+- [State machine](/pledge/state-machine) —
+  `pending → resolvable → kept | broken | disputed | expired_unresolved`.
 - [Resolution grammar](/pledge/resolution-grammar) — full DSL per mechanism.
-- [Composition with the family](/pledge/composition) — Stamp, Vote, Agent,
-  Lock integrations.
+- [Composition with the family](/pledge/composition) — Stamp, Vote, Agent, Lock
+  integrations.
 - [Specification](/pledge/spec) — normative rules.

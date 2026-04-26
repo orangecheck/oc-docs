@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Protocol walkthrough',
-    description: 'Narrative companion to the spec. If you want the normative rules, read the spec. If you want to understand why and how, read this.',
+    description:
+        'Narrative companion to the spec. If you want the normative rules, read the spec. If you want to understand why and how, read this.',
 };
 
 export const meta = {
@@ -10,7 +11,8 @@ export const meta = {
 
 # Protocol walkthrough
 
-Narrative companion to the [spec](/stamp/spec). If you want the normative rules, read the spec. If you want to understand *why* and *how*, read this.
+Narrative companion to the [spec](/stamp/spec). If you want the normative rules,
+read the spec. If you want to understand _why_ and _how_, read this.
 
 ## The mental model
 
@@ -31,24 +33,36 @@ flowchart LR
     class OTS,ENV store;
 ```
 
-Every stamp is **one signing ceremony, one calendar submission, one later upgrade**. The envelope is self-contained: canonical message, BIP-322 signature, OTS proof, optional stake context. Verification is a pure function of envelope + Bitcoin headers.
+Every stamp is **one signing ceremony, one calendar submission, one later
+upgrade**. The envelope is self-contained: canonical message, BIP-322 signature,
+OTS proof, optional stake context. Verification is a pure function of envelope +
+Bitcoin headers.
 
 ## Flow 1 — Alice stamps a blog post
 
 1. Alice writes a Markdown post. 12,843 bytes.
 2. Her browser computes `sha256(bytes)` locally — content never leaves her tab.
-3. Client builds the canonical message (six lines, `oc-stamp:v1` domain-separated).
+3. Client builds the canonical message (six lines, `oc-stamp:v1`
+   domain-separated).
 4. Her wallet signs it via BIP-322. One prompt.
-5. Client derives `id = sha256(canonical_message)`, submits to two OTS calendars.
-6. Client assembles the envelope: v, kind, id, content (hash + length + mime + ref), signer, signed_at, stake (null), ots (pending), sig.
-7. About an hour later, an OTS calendar anchors the root to a Bitcoin block. The upgraded proof contains the Merkle path from id up to the block header. Any client can fetch and replace `ots.proof`.
+5. Client derives `id = sha256(canonical_message)`, submits to two OTS
+   calendars.
+6. Client assembles the envelope: v, kind, id, content (hash + length + mime +
+   ref), signer, signed_at, stake (null), ots (pending), sig.
+7. About an hour later, an OTS calendar anchors the root to a Bitcoin block. The
+   upgraded proof contains the Merkle path from id up to the block header. Any
+   client can fetch and replace `ots.proof`.
 8. Alice ships `blogpost.md.stamp` alongside her post.
 
-A year later, Bob reads the post offline on a plane. He loads the `.stamp`, his tool reconstructs the canonical message, re-derives the id, verifies the BIP-322 signature, walks the OTS proof to the Bitcoin header Merkle root, and confirms the bytes he has match `content.hash`. No network required.
+A year later, Bob reads the post offline on a plane. He loads the `.stamp`, his
+tool reconstructs the canonical message, re-derives the id, verifies the BIP-322
+signature, walks the OTS proof to the Bitcoin header Merkle root, and confirms
+the bytes he has match `content.hash`. No network required.
 
 ## Flow 2 — Commit-signing with `git-stamp`
 
-Current state of tag signing: GPG keys nobody audits, keyservers nobody trusts. Developers already have Bitcoin wallets.
+Current state of tag signing: GPG keys nobody audits, keyservers nobody trusts.
+Developers already have Bitcoin wallets.
 
 ```
 $ git-stamp tag v2.1.0
@@ -64,15 +78,18 @@ $ git-stamp tag v2.1.0
 > Stamp written: .git/stamps/v2.1.0.stamp
 ```
 
-Anyone cloning runs `git-stamp verify v2.1.0` — authorship, priority, and tree-hash equality all checked, no GPG keyserver involved.
+Anyone cloning runs `git-stamp verify v2.1.0` — authorship, priority, and
+tree-hash equality all checked, no GPG keyserver involved.
 
 ## Flow 3 — Sybil-gated publishing feed
 
-A platform accepts submissions from anyone but wants a stake signal. With stamps, the stake is **time-pinned**: the platform can require that the signer held stake *at the moment they wrote the content*, not just right now.
+A platform accepts submissions from anyone but wants a stake signal. With
+stamps, the stake is **time-pinned**: the platform can require that the signer
+held stake _at the moment they wrote the content_, not just right now.
 
 ```ts
-import { verify } from '@orangecheck/stamp-core';
 import { ocGate } from '@orangecheck/gate';
+import { verify } from '@orangecheck/stamp-core';
 
 app.post('/submit', async (req, res) => {
     const { stamp, bytes } = req.body;
@@ -92,30 +109,48 @@ Time-pinned stake defeats farmed-stake-in-the-last-week gaming.
 
 ## Flow 4 — Legal self-notarization
 
-Wills, assignment agreements, IP disclosures, NDAs. A notary's job is "this document existed, signed by this person, on this date." OC Stamp produces that cryptographically:
+Wills, assignment agreements, IP disclosures, NDAs. A notary's job is "this
+document existed, signed by this person, on this date." OC Stamp produces that
+cryptographically:
 
 - **Authorship**: BIP-322 bound to a provable Bitcoin address.
-- **Priority**: confirmed OTS anchor in a specific Bitcoin block, adversarially public.
-- **Tamper-evidence**: `content.hash` commits to the bytes; any edit invalidates the id and the signature.
+- **Priority**: confirmed OTS anchor in a specific Bitcoin block, adversarially
+  public.
+- **Tamper-evidence**: `content.hash` commits to the bytes; any edit invalidates
+  the id and the signature.
 
-In jurisdictions that recognize digital signatures (Federal Rules of Evidence 901/902 in the US, eIDAS in the EU), a BIP-322-signed PDF with a confirmed OTS anchor is admissible.
+In jurisdictions that recognize digital signatures (Federal Rules of Evidence
+901/902 in the US, eIDAS in the EU), a BIP-322-signed PDF with a confirmed OTS
+anchor is admissible.
 
 ## Flow 5 — DAO proposal with durable provenance
 
-A proposal is a Markdown doc. Today it lives in a forum thread whose authorship is whoever clicked "post." With OC Stamp, the proposal author includes a `.stamp` envelope carrying *who proposed, when, at what stake* — and the DAO's later vote (via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
+A proposal is a Markdown doc. Today it lives in a forum thread whose authorship
+is whoever clicked "post." With OC Stamp, the proposal author includes a
+`.stamp` envelope carrying _who proposed, when, at what stake_ — and the DAO's
+later vote (via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
 
 ## What's NOT in the protocol
 
 - **Our own timestamping layer.** OTS works. Peter Todd built it correctly.
-- **A proprietary Nostr kind.** We use 30083 in the OrangeCheck family range (30078 for attestations and lock device records, 30080–30082 for vote). No overloading.
-- **Keyservers we operate.** Envelopes are self-contained; directory is optional.
-- **Custody of signer keys.** Never. The wallet the user already holds is the identity.
-- **Making OTS non-optional for signing.** A signed-but-unanchored envelope is a legitimate artifact; any later client can upgrade it.
+- **A proprietary Nostr kind.** We use 30083 in the OrangeCheck family range
+  (30078 for attestations and lock device records, 30080–30082 for vote). No
+  overloading.
+- **Keyservers we operate.** Envelopes are self-contained; directory is
+  optional.
+- **Custody of signer keys.** Never. The wallet the user already holds is the
+  identity.
+- **Making OTS non-optional for signing.** A signed-but-unanchored envelope is a
+  legitimate artifact; any later client can upgrade it.
 
 ## What's layered from OrangeCheck
 
-- **Optional stake reference** in `stake.attestation_id`. Composes with [`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) on the consumer side.
-- **Identity continuity** — the same Bitcoin address the user holds an OrangeCheck attestation under, an OC Lock device record under, is the stamp signer.
+- **Optional stake reference** in `stake.attestation_id`. Composes with
+  [`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) on the
+  consumer side.
+- **Identity continuity** — the same Bitcoin address the user holds an
+  OrangeCheck attestation under, an OC Lock device record under, is the stamp
+  signer.
 
 ## Where to go next
 

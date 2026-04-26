@@ -100,10 +100,7 @@ export function Mermaid({ chart, className }: MermaidProps) {
 
     return (
         <figure
-            className={cn(
-                'my-6 overflow-x-auto rounded-lg border bg-zinc-950/40 p-4',
-                className,
-            )}
+            className={cn('my-6 overflow-x-auto rounded-lg border bg-zinc-950/40 p-4', className)}
         >
             {svg ? (
                 <div

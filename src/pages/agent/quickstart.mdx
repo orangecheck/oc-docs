@@ -1,11 +1,13 @@
 export const metadata = {
     title: 'Quickstart — OC Agent',
-    description: 'Install @orangecheck/agent-signer and issue your first delegation in five minutes.',
+    description:
+        'Install @orangecheck/agent-signer and issue your first delegation in five minutes.',
 };
 
 # Quickstart
 
-Five minutes from nothing to a signed delegation, an exercised action, and a verified result.
+Five minutes from nothing to a signed delegation, an exercised action, and a
+verified result.
 
 ## Install
 
@@ -14,14 +16,19 @@ npm i @orangecheck/agent-core @orangecheck/agent-signer
 ```
 
 Optional:
-- `@orangecheck/wallet-adapter` — browser Bitcoin wallets (UniSat / Xverse / Leather)
+
+- `@orangecheck/wallet-adapter` — browser Bitcoin wallets (UniSat / Xverse /
+  Leather)
 - `@orangecheck/stamp-ots` — OpenTimestamps anchoring
 - `@orangecheck/agent-mcp` — stamp MCP tool invocations as agent-actions
-- `@orangecheck/agent-cli` — `oc-agent` shell for verify / inspect / canonicalize / scope checks
+- `@orangecheck/agent-cli` — `oc-agent` shell for verify / inspect /
+  canonicalize / scope checks
 
 ## 1. Delegate
 
-The principal creates a delegation. `signMessage` is any function that returns a BIP-322 base64 signature of the given string (in a browser, `@orangecheck/wallet-adapter` provides one).
+The principal creates a delegation. `signMessage` is any function that returns a
+BIP-322 base64 signature of the given string (in a browser,
+`@orangecheck/wallet-adapter` provides one).
 
 ```ts
 import { createDelegation } from '@orangecheck/agent-signer';
@@ -43,7 +50,8 @@ const delegation = await createDelegation({
 const encoded = JSON.stringify(delegation);
 ```
 
-Send `encoded` to the agent — over OC Lock, email, MCP, whatever transport fits. The agent stores it.
+Send `encoded` to the agent — over OC Lock, email, MCP, whatever transport fits.
+The agent stores it.
 
 ## 2. Act
 
@@ -67,14 +75,16 @@ const action = await signAsAgent({
 
 Every action is:
 
-- a strict extension of an [OC Stamp](https://stamp.ochk.io) envelope (so stamp verifiers keep working),
+- a strict extension of an [OC Stamp](https://stamp.ochk.io) envelope (so stamp
+  verifiers keep working),
 - signed by the agent's Bitcoin address (non-repudiable),
 - bound to the delegation by id (no cross-delegation replay),
 - scope-constrained (verifiers enforce sub-scope containment).
 
 ## 3. Verify
 
-Any counterparty — auditor, recipient, the principal themselves — runs the verification algorithm offline.
+Any counterparty — auditor, recipient, the principal themselves — runs the
+verification algorithm offline.
 
 ```ts
 import { verifyAction } from '@orangecheck/agent-core';
@@ -83,13 +93,16 @@ import { Verifier as Bip322 } from 'bip322-js';
 const result = await verifyAction({
     action,
     delegation,
-    verifyBip322: async (msg, sig, addr) => Bip322.verifySignature(addr, msg, sig),
+    verifyBip322: async (msg, sig, addr) =>
+        Bip322.verifySignature(addr, msg, sig),
 });
 
 if (!result.ok) {
     console.log(`REJECTED: ${result.code} — ${result.message}`);
 } else {
-    console.log(`OK: principal ${delegation.principal.address} authorized agent ${delegation.agent.address}`);
+    console.log(
+        `OK: principal ${delegation.principal.address} authorized agent ${delegation.agent.address}`
+    );
     console.log(`  scope exercised: ${result.scopeExercised}`);
     console.log(`  content hash:    ${action.content.hash}`);
 }
@@ -104,7 +117,7 @@ import { revoke } from '@orangecheck/agent-signer';
 import { stampCommit } from '@orangecheck/stamp-ots'; // optional anchoring
 
 const rev = await revoke({
-    signer: principal,  // or agent, if delegation.revocation.holders includes 'agent'
+    signer: principal, // or agent, if delegation.revocation.holders includes 'agent'
     delegation,
     reason: 'agent key rotated',
 });
@@ -124,7 +137,9 @@ await nostr.publish({
 });
 ```
 
-A verifier passing `revocations: [rev]` to `verifyAction()` will compare its effective time (OTS anchor if present, else `signed_at`) against the action's and return `E_REVOKED` if the revocation was effective first.
+A verifier passing `revocations: [rev]` to `verifyAction()` will compare its
+effective time (OTS anchor if present, else `signed_at`) against the action's
+and return `E_REVOKED` if the revocation was effective first.
 
 ## From the shell
 
@@ -138,11 +153,16 @@ npx @orangecheck/agent-cli scope 'ln:send(max_sats<=1000,node=03abc)'
 npx @orangecheck/agent-cli subscope 'ln:send(max_sats<=1000)' 'ln:send(max_sats=500)'
 ```
 
-Exit codes: `0` = verified / admitted, `1` = any rejection. Every command has `--json` for script-friendly output.
+Exit codes: `0` = verified / admitted, `1` = any rejection. Every command has
+`--json` for script-friendly output.
 
 ## Next steps
 
-- Learn the [scope grammar](/agent/scopes) — what the 8 MVP scopes express, how sub-scope containment works, how to write constraints.
-- Try the live [playground](https://agent.ochk.io/playground) — the same library, in your browser.
-- Read the [protocol walkthrough](/agent/protocol) for a diagram-first view of the three envelopes.
-- Skim the [security posture](/agent/security) before trusting a production delegation.
+- Learn the [scope grammar](/agent/scopes) — what the 8 MVP scopes express, how
+  sub-scope containment works, how to write constraints.
+- Try the live [playground](https://agent.ochk.io/playground) — the same
+  library, in your browser.
+- Read the [protocol walkthrough](/agent/protocol) for a diagram-first view of
+  the three envelopes.
+- Skim the [security posture](/agent/security) before trusting a production
+  delegation.

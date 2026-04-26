@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import { useEffect, useRef } from 'react';
 
 /**
  * ThemeBridge — cross-subdomain theme persistence.
@@ -51,8 +51,7 @@ function readCookie(name: string): string | null {
 function writeCookie(value: string): void {
     if (typeof document === 'undefined') return;
     if (!ALLOWED.has(value)) return;
-    const isLocal =
-        location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     const parts = [
         `${COOKIE}=${encodeURIComponent(value)}`,
         'Path=/',

@@ -1,11 +1,13 @@
 export const metadata = {
     title: 'walkthrough',
-    description: 'Narrative companion to the spec. Five flows, concrete scenarios, realistic addresses and block heights.',
+    description:
+        'Narrative companion to the spec. Five flows, concrete scenarios, realistic addresses and block heights.',
 };
 
 # walkthrough
 
-Narrative companion to the [spec](/vote/spec). Five flows, concrete scenarios, realistic addresses and block heights.
+Narrative companion to the [spec](/vote/spec). Five flows, concrete scenarios,
+realistic addresses and block heights.
 
 ## mental model
 
@@ -23,46 +25,69 @@ flowchart LR
     class N,U store;
 ```
 
-Every actor has one job. The creator publishes a poll. The voter publishes a ballot. The observer runs a function. Nobody trusts anybody; the math holds.
+Every actor has one job. The creator publishes a poll. The voter publishes a
+ballot. The observer runs a function. Nobody trusts anybody; the math holds.
 
 ## flow 1 — public sats-days weighted poll
 
-Alice coordinates Bitcoin grant recipients. They want to allocate $5k among three candidate projects. Non-binding signal, weighted by sats × days.
+Alice coordinates Bitcoin grant recipients. They want to allocate $5k among
+three candidate projects. Non-binding signal, weighted by sats × days.
 
-**Alice:** visits `vote.ochk.io/create`, enters question + 3 options, deadline 2026-05-08, weight_mode `sats_days` (cap 180 d), min_sats 100,000, min_days 30. Signs once. URL at `vote.ochk.io/p/<poll_id>`.
+**Alice:** visits `vote.ochk.io/create`, enters question + 3 options, deadline
+2026-05-08, weight_mode `sats_days` (cap 180 d), min_sats 100,000, min_days 30.
+Signs once. URL at `vote.ochk.io/p/<poll_id>`.
 
-**Bob:** opens the URL. Picks `split_b`. Signs once. His ballot lands on Nostr kind 30081 under `d = oc-vote:ballot:<poll_id>:<bob_addr>`.
+**Bob:** opens the URL. Picks `split_b`. Signs once. His ballot lands on Nostr
+kind 30081 under `d = oc-vote:ballot:<poll_id>:<bob_addr>`.
 
-**Bob changes his mind:** picks `split_c` two days later. Same `d`-tag, higher `created_at`, relays replace the previous event.
+**Bob changes his mind:** picks `split_c` two days later. Same `d`-tag, higher
+`created_at`, relays replace the previous event.
 
-**At deadline:** the client resolves the snapshot block (greatest block with `median_time_past ≤ deadline` and ≥ 6 confirmations). Any observer re-runs the tally function against the published ballots + their own UTXO-source. Everyone gets the same numbers.
+**At deadline:** the client resolves the snapshot block (greatest block with
+`median_time_past ≤ deadline` and ≥ 6 confirmations). Any observer re-runs the
+tally function against the published ballots + their own UTXO-source. Everyone
+gets the same numbers.
 
 ## flow 2 — one-per-address with high threshold
 
-A Nostr community votes on a relay policy change. They want one-voter-one-vote and to price out address splitting. They set `weight_mode: one_per_address`, `min_sats: 1_000_000`, `min_days: 90`.
+A Nostr community votes on a relay policy change. They want one-voter-one-vote
+and to price out address splitting. They set `weight_mode: one_per_address`,
+`min_sats: 1_000_000`, `min_days: 90`.
 
-Attacker trying to manufacture 100 extra votes needs 100 × 1M sats × 90 days of opportunity cost — prohibitive for a relay-policy argument. Honest voters pay nothing.
+Attacker trying to manufacture 100 extra votes needs 100 × 1M sats × 90 days of
+opportunity cost — prohibitive for a relay-policy argument. Honest voters pay
+nothing.
 
 ## flow 3 — secret ballot
 
-A DAO votes on a contentious treasury disbursement. Ballots hidden until close so whales can't influence smaller voters by casting early.
+A DAO votes on a contentious treasury disbursement. Ballots hidden until close
+so whales can't influence smaller voters by casting early.
 
-**Alice** (creator) generates an X25519 reveal keypair. `reveal_pk` goes in the poll; `reveal_sk` stays local.
+**Alice** (creator) generates an X25519 reveal keypair. `reveal_pk` goes in the
+poll; `reveal_sk` stays local.
 
-**Bob** encrypts `"yes"` into an OC Lock envelope addressed to `reveal_pk`, commits to `sha256("oc-vote/v0/commit\npoll_id:…\nvoter:…\noption:yes\n")`, and signs the ballot. Observers see Bob voted — but not what.
+**Bob** encrypts `"yes"` into an OC Lock envelope addressed to `reveal_pk`,
+commits to `sha256("oc-vote/v0/commit\npoll_id:…\nvoter:…\noption:yes\n")`, and
+signs the ballot. Observers see Bob voted — but not what.
 
-**At deadline** Alice publishes `reveal_sk` as a kind-30082 event. Tallier unseals every ballot, verifies each commit, and computes the tally.
+**At deadline** Alice publishes `reveal_sk` as a kind-30082 event. Tallier
+unseals every ballot, verifies each commit, and computes the tally.
 
-If Alice refuses to reveal, the poll is permanently **abandoned**. Participation is still provable; the tally is not. This is an honest trade-off — see [secret ballot](/vote/secret-ballot).
+If Alice refuses to reveal, the poll is permanently **abandoned**. Participation
+is still provable; the tally is not. This is an honest trade-off — see
+[secret ballot](/vote/secret-ballot).
 
 ## flow 4 — multi-address voter
 
-Charlie controls two addresses: `bc1qcharlie1` (100k sat, 45 d old) and `bc1qcharlie2` (500k sat, 400 d old). He signs two ballots, one per address, both `yes`. The tally treats them independently:
+Charlie controls two addresses: `bc1qcharlie1` (100k sat, 45 d old) and
+`bc1qcharlie2` (500k sat, 400 d old). He signs two ballots, one per address,
+both `yes`. The tally treats them independently:
 
 - `bc1qcharlie1`: 100k × min(45, 180) = 4,500,000 sat-days
 - `bc1qcharlie2`: 500k × min(400, 180) = 90,000,000 sat-days
 
-Total contribution to `yes`: 94,500,000 sat-days. Splitting or consolidating UTXOs after the snapshot doesn't change this.
+Total contribution to `yes`: 94,500,000 sat-days. Splitting or consolidating
+UTXOs after the snapshot doesn't change this.
 
 ## flow 5 — dispute
 
@@ -72,7 +97,11 @@ Dave thinks the poll page is lying. He runs:
 npx @orangecheck/vote-cli tally <poll_id>
 ```
 
-The CLI pulls the poll + ballots from his own relay set, verifies every signature, fetches UTXO state from his own bitcoind, and prints the tally. If his numbers match the web page: Dave was wrong. If they don't: the web page has a bug — file an issue with the diff. Correctness is defined by the spec's pure tally function, not by any server.
+The CLI pulls the poll + ballots from his own relay set, verifies every
+signature, fetches UTXO state from his own bitcoind, and prints the tally. If
+his numbers match the web page: Dave was wrong. If they don't: the web page has
+a bug — file an issue with the diff. Correctness is defined by the spec's pure
+tally function, not by any server.
 
 ## anti-patterns we rejected
 
@@ -84,10 +113,19 @@ The CLI pulls the poll + ballots from his own relay set, verifies every signatur
 
 ## how this composes with the family
 
-- **OC Attest** — voters may reference an existing attestation in `ballot.attestation_id` as a client hint. Authoritative check is always the UTXO snapshot.
-- **OC Lock** — every secret-mode ballot is an OC Lock envelope addressed to the poll's `reveal_pk`. The envelope format is unchanged.
-- **OC Stamp** — a `vote_resolves` envelope can be stamped + OTS-anchored to give the resolved tally durable Bitcoin-block priority for archival.
-- **OC Agent** — a principal can grant `vote:cast(poll_id=…)` scope to a delegated agent; the agent's signed ballot counts against the principal's address.
-- **OC Pledge** — a pledge can defer its dispute resolution to an OC Vote with a pre-specified voter set + threshold via the `vote_resolves` mechanism. The vote becomes the authoritative resolver.
+- **OC Attest** — voters may reference an existing attestation in
+  `ballot.attestation_id` as a client hint. Authoritative check is always the
+  UTXO snapshot.
+- **OC Lock** — every secret-mode ballot is an OC Lock envelope addressed to the
+  poll's `reveal_pk`. The envelope format is unchanged.
+- **OC Stamp** — a `vote_resolves` envelope can be stamped + OTS-anchored to
+  give the resolved tally durable Bitcoin-block priority for archival.
+- **OC Agent** — a principal can grant `vote:cast(poll_id=…)` scope to a
+  delegated agent; the agent's signed ballot counts against the principal's
+  address.
+- **OC Pledge** — a pledge can defer its dispute resolution to an OC Vote with a
+  pre-specified voter set + threshold via the `vote_resolves` mechanism. The
+  vote becomes the authoritative resolver.
 
-Six verbs of sovereign sociality — Vote is **decide**. Compose freely; no protocol depends on another at the wire level.
+Six verbs of sovereign sociality — Vote is **decide**. Compose freely; no
+protocol depends on another at the wire level.

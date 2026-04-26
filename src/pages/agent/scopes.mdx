@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Scope grammar — OC Agent',
-    description: 'Declarative scope strings, constraint operators, sub-scope containment, and the MVP constraint-key registry.',
+    description:
+        'Declarative scope strings, constraint operators, sub-scope containment, and the MVP constraint-key registry.',
 };
 
 # Scope grammar
@@ -11,7 +12,9 @@ A scope is a compact declarative statement of the form:
 <product>:<verb>(<constraint-list>)
 ```
 
-Scopes are the protocol's contract for "what may this agent do, and on what terms." They are parseable, comparable, and composable across OrangeCheck sub-products.
+Scopes are the protocol's contract for "what may this agent do, and on what
+terms." They are parseable, comparable, and composable across OrangeCheck
+sub-products.
 
 ## Shape
 
@@ -26,24 +29,28 @@ op              := "=" | "!=" | "<" | "<=" | ">" | ">=" | "*"
 value           := quoted-string | bare-token
 ```
 
-No whitespace is permitted inside a scope string. `*` is the wildcard op and takes no value.
+No whitespace is permitted inside a scope string. `*` is the wildcard op and
+takes no value.
 
 ## MVP scope registry
 
 Implementations MUST accept these products and verbs.
 
-| Scope | Registered keys |
-|---|---|
-| `lock:seal` | `recipient`, `mime`, `max_bytes` |
-| `lock:chat` | `recipient`, `max_bytes_per_msg`, `max_msgs` |
-| `stamp:sign` | `mime`, `max_bytes`, `content_hash_prefix` |
-| `vote:cast` | `poll_id`, `choice` |
-| `nostr:publish` | `kind`, `relay`, `max_bytes` |
-| `http:request` | `origin`, `method`, `max_rps`, `max_bytes_out` |
-| `ln:send` | `max_sats`, `node`, `max_fee_sats` |
-| `mcp:invoke` | `server`, `tool`, `max_invocations` |
+| Scope           | Registered keys                                |
+| --------------- | ---------------------------------------------- |
+| `lock:seal`     | `recipient`, `mime`, `max_bytes`               |
+| `lock:chat`     | `recipient`, `max_bytes_per_msg`, `max_msgs`   |
+| `stamp:sign`    | `mime`, `max_bytes`, `content_hash_prefix`     |
+| `vote:cast`     | `poll_id`, `choice`                            |
+| `nostr:publish` | `kind`, `relay`, `max_bytes`                   |
+| `http:request`  | `origin`, `method`, `max_rps`, `max_bytes_out` |
+| `ln:send`       | `max_sats`, `node`, `max_fee_sats`             |
+| `mcp:invoke`    | `server`, `tool`, `max_invocations`            |
 
-In **strict mode** (default), verifiers reject unknown products / verbs / constraint keys. In **permissive mode**, verifiers accept unknowns but never treat them as wider — an unknown key is ignored *as a constraint*, not inflated to a wildcard.
+In **strict mode** (default), verifiers reject unknown products / verbs /
+constraint keys. In **permissive mode**, verifiers accept unknowns but never
+treat them as wider — an unknown key is ignored _as a constraint_, not inflated
+to a wildcard.
 
 ## Canonical form
 
@@ -53,7 +60,9 @@ To make sub-scope comparison deterministic, scopes are canonicalized before use:
 2. Bare tokens lowercased unless the registered key is case-sensitive.
 3. No whitespace.
 
-`ln:send(node=03abc,max_sats<=1000)` canonicalizes to `ln:send(max_sats<=1000,node=03abc)`. The canonical form is what gets written to `scopes` and `scope_exercised`.
+`ln:send(node=03abc,max_sats<=1000)` canonicalizes to
+`ln:send(max_sats<=1000,node=03abc)`. The canonical form is what gets written to
+`scopes` and `scope_exercised`.
 
 ## Sub-scope containment
 
@@ -63,34 +72,44 @@ An exercised scope `S_x` is a sub-scope of a granted scope `S_g` iff:
 2. For every constraint `(k, op, v)` in `S_g`:
     - `op = *` — no requirement on `S_x`.
     - `op = =` — `S_x` must contain `(k, =, v)` exactly.
-    - `op = !=` — `S_x` must contain a value that isn't `v` (via `=` or another `!=`).
-    - Ordered ops (`<`, `<=`, `>`, `>=`) — `S_x`'s implied numeric range must be a subset of `S_g`'s.
-3. `S_x` may add constraints on keys not present in `S_g`, as long as they're registered for that `product:verb`.
+    - `op = !=` — `S_x` must contain a value that isn't `v` (via `=` or another
+      `!=`).
+    - Ordered ops (`<`, `<=`, `>`, `>=`) — `S_x`'s implied numeric range must be
+      a subset of `S_g`'s.
+3. `S_x` may add constraints on keys not present in `S_g`, as long as they're
+   registered for that `product:verb`.
 
 ### Examples
 
-| Granted | Exercised | Result |
-|---|---|---|
-| `lock:seal(recipient=bc1qalice)` | `lock:seal(recipient=bc1qalice)` | ✓ exact match |
-| `ln:send(max_sats<=1000)` | `ln:send(max_sats=500,node=03abc)` | ✓ tighter bound + extra key |
-| `stamp:sign(mime=text/markdown)` | `stamp:sign(mime=application/pdf)` | ✗ `=` value mismatch |
-| `http:request(origin=https://api.example.com)` | `http:request(origin=https://api.evil.com)` | ✗ `=` value mismatch |
-| `http:request(method!=POST)` | `http:request(method=GET)` | ✓ admissible under `!=` |
-| `http:request(method!=POST)` | `http:request(method=POST)` | ✗ disallowed under `!=` |
-| `ln:send(max_sats<=1000)` | `ln:send(max_sats=5000)` | ✗ wider range |
-| `http:request(origin=*)` | `http:request(origin=https://anything)` | ✓ wildcard grants everything |
+| Granted                                        | Exercised                                   | Result                       |
+| ---------------------------------------------- | ------------------------------------------- | ---------------------------- |
+| `lock:seal(recipient=bc1qalice)`               | `lock:seal(recipient=bc1qalice)`            | ✓ exact match                |
+| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=500,node=03abc)`          | ✓ tighter bound + extra key  |
+| `stamp:sign(mime=text/markdown)`               | `stamp:sign(mime=application/pdf)`          | ✗ `=` value mismatch         |
+| `http:request(origin=https://api.example.com)` | `http:request(origin=https://api.evil.com)` | ✗ `=` value mismatch         |
+| `http:request(method!=POST)`                   | `http:request(method=GET)`                  | ✓ admissible under `!=`      |
+| `http:request(method!=POST)`                   | `http:request(method=POST)`                 | ✗ disallowed under `!=`      |
+| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=5000)`                    | ✗ wider range                |
+| `http:request(origin=*)`                       | `http:request(origin=https://anything)`     | ✓ wildcard grants everything |
 
 ## Wildcards
 
-A delegation MAY grant `product:verb(key=*)` to express "any value for key." Wildcards widen — use them deliberately. An unbonded delegation with `http:request(*)` (no constraints, blanket verb) is maximally permissive; verifiers MAY reject such delegations by policy.
+A delegation MAY grant `product:verb(key=*)` to express "any value for key."
+Wildcards widen — use them deliberately. An unbonded delegation with
+`http:request(*)` (no constraints, blanket verb) is maximally permissive;
+verifiers MAY reject such delegations by policy.
 
 ## Adding new scopes
 
-New products, verbs, and constraint keys are allocated by PR to the [oc-agent-protocol](https://github.com/orangecheck/oc-agent-protocol) repository. Vendor-specific experimental values SHOULD use an `x-vendor/` prefix until standardized.
+New products, verbs, and constraint keys are allocated by PR to the
+[oc-agent-protocol](https://github.com/orangecheck/oc-agent-protocol)
+repository. Vendor-specific experimental values SHOULD use an `x-vendor/` prefix
+until standardized.
 
 ## Implementing the sub-scope check
 
-The reference TypeScript implementation lives in [`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core):
+The reference TypeScript implementation lives in
+[`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core):
 
 ```ts
 import { isSubScope, parseScope } from '@orangecheck/agent-core';
@@ -103,4 +122,5 @@ if (!isSubScope(exercised, granted)) {
 }
 ```
 
-The algorithm is pure and deterministic — same inputs on any compliant implementation yield the same accept/reject.
+The algorithm is pure and deterministic — same inputs on any compliant
+implementation yield the same accept/reject.

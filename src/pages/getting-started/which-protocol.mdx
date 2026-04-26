@@ -71,21 +71,21 @@ ballot at all_, Attest is the door.
 ### Pledge + Attest
 
 A Pledge's bond _is_ an Attest reference — `bond.attestation_id` points at the
-sats × days the pledger has staked behind their word. There is no Pledge
-without Attest. Threshold the bond minimum to filter cheap commitments.
+sats × days the pledger has staked behind their word. There is no Pledge without
+Attest. Threshold the bond minimum to filter cheap commitments.
 
 ### Pledge + Stamp
 
 The canonical pledge-resolution mechanism is `stamp_published`: the pledger
-satisfies the claim by publishing an OC Stamp envelope that matches a
-declared content predicate before the deadline. Pledge writes the contract,
-Stamp closes it.
+satisfies the claim by publishing an OC Stamp envelope that matches a declared
+content predicate before the deadline. Pledge writes the contract, Stamp closes
+it.
 
 ### Pledge + Vote
 
-When a pledge's outcome is contested (e.g. "did the deliverable ship on time
-and to spec?"), the dispute mechanism can be a stake-weighted OC Vote poll
-with the pledger and counterparty bonded. The tally settles the pledge.
+When a pledge's outcome is contested (e.g. "did the deliverable ship on time and
+to spec?"), the dispute mechanism can be a stake-weighted OC Vote poll with the
+pledger and counterparty bonded. The tally settles the pledge.
 
 ## If this still doesn't fit
 

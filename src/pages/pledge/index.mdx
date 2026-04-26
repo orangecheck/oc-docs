@@ -10,13 +10,13 @@ export const metadata = {
 
 OC Pledge is the **commitment primitive** in the OrangeCheck family. A pledge
 envelope is a canonical JSON object signed via BIP-322 by a Bitcoin address
-naming a future-verifiable proposition, a deterministic resolution mechanism,
-a deadline, and a bond referencing an OrangeCheck attestation. At resolution
-time a paired **outcome envelope** declares the pledge `kept`, `broken`,
-`expired_unresolved`, or `disputed`. The pair is the complete lifecycle
-record — offline-verifiable from its JSON alone plus Bitcoin chain state.
+naming a future-verifiable proposition, a deterministic resolution mechanism, a
+deadline, and a bond referencing an OrangeCheck attestation. At resolution time
+a paired **outcome envelope** declares the pledge `kept`, `broken`,
+`expired_unresolved`, or `disputed`. The pair is the complete lifecycle record —
+offline-verifiable from its JSON alone plus Bitcoin chain state.
 
-Six verbs of sovereign sociality: *am, whisper, decide, declare, delegate,*
+Six verbs of sovereign sociality: _am, whisper, decide, declare, delegate,_
 **swear**. Pledge is **swear**.
 
 ## What it proves
@@ -27,61 +27,60 @@ A valid `kept` outcome envelope proves three things cryptographically:
    pledge canonical message was BIP-322-signed by the swearer.
 2. **The proposition resolved as kept under public state.** The outcome was
    computed deterministically from chain state, a Nostr event set, an HTTP
-   response, a DNS record, an OC Stamp, an OC Vote outcome, or a
-   counterparty's signed envelope.
-3. **A bond was in place.** The swearer held an OrangeCheck attestation
-   meeting the declared `min_sats × min_days` threshold at the time of
-   swearing, and the verifier can re-derive its current state.
+   response, a DNS record, an OC Stamp, an OC Vote outcome, or a counterparty's
+   signed envelope.
+3. **A bond was in place.** The swearer held an OrangeCheck attestation meeting
+   the declared `min_sats × min_days` threshold at the time of swearing, and the
+   verifier can re-derive its current state.
 
-A `broken` or `expired_unresolved` outcome proves the inverse: the same
-Bitcoin address committed and the public state did not resolve the
-proposition as the swearer staked.
+A `broken` or `expired_unresolved` outcome proves the inverse: the same Bitcoin
+address committed and the public state did not resolve the proposition as the
+swearer staked.
 
 ## What it does NOT do
 
-Read this list twice. These are the things the protocol *visibly refuses* to
-be.
+Read this list twice. These are the things the protocol _visibly refuses_ to be.
 
 - **Not a reputation system.** It produces the raw cryptographic evidence a
-  reputation system would use as input. No scores. No rollups. No
-  cross-address aggregation.
+  reputation system would use as input. No scores. No rollups. No cross-address
+  aggregation.
 - **Not custodial.** Bonds are never held by the protocol. Funds never move.
   Enforcement is by public exposure only — a broken pledge attached to an
   address is a permanent record, queryable by any verifier, and that is the
   entire teeth of the system.
-- **Not a general promise ledger.** Pledges must choose a resolution
-  mechanism whose outcome is a pure function of public state. Pledges with
-  un-verifiable "trust me" proofs are refused at envelope-construction time.
-- **Not a prediction market.** No pooled liquidity, no automated market
-  maker, no payout routing. A pledge can be *used* in a prediction-market
-  shape by two parties swearing opposite propositions with counterparty
-  resolution, but the protocol does not escrow value or route payouts.
+- **Not a general promise ledger.** Pledges must choose a resolution mechanism
+  whose outcome is a pure function of public state. Pledges with un-verifiable
+  "trust me" proofs are refused at envelope-construction time.
+- **Not a prediction market.** No pooled liquidity, no automated market maker,
+  no payout routing. A pledge can be _used_ in a prediction-market shape by two
+  parties swearing opposite propositions with counterparty resolution, but the
+  protocol does not escrow value or route payouts.
 - **Not a smart contract.** No VM, no gas, no on-chain state writes.
-- **Not slashing-based.** There is no mechanism by which a protocol actor
-  can seize bonded sats. Ever.
+- **Not slashing-based.** There is no mechanism by which a protocol actor can
+  seize bonded sats. Ever.
 
 ## Section contents
 
-- [**Why OC Pledge**](/pledge/why) — what gap it fills and what it
-  explicitly refuses.
-- [**Quickstart**](/pledge/quickstart) — swear a pledge, publish, verify
-  the outcome end-to-end.
-- [**How it works**](/pledge/how-it-works) — canonical message, seven
-  resolution mechanisms, outcome envelope.
+- [**Why OC Pledge**](/pledge/why) — what gap it fills and what it explicitly
+  refuses.
+- [**Quickstart**](/pledge/quickstart) — swear a pledge, publish, verify the
+  outcome end-to-end.
+- [**How it works**](/pledge/how-it-works) — canonical message, seven resolution
+  mechanisms, outcome envelope.
 - [**Resolution grammar**](/pledge/resolution-grammar) — `chain_state`,
   `counterparty_signs`, `nostr_event_exists`, `stamp_published`,
   `http_get_hash`, `dns_record`, `vote_resolves`.
-- [**State machine**](/pledge/state-machine) — `pending → resolvable →
-  kept | broken | disputed | expired_unresolved`.
+- [**State machine**](/pledge/state-machine) —
+  `pending → resolvable → kept | broken | disputed | expired_unresolved`.
 - [**Enforcement by exposure**](/pledge/enforcement-by-exposure) — why no
   slashing, why no custody, why public records are sufficient teeth.
-- [**Composition with the family**](/pledge/composition) — Stamp as
-  resolution, Vote as dispute, Agent as delegated swearer, Lock for
-  private counterparty negotiation.
-- [**Security posture**](/pledge/security) — threat model, address
-  linkability, dispute-gaming, bond-draining mitigations.
-- [**Specification**](/pledge/spec) — normative rules. Reference impls
-  must pass the 28 conformance vectors.
+- [**Composition with the family**](/pledge/composition) — Stamp as resolution,
+  Vote as dispute, Agent as delegated swearer, Lock for private counterparty
+  negotiation.
+- [**Security posture**](/pledge/security) — threat model, address linkability,
+  dispute-gaming, bond-draining mitigations.
+- [**Specification**](/pledge/spec) — normative rules. Reference impls must pass
+  the 28 conformance vectors.
 
 ## Packages
 
@@ -93,8 +92,8 @@ be.
 
 Existing packages also gain a Pledge surface:
 
-- `@orangecheck/gate` — new `pledgeHistory` predicate
-  (`minKept`, `maxBrokenSince`, `minBondInFlight`, `minBondKeptLifetime`).
+- `@orangecheck/gate` — new `pledgeHistory` predicate (`minKept`,
+  `maxBrokenSince`, `minBondInFlight`, `minBondKeptLifetime`).
 - `@orangecheck/react` — `<OcPledgeBadge>`, `<OcAddressPledgeHistory>`,
   `<OcPledgeComposer>`.
 - `@orangecheck/cli` — `oc pledge {create,resolve,verify,history}`.
@@ -118,6 +117,6 @@ See [SDK overview](/sdks).
 - NIP:
   [`oc-pledge-protocol/NIP_ORANGECHECK_PLEDGE.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/NIP_ORANGECHECK_PLEDGE.md)
 - Reference site: [`pledge.ochk.io`](https://pledge.ochk.io)
-- Conformance: 28 vectors covering canonical serialization, the seven
-  resolution mechanisms, the state machine, bilateral consistency,
-  agent-delegated pledges, and edge-case rejection.
+- Conformance: 28 vectors covering canonical serialization, the seven resolution
+  mechanisms, the state machine, bilateral consistency, agent-delegated pledges,
+  and edge-case rejection.

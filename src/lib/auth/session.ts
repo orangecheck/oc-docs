@@ -1,10 +1,7 @@
+import type { SessionPayload } from '@orangecheck/auth-core';
 import type { NextApiRequest } from 'next';
 
-import {
-    SESSION_COOKIE,
-    verifySessionToken,
-    type SessionPayload,
-} from '@orangecheck/auth-core';
+import { SESSION_COOKIE, verifySessionToken } from '@orangecheck/auth-core';
 
 /**
  * oc-docs is a CONSUMER of the cross-subdomain oc_session.

@@ -7,13 +7,13 @@ export const metadata = {
 # Resolution grammar
 
 OC Pledge ships **seven** resolution mechanisms. Each is a deterministic
-function of public state plus the pledge envelope. New mechanisms are added
-only with working integrator code demonstrating real demand — same
-discipline OrangeCheck applies to identity bindings.
+function of public state plus the pledge envelope. New mechanisms are added only
+with working integrator code demonstrating real demand — same discipline
+OrangeCheck applies to identity bindings.
 
 The canonical DSL for each mechanism is normative; conforming implementations
-must produce byte-identical outcome envelopes for byte-identical inputs.
-Full grammar in
+must produce byte-identical outcome envelopes for byte-identical inputs. Full
+grammar in
 [SPEC §3.4](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md).
 
 ## chain_state
@@ -34,10 +34,10 @@ byte-identical across implementations for the same chain state.
 
 ## counterparty_signs
 
-Resolution requires a BIP-322 signature from the named counterparty over
-an outcome envelope. If the counterparty does not sign within `expires_at`,
-the pledge resolves to `expired_unresolved` — counted as a distinct third
-outcome class, neither kept nor broken.
+Resolution requires a BIP-322 signature from the named counterparty over an
+outcome envelope. If the counterparty does not sign within `expires_at`, the
+pledge resolves to `expired_unresolved` — counted as a distinct third outcome
+class, neither kept nor broken.
 
 ## nostr_event_exists
 
@@ -45,36 +45,36 @@ outcome class, neither kept nor broken.
 kind=<N>, author=<pubkey>, tag(<name>)=<value>, created_at_before=<time>
 ```
 
-Implementations query ≥ 2 relays from the default set; an event is
-considered to exist if any relay returns it and it validates.
+Implementations query ≥ 2 relays from the default set; an event is considered to
+exist if any relay returns it and it validates.
 
 ## stamp_published
 
-Looks up a specific OC Stamp envelope by content hash or id. The
-verifier consults the OC Stamp directory (Nostr kind-30078 under the
-Stamp NIP's d-tag namespace) and validates the envelope. This is the
-canonical way to pledge "I will publish X by time T."
+Looks up a specific OC Stamp envelope by content hash or id. The verifier
+consults the OC Stamp directory (Nostr kind-30078 under the Stamp NIP's d-tag
+namespace) and validates the envelope. This is the canonical way to pledge "I
+will publish X by time T."
 
 ## http_get_hash
 
-Fetches a URL, compares SHA-256 of the response body to an expected
-value. Follows redirects up to a fixed limit. Implementations document
-their user-agent, timeout, and redirect behavior — disagreements on HTTP
-resolution are not protocol bugs and resolve in favor of the majority of
-conforming implementations (see SPEC §3.4.5 for the formal "best-effort"
-clause for non-fully-deterministic public state).
+Fetches a URL, compares SHA-256 of the response body to an expected value.
+Follows redirects up to a fixed limit. Implementations document their
+user-agent, timeout, and redirect behavior — disagreements on HTTP resolution
+are not protocol bugs and resolve in favor of the majority of conforming
+implementations (see SPEC §3.4.5 for the formal "best-effort" clause for
+non-fully-deterministic public state).
 
 ## dns_record
 
-`<record_type> <name>` queried via DNS-over-HTTPS from a specified
-resolver set. The resolver set is part of the canonical query so that two
-verifiers reach the same answer.
+`<record_type> <name>` queried via DNS-over-HTTPS from a specified resolver set.
+The resolver set is part of the canonical query so that two verifiers reach the
+same answer.
 
 ## vote_resolves
 
-Resolution delegated to an OC Vote poll whose id is named in the pledge.
-`kept` if the poll resolves above a specified threshold for a specified
-option, `broken` otherwise. See [OC Vote](/vote) for poll semantics.
+Resolution delegated to an OC Vote poll whose id is named in the pledge. `kept`
+if the poll resolves above a specified threshold for a specified option,
+`broken` otherwise. See [OC Vote](/vote) for poll semantics.
 
 ## What's NOT in the grammar
 
@@ -82,14 +82,14 @@ Read this list twice. These mechanisms were proposed during design and
 explicitly rejected:
 
 - **`self_proof`** — a free-text "trust me" proof. Refused on
-  protocol-correctness grounds: a pledge whose truth can't be checked
-  from public state is not a pledge, it's a claim.
-- **`oracle_attests`** — single-oracle resolution. Refused because the
-  oracle becomes a captured intermediary; any oracle-resolution use case
-  can be modeled as `counterparty_signs` with the oracle as counterparty.
-- **`majority_signs`** — m-of-n threshold of named signers. Deferred
-  until v0.2 with bonded voter sets; in v0.1 the same thing is modeled
-  via `vote_resolves` with a 1-option poll.
+  protocol-correctness grounds: a pledge whose truth can't be checked from
+  public state is not a pledge, it's a claim.
+- **`oracle_attests`** — single-oracle resolution. Refused because the oracle
+  becomes a captured intermediary; any oracle-resolution use case can be modeled
+  as `counterparty_signs` with the oracle as counterparty.
+- **`majority_signs`** — m-of-n threshold of named signers. Deferred until v0.2
+  with bonded voter sets; in v0.1 the same thing is modeled via `vote_resolves`
+  with a 1-option poll.
 
 The full rejection log: [WHY](/pledge/why) and the
 [REGISTRY](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md).

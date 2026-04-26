@@ -3,8 +3,9 @@ import type { MDXComponents } from 'mdx/types';
 import NextLink from 'next/link';
 import React, { isValidElement } from 'react';
 
-import { Mermaid } from '@/components/docs/Mermaid';
 import { cn } from '@/lib/utils/utils';
+
+import { Mermaid } from '@/components/docs/Mermaid';
 
 // MDX content is constrained by DocsLayout's center column; no wrapper.
 const MDXWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;

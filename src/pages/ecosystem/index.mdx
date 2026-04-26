@@ -7,8 +7,8 @@ export const metadata = {
 # Ecosystem — shared concepts
 
 Every sibling protocol in the OrangeCheck family (Attest, Lock, Vote, Stamp,
-Agent, Pledge) inherits the same plumbing. Learning it once saves re-learning
-it six times. This section is the shared layer.
+Agent, Pledge) inherits the same plumbing. Learning it once saves re-learning it
+six times. This section is the shared layer.
 
 ## What's in here
 
@@ -24,8 +24,8 @@ it six times. This section is the shared layer.
 - **[Nostr kind-30078](/ecosystem/nostr-kind-30078)** — NIP-78
   parameterized-replaceable addressable events are how every sibling publishes
   its artifacts (attestations, device records, stamps, ballots, agent
-  delegations, pledges + outcomes). The `d` tag convention is per-protocol;
-  the event shape is shared.
+  delegations, pledges + outcomes). The `d` tag convention is per-protocol; the
+  event shape is shared.
 - **[Conformance vectors](/ecosystem/conformance)** — every sibling ships
   normative test vectors in its `oc-*-protocol` repo. Reference impls are
   required to pass them on every CI run. This is how we catch implementation
@@ -38,11 +38,11 @@ it six times. This section is the shared layer.
 
 ## Why a shared section
 
-Writing the canonical-message format six times (once per protocol) would
-produce six slightly-different descriptions and, over time, actual drift in
-the impls. By specifying it once and linking from every protocol's pages, we
-keep the docs in sync with the reality — every sibling literally uses the
-same canonical-message builder under the hood.
+Writing the canonical-message format six times (once per protocol) would produce
+six slightly-different descriptions and, over time, actual drift in the impls.
+By specifying it once and linking from every protocol's pages, we keep the docs
+in sync with the reality — every sibling literally uses the same
+canonical-message builder under the hood.
 
 When a protocol _extends_ a shared concept — like Vote's secret-mode commitment,
 or Lock's envelope canonicalization rule — the protocol's own pages cover only

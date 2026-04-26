@@ -6,27 +6,45 @@ export const metadata = {
 
 # Why OC Lock
 
-Bitcoin solved identity better than any existing system. Every address is a public commitment to a keypair; control is provable via BIP-322 without revealing the private key. OC Lock takes that identity layer at face value and builds end-to-end encryption directly on top — no accounts, no servers, no chain transactions in the critical path.
+Bitcoin solved identity better than any existing system. Every address is a
+public commitment to a keypair; control is provable via BIP-322 without
+revealing the private key. OC Lock takes that identity layer at face value and
+builds end-to-end encryption directly on top — no accounts, no servers, no chain
+transactions in the critical path.
 
 ## Your Bitcoin address is the account
 
-No signup. No email. No phone number. No password. No recovery questions. Anyone who knows your Bitcoin address can encrypt to you. You control reading with the same key you use to control sats. The same wallet that signs a Bitcoin transaction signs one BIP-322 message to bind an X25519 device key to your address — and you're done.
+No signup. No email. No phone number. No password. No recovery questions. Anyone
+who knows your Bitcoin address can encrypt to you. You control reading with the
+same key you use to control sats. The same wallet that signs a Bitcoin
+transaction signs one BIP-322 message to bind an X25519 device key to your
+address — and you're done.
 
-Sender and recipient never coordinate out of band. Sender looks your address up on Nostr, verifies your device binding, encrypts, hands off. That's the whole flow.
+Sender and recipient never coordinate out of band. Sender looks your address up
+on Nostr, verifies your device binding, encrypts, hands off. That's the whole
+flow.
 
 ## One signature. Every message after is zero-click.
 
 First-run in a browser costs you one wallet signature. After that:
 
-- **Sending** a chat message or sealing a file: no wallet prompt needed. The envelope can optionally carry a BIP-322 signature for sender authentication, but the crypto works without it.
-- **Receiving**: zero clicks. The Nostr subscription auto-decrypts incoming envelopes with your local device key.
-- **Decrypting a share link or `.lock` file**: zero clicks. Click the URL, read the message.
+- **Sending** a chat message or sealing a file: no wallet prompt needed. The
+  envelope can optionally carry a BIP-322 signature for sender authentication,
+  but the crypto works without it.
+- **Receiving**: zero clicks. The Nostr subscription auto-decrypts incoming
+  envelopes with your local device key.
+- **Decrypting a share link or `.lock` file**: zero clicks. Click the URL, read
+  the message.
 
-The old "sign each transaction" pattern is gone. Identity is a one-time cost, not a per-message tax.
+The old "sign each transaction" pattern is gone. Identity is a one-time cost,
+not a per-message tax.
 
 ## Nothing touches the blockchain
 
-Sealing, sending, decrypting, rotating keys, revoking — all pure client-side operations. No fees, no mempool, no confirmations, no fat-finger errors, no waiting for block space. Bitcoin is load-bearing for *identity*; every other layer runs where it should — in the browser, over Nostr, or both.
+Sealing, sending, decrypting, rotating keys, revoking — all pure client-side
+operations. No fees, no mempool, no confirmations, no fat-finger errors, no
+waiting for block space. Bitcoin is load-bearing for _identity_; every other
+layer runs where it should — in the browser, over Nostr, or both.
 
 ## Standard, audited crypto only
 
@@ -36,43 +54,80 @@ Sealing, sending, decrypting, rotating keys, revoking — all pure client-side o
 - **BIP-322 / secp256k1 Schnorr** for identity signatures
 - **PBKDF2-SHA256** at 600k iterations for optional passphrase-at-rest
 
-Every primitive comes from the widely-deployed `@noble/*` libraries. No hand-rolled algorithms. No exotic constructions. No dependency on browser-hostile WASM. Everything runs natively in any modern JS runtime.
+Every primitive comes from the widely-deployed `@noble/*` libraries. No
+hand-rolled algorithms. No exotic constructions. No dependency on
+browser-hostile WASM. Everything runs natively in any modern JS runtime.
 
 ## Envelopes are self-contained
 
-A sealed `.lock` file (or its share-URL equivalent) is a canonical JSON object containing every piece of metadata a recipient's browser needs to decrypt. Store it on disk. Attach to email. Drop on a USB stick. Print as a QR code. Embed in a Nostr event. All transports work the same way. No Lock server needs to be alive for any of it.
+A sealed `.lock` file (or its share-URL equivalent) is a canonical JSON object
+containing every piece of metadata a recipient's browser needs to decrypt. Store
+it on disk. Attach to email. Drop on a USB stick. Print as a QR code. Embed in a
+Nostr event. All transports work the same way. No Lock server needs to be alive
+for any of it.
 
 ## Decentralized delivery, when you want it
 
-Nostr provides auto-delivery as an opt-in layer: publish a device record once, and anyone can look you up and gift-wrap a message to your inbox. Four public relays by default; self-host or swap at any time. The trust anchor is still BIP-322 verification done client-side — a malicious relay can't forge a device record or impersonate a sender.
+Nostr provides auto-delivery as an opt-in layer: publish a device record once,
+and anyone can look you up and gift-wrap a message to your inbox. Four public
+relays by default; self-host or swap at any time. The trust anchor is still
+BIP-322 verification done client-side — a malicious relay can't forge a device
+record or impersonate a sender.
 
-Don't want auto-delivery? Don't publish a device record. Keep the app purely in its one-shot `.lock`-file mode. Same crypto either way.
+Don't want auto-delivery? Don't publish a device record. Keep the app purely in
+its one-shot `.lock`-file mode. Same crypto either way.
 
 ## Multi-device and multi-identity
 
-- **Same address across browsers**: register multiple devices under the same Bitcoin address. Senders fan out to all of them so every device sees every message.
-- **Multiple addresses in one browser**: register as many as you like. Each tab picks which address to act as, isolated via `sessionStorage`, so you can run two identities side-by-side in the same browser window.
+- **Same address across browsers**: register multiple devices under the same
+  Bitcoin address. Senders fan out to all of them so every device sees every
+  message.
+- **Multiple addresses in one browser**: register as many as you like. Each tab
+  picks which address to act as, isolated via `sessionStorage`, so you can run
+  two identities side-by-side in the same browser window.
 
-Rotating a device is cheap: generate a new key, publish a new record, revoke the old one — no transactions, no fees, no delay.
+Rotating a device is cheap: generate a new key, publish a new record, revoke the
+old one — no transactions, no fees, no delay.
 
 ## Sybil-resistant inboxes (opt-in)
 
-Post your address publicly without drowning in spam. The OrangeCheck gate on every thread can require senders to hold a minimum on-chain stake ("≥ 100k sats for ≥ 30 days") before you accept their first message. Real skin in the game, no captchas, no centralized anti-spam provider.
+Post your address publicly without drowning in spam. The OrangeCheck gate on
+every thread can require senders to hold a minimum on-chain stake ("≥ 100k sats
+for ≥ 30 days") before you accept their first message. Real skin in the game, no
+captchas, no centralized anti-spam provider.
 
 ## Every message is a sealable vault
 
-Chat messages and one-shot sealed envelopes are the same object at the protocol level. The UI surfaces that reality: every bubble exposes a share URL, a `.lock` download, and a scannable QR. A message you typed thirty seconds ago and a vault you created last week are interchangeable formats — pick whichever transport suits the moment.
+Chat messages and one-shot sealed envelopes are the same object at the protocol
+level. The UI surfaces that reality: every bubble exposes a share URL, a `.lock`
+download, and a scannable QR. A message you typed thirty seconds ago and a vault
+you created last week are interchangeable formats — pick whichever transport
+suits the moment.
 
 ## Under three seconds to decrypt
 
-Pure client-side crypto. No network round-trip to a Lock server (there isn't one). Opens in any modern browser. From URL-click to plaintext, under three seconds on a phone, faster on a laptop.
+Pure client-side crypto. No network round-trip to a Lock server (there isn't
+one). Opens in any modern browser. From URL-click to plaintext, under three
+seconds on a phone, faster on a laptop.
 
 ## Honest limits
 
-- **Forward secrecy** is coarse — per-message eph_pk gives message-level FS, but there's no Signal-style double ratchet. Compromise of a device_sk reveals all envelopes currently addressed to it. Rotation mitigates. Ratchet complexity isn't on the roadmap unless a concrete use case demands it.
-- **Post-quantum readiness** isn't here. X25519 and secp256k1 both break under a capable quantum computer. A Kyber-768 key-wrap layer is tracked as a future minor-version enhancement.
-- **Trustless payment mode** requires a named relay today. A DLC-oracle or BIP-118 covenant-based variant is research-stage, not shippable yet.
+- **Forward secrecy** is coarse — per-message eph_pk gives message-level FS, but
+  there's no Signal-style double ratchet. Compromise of a device_sk reveals all
+  envelopes currently addressed to it. Rotation mitigates. Ratchet complexity
+  isn't on the roadmap unless a concrete use case demands it.
+- **Post-quantum readiness** isn't here. X25519 and secp256k1 both break under a
+  capable quantum computer. A Kyber-768 key-wrap layer is tracked as a future
+  minor-version enhancement.
+- **Trustless payment mode** requires a named relay today. A DLC-oracle or
+  BIP-118 covenant-based variant is research-stage, not shippable yet.
 
 ## Curious about the history?
 
-OC Lock v2 is the second iteration. The first tried to keep Bitcoin transactions in the critical path for every operation — an idea that turned out to be incompatible with ordinary user expectations about speed, fees, and wallet complexity. If you want the technical retrospective on that arc, [`WHY.md` in the protocol repo](https://github.com/orangecheck/oc-lock-protocol/blob/main/WHY.md) has the full write-up. v2 is the distillation: keep the identity primitive, discard the chain-as-execution-layer assumption, ship.
+OC Lock v2 is the second iteration. The first tried to keep Bitcoin transactions
+in the critical path for every operation — an idea that turned out to be
+incompatible with ordinary user expectations about speed, fees, and wallet
+complexity. If you want the technical retrospective on that arc,
+[`WHY.md` in the protocol repo](https://github.com/orangecheck/oc-lock-protocol/blob/main/WHY.md)
+has the full write-up. v2 is the distillation: keep the identity primitive,
+discard the chain-as-execution-layer assumption, ship.

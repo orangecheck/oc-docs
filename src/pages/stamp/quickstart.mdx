@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'Quickstart',
-    description: 'Goal: go from a file on your disk to a published, verifiable stamp in under a minute.',
+    description:
+        'Goal: go from a file on your disk to a published, verifiable stamp in under a minute.',
 };
 
 export const meta = {
@@ -10,10 +11,13 @@ export const meta = {
 
 # Quickstart
 
-**Goal: go from a file on your disk to a published, verifiable stamp in under a minute.**
+**Goal: go from a file on your disk to a published, verifiable stamp in under a
+minute.**
 
 You will need:
-- A Bitcoin wallet that supports BIP-322 (UniSat, Xverse, Leather, Sparrow, Electrum, OKX, Phantom all qualify).
+
+- A Bitcoin wallet that supports BIP-322 (UniSat, Xverse, Leather, Sparrow,
+  Electrum, OKX, Phantom all qualify).
 - A browser.
 
 No account. No server. No fees.
@@ -21,13 +25,20 @@ No account. No server. No fees.
 ## Option A — use the hosted web client
 
 1. Open [stamp.ochk.io/create](https://stamp.ochk.io/create).
-2. Drop the file you want to stamp. Your browser hashes it in-place; the bytes never leave your tab.
+2. Drop the file you want to stamp. Your browser hashes it in-place; the bytes
+   never leave your tab.
 3. Connect your wallet. Your Bitcoin address auto-fills.
-4. Click **sign**. Your wallet pops up with a short canonical message (six lines, starting with `oc-stamp:v1`). Approve.
-5. The client submits the envelope id to two OpenTimestamps calendars. You get a **pending** proof immediately, and a **confirmed** anchor within about an hour.
-6. Download the `.stamp` file. Ship it alongside your content, or copy the share link.
+4. Click **sign**. Your wallet pops up with a short canonical message (six
+   lines, starting with `oc-stamp:v1`). Approve.
+5. The client submits the envelope id to two OpenTimestamps calendars. You get a
+   **pending** proof immediately, and a **confirmed** anchor within about an
+   hour.
+6. Download the `.stamp` file. Ship it alongside your content, or copy the share
+   link.
 
-Later, anyone can drop that `.stamp` into [stamp.ochk.io/verify](https://stamp.ochk.io/verify) and re-derive all three guarantees — authorship, priority, stake — offline.
+Later, anyone can drop that `.stamp` into
+[stamp.ochk.io/verify](https://stamp.ochk.io/verify) and re-derive all three
+guarantees — authorship, priority, stake — offline.
 
 ## Option B — use the SDK
 
@@ -64,18 +75,25 @@ import { verify } from '@orangecheck/stamp-core';
 
 const result = await verify({
     envelope: anchored,
-    content: new TextEncoder().encode('hello stamp'),  // optional; checks bytes match
-    verifyBip322: async (msg, sig, addr) => { /* your BIP-322 verifier */ },
+    content: new TextEncoder().encode('hello stamp'), // optional; checks bytes match
+    verifyBip322: async (msg, sig, addr) => {
+        /* your BIP-322 verifier */
+    },
 });
 
 if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
 console.log('authorship + priority + content: ✓');
 ```
 
-See the [envelope format](/stamp/envelope) for the wire schema and the full [verification algorithm](/stamp/spec#8-verification-algorithm) for the seven check steps.
+See the [envelope format](/stamp/envelope) for the wire schema and the full
+[verification algorithm](/stamp/spec#8-verification-algorithm) for the seven
+check steps.
 
 ## What's next
 
-- **[Why OC Stamp?](/stamp/why)** — the design rationale and the hypothesis stress tests.
-- **[The spec](/stamp/spec)** — normative rules if you're implementing in another language.
-- **[Security model](/stamp/security)** — what OC Stamp proves, what it doesn't, and the trust assumptions.
+- **[Why OC Stamp?](/stamp/why)** — the design rationale and the hypothesis
+  stress tests.
+- **[The spec](/stamp/spec)** — normative rules if you're implementing in
+  another language.
+- **[Security model](/stamp/security)** — what OC Stamp proves, what it doesn't,
+  and the trust assumptions.

@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'quickstart',
-    description: 'Create a poll, cast a ballot, run a tally. No account. No chain transaction.',
+    description:
+        'Create a poll, cast a ballot, run a tally. No account. No chain transaction.',
 };
 
 # quickstart
@@ -15,23 +16,32 @@ Visit [`/create`](https://vote.ochk.io/create). Enter:
 - the question and at least two options
 - a deadline (UTC)
 - a weight mode (`sats`, `sats_days`, or `one_per_address`)
-- thresholds: `min_sats` and `min_days` that a voter must clear for their ballot to count
+- thresholds: `min_sats` and `min_days` that a voter must clear for their ballot
+  to count
 
-Click **sign & publish**. Your wallet prompts once for a BIP-322 signature over the poll's content-addressed id. The client publishes to Nostr kind 30080 across four default relays. You land on the poll page at `/p/<poll_id>`.
+Click **sign & publish**. Your wallet prompts once for a BIP-322 signature over
+the poll's content-addressed id. The client publishes to Nostr kind 30080 across
+four default relays. You land on the poll page at `/p/<poll_id>`.
 
 ## 2. cast a ballot
 
-Anyone with a Bitcoin address can vote. Open the poll URL. Pick an option. Click **sign & publish ballot**. Your wallet prompts once. The client publishes to Nostr kind 30081 (replaceable per voter per poll — you can change your vote until deadline if the poll's `tiebreak` is `latest`).
+Anyone with a Bitcoin address can vote. Open the poll URL. Pick an option. Click
+**sign & publish ballot**. Your wallet prompts once. The client publishes to
+Nostr kind 30081 (replaceable per voter per poll — you can change your vote
+until deadline if the poll's `tiebreak` is `latest`).
 
 ## 3. verify the tally
 
-The poll page recomputes the tally live against the current UTXO snapshot from mempool.space. To verify independently:
+The poll page recomputes the tally live against the current UTXO snapshot from
+mempool.space. To verify independently:
 
 ```bash
 curl https://vote.ochk.io/api/tally?poll=<poll_id>
 ```
 
-You get a JSON object — the same shape any conforming implementation produces. The web UI is convenience; the `curl` output is the authoritative result. Disputes are resolvable.
+You get a JSON object — the same shape any conforming implementation produces.
+The web UI is convenience; the `curl` output is the authoritative result.
+Disputes are resolvable.
 
 ## the library
 
@@ -40,11 +50,12 @@ npm i @orangecheck/vote-core
 ```
 
 ```ts
-import { tally, pollId } from '@orangecheck/vote-core';
+import { pollId, tally } from '@orangecheck/vote-core';
 
 const result = await tally({
-  poll, ballots,
-  utxosAt: (addr, snapshot) => fetchMyUtxos(addr, snapshot),
+    poll,
+    ballots,
+    utxosAt: (addr, snapshot) => fetchMyUtxos(addr, snapshot),
 });
 ```
 
@@ -52,7 +63,10 @@ Pure function. Same inputs → byte-identical output.
 
 ## what you'll need
 
-- a Bitcoin wallet that can sign BIP-322 messages: **UniSat**, **Xverse**, **Leather**, **OKX**, or **Phantom**. Or paste a signature from any offline signer.
-- a Bitcoin address with some UTXOs if you want your ballot to carry weight. The threshold the poll sets is the bar.
+- a Bitcoin wallet that can sign BIP-322 messages: **UniSat**, **Xverse**,
+  **Leather**, **OKX**, or **Phantom**. Or paste a signature from any offline
+  signer.
+- a Bitcoin address with some UTXOs if you want your ballot to carry weight. The
+  threshold the poll sets is the bar.
 
 Nothing else. No signup. No KYC. No sats move.

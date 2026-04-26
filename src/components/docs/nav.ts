@@ -327,7 +327,7 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'agent',
         label: 'OC Agent',
-        blurb: "Bitcoin-identity-bound delegation authority. Scoped, revocable, signed.",
+        blurb: 'Bitcoin-identity-bound delegation authority. Scoped, revocable, signed.',
         items: [
             {
                 href: '/agent',

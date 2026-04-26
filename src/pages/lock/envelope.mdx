@@ -6,7 +6,10 @@ export const metadata = {
 
 # Envelope format
 
-A **sealed vault** is a single canonical JSON object called an *envelope*. It's self-contained — you can transport it in a URL fragment, a file, a QR code, a Nostr event, or a pigeon. This page walks the format end-to-end. For the normative rules, see the [specification](/lock/spec).
+A **sealed vault** is a single canonical JSON object called an _envelope_. It's
+self-contained — you can transport it in a URL fragment, a file, a QR code, a
+Nostr event, or a pigeon. This page walks the format end-to-end. For the
+normative rules, see the [specification](/lock/spec).
 
 ## Shape
 
@@ -55,43 +58,52 @@ A **sealed vault** is a single canonical JSON object called an *envelope*. It's 
 
 ## Field reference
 
-| Field | Bytes / type | Purpose |
-|---|---|---|
-| `v` | integer (literal `2`) | Format version. Clients MUST reject unknown versions. |
-| `kind` | `"identity"` \| `"payment"` | Identity = local decrypt; payment = relay-held key released after tx. |
-| `id` | 64-char lowercase hex | SHA-256 of the canonical envelope with `sig.value` emptied. |
-| `alg` | object | Algorithm identifiers. Fixed in v2; reserved for forward-compat. |
-| `from.address` | string | Sender's mainnet Bitcoin address. |
-| `from.attestation_id` | hex, optional | SHA-256 of the sender's OrangeCheck canonical message. |
-| `recipients[].device_pk` | 32-byte hex | Recipient's long-lived X25519 pubkey. |
-| `recipients[].eph_pk` | 32-byte hex | Sender's ephemeral X25519 pubkey for this recipient. |
-| `recipients[].wrapped_key` | base64url | Content key encrypted under the derived KEK. |
-| `recipients[].nonce_kek` | 12-byte hex | Nonce used when wrapping the content key. |
-| `ciphertext` | base64url | `AEAD(content_key, nonce_ct, payload, aad=envelope_id_draft)`. |
-| `nonce_ct` | 12-byte hex | Nonce used when encrypting `ciphertext`. Also the HKDF salt for KEKs. |
-| `hint` | string ≤ 200 bytes, optional | Plaintext hint (filename, subject). Not required; leaks what you choose. |
-| `sig.value` | base64 | BIP-322 signature over `id`, by `sig.pubkey`. |
+| Field                      | Bytes / type                 | Purpose                                                                  |
+| -------------------------- | ---------------------------- | ------------------------------------------------------------------------ |
+| `v`                        | integer (literal `2`)        | Format version. Clients MUST reject unknown versions.                    |
+| `kind`                     | `"identity"` \| `"payment"`  | Identity = local decrypt; payment = relay-held key released after tx.    |
+| `id`                       | 64-char lowercase hex        | SHA-256 of the canonical envelope with `sig.value` emptied.              |
+| `alg`                      | object                       | Algorithm identifiers. Fixed in v2; reserved for forward-compat.         |
+| `from.address`             | string                       | Sender's mainnet Bitcoin address.                                        |
+| `from.attestation_id`      | hex, optional                | SHA-256 of the sender's OrangeCheck canonical message.                   |
+| `recipients[].device_pk`   | 32-byte hex                  | Recipient's long-lived X25519 pubkey.                                    |
+| `recipients[].eph_pk`      | 32-byte hex                  | Sender's ephemeral X25519 pubkey for this recipient.                     |
+| `recipients[].wrapped_key` | base64url                    | Content key encrypted under the derived KEK.                             |
+| `recipients[].nonce_kek`   | 12-byte hex                  | Nonce used when wrapping the content key.                                |
+| `ciphertext`               | base64url                    | `AEAD(content_key, nonce_ct, payload, aad=envelope_id_draft)`.           |
+| `nonce_ct`                 | 12-byte hex                  | Nonce used when encrypting `ciphertext`. Also the HKDF salt for KEKs.    |
+| `hint`                     | string ≤ 200 bytes, optional | Plaintext hint (filename, subject). Not required; leaks what you choose. |
+| `sig.value`                | base64                       | BIP-322 signature over `id`, by `sig.pubkey`.                            |
 
 ## Canonicalization
 
-The envelope must be byte-identical across clients or the `id` won't match and verification fails. Rules per [SPEC §5](/lock/spec):
+The envelope must be byte-identical across clients or the `id` won't match and
+verification fails. Rules per [SPEC §5](/lock/spec):
 
 1. UTF-8 JSON with keys sorted lexicographically at every level.
 2. No insignificant whitespace.
-3. Arrays preserve order — **except** `recipients[]`, which is sorted by `device_id` ascending.
-4. Integers within IEEE 754 double range are serialized without fractional zeros or exponents.
+3. Arrays preserve order — **except** `recipients[]`, which is sorted by
+   `device_id` ascending.
+4. Integers within IEEE 754 double range are serialized without fractional zeros
+   or exponents.
 5. Strings use `\uXXXX` escape only for control chars and `"` / `\`.
 6. File ends in a single LF.
 
-This is RFC 8785 JCS plus the one `recipients[]` sort rule. `@orangecheck/lock-core` ships the canonicalizer; if you implement one in a new language, cross-check against the [committed test vectors](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors) (`v01-minimal.json` … `v04-with-hint.json`).
+This is RFC 8785 JCS plus the one `recipients[]` sort rule.
+`@orangecheck/lock-core` ships the canonicalizer; if you implement one in a new
+language, cross-check against the
+[committed test vectors](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)
+(`v01-minimal.json` … `v04-with-hint.json`).
 
 ## Encryption procedure (identity mode)
 
-Given `payload: Uint8Array` and one or more recipient `{ address, device_id, device_pk }` records:
+Given `payload: Uint8Array` and one or more recipient
+`{ address, device_id, device_pk }` records:
 
 1. `content_key := random(32)` — the only key that ever touches the payload.
 2. `nonce_ct := random(12)`.
-3. Build the **draft envelope** — every field filled in *except* `ciphertext`, `sig.value`, and `recipients[*].wrapped_key`, which are empty strings.
+3. Build the **draft envelope** — every field filled in _except_ `ciphertext`,
+   `sig.value`, and `recipients[*].wrapped_key`, which are empty strings.
 4. `envelope_id_draft := SHA-256(canonical(draft))`.
 5. `ciphertext := AEAD(content_key, nonce_ct, payload, aad = envelope_id_draft)`.
 6. For each recipient:
@@ -101,7 +113,8 @@ Given `payload: Uint8Array` and one or more recipient `{ address, device_id, dev
     - `nonce_kek := random(12)`
     - `wrapped_key := AEAD(kek, nonce_kek, content_key, aad = device_id)`
     - Zeroize `eph_sk`, `shared`, `kek`.
-7. Canonicalize the now-complete envelope (with `ciphertext` and all `wrapped_key` values).
+7. Canonicalize the now-complete envelope (with `ciphertext` and all
+   `wrapped_key` values).
 8. `id := SHA-256(canonical(envelope with sig.value empty))`.
 9. `sig.value := BIP322(sender_addr, id)`.
 10. Zeroize `content_key`.
@@ -110,39 +123,56 @@ Given `payload: Uint8Array` and one or more recipient `{ address, device_id, dev
 
 Given an envelope and a local `(device_id, device_sk)`:
 
-1. Recompute `id` from the envelope and compare against `envelope.id`. Reject on mismatch.
-2. Verify `sig.value` using BIP-322 against `sig.pubkey` and `envelope.id`. (Self-seals may skip.)
-3. Find the `recipients[]` entry matching your local `device_id`. If none — `E_NOT_ADDRESSED`.
+1. Recompute `id` from the envelope and compare against `envelope.id`. Reject on
+   mismatch.
+2. Verify `sig.value` using BIP-322 against `sig.pubkey` and `envelope.id`.
+   (Self-seals may skip.)
+3. Find the `recipients[]` entry matching your local `device_id`. If none —
+   `E_NOT_ADDRESSED`.
 4. `shared := X25519(device_sk, eph_pk)`.
 5. `kek := HKDF(ikm = shared, salt = nonce_ct, info = "oc-lock/v2/kek:" || device_id, L = 32)`.
 6. `content_key := AEAD.decrypt(kek, nonce_kek, wrapped_key, aad = device_id)`.
-7. `payload := AEAD.decrypt(content_key, nonce_ct, ciphertext, aad = envelope_id_draft)` where `envelope_id_draft` is recomputed exactly as in step 3 of the encryption procedure.
+7. `payload := AEAD.decrypt(content_key, nonce_ct, ciphertext, aad = envelope_id_draft)`
+   where `envelope_id_draft` is recomputed exactly as in step 3 of the
+   encryption procedure.
 8. Zeroize `shared`, `kek`, `content_key`.
 
 ## Size budget
 
 A single envelope typically weighs:
 
-| Component | Approx bytes |
-|---|---|
-| Fixed fields (v, kind, alg, from, sig, timestamps) | ~220 |
-| Per-recipient entry | ~200 |
-| Ciphertext | payload + 16 (GCM tag) |
-| Base64url overhead on ciphertext | × 1.33 |
+| Component                                          | Approx bytes           |
+| -------------------------------------------------- | ---------------------- |
+| Fixed fields (v, kind, alg, from, sig, timestamps) | ~220                   |
+| Per-recipient entry                                | ~200                   |
+| Ciphertext                                         | payload + 16 (GCM tag) |
+| Base64url overhead on ciphertext                   | × 1.33                 |
 
-A 10-recipient envelope with a 1 KiB payload is roughly 3.5 KiB canonical. The web client encodes envelopes in URL fragments; browsers handle fragments up to ~2 MiB reliably but we cap payloads at 256 KiB to keep URLs shareable.
+A 10-recipient envelope with a 1 KiB payload is roughly 3.5 KiB canonical. The
+web client encodes envelopes in URL fragments; browsers handle fragments up to
+~2 MiB reliably but we cap payloads at 256 KiB to keep URLs shareable.
 
 ## Transport
 
 Any lossless UTF-8 channel works:
 
-- **URL fragment.** The canonical JSON → UTF-8 → base64url → `#…`. Never sent to a server.
+- **URL fragment.** The canonical JSON → UTF-8 → base64url → `#…`. Never sent to
+  a server.
 - **File.** Save as `.lock`, MIME `application/vnd.oc-lock+json`.
-- **QR code.** For envelopes ≤ ~2.9 KiB at error-correction M — rendered as a single code. Larger payloads are split via the `oc-lock:mp/v1:<id>:<index>:<total>:<slice>` multipart framing. Each part is itself a QR; scanners pick them up in any order and reassemble by the content-addressed `id`. The reference composer produces the grid automatically when a share URL exceeds the single-QR budget, and the reader's built-in camera scanner tracks multi-part progress (`N / total parts captured`) and auto-parses the envelope when every piece is in.
+- **QR code.** For envelopes ≤ ~2.9 KiB at error-correction M — rendered as a
+  single code. Larger payloads are split via the
+  `oc-lock:mp/v1:<id>:<index>:<total>:<slice>` multipart framing. Each part is
+  itself a QR; scanners pick them up in any order and reassemble by the
+  content-addressed `id`. The reference composer produces the grid automatically
+  when a share URL exceeds the single-QR budget, and the reader's built-in
+  camera scanner tracks multi-part progress (`N / total parts captured`) and
+  auto-parses the envelope when every piece is in.
 
 ## Multi-file payloads
 
-The envelope carries a single opaque `payload` byte array. To send multiple files in one envelope, the reference client bundles them in an **`oc-lock/archive/v1`** wrapper before encryption:
+The envelope carries a single opaque `payload` byte array. To send multiple
+files in one envelope, the reference client bundles them in an
+**`oc-lock/archive/v1`** wrapper before encryption:
 
 ```
 magic       = "OCLA"           (4 bytes)
@@ -157,8 +187,17 @@ for each file:
     data      = <data_len> raw bytes
 ```
 
-The wrapper is applied *before* the envelope's AEAD encryption, so the archive framing is only visible after a successful unseal. The reference reader detects the `OCLA` magic at byte 0 and offers per-file download plus a "download all" action. Single-file envelopes skip the archive wrapper entirely — back-compat with receivers that only understand the single-file case. If a sender includes both a text note and file attachments, the composer puts the note at `files[0].name = "message.txt"` and the receiver renders it inline as the accompanying message.
-- **Nostr event.** Put the canonical JSON in `content`; any kind works (we don't use Nostr for envelope transport by default — only for the device directory).
+The wrapper is applied _before_ the envelope's AEAD encryption, so the archive
+framing is only visible after a successful unseal. The reference reader detects
+the `OCLA` magic at byte 0 and offers per-file download plus a "download all"
+action. Single-file envelopes skip the archive wrapper entirely — back-compat
+with receivers that only understand the single-file case. If a sender includes
+both a text note and file attachments, the composer puts the note at
+`files[0].name = "message.txt"` and the receiver renders it inline as the
+accompanying message.
+
+- **Nostr event.** Put the canonical JSON in `content`; any kind works (we don't
+  use Nostr for envelope transport by default — only for the device directory).
 - **Paper / SD card.** Self-contained bytes; decrypt when you're back online.
 
 ## What's plaintext on the wire
@@ -172,4 +211,7 @@ Every envelope leaks these by design:
 - `payment` metadata if in payment mode.
 - `created_at` and `expires_at`.
 
-Everything else is ciphertext. If you want to hide the recipient set, strip addresses and transport the envelope out-of-band to known recipients only. The `device_id` still links across envelopes; for perfect unlinkability between messages, rotate device keys between sends.
+Everything else is ciphertext. If you want to hide the recipient set, strip
+addresses and transport the envelope out-of-band to known recipients only. The
+`device_id` still links across envelopes; for perfect unlinkability between
+messages, rotate device keys between sends.

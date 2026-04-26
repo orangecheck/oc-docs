@@ -1,6 +1,7 @@
 export const metadata = {
     title: 'api',
-    description: 'The web UI is convenience. The curl output is the authoritative result.',
+    description:
+        'The web UI is convenience. The curl output is the authoritative result.',
 };
 
 # api
@@ -13,18 +14,24 @@ The web UI is convenience. The curl output is the authoritative result.
 GET /api/tally?poll=<64-char hex poll_id>
 ```
 
-Fetches the poll from the default Nostr relay set, pulls every matching ballot, verifies every BIP-322 signature, resolves the snapshot block, looks up UTXOs from mempool.space, runs the pure tally function, and returns JSON.
+Fetches the poll from the default Nostr relay set, pulls every matching ballot,
+verifies every BIP-322 signature, resolves the snapshot block, looks up UTXOs
+from mempool.space, runs the pure tally function, and returns JSON.
 
 **200 tallied:**
 
 ```json
 {
-  "poll_id": "3054…",
-  "state": "tallied",
-  "snapshot_block": 900412,
-  "turnout": { "voters": 47, "weight": 2814300000 },
-  "tallies": { "split_a": 812300000, "split_b": 1102900000, "split_c": 899100000 },
-  "ballot_count": 47
+    "poll_id": "3054…",
+    "state": "tallied",
+    "snapshot_block": 900412,
+    "turnout": { "voters": 47, "weight": 2814300000 },
+    "tallies": {
+        "split_a": 812300000,
+        "split_b": 1102900000,
+        "split_c": 899100000
+    },
+    "ballot_count": 47
 }
 ```
 
@@ -40,7 +47,8 @@ Fetches the poll from the default Nostr relay set, pulls every matching ballot, 
 - `404` — poll not found on any default relay.
 - `422` — poll event content did not match poll_id (relay corruption).
 
-Response is cached for 60 seconds at the edge. Live tallies on the poll page recompute client-side against the same function.
+Response is cached for 60 seconds at the edge. Live tallies on the poll page
+recompute client-side against the same function.
 
 ## library
 
@@ -51,19 +59,34 @@ npm i @orangecheck/vote-core
 Full API surface:
 
 ```ts
+import type {
+    Ballot,
+    // types
+    Poll,
+    Reveal,
+    TallyResult,
+    Utxo,
+} from '@orangecheck/vote-core';
+
 import {
-  // canonicalization
-  canonicalize, canonicalBytes,
-  // ids (content-addressed, SHA-256 of canonical bytes with sig.value = "")
-  pollId, ballotId, revealId,
-  // secret-mode commit
-  commit, buildCommitMessage,
-  // weight computation
-  voterWeight, ageDays, qualifyingUtxos, totalQualifyingSats, isSupportedMode,
-  // the tally
-  tally,
-  // types
-  type Poll, type Ballot, type Reveal, type TallyResult, type Utxo,
+    ageDays,
+    ballotId,
+    buildCommitMessage,
+    canonicalBytes,
+    // canonicalization
+    canonicalize,
+    // secret-mode commit
+    commit,
+    isSupportedMode,
+    // ids (content-addressed, SHA-256 of canonical bytes with sig.value = "")
+    pollId,
+    qualifyingUtxos,
+    revealId,
+    // the tally
+    tally,
+    totalQualifyingSats,
+    // weight computation
+    voterWeight,
 } from '@orangecheck/vote-core';
 ```
 
@@ -73,18 +96,26 @@ import {
 import { pollId } from '@orangecheck/vote-core';
 
 const draft: Poll = {
-  v: 0, kind: 'oc-vote/poll',
-  creator: 'bc1q…',
-  question: 'Should we ship?',
-  options: [{ id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' }],
-  deadline: '2026-05-08T00:00:00Z',
-  snapshot_block: 'deadline',
-  weight_mode: 'sats', weight_params: null,
-  min_sats: 100_000, min_days: 30,
-  mode: 'public', reveal_pk: null,
-  tiebreak: 'latest', notes: null,
-  created_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
-  sig: { alg: 'bip322', pubkey: 'bc1q…', value: '' },
+    v: 0,
+    kind: 'oc-vote/poll',
+    creator: 'bc1q…',
+    question: 'Should we ship?',
+    options: [
+        { id: 'yes', label: 'Yes' },
+        { id: 'no', label: 'No' },
+    ],
+    deadline: '2026-05-08T00:00:00Z',
+    snapshot_block: 'deadline',
+    weight_mode: 'sats',
+    weight_params: null,
+    min_sats: 100_000,
+    min_days: 30,
+    mode: 'public',
+    reveal_pk: null,
+    tiebreak: 'latest',
+    notes: null,
+    created_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+    sig: { alg: 'bip322', pubkey: 'bc1q…', value: '' },
 };
 
 const id = pollId(draft);
@@ -97,18 +128,20 @@ const id = pollId(draft);
 import { tally } from '@orangecheck/vote-core';
 
 const result = await tally({
-  poll,
-  ballots,
-  utxosAt: (addr, snapshotHeight) => myUtxoSource.fetch(addr, snapshotHeight),
-  skipSignatures: false,
-  verifyBip322: async (address, message, signatureB64) => {
-    const { Verifier } = await import('bip322-js');
-    return Verifier.verifySignature(address, message, signatureB64);
-  },
+    poll,
+    ballots,
+    utxosAt: (addr, snapshotHeight) => myUtxoSource.fetch(addr, snapshotHeight),
+    skipSignatures: false,
+    verifyBip322: async (address, message, signatureB64) => {
+        const { Verifier } = await import('bip322-js');
+        return Verifier.verifySignature(address, message, signatureB64);
+    },
 });
 ```
 
-The library is **pure**. Same inputs → byte-identical output across implementations. 28/28 tests pass against the canonical fixtures in [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors).
+The library is **pure**. Same inputs → byte-identical output across
+implementations. 28/28 tests pass against the canonical fixtures in
+[`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors).
 
 ## dispute resolution
 
@@ -119,4 +152,5 @@ npx -y @orangecheck/vote-cli tally <poll_id>
 # or: git clone oc-vote-protocol && implement tally() yourself
 ```
 
-Whoever matches the canonical fixtures + the spec is correct. The web page is a convenience over the same function any client can run.
+Whoever matches the canonical fixtures + the spec is correct. The web page is a
+convenience over the same function any client can run.

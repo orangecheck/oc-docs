@@ -1,32 +1,39 @@
 export const metadata = {
     title: 'Nostr directory',
-    description: 'Publishing to Nostr is optional. The envelope is self-contained and can travel over any transport (URL fragment, email, IPFS, QR code, paper, git).',
+    description:
+        'Publishing to Nostr is optional. The envelope is self-contained and can travel over any transport (URL fragment, email, IPFS, QR code, paper, git).',
 };
 
 export const meta = {
     title: 'Nostr directory — OC Stamp docs',
-    description: 'Publishing stamps to kind-30083 for durable public discovery.',
+    description:
+        'Publishing stamps to kind-30083 for durable public discovery.',
 };
 
 # Nostr directory
 
-**Publishing to Nostr is optional.** The envelope is self-contained and can travel over any transport (URL fragment, email, IPFS, QR code, paper, git). Nostr is one choice among many — a good one for durable public discovery.
+**Publishing to Nostr is optional.** The envelope is self-contained and can
+travel over any transport (URL fragment, email, IPFS, QR code, paper, git).
+Nostr is one choice among many — a good one for durable public discovery.
 
 ## Event kind
 
-**Kind `30083`.** Parameterized-replaceable, in the OrangeCheck family's 30078–30099 range.
+**Kind `30083`.** Parameterized-replaceable, in the OrangeCheck family's
+30078–30099 range.
 
 The family's claims so far:
 
-| Kind | Claimed by |
-|---|---|
-| 30078 | OrangeCheck attestations + OC Lock device records |
-| 30080 | OC Vote poll |
-| 30081 | OC Vote ballot |
-| 30082 | OC Vote reveal |
-| **30083** | **OC Stamp envelope** |
+| Kind      | Claimed by                                        |
+| --------- | ------------------------------------------------- |
+| 30078     | OrangeCheck attestations + OC Lock device records |
+| 30080     | OC Vote poll                                      |
+| 30081     | OC Vote ballot                                    |
+| 30082     | OC Vote reveal                                    |
+| **30083** | **OC Stamp envelope**                             |
 
-We deliberately did NOT reuse 30078. Relays that index by `(kind, d-tag)` as a compound key would see prefix collisions across protocols over time. Clean namespace per protocol is the rule.
+We deliberately did NOT reuse 30078. Relays that index by `(kind, d-tag)` as a
+compound key would see prefix collisions across protocols over time. Clean
+namespace per protocol is the rule.
 
 ## Event shape
 
@@ -43,7 +50,10 @@ event.pubkey     = <ephemeral Nostr pubkey, any key>
 event.created_at = unix_seconds
 ```
 
-The Nostr event `pubkey` has **no relationship** to the Bitcoin identity. The authenticity of the stamp is proved by the BIP-322 signature inside the envelope, not by the Nostr author. A fresh ephemeral Nostr keypair SHOULD be derived per-publish:
+The Nostr event `pubkey` has **no relationship** to the Bitcoin identity. The
+authenticity of the stamp is proved by the BIP-322 signature inside the
+envelope, not by the Nostr author. A fresh ephemeral Nostr keypair SHOULD be
+derived per-publish:
 
 ```
 nostr_sk := HKDF(ikm=random(32), salt="oc-stamp/v1/nostr-key", info=id, L=32)
@@ -79,15 +89,20 @@ Use case: "fetch this specific stamp."
 
 ## Addressability + upgrades
 
-Kind-30083 is *addressable* — relays replace prior events with the same `(pubkey, kind, d-tag)` tuple.
+Kind-30083 is _addressable_ — relays replace prior events with the same
+`(pubkey, kind, d-tag)` tuple.
 
 For OC Stamp this is **harmless in practice**:
 
-- The d-tag is content-addressed (`oc-stamp:<id>` where `id` is a hash of the canonical message).
+- The d-tag is content-addressed (`oc-stamp:<id>` where `id` is a hash of the
+  canonical message).
 - A "replacement" with the same d-tag must carry the same id.
-- Same id → same signed content. Any attempt to swap in different content fails verification on the consumer side.
+- Same id → same signed content. Any attempt to swap in different content fails
+  verification on the consumer side.
 
-The **common** reason to republish with the same d-tag is an OTS upgrade: pending → confirmed. Verifiers that see multiple versions of the same id SHOULD accept the one with `ots.status === "confirmed"` and the latest `upgraded_at`.
+The **common** reason to republish with the same d-tag is an OTS upgrade:
+pending → confirmed. Verifiers that see multiple versions of the same id SHOULD
+accept the one with `ots.status === "confirmed"` and the latest `upgraded_at`.
 
 ## Recommended relays
 
@@ -98,7 +113,9 @@ The reference clients use this set:
 - `wss://nos.lol`
 - `wss://relay.snort.social`
 
-Clients SHOULD publish to at least three diverse relays. A hostile relay set can refuse to publish or return your envelope, but cannot forge it — BIP-322 verification is relay-independent.
+Clients SHOULD publish to at least three diverse relays. A hostile relay set can
+refuse to publish or return your envelope, but cannot forge it — BIP-322
+verification is relay-independent.
 
 ## Why Nostr is optional
 
@@ -111,9 +128,13 @@ Envelopes are **self-contained JSON**. Put them:
 - On paper, via QR code.
 - In a Nostr event (this page).
 
-No single directory is load-bearing. The ochk.io/stamp.ochk.io operators do **not** run a privileged directory — the reference aggregator uses the same Nostr relays anyone else would.
+No single directory is load-bearing. The ochk.io/stamp.ochk.io operators do
+**not** run a privileged directory — the reference aggregator uses the same
+Nostr relays anyone else would.
 
 ## Further reading
 
-- [SPEC §7](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#7-nostr-directory-optional) — normative rules.
-- [SPEC §13](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#13-registry-for-extensions) — the 30078–30099 family kind registry.
+- [SPEC §7](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#7-nostr-directory-optional)
+  — normative rules.
+- [SPEC §13](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#13-registry-for-extensions)
+  — the 30078–30099 family kind registry.

@@ -1,90 +1,135 @@
 export const metadata = {
     title: 'Security',
-    description: 'Summary of the threat model. The authoritative copy with every numbered attack scenario lives in SECURITY.md.',
+    description:
+        'Summary of the threat model. The authoritative copy with every numbered attack scenario lives in SECURITY.md.',
 };
 
 export const meta = {
     title: 'Security — OC Stamp docs',
-    description: 'Threat model, attack scenarios, trust assumptions. Report channel.',
+    description:
+        'Threat model, attack scenarios, trust assumptions. Report channel.',
 };
 
 # Security
 
-Summary of the threat model. The authoritative copy with every numbered attack scenario lives in [`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md).
+Summary of the threat model. The authoritative copy with every numbered attack
+scenario lives in
+[`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md).
 
 ## Report channel
 
-Email **security@ochk.io**. See [`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md#reporting-a-vulnerability) for the full reporting protocol.
+Email **security@ochk.io**. See
+[`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md#reporting-a-vulnerability)
+for the full reporting protocol.
 
 ## What OC Stamp protects
 
-- **Authorship.** Only the holder of `signer.address`'s private key could have produced `sig.value`. BIP-322 assumption.
-- **Priority** *(confirmed anchors only)*. The envelope id existed on or before the block at `ots.block_height`. Bitcoin consensus assumption.
-- **Integrity.** Any tampering with `content.hash`, `content.length`, `content.mime`, `signer.address`, or `signed_at` invalidates `id` and therefore `sig.value`.
-- **Stake** *(when declared and re-verified)*. At the moment a verifier resolves `stake.attestation_id`, the holder of `signer.address` controls UTXOs matching the declared bond.
+- **Authorship.** Only the holder of `signer.address`'s private key could have
+  produced `sig.value`. BIP-322 assumption.
+- **Priority** _(confirmed anchors only)_. The envelope id existed on or before
+  the block at `ots.block_height`. Bitcoin consensus assumption.
+- **Integrity.** Any tampering with `content.hash`, `content.length`,
+  `content.mime`, `signer.address`, or `signed_at` invalidates `id` and
+  therefore `sig.value`.
+- **Stake** _(when declared and re-verified)_. At the moment a verifier resolves
+  `stake.attestation_id`, the holder of `signer.address` controls UTXOs matching
+  the declared bond.
 
 ## What OC Stamp does NOT protect
 
-- **Recency.** `signed_at` is self-declared. Only OTS proves priority *before a block*, not absolute wall-clock time.
-- **Uniqueness.** A signer can sign the same content twice with different `signed_at`. First-stamp ordering relies on `ots.block_height`, not `signed_at`.
-- **Content liveness.** `content.ref` can 404 or mutate. The hash is authoritative; the pointer is a convenience.
-- **Sender anonymity.** `signer.address` is plaintext. For anonymity, sign from a fresh address — but you lose stake signal and identity continuity.
-- **Post-quantum confidentiality / authenticity.** secp256k1 and SHA-256 have finite lifetimes under sufficiently large quantum computers. No PQ layer in v1.
+- **Recency.** `signed_at` is self-declared. Only OTS proves priority _before a
+  block_, not absolute wall-clock time.
+- **Uniqueness.** A signer can sign the same content twice with different
+  `signed_at`. First-stamp ordering relies on `ots.block_height`, not
+  `signed_at`.
+- **Content liveness.** `content.ref` can 404 or mutate. The hash is
+  authoritative; the pointer is a convenience.
+- **Sender anonymity.** `signer.address` is plaintext. For anonymity, sign from
+  a fresh address — but you lose stake signal and identity continuity.
+- **Post-quantum confidentiality / authenticity.** secp256k1 and SHA-256 have
+  finite lifetimes under sufficiently large quantum computers. No PQ layer in
+  v1.
 
 ## Assumptions
 
-- **Bitcoin's security model holds.** secp256k1 / Schnorr remain unforgeable at current parameter sizes; work-weighted longest chain is canonical.
-- **BIP-322 is implemented correctly.** Pin a verifier known to handle all address types (P2WPKH, P2TR, P2WSH, P2PKH).
-- **At least one OTS calendar is non-colluding.** Submit to ≥2 independently-operated calendars.
-- **SHA-256 is collision-resistant.** Practical collisions break `id` uniqueness.
-- **Randomness at signing time is strong** for any ephemeral values used by the signing wallet.
+- **Bitcoin's security model holds.** secp256k1 / Schnorr remain unforgeable at
+  current parameter sizes; work-weighted longest chain is canonical.
+- **BIP-322 is implemented correctly.** Pin a verifier known to handle all
+  address types (P2WPKH, P2TR, P2WSH, P2PKH).
+- **At least one OTS calendar is non-colluding.** Submit to ≥2
+  independently-operated calendars.
+- **SHA-256 is collision-resistant.** Practical collisions break `id`
+  uniqueness.
+- **Randomness at signing time is strong** for any ephemeral values used by the
+  signing wallet.
 
 ## Normative compliance requirements
 
 A conformant implementation MUST:
 
-1. **Reconstruct the canonical message** from envelope fields before trusting the declared `id`.
+1. **Reconstruct the canonical message** from envelope fields before trusting
+   the declared `id`.
 2. **Verify `sig.value`** under BIP-322 before trusting envelope contents.
-3. **Verify the OTS anchor** against a real Bitcoin block header when `ots.status === "confirmed"` and the caller attaches legal/economic weight.
-4. **Re-resolve any stake claim.** Never trust the declared `sats_bonded` / `days_unspent` — fetch the attestation.
-5. **Reject unknown `envelope.v`** values. Preserve unknown optional fields on relay.
-6. **Produce byte-identical canonical messages** for identical inputs across implementations.
-7. **Sign the hex form of `id`** (64 ASCII bytes) with BIP-322, not the raw 32 bytes.
+3. **Verify the OTS anchor** against a real Bitcoin block header when
+   `ots.status === "confirmed"` and the caller attaches legal/economic weight.
+4. **Re-resolve any stake claim.** Never trust the declared `sats_bonded` /
+   `days_unspent` — fetch the attestation.
+5. **Reject unknown `envelope.v`** values. Preserve unknown optional fields on
+   relay.
+6. **Produce byte-identical canonical messages** for identical inputs across
+   implementations.
+7. **Sign the hex form of `id`** (64 ASCII bytes) with BIP-322, not the raw 32
+   bytes.
 
 ## Attack scenarios (selected)
 
-The full list of 16 numbered scenarios lives in [`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md#attack-scenarios). Highlights:
+The full list of 16 numbered scenarios lives in
+[`SECURITY.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SECURITY.md#attack-scenarios).
+Highlights:
 
-- **Envelope tampering in transit** — *mitigated*. Envelope id is `H(canonical)`, committed to by `sig.value`.
-- **Signature replay across canonical messages** — *mitigated*. `oc-stamp:v1` domain separator prevents replay against other OrangeCheck protocols.
-- **Fraudulent OTS proof claiming earlier block** — *mitigated*. Verifiers walk proof to real Bitcoin header.
-- **Calendar–miner collusion to backdate** — *partially mitigated* by using multiple independent calendars.
-- **Aggregator substitution** — *mitigated*. Aggregator cannot sign; envelope is already signed when submitted.
-- **Pending proof used as priority evidence** — *mitigated* by policy and the `E_NO_ANCHOR` error.
-- **`content.ref` returns attacker-controlled bytes** — *mitigated*. Verifiers fetching via ref MUST re-hash.
-- **Key compromise of signer** — *accepted*. Same trust model as BIP-322 everywhere. Rotate to a new address; past stamps remain valid via anchor.
+- **Envelope tampering in transit** — _mitigated_. Envelope id is
+  `H(canonical)`, committed to by `sig.value`.
+- **Signature replay across canonical messages** — _mitigated_. `oc-stamp:v1`
+  domain separator prevents replay against other OrangeCheck protocols.
+- **Fraudulent OTS proof claiming earlier block** — _mitigated_. Verifiers walk
+  proof to real Bitcoin header.
+- **Calendar–miner collusion to backdate** — _partially mitigated_ by using
+  multiple independent calendars.
+- **Aggregator substitution** — _mitigated_. Aggregator cannot sign; envelope is
+  already signed when submitted.
+- **Pending proof used as priority evidence** — _mitigated_ by policy and the
+  `E_NO_ANCHOR` error.
+- **`content.ref` returns attacker-controlled bytes** — _mitigated_. Verifiers
+  fetching via ref MUST re-hash.
+- **Key compromise of signer** — _accepted_. Same trust model as BIP-322
+  everywhere. Rotate to a new address; past stamps remain valid via anchor.
 
 ## Aggregator-specific risks
 
-An aggregator (e.g., the reference service at stamp.ochk.io) is trusted for **liveness only**:
+An aggregator (e.g., the reference service at stamp.ochk.io) is trusted for
+**liveness only**:
 
-| Attack | Mitigation |
-|---|---|
-| Aggregator refuses service | Submit directly to calendars |
-| Aggregator drops submission | Re-submit; OTS is idempotent |
-| Aggregator delays pending proof | Re-query calendar directly |
+| Attack                                      | Mitigation                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------ |
+| Aggregator refuses service                  | Submit directly to calendars                                             |
+| Aggregator drops submission                 | Re-submit; OTS is idempotent                                             |
+| Aggregator delays pending proof             | Re-query calendar directly                                               |
 | Aggregator returns fraudulent pending proof | Caught at upgrade; the "pending" proof cannot chain to any Bitcoin block |
-| Aggregator strips / modifies fields | Invalidates id, fails signature verification on relay |
+| Aggregator strips / modifies fields         | Invalidates id, fails signature verification on relay                    |
 
 ## Dependency posture
 
 Narrow surface:
 
-| Package | Purpose |
-|---|---|
-| `@noble/hashes` | SHA-256 |
-| `@noble/curves` | secp256k1 Schnorr / ECDSA |
-| `javascript-opentimestamps` *(pluggable)* | OTS proof parsing |
-| `bip322-js` | BIP-322 verification |
+| Package                                   | Purpose                   |
+| ----------------------------------------- | ------------------------- |
+| `@noble/hashes`                           | SHA-256                   |
+| `@noble/curves`                           | secp256k1 Schnorr / ECDSA |
+| `javascript-opentimestamps` _(pluggable)_ | OTS proof parsing         |
+| `bip322-js`                               | BIP-322 verification      |
 
-`bip322-js` transitively depends on `elliptic`, which has known low-severity timing channels in ECDSA (npm advisory 1112030). Our use is verification-only and signatures are bound to the BIP-322 message domain, so the risk is limited to signature-check timing. A migration to a `@noble`-based BIP-322 verifier is planned.
+`bip322-js` transitively depends on `elliptic`, which has known low-severity
+timing channels in ECDSA (npm advisory 1112030). Our use is verification-only
+and signatures are bound to the BIP-322 message domain, so the risk is limited
+to signature-check timing. A migration to a `@noble`-based BIP-322 verifier is
+planned.

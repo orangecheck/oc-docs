@@ -2,13 +2,14 @@
 
 **`docs.ochk.io`** — unified documentation for the OrangeCheck ecosystem.
 
-One site, every protocol:
+One site, every protocol — six verbs of sovereign sociality:
 
-- **OC Attest** — proof of Bitcoin stake (the base-layer sybil-resistance primitive)
-- **OC Lock** — end-to-end encryption addressed to a Bitcoin address
-- **OC Stamp** — Bitcoin-block-anchored signed statements
-- **OC Vote** — stake-weighted sybil-resistant polls
-- **OC Agent** — agent-authorization records (design-state)
+- **OC Attest** _(am)_ — proof of Bitcoin stake (the base-layer sybil-resistance primitive)
+- **OC Lock** _(whisper)_ — end-to-end encryption addressed to a Bitcoin address
+- **OC Vote** _(decide)_ — stake-weighted sybil-resistant polls
+- **OC Stamp** _(declare)_ — Bitcoin-block-anchored signed statements
+- **OC Agent** _(delegate)_ — scoped, bonded, revocable delegation authority
+- **OC Pledge** _(swear)_ — bonded commitments to future-verifiable propositions
 
 Shared concepts (canonical message, BIP-322, Nostr kind-30078, conformance
 vectors, SDKs, security model) live in one `Ecosystem` section so they're

@@ -1,20 +1,45 @@
 export const metadata = {
-    title: 'Nostr kind-30078',
+    title: 'Nostr publication',
     description:
-        'How every OrangeCheck protocol publishes its artifacts on Nostr using NIP-78 parameterized-replaceable addressable events.',
+        'How every OrangeCheck protocol publishes its artifacts on Nostr — kinds 30078, 30080–30085, d-tag conventions per protocol, multi-relay discovery defaults.',
 };
 
-# Nostr kind-30078
+# Nostr publication
 
-Every OrangeCheck sibling publishes its public artifacts — attestations, device
-records, stamps, vote ballots — as
+Every OrangeCheck sibling publishes its public artifacts as
 [NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md)
-parameterized-replaceable addressable events at kind `30078`.
+parameterized-replaceable addressable events. The original kind, **30078**, is
+the namespake of this page and still carries Attest attestations, Lock device
+records, and Pledge envelopes. As more siblings shipped, the family expanded
+into the **30078–30099 range** with one kind per artifact type. This page is the
+authoritative roll-up.
 
-## Why kind-30078
+> **Source of truth:** the kind table here mirrors `oc-agent-protocol/SPEC.md`
+> §4, which is the family's authoritative kind registry. Each protocol's own
+> spec normatively claims the kind(s) it owns.
 
-NIP-78 is the "application-specific data" event kind. It's designed precisely
-for what we need:
+## Kind registry
+
+| Kind    | Owner            | Purpose                                                                                  |
+| ------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| `30078` | OC Attest        | Attestation envelope (the original family event kind)                                    |
+| `30078` | OC Lock          | Device record (binds an X25519 device key to a Bitcoin address)                          |
+| `30078` | OC Pledge        | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)       |
+| `30080` | OC Vote          | Poll                                                                                     |
+| `30081` | OC Vote          | Ballot                                                                                   |
+| `30082` | OC Vote          | Reveal (secret-mode tally)                                                               |
+| `30083` | OC Agent         | Agent delegation                                                                         |
+| `30084` | OC Stamp         | Stamp envelope (also: OC Agent **action** envelopes share this transport, disambiguated by inner `kind` field) |
+| `30085` | OC Agent         | Agent revocation                                                                         |
+
+If you're allocating a new kind for a new sibling, claim the next unused number
+(currently `30086`) and update the registry in `oc-agent-protocol/SPEC.md`.
+Kinds are never reused across sub-protocols.
+
+## Why NIP-78 / kind 30078
+
+NIP-78 is the "application-specific data" event kind, designed precisely for
+what we need:
 
 - **Addressable** — `(pubkey, kind, d)` uniquely identifies an event across all
   relays. Republishing with the same `d` tag replaces the old version.
@@ -22,43 +47,64 @@ for what we need:
   fill it with the JSON envelope each protocol specifies.
 - **First-class in every Nostr client** — no custom relay patches required.
 
-We considered minting a fresh NIP for OrangeCheck, but nothing in our use-case
-needed new event-kind semantics. Using 30078 means every off-the-shelf Nostr
-relay (`damus.io`, `primal.net`, `nos.lol`, `snort.social`, etc.) stores and
-serves our events.
+The 30080–30085 kinds claimed by Vote/Stamp/Agent are also in NIP-78's
+parameterized-replaceable range and behave identically; the only reason they
+exist as separate kinds (rather than reusing 30078) is so a relay query like
+`{kinds: [30080]}` returns only polls without the integrator having to
+post-filter on the `d` tag.
 
-## The d-tag convention
+## d-tag conventions
 
-Every protocol reserves a `d`-tag prefix so events from different siblings don't
-collide:
+Each protocol reserves a `d`-tag namespace so events from different siblings
+don't collide on overlapping kinds.
 
-| Protocol                | `d` tag format                                                    |
-| ----------------------- | ----------------------------------------------------------------- |
-| OC Attest               | `<attestation_id>` (64-char hex SHA-256 of the canonical message) |
-| OC Lock (device record) | `oc-lock:device:<btc_address>`                                    |
-| OC Stamp                | `oc-stamp:<envelope_id>`                                          |
-| OC Vote (poll)          | `oc-vote:poll:<poll_id>`                                          |
-| OC Vote (ballot)        | `oc-vote:ballot:<ballot_id>`                                      |
+| Protocol  | Kind    | `d` tag format                                       |
+| --------- | ------- | ---------------------------------------------------- |
+| OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)             |
+| OC Lock   | `30078` | `oc-lock:device:<btc_address>` (or `<addr>:<device_id>` for multi-device) |
+| OC Pledge | `30078` | `oc-pledge:<pledge_id>`                              |
+| OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                      |
+| OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                  |
+| OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                             |
+| OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                   |
+| OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                           |
+| OC Agent  | `30083` | `oc-agent:delegation:<delegation_id>`                |
+| OC Stamp  | `30084` | `oc-stamp:<envelope_id>`                             |
+| OC Agent  | `30084` | `oc-agent:action:<action_id>` (action envelopes ride OC Stamp's kind) |
+| OC Agent  | `30085` | `oc-agent:revocation:<revocation_id>`                |
 
-The relay doesn't care — `d` is just a string. The convention matters so that
-discovery queries (`#d: oc-stamp:*`) can narrow by protocol without enumerating
-every event kind.
+The relay doesn't enforce any of this — `d` is just a string. The convention
+matters so that discovery queries (`#d: oc-stamp:*`, `#d: oc-vote:poll:*`) can
+narrow by artifact type without enumerating kinds.
 
 ## Required tags per protocol
 
-Each sibling's spec defines which tags MUST appear on its events. Common ones
-across OC Attest:
+Each sibling's spec defines which tags MUST appear on its events. These tags
+exist to enable secondary-index discovery without parsing the JSON `content`.
+
+**Common across all protocols:**
+
+| Tag    | Value                                       |
+| ------ | ------------------------------------------- |
+| `d`    | The addressable identifier (per table above) |
+
+**OC Attest example:**
 
 | Tag       | Purpose                                                          |
 | --------- | ---------------------------------------------------------------- |
-| `d`       | Attestation ID — the addressable identifier                      |
 | `address` | Bitcoin address the attestation is for                           |
 | `scheme`  | `bip322` or `legacy`                                             |
 | `i`       | One per identity binding, formatted as `<protocol>:<identifier>` |
 | `expires` | ISO timestamp (optional)                                         |
 
-Tags enable secondary-index queries. `#address:bc1q…` is how verifiers find an
-attestation when the caller knows the address but not the ID.
+For the exact normative tag set per protocol, consult that protocol's spec:
+
+- [OC Attest tags](/attest/api) · `oc-attest-protocol` SPEC §3
+- [OC Lock device record tags](/lock) · `oc-lock-protocol` SPEC §3
+- [OC Stamp envelope tags](/stamp) · `oc-stamp-protocol` SPEC §6
+- [OC Vote tags](/vote) · `oc-vote-protocol` SPEC §3
+- [OC Agent tags](/agent) · `oc-agent-protocol` SPEC §3
+- [OC Pledge tags](/pledge) · `oc-pledge-protocol` SPEC §16
 
 ## Author pubkey — real npub vs. ephemeral
 
@@ -70,12 +116,13 @@ OrangeCheck events are authored by one of two key types:
 - **Ephemeral key** — when there's no NIP-07, the SDK generates a fresh BIP-340
   Schnorr keypair per publish, signs the event, and throws the key away. The
   event is still valid (relays check only that the signature matches the
-  pubkey); the pubkey is just a throwaway.
+  pubkey); the pubkey is just a throwaway. OC Vote derives the ephemeral key
+  deterministically via HKDF so the same poll re-publishes under the same npub.
 
-In both cases, the **attestation inside the event's `content` is
-cryptographically bound to the Bitcoin address** via BIP-322. Who authored the
-Nostr event is independent from who controls the Bitcoin address. The inner
-attestation is what matters.
+In both cases, the **artifact inside the event's `content` is cryptographically
+bound to the Bitcoin address** via BIP-322. Who authored the Nostr event is
+independent from who controls the Bitcoin address. The inner artifact is what
+matters.
 
 ## Reading events
 
@@ -86,17 +133,25 @@ Any Nostr client or relay library works. With
 import { Relay } from 'nostr-tools/relay';
 
 const relay = await Relay.connect('wss://relay.damus.io');
+
+// Find an OC Attest attestation by Bitcoin address
 const sub = relay.subscribe([{ kinds: [30078], '#address': ['bc1qalice…'] }], {
     onevent(event) {
-        // event.content is the attestation envelope as JSON
         const envelope = JSON.parse(event.content);
         // Verify locally — see /attest/verification
     },
 });
+
+// Find an OC Vote poll by id
+relay.subscribe([{ kinds: [30080], '#d': ['oc-vote:poll:<poll_id>'] }], { /*…*/ });
+
+// Find every OC Stamp by a specific signer
+relay.subscribe([{ kinds: [30084], '#address': ['bc1qsigner…'] }], { /*…*/ });
 ```
 
-`@orangecheck/sdk` wraps this with `getAttestationsForAddress()` and
-`queryByAttestationId()`, fanning out to multiple relays and deduplicating.
+Each protocol's reference core wraps these queries with typed helpers
+(`getAttestationsForAddress`, `fetchPoll`, `fetchStamp`, `fetchDelegation`,
+`fetchPledge`) that fan out to multiple relays and deduplicate.
 
 ## Default relay set
 
@@ -108,16 +163,13 @@ The reference SDKs default to a small set of stable public relays:
 - `wss://relay.snort.social`
 
 Override with `relays: [...]` on any SDK call. For production deployments you
-SHOULD query ≥3 distinct relay operators — a single slow or partitioned relay
-shouldn't break discovery.
+SHOULD query **≥3 distinct relay operators** — a single slow or partitioned
+relay shouldn't break discovery. See
+[Security — relay censorship / partition](/ecosystem/security#relay-censorship--partition)
+for why this matters.
 
 ## See also
 
-- [Canonical message](/ecosystem/canonical-message) — what goes inside the
-  `content` field
-- [BIP-322 signing](/ecosystem/bip322) — what ties the Nostr event to the
-  Bitcoin address
-- [OC Attest — verification](/attest/verification) — what to do with a
-  discovered event
-- [Security — relay censorship / partition](/ecosystem/security#relay-censorship-partition)
-  — why multi-relay queries matter
+- [Canonical message](/ecosystem/canonical-message) — what goes inside each event's `content` field
+- [BIP-322 signing](/ecosystem/bip322) — what ties the Nostr event to the Bitcoin address
+- [Security model](/ecosystem/security) — relay assumptions and partition mitigation

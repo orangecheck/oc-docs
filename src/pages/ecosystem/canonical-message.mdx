@@ -61,21 +61,39 @@ Seven lines. One trailing newline. That's the whole thing.
 
 ## Per-protocol headers
 
-| Protocol                          | Header literal                                                        |
-| --------------------------------- | --------------------------------------------------------------------- |
-| OC Attest (the default)           | `orangecheck`                                                         |
-| OC Attest challenge flow          | `orangecheck-auth` (shorter-lived, audience + expiry fields required) |
-| OC Lock device binding            | `oc-lock-device-binding-v0`                                           |
-| OC Lock envelope canonicalization | (RFC-8785 over JSON — not a line-format message)                      |
-| OC Stamp                          | `oc-stamp`                                                            |
-| OC Vote poll / ballot             | `oc-vote`                                                             |
-| OC Agent delegation / act         | `oc-agent`                                                            |
-| OC Pledge declaration / outcome   | `oc-pledge`                                                           |
+Each header is a **literal first-line domain separator**. A signature produced
+under one header cannot be replayed against another protocol's verifier — the
+prefix is part of the bytes the wallet signed.
 
-Lock's envelope format is the outlier — it canonicalizes a JSON structure via
-RFC-8785 rather than producing a newline-delimited text blob. The reason is that
-Lock envelopes carry binary AES-GCM ciphertext, which doesn't fit cleanly into a
-line-format. Every OTHER sibling uses the text canonical message.
+| Protocol                            | Header literal              |
+| ----------------------------------- | --------------------------- |
+| OC Attest (default)                 | `orangecheck`               |
+| OC Attest (challenge / auth flow)   | `orangecheck-auth`          |
+| OC Lock device binding              | `oc-lock:device-bind:v2`    |
+| OC Stamp envelope                   | `oc-stamp:v1`               |
+| OC Agent delegation                 | `oc-agent:delegation:v1`    |
+| OC Agent action                     | `oc-agent:action:v1`        |
+| OC Agent revocation                 | `oc-agent:revocation:v1`    |
+| OC Pledge                           | `oc-pledge/v1`              |
+| OC Pledge outcome                   | `oc-pledge-outcome/v1`      |
+| OC Pledge abandonment               | `oc-pledge-abandonment/v1`  |
+
+### Two sibling protocols don't use the line format
+
+- **OC Lock envelope canonicalization** — Lock envelopes carry binary AES-GCM
+  ciphertext that doesn't fit cleanly into a line-format text blob, so the
+  envelope is canonicalized as **RFC-8785 JSON** instead. The signed device
+  binding (above) still uses the line format.
+- **OC Vote poll / ballot** — Polls and ballots are **canonical JSON objects**
+  with a `kind` field (`oc-vote/poll`, `oc-vote/ballot`); BIP-322 signs the
+  SHA-256 hex of the canonical bytes rather than the multi-line text. OC Vote
+  also defines a small line-format domain separator `oc-vote/v0/commit` used
+  inside secret-mode ballot commitments.
+
+The text-line canonical format described on this page applies to Attest, Lock
+device binding, Stamp, Agent (all three envelopes), and Pledge (all three
+envelopes). Vote and Lock-envelope use canonical JSON; consult those specs
+directly for their exact byte layout.
 
 ## Versioning
 
@@ -102,11 +120,22 @@ breaks:
 
 ## Implementations
 
-- **TypeScript** — `buildCanonicalMessage()` in `@orangecheck/sdk/canonical`.
-- **Python** — `build_canonical_message()` in the `orangecheck` package.
+Each protocol's reference core ships its own canonical-message builder. They all
+follow the same shape rules described above; the per-protocol code is a thin
+shim that prepends the header literal and validates the per-protocol field set.
 
-Both ship with the same vendored conformance vectors and a CI job that fails if
-either drifts from `oc-protocol/conformance/vectors/`.
+| Protocol  | TypeScript core              | Python core (where shipped)  |
+| --------- | ---------------------------- | ---------------------------- |
+| OC Attest | `@orangecheck/sdk` (umbrella) + `@orangecheck/attest-core` | `orangecheck` (PyPI) |
+| OC Lock   | `@orangecheck/lock-core`     | —                            |
+| OC Stamp  | `@orangecheck/stamp-core`    | `orangecheck-stamp` (PyPI)   |
+| OC Vote   | `@orangecheck/vote-core`     | —                            |
+| OC Agent  | `@orangecheck/agent-core`    | —                            |
+| OC Pledge | `@orangecheck/pledge-core`   | —                            |
+
+Every core vendors its protocol's `test-vectors/*.json` from the matching
+`oc-*-protocol` repo and runs them on every CI push, so canonical-message
+drift between spec and impl is caught before publish.
 
 ## See also
 

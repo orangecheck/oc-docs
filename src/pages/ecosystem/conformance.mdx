@@ -27,14 +27,23 @@ produces the same bytes and the same hash as the spec.
 
 ## Vector set per protocol
 
-| Protocol  | Spec repo path                                                                                                | # vectors          | Location in impl                                      |
-| --------- | ------------------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------- |
-| OC Attest | [`oc-protocol/conformance/vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/conformance) | 23 (`tv01`–`tv23`) | `sdk/src/__tests__/vectors/`, `sdk-py/tests/vectors/` |
-| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)    | 5 (`v01`–`v05`)    | `vote-core/src/__tests__/vectors/`                    |
-| OC Lock   | `oc-lock-protocol/conformance/`                                                                               | —                  | `lock-core/src/__tests__/`                            |
-| OC Stamp  | `oc-stamp-protocol/conformance/`                                                                              | —                  | `stamp-core/src/__tests__/`                           |
-| OC Agent  | `oc-agent-protocol/conformance/`                                                                              | —                  | `agent-core/src/__tests__/`                           |
-| OC Pledge | `oc-pledge-protocol/conformance/`                                                                             | —                  | `pledge-core/src/__tests__/`                          |
+Every spec repo ships its vectors under `test-vectors/` (the family standard).
+OC Attest, the progenitor spec, additionally mirrors them under
+`conformance/vectors/` for backward compatibility — both directories contain
+the same files.
+
+| Protocol  | Spec repo path                                                                                                          | # vectors           |
+| --------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| OC Attest | [`oc-attest-protocol/test-vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/test-vectors)          | 23 (`tv01`–`tv23`)  |
+| OC Lock   | [`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)              | 4 (`v01`–`v04`)     |
+| OC Stamp  | [`oc-stamp-protocol/test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors)            | 5 (`v01`–`v05`)     |
+| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)              | 5 (`v01`–`v05`)     |
+| OC Agent  | [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors)            | 5 (`v01`–`v05`)     |
+| OC Pledge | [`oc-pledge-protocol/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)          | 28 (`v01`–`v28`)    |
+
+Each protocol's reference core (`@orangecheck/<verb>-core`) vendors the
+matching `test-vectors/` directory verbatim and runs every vector on each CI
+push.
 
 ## Vector categories (OC Attest example)
 
@@ -74,22 +83,24 @@ fails and the SDK must re-vendor.
 
 ## Adding a vector
 
-For a new OC Attest category:
+For any sibling protocol, the flow is the same:
 
-1. Write the vector JSON in `oc-protocol/conformance/vectors/tvXX.json`
-   following the existing shape. The script at
-   `oc-protocol/conformance/generate.mjs` helps if the vector is derivable from
-   a reference calculation.
-2. Regenerate `oc-protocol/conformance/index.json` (the file listing).
-3. Update `oc-packages/sdk/src/__tests__/vectors/` and
-   `oc-packages/sdk-py/tests/vectors/` to vendor the new file.
-4. Both impls must pass the new vector before merging.
+1. Write the vector JSON in `oc-<verb>-protocol/test-vectors/<id>.json`
+   following the existing shape for that spec. OC Attest additionally has a
+   `generate.mjs` helper for vectors that are derivable from a reference
+   calculation.
+2. Update the spec's `test-vectors/index.json` (or `README.md` listing) so
+   tooling can discover the new file.
+3. Re-vendor the directory into the matching reference core (`oc-packages/
+   <verb>-core/src/__tests__/vectors/`) and run the test suite locally.
+4. The new vector must pass before the spec PR merges; the core PR re-vendoring
+   the spec's `test-vectors/` is paired with the spec PR.
 
-Specs that add a new MUST-reject case should include a vector in the `reject`
-category so the behavior is pinned.
+Specs that add a new MUST-reject case should include a vector in the
+spec's reject category so the behavior is pinned.
 
 ## See also
 
 - [Canonical message](/ecosystem/canonical-message) — what the bytes look like
-- [`@orangecheck/sdk`](/sdks/javascript) — TypeScript implementation
-- [`orangecheck` (Python)](/sdks/python) — Python implementation
+- [SDKs at a glance](/sdks) — the per-protocol cores that vendor and run these
+  vectors

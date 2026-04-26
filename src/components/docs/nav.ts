@@ -73,8 +73,8 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/ecosystem/nostr-kind-30078',
-                label: 'Nostr kind-30078',
-                blurb: 'How every protocol uses the NIP-78 addressable event kind.',
+                label: 'Nostr publication',
+                blurb: 'Kind registry (30078, 30080–30085) + d-tag conventions for all six protocols.',
             },
             {
                 href: '/ecosystem/conformance',

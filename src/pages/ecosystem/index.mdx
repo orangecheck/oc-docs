@@ -6,7 +6,7 @@ export const metadata = {
 
 # Ecosystem — shared concepts
 
-Every sibling protocol in the OrangeCheck family (Attest, Lock, Vote, Stamp,
+Every sibling protocol in the OrangeCheck family (Attest, Lock, Stamp, Vote,
 Agent, Pledge) inherits the same plumbing. Learning it once saves re-learning it
 six times. This section is the shared layer.
 
@@ -21,11 +21,12 @@ six times. This section is the shared layer.
   message via BIP-322. Why not legacy `signmessage`. What wallets support it.
   The one-line answer to "which signing scheme do I use?" is always "BIP-322,
   unless you're on a pre-SegWit P2PKH address."
-- **[Nostr kind-30078](/ecosystem/nostr-kind-30078)** — NIP-78
+- **[Nostr publication](/ecosystem/nostr-kind-30078)** — NIP-78
   parameterized-replaceable addressable events are how every sibling publishes
-  its artifacts (attestations, device records, stamps, ballots, agent
-  delegations, pledges + outcomes). The `d` tag convention is per-protocol; the
-  event shape is shared.
+  its artifacts. The original kind `30078` carries Attest, Lock device records,
+  and Pledge envelopes; Vote/Stamp/Agent claim 30080–30085 in the family's
+  reserved range. Authoritative kind registry + d-tag conventions for all six
+  protocols.
 - **[Conformance vectors](/ecosystem/conformance)** — every sibling ships
   normative test vectors in its `oc-*-protocol` repo. Reference impls are
   required to pass them on every CI run. This is how we catch implementation

@@ -20,17 +20,18 @@ authoritative roll-up.
 
 ## Kind registry
 
-| Kind    | Owner     | Purpose                                                                                                        |
-| ------- | --------- | -------------------------------------------------------------------------------------------------------------- |
-| `30078` | OC Attest | Attestation envelope (the original family event kind)                                                          |
-| `30078` | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                                |
-| `30078` | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                             |
-| `30080` | OC Vote   | Poll                                                                                                           |
-| `30081` | OC Vote   | Ballot                                                                                                         |
-| `30082` | OC Vote   | Reveal (secret-mode tally)                                                                                     |
-| `30083` | OC Agent  | Agent delegation                                                                                               |
-| `30084` | OC Stamp  | Stamp envelope (also: OC Agent **action** envelopes share this transport, disambiguated by inner `kind` field) |
-| `30085` | OC Agent  | Agent revocation                                                                                               |
+| Kind    | Owner     | Purpose                                                                                           |
+| ------- | --------- | ------------------------------------------------------------------------------------------------- |
+| `30078` | OC Attest | Attestation envelope (the original family event kind)                                             |
+| `30078` | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                   |
+| `30078` | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                |
+| `30080` | OC Vote   | Poll                                                                                              |
+| `30081` | OC Vote   | Ballot                                                                                            |
+| `30082` | OC Vote   | Reveal (secret-mode tally)                                                                        |
+| `30083` | OC Stamp  | Stamp envelope                                                                                    |
+| `30083` | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)             |
+| `30084` | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind) |
+| `30085` | OC Agent  | Agent revocation                                                                                  |
 
 If you're allocating a new kind for a new sibling, claim the next unused number
 (currently `30086`) and update the registry in `oc-agent-protocol/SPEC.md`.
@@ -68,10 +69,10 @@ don't collide on overlapping kinds.
 | OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                                                  |
 | OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                                        |
 | OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                                                |
-| OC Agent  | `30083` | `oc-agent:delegation:<delegation_id>`                                     |
-| OC Stamp  | `30084` | `oc-stamp:<envelope_id>`                                                  |
-| OC Agent  | `30084` | `oc-agent:action:<action_id>` (action envelopes ride OC Stamp's kind)     |
-| OC Agent  | `30085` | `oc-agent:revocation:<revocation_id>`                                     |
+| OC Stamp  | `30083` | `oc-stamp:<envelope_id>`                                                  |
+| OC Agent  | `30083` | `oc-agent-del:<delegation_id>` (co-claim with OC Stamp; disjoint prefix)  |
+| OC Agent  | `30084` | `oc-agent-act:<action_id>`                                                |
+| OC Agent  | `30085` | `oc-agent-rev:<revocation_id>`                                            |
 
 The relay doesn't enforce any of this — `d` is just a string. The convention
 matters so that discovery queries (`#d: oc-stamp:*`, `#d: oc-vote:poll:*`) can
@@ -147,10 +148,36 @@ relay.subscribe([{ kinds: [30080], '#d': ['oc-vote:poll:<poll_id>'] }], {
     /*…*/
 });
 
-// Find every OC Stamp by a specific signer
-relay.subscribe([{ kinds: [30084], '#address': ['bc1qsigner…'] }], {
-    /*…*/
-});
+// Find every OC Stamp by a specific signer (kind 30083, prefix-filtered to
+// avoid catching co-claimed OC Agent delegations on the same kind)
+relay.subscribe(
+    [
+        {
+            kinds: [30083],
+            '#d': ['oc-stamp:'],
+            '#address': ['bc1qsigner…'],
+        },
+    ],
+    {
+        /*…*/
+    }
+);
+
+// Find every OC Agent delegation issued to a given agent
+relay.subscribe(
+    [{ kinds: [30083], '#d': ['oc-agent-del:'], '#agent': ['bc1qagent…'] }],
+    {
+        /*…*/
+    }
+);
+
+// Find every revocation of a specific delegation
+relay.subscribe(
+    [{ kinds: [30085], '#delegation': ['<64-hex delegation id>'] }],
+    {
+        /*…*/
+    }
+);
 ```
 
 Each protocol's reference core wraps these queries with typed helpers

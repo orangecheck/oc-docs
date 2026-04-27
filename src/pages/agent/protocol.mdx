@@ -15,11 +15,11 @@ rest of the OrangeCheck stack. For the normative rules see the
 OC Agent defines three envelope kinds. All three share the canonical-message /
 BIP-322 / Nostr publication discipline of the rest of the OrangeCheck stack.
 
-| Envelope         | `kind`             | Nostr kind                     | Purpose                                      |
-| ---------------- | ------------------ | ------------------------------ | -------------------------------------------- |
-| **Delegation**   | `agent-delegation` | 30083                          | Principal grants the agent scoped authority. |
-| **Agent-action** | `agent-action`     | 30084 _(shared with OC Stamp)_ | Agent exercises the delegation.              |
-| **Revocation**   | `agent-revocation` | 30085                          | Principal (or agent) burns the delegation.   |
+| Envelope         | `kind`             | Nostr kind                                                    | `d`-tag prefix  | Purpose                                      |
+| ---------------- | ------------------ | ------------------------------------------------------------- | --------------- | -------------------------------------------- |
+| **Delegation**   | `agent-delegation` | 30083 _(co-claimed with OC Stamp; disjoint `d`-tag prefixes)_ | `oc-agent-del:` | Principal grants the agent scoped authority. |
+| **Agent-action** | `agent-action`     | 30084 _(claimed exclusively; reuses OC Stamp envelope shape)_ | `oc-agent-act:` | Agent exercises the delegation.              |
+| **Revocation**   | `agent-revocation` | 30085 _(claimed exclusively)_                                 | `oc-agent-rev:` | Principal (or agent) burns the delegation.   |
 
 Each envelope is independently verifiable:
 

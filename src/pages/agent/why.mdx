@@ -149,13 +149,18 @@ The OrangeCheck family has reserved 30078–30099. Existing:
 
 - 30078 — OrangeCheck / OC Lock device record
 - 30080–30082 — OC Vote poll / ballot / tally
-- 30083 — **OC Agent delegation**
-- 30084 — OC Stamp envelope _(shared transport for agent-actions, disambiguated
-  by envelope `kind`)_
-- 30085 — **OC Agent revocation**
+- 30083 — **OC Agent delegation** (`oc-agent-del:`) **and** OC Stamp envelope
+  (`oc-stamp:`); co-claimed under disjoint `d`-tag prefixes plus distinct
+  envelope `kind` field
+- 30084 — **OC Agent action** (`oc-agent-act:`); reuses OC Stamp v1 envelope
+  shape (canonical message + BIP-322 sig + OTS anchor field) but on a distinct
+  Nostr kind from stamps
+- 30085 — **OC Agent revocation** (`oc-agent-rev:`)
 
-Using 30084 for agent-action transport is a consequence of "agent-action is a
-stamp."
+"Agent-action is a stamp" means the _envelope structure_ (canonical message,
+signature, anchor field) is reused — not the Nostr kind. 30083 already carries
+two d-tag namespaces (delegations + stamps); putting agent-actions there too
+would overload the verifier query path, so they got 30084 to themselves.
 
 ## Why "every AI agent should have a Bitcoin address"
 

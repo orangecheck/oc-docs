@@ -5,7 +5,9 @@ import { readJwtSession } from '@/lib/auth/session';
 /**
  * Crypto-only identity lookup. No DB — we trust the Ed25519 signature and
  * the `exp` claim on the cross-subdomain oc_session cookie minted by the
- * auth host at ochk.io.
+ * auth host at ochk.io. Surfaces optional `display_name` + `nostr_npub`
+ * straight from the JWT claims so the header chip can render the user's
+ * chosen name without a profile fetch.
  *
  * `Cache-Control: no-store` + `Vary: Cookie` are non-negotiable: without
  * them a cached 401 (anonymous) can be served to an authenticated caller,
@@ -32,6 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         account: {
             id: session.sub,
             btc_address: session.addr,
+            display_name: session.name ?? null,
+            nostr_npub: session.npub ?? null,
         },
     });
 }

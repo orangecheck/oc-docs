@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+
+/* Scan @orangecheck/ui (EcosystemSwitcher etc.) so utilities like h-4/w-4 used
+   inside the published package emit even when no local file uses them. */
+@source '../../node_modules/@orangecheck/ui';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));

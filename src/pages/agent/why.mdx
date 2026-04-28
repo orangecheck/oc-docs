@@ -156,6 +156,8 @@ The OrangeCheck family has reserved 30078–30099. Existing:
   shape (canonical message + BIP-322 sig + OTS anchor field) but on a distinct
   Nostr kind from stamps
 - 30085 — **OC Agent revocation** (`oc-agent-rev:`)
+- 30086 — **OC Agent sub-delegation** _(v1.1)_ (`oc-agent-sub:`); chained
+  authority — see [sub-delegation](/agent/sub-delegation)
 
 "Agent-action is a stamp" means the _envelope structure_ (canonical message,
 signature, anchor field) is reused — not the Nostr kind. 30083 already carries

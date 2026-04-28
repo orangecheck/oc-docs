@@ -32,6 +32,7 @@ authoritative roll-up.
 | `30083` | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)             |
 | `30084` | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind) |
 | `30085` | OC Agent  | Agent revocation                                                                                  |
+| `30086` | OC Agent  | Agent sub-delegation _(v1.1)_ — chained narrowing of authority                                    |
 
 If you're allocating a new kind for a new sibling, claim the next unused number
 (currently `30086`) and update the registry in `oc-agent-protocol/SPEC.md`.
@@ -73,6 +74,7 @@ don't collide on overlapping kinds.
 | OC Agent  | `30083` | `oc-agent-del:<delegation_id>` (co-claim with OC Stamp; disjoint prefix)  |
 | OC Agent  | `30084` | `oc-agent-act:<action_id>`                                                |
 | OC Agent  | `30085` | `oc-agent-rev:<revocation_id>`                                            |
+| OC Agent  | `30086` | `oc-agent-sub:<subdelegation_id>` _(v1.1)_                                |
 
 The relay doesn't enforce any of this — `d` is just a string. The convention
 matters so that discovery queries (`#d: oc-stamp:*`, `#d: oc-vote:poll:*`) can

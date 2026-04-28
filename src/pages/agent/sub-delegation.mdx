@@ -1,0 +1,166 @@
+export const metadata = {
+    title: 'Sub-delegation (v1.1)',
+    description:
+        'Chained authority — an agent grants a NARROWER slice of its delegated authority to another agent. Verifiers walk the chain back to a root v1.0 delegation and enforce strict scope/temporal containment at every link.',
+};
+
+# Sub-delegation (v1.1)
+
+OC Agent v1.1 adds **sub-delegation** as an additive extension to the v1.0 spec.
+An agent holding a delegation can issue a _narrower_ delegation to a sub-agent,
+who in turn signs actions citing the leaf subdelegation. Verifiers walk the
+chain back to a root v1.0 delegation and enforce strict containment at every
+link.
+
+> **Normative spec:**
+> [`SUB-DELEGATION.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/SUB-DELEGATION.md).
+> This page is a friendly summary; consult the spec for the bit-level details.
+
+## Why
+
+Real organizations issue authority hierarchically. A treasurer grants the
+finance bot Lightning-spending rights; the finance bot delegates to a
+vendor-specific bot for one supplier. Without sub-delegation, you'd have to
+re-issue every leaf grant directly from the root principal — defeating the point
+of having a finance bot at all.
+
+Sub-delegation lets you build agent topologies that mirror real-world authority
+chains while keeping every action transitively bound to the root principal's
+Bitcoin identity.
+
+## The shape
+
+```
+Root principal (bc1qceo…)
+    │
+    │  delegates `ln:send(max_sats<=10000)`, 90 days
+    ▼
+Finance bot (bc1qfin…)                          ← v1.0 delegation
+    │
+    │  sub-delegates `ln:send(max_sats<=1000, node=03abc…)`, 7 days
+    ▼
+Vendor bot (bc1qvendor…)                        ← v1.1 sub-delegation
+    │
+    │  signs an action exercising `ln:send(max_sats=850, node=03abc…)`
+    ▼
+agent-action envelope                           ← cites the LEAF subdelegation
+```
+
+A verifier given the action walks the chain `[root delegation, sub-delegation]`
+and enforces:
+
+| At each link | Check                                                                             |
+| ------------ | --------------------------------------------------------------------------------- |
+| Linkage      | `child.parent_id == parent.id` AND `child.principal == parent.agent`              |
+| Scope        | every scope in `child.scopes` is a sub-scope of _some_ scope in `parent.scopes`   |
+| Time         | `child.issued_at >= parent.issued_at` AND `child.expires_at <= parent.expires_at` |
+| Authenticity | `child` carries a valid BIP-322 signature by `child.principal.address`            |
+| Revocation   | no published revocation against this link predates the action                     |
+
+If any check fails at any link, the action fails verification. The leaf-level
+checks (action's signer, window, scope) are run against the leaf subdelegation,
+not the root.
+
+## Strictly narrowing
+
+Sub-delegations CAN'T expand authority. The spec rules this out structurally:
+
+- **Scope.** A child scope's constraints must transitively contain the action's
+  scope, AND must be a sub-scope of some parent scope. So
+  `lock:seal(recipient=bc1qalice)` (parent) → `lock:seal(recipient=bc1qmallory)`
+  (child) is rejected with `E_SUBDELEGATION_SCOPE_ESCALATED` — same key, same
+  op, different value.
+- **Time.** A child's window must be inside the parent's. `expires_at` past the
+  parent's → `E_SUBDELEGATION_EXPIRES_EXTENDED`.
+- **Identity.** A child's `principal.address` must equal the parent's
+  `agent.address`. Anyone else trying to sub-delegate from a parent they don't
+  control → `E_SUBDELEGATION_PRINCIPAL_MISMATCH`.
+
+There's no way for a compromised sub-principal to grant more than they hold.
+
+## Bond stays at the root
+
+Sub-delegations carry no bond field. The root delegation's bond backstops the
+entire chain. The principal's reputational stake is committed once, on the
+grant, and the verifier re-resolves it at action evaluation time — exactly like
+v1.0.
+
+If you need a sub-agent to stake their own sats independently, that's a
+different verb (and a deferred v2 question).
+
+## Revocation cascades
+
+Revoking ANY link in the chain invalidates that link AND every descendant. The
+verifier implements this naturally — it queries Nostr kind-30085 for revocations
+targeting every link in the chain, and any revocation predating the action's
+effective time fires `E_REVOKED`.
+
+If the root principal wants to nuke an entire sub-tree, they revoke the root
+delegation. If a sub-principal wants to disown one branch they created, they
+revoke just that subdelegation.
+
+## Depth limit
+
+Verifiers cap chain depth (default **5**). Chains beyond that fail fast with
+`E_SUBDELEGATION_DEPTH_EXCEEDED`. Keeps the verifier's worst-case work bounded
+and makes "publish a million subdelegations to slow the verifier" non-attack.
+
+## Wire format
+
+A sub-delegation is the same JSON shape as a v1.0 delegation, with one extra
+field (`parent_id`) and no `bond` field. The canonical message domain separator
+is `oc-agent:subdelegation:v1` (so signatures can't be replayed against v1.0
+delegations).
+
+```json
+{
+    "v": 1,
+    "kind": "agent-subdelegation",
+    "id": "<64-hex>",
+    "parent_id": "<64-hex>",
+    "principal": { "address": "<= parent.agent.address>", "alg": "bip322" },
+    "agent": { "address": "<sub-agent>", "alg": "bip322" },
+    "scopes": ["<each must be a sub-scope of some parent scope>"],
+    "issued_at": "<>= parent.issued_at>",
+    "expires_at": "<<= parent.expires_at>",
+    "nonce": "<32-hex>",
+    "revocation": { "holders": ["principal"], "ref": null },
+    "sig": {
+        "alg": "bip322",
+        "pubkey": "<principal.address>",
+        "value": "<base64>"
+    }
+}
+```
+
+Published to Nostr **kind 30086** with `d`-tag prefix `oc-agent-sub:`. Tags
+include `parent` (immediate parent's id), `root` (ultimate root delegation id),
+`principal`, `agent`, `expires`, and one `scope` per granted scope.
+
+## Backwards compatibility
+
+A v1.0 verifier:
+
+- Doesn't subscribe to kind 30086 → ignores subdelegations entirely.
+- Sees an action whose `delegation_id` resolves only to a kind-30086 event →
+  looks it up at kind 30083, finds nothing, fails `E_DELEGATION_MISMATCH`.
+  Correct fail-closed behavior.
+
+A v1.1 verifier handling a v1.0 envelope (no chain): runs the same algorithm
+with chain length 1 (just the root). Identical verdict to v1.0. **None of the
+existing test vectors v01–v09 change verdict under v1.1.**
+
+## Where to dig deeper
+
+- [SUB-DELEGATION.md](https://github.com/orangecheck/oc-agent-protocol/blob/main/SUB-DELEGATION.md)
+  — normative spec.
+- [SPEC.md](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md)
+  — base v1.0 spec.
+- [`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core)
+  — reference TypeScript impl. `verifyAction({ subdelegationChain: [...] })` is
+  the chain-walking entry point; `verifySubdelegation` is the standalone helper
+  for inspection.
+- Test vectors `v10`–`v14` in
+  [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors).
+- [Errors](/agent/spec) — the four new v1.1 codes (`E_SUBDELEGATION_*`) live
+  alongside the existing v1.0 codes.

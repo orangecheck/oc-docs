@@ -60,8 +60,10 @@ And optionally, with an Attest reference:
   delegation, what the alternatives can't do.
 - [**Quickstart**](/agent/quickstart) — mint a delegation, sign an action,
   verify it downstream. Five minutes.
-- [**Protocol walkthrough**](/agent/protocol) — the three envelopes (delegation,
-  action, revocation), the two canonical flows, diagrams.
+- [**Protocol walkthrough**](/agent/protocol) — the envelopes (delegation,
+  action, revocation, sub-delegation), the canonical flows, diagrams.
+- [**Sub-delegation (v1.1)**](/agent/sub-delegation) — chained authority. An
+  agent grants a _narrower_ slice of its delegated rights to another agent.
 - [**Scope grammar**](/agent/scopes) — BNF, sub-scope containment, constraint
   semantics, the 8 MVP scopes.
 - [**Security posture**](/agent/security) — revocation timing, blast radius,
@@ -93,7 +95,8 @@ Agent inherits the same plumbing every OrangeCheck protocol uses:
   kind-30083 (co-claimed with OC Stamp under disjoint `d`-tag prefixes
   `oc-agent-del:` vs `oc-stamp:`), agent-actions on kind-30084 (claimed
   exclusively by OC Agent — they reuse OC Stamp's envelope **structure** but on
-  a distinct Nostr kind), revocations on kind-30085.
+  a distinct Nostr kind), revocations on kind-30085, sub-delegations _(v1.1)_ on
+  kind-30086.
 - [Conformance vectors](/ecosystem/conformance) — the cross-impl test suite.
 - [Security model](/ecosystem/security) — shared threat framework.
 

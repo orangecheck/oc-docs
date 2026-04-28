@@ -14,11 +14,12 @@ notation, test vectors, and compliance checklist.
 
 ## Envelope family
 
-| Envelope     | `kind`             | Nostr kind                                               | `d`-tag prefix  | File ext      |
-| ------------ | ------------------ | -------------------------------------------------------- | --------------- | ------------- |
-| Delegation   | `agent-delegation` | 30083 _(co-claimed with OC Stamp via disjoint `d`-tags)_ | `oc-agent-del:` | `.delegation` |
-| Agent-action | `agent-action`     | 30084 _(claimed exclusively; reuses OC Stamp env shape)_ | `oc-agent-act:` | `.action`     |
-| Revocation   | `agent-revocation` | 30085 _(claimed exclusively)_                            | `oc-agent-rev:` | `.revocation` |
+| Envelope                | `kind`                | Nostr kind                                               | `d`-tag prefix  | File ext         |
+| ----------------------- | --------------------- | -------------------------------------------------------- | --------------- | ---------------- |
+| Delegation              | `agent-delegation`    | 30083 _(co-claimed with OC Stamp via disjoint `d`-tags)_ | `oc-agent-del:` | `.delegation`    |
+| Agent-action            | `agent-action`        | 30084 _(claimed exclusively; reuses OC Stamp env shape)_ | `oc-agent-act:` | `.action`        |
+| Revocation              | `agent-revocation`    | 30085 _(claimed exclusively)_                            | `oc-agent-rev:` | `.revocation`    |
+| Sub-delegation _(v1.1)_ | `agent-subdelegation` | 30086 _(claimed exclusively)_                            | `oc-agent-sub:` | `.subdelegation` |
 
 ## Delegation canonical message (§SPEC 4.1)
 
@@ -120,6 +121,11 @@ optional bond check:
 `E_DELEGATION_MISMATCH` · `E_AGENT_MISMATCH` · `E_OUT_OF_WINDOW` ·
 `E_SCOPE_DENIED` · `E_BAD_ACTION_STAMP` · `E_NO_BOND` · `E_BOND_UNMET` ·
 `E_BOND_UNVERIFIED` · `E_REVOKER_UNAUTHORIZED` · `E_CALENDAR_UNREACHABLE`
+
+**v1.1 (sub-delegation):** `E_SUBDELEGATION_DEPTH_EXCEEDED` ·
+`E_SUBDELEGATION_PRINCIPAL_MISMATCH` · `E_SUBDELEGATION_EXPIRES_EXTENDED` ·
+`E_SUBDELEGATION_SCOPE_ESCALATED`. See [sub-delegation](/agent/sub-delegation)
+for the chain-walking algorithm.
 
 ## Canonicalization (§SPEC 6)
 

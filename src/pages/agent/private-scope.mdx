@@ -1,0 +1,179 @@
+export const metadata = {
+    title: 'Private scope (v1.2)',
+    description:
+        'Confidential mode for the delegation scope list. The principal seals the canonical scope set with OC Lock to the agent + named verifiers; public Nostr observers see ciphertext, not scopes. Verification is unchanged for everyone with a recipient device key.',
+};
+
+# Private scope (v1.2)
+
+OC Agent v1.0 / v1.1 publishes the `scopes` field as plaintext on Nostr
+kind 30083. That's the right default — public verifiability is load-bearing for
+the family. It's also the wrong default for a real procurement bot whose
+Lightning caps shouldn't be in competitors' RSS feeds, or a personal-assistant
+agent whose owner doesn't want their daily activity inferable.
+
+**v1.2 adds an optional confidential mode.** The principal seals the canonical
+scope list with OC Lock to one or more recipient device keys (the agent, plus
+any verifiers they explicitly authorize). Public Nostr observers see the
+encrypted blob, not the scope set. Recipients decrypt with their device's X25519
+key and verify normally. Public-mode envelopes are unchanged from v1.0.
+
+> **Normative spec:**
+> [`PRIVATE-SCOPE.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/PRIVATE-SCOPE.md).
+> This page is a friendly summary; consult the spec for the bit-level details.
+
+## When to use it
+
+- The scope itself is sensitive (spending caps, target Lightning nodes, MCP
+  server URLs, vendor identities, regulated workflow surfaces).
+- The recipient set is small and known at issuance time (the agent, an auditor,
+  the principal themselves for audit). Wide public discovery isn't required.
+- Public-by-default is the wrong tradeoff for the deployment.
+
+When in doubt, stay public — fully-public verifiability is what makes "anyone
+can audit any agent" the family's pitch. Only opt into private when the leak
+cost outweighs the audit benefit.
+
+## How it composes
+
+OC Lock is the family's confidentiality verb. v1.2 just consumes its primitives
+— no new crypto.
+
+```
+[ scope list (plaintext JSON array) ]
+            │
+            ▼
+   OC Lock seal()
+   (X25519 KEM + AES-GCM AEAD + HKDF-SHA256)
+            │
+            ▼
+[ LockEnvelope { ciphertext, recipients[].wrapped_key, sig, ... } ]
+            │
+            ▼
+[ OC Agent delegation envelope ]
+   { v: 1, kind: agent-delegation,
+     scopes_encrypted: <LockEnvelope>,
+     ...,
+     sig: BIP-322 by principal }
+```
+
+The principal signs **two** BIP-322 signatures: one over the OC Lock envelope id
+(commits to ciphertext + recipients), one over the OC Agent canonical message
+(commits to plaintext scopes). The two together bind: "the principal authorized
+exactly these scopes AND exactly these recipients to decrypt them."
+
+## What changes for the verifier
+
+Three new pre-verification steps before the standard SPEC §8.1 algorithm:
+
+1. **Mutual exclusion** — exactly one of `scopes` / `scopes_encrypted` must be
+   present. Else `E_SCOPES_BOTH_PROVIDED` / `E_SCOPES_NEITHER_PROVIDED`.
+2. **Decryption capability** — if the verifier holds a device key matching one
+   of the OC Lock envelope's recipients, decrypt. Else `E_SCOPES_UNREADABLE`.
+3. **Hydrate then verify** — replace `scopes_encrypted` with the recovered
+   plaintext list, then run SPEC §8.1 unchanged.
+
+A verifier without a recipient key fails closed. That's the point: privacy means
+privacy from the verifier too. If you want public auditability, don't use
+private mode.
+
+## Sub-delegation interaction
+
+v1.1 sub-delegation chains can mix modes per link. A public root may have a
+private sub-delegation, or vice versa. The chain walker decrypts each private
+link with the verifier's key, then enforces transitive narrowing on the
+recovered plaintext. A verifier missing the key for any single link fails the
+whole chain — without that link's scope, transitive containment isn't checkable.
+
+## Wire format at a glance
+
+```json
+{
+    "v": 1,
+    "kind": "agent-delegation",
+    "id": "<64-hex>",
+    "principal": { "address": "bc1q…", "alg": "bip322" },
+    "agent": { "address": "bc1q…", "alg": "bip322" },
+    "scopes_encrypted": {
+        // ────── OC Lock v2 envelope (kind: "identity") ──────
+        "v": 2,
+        "kind": "identity",
+        "id": "<64-hex>",
+        "alg": { "kem": "x25519", "aead": "aes-256-gcm", "kdf": "hkdf-sha256" },
+        "from": { "address": "<= delegation.principal.address>" },
+        "recipients": [
+            {
+                "address": "<recipient btc>",
+                "device_id": "agent-prod",
+                "device_pk": "<32-byte hex X25519>",
+                "eph_pk": "<32-byte hex>",
+                "wrapped_key": "<base64url>",
+                "nonce_kek": "<12-byte hex>"
+            }
+        ],
+        "ciphertext": "<base64url>",
+        "nonce_ct": "<12-byte hex>",
+        "created_at": "<ISO 8601>",
+        "expires_at": null,
+        "payment": null,
+        "sig": { "alg": "bip322", "pubkey": "<principal>", "value": "<base64>" }
+    },
+    "bond": null,
+    "issued_at": "<ISO 8601>",
+    "expires_at": "<ISO 8601>",
+    "nonce": "<32-hex>",
+    "revocation": { "holders": ["principal"], "ref": null },
+    "sig": { "alg": "bip322", "pubkey": "<principal>", "value": "<base64>" }
+}
+```
+
+The plaintext sealed inside `scopes_encrypted.ciphertext` is a canonical JSON
+array of scope strings (sorted, constraints sorted by key) UTF-8 encoded.
+Identical canonicalization to v1.0's scope-list serialization.
+
+## What it does NOT hide
+
+- **Principal address** — already public via the OC Agent envelope's
+  `principal.address` field.
+- **Agent address** — already public via `agent.address`.
+- **Recipient identities** — the OC Lock envelope's `recipients[]` lists each
+  recipient's address and `device_id`. Acknowledged in PRIVATE-SCOPE.md §6 as
+  **T18** (recipient-identity leakage). For most use cases this is fine; for
+  deployments where recipient identity is itself sensitive, layer additional
+  encryption or use private channels.
+- **Issuance timing, expiry, bond, nonce** — all visible in cleartext.
+- **The fact that a delegation exists** — observers see kind-30083 events even
+  when scopes are encrypted.
+
+If you need transactional-level privacy (hiding even who delegated to whom),
+you're past v1.2's threat model. Compose with private Nostr relays or
+out-of-band distribution.
+
+## Backwards compatibility
+
+- A v1.0 / v1.1 verifier sees `scopes` is missing on a v1.2 private envelope and
+  fails `E_MALFORMED`. **Correct fail-closed behavior** — verifiers that don't
+  understand encryption MUST NOT accept the delegation.
+- A v1.2 verifier handling a v1.0 / v1.1 public envelope skips PRE-VERIFICATION
+  entirely and runs the standard algorithm with byte-identical results.
+- **No existing test vector v01–v14 changes verdict under v1.2.**
+
+## Where to dig deeper
+
+- [PRIVATE-SCOPE.md](https://github.com/orangecheck/oc-agent-protocol/blob/main/PRIVATE-SCOPE.md)
+  — normative spec.
+- [SPEC.md](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md)
+  — base v1.0.
+- [`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core)
+  — reference TypeScript impl.
+  `verifyDelegation({ envelope, decryptScopesWith })` is the verifier entry
+  point. `sealScopes` / `unsealScopes` are the seal-side helpers.
+- [`@orangecheck/agent-signer`](https://github.com/orangecheck/oc-packages/tree/main/agent-signer)
+  — `createDelegation({ ..., privateScopes: { recipients } })` mints
+  private-mode envelopes.
+- [OC Lock SPEC](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md)
+  — the encryption layer's normative wire format.
+- Test vectors `v15`–`v17` in
+  [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors).
+- [Errors](/agent/spec) — the four v1.2 codes (`E_SCOPES_*`,
+  `E_BAD_LOCK_ENVELOPE`) live alongside the v1.0/v1.1 codes.

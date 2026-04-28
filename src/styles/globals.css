@@ -146,6 +146,12 @@
     .docs-prose > * + * {
         margin-top: 1rem;
     }
+    /* Anchor links from the right-hand TOC scroll the heading to y=0 by
+       default, which lands it underneath the 48px sticky header. Push
+       the landing position down so the heading is visible. */
+    .docs-prose :is(h1, h2, h3, h4) {
+        scroll-margin-top: 5rem;
+    }
     .docs-prose h1 {
         font-family: var(--font-mono-display), ui-monospace, monospace;
         font-size: 2rem;

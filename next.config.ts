@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 import createMDX from '@next/mdx';
+import rehypeSlug from 'rehype-slug';
 
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -48,7 +49,10 @@ const nextConfig: NextConfig = {
 const withMDX = createMDX({
     options: {
         remarkPlugins: [['remark-gfm']],
-        rehypePlugins: [],
+        // rehype-slug bakes `id="…"` onto every heading at build time so
+        // anchor links (DocsToc + direct deep links like /foo#bar) work
+        // immediately, with no client-side race against collectHeadings().
+        rehypePlugins: [rehypeSlug],
     },
 });
 

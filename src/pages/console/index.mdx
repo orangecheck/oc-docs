@@ -6,12 +6,13 @@ export const metadata = {
 
 # OC Console
 
-**Managed infrastructure for the OC Agent family.** [console.ochk.io](https://console.ochk.io)
-is where customers register their BIP-322-signed delegations, ingest stamped
-agent-action envelopes from their LLM tool calls, anchor every receipt to
-Bitcoin via the OC Stamp pipeline, fan out signed deliveries to subscribed
-webhook endpoints, and export verifiable audit bundles for compliance — without
-running their own Postgres, Nostr publisher, or OTS calendar relay.
+**Managed infrastructure for the OC Agent family.**
+[console.ochk.io](https://console.ochk.io) is where customers register their
+BIP-322-signed delegations, ingest stamped agent-action envelopes from their LLM
+tool calls, anchor every receipt to Bitcoin via the OC Stamp pipeline, fan out
+signed deliveries to subscribed webhook endpoints, and export verifiable audit
+bundles for compliance — without running their own Postgres, Nostr publisher, or
+OTS calendar relay.
 
 The protocol surface is the same OC Agent + OC Stamp + OC Pledge primitives
 documented elsewhere in these docs. Console is a commercial layer on top: same
@@ -20,23 +21,29 @@ SaaS so a typical customer ships in an afternoon instead of a quarter.
 
 ## What console is, and what it isn't
 
-| | |
-|---|---|
-| **Is** | A turnkey **operator dashboard** for OC Agent envelopes. Sign in with your Bitcoin address, register delegations, watch action receipts stream in, audit-export at any time. |
-| **Is** | A **managed publisher**. We sign Nostr events for you (kind 30083 / 30084 / 30085 / 30086), submit OTS commitments to the calendar set, and re-publish on relay flake. |
-| **Is** | A **webhook delivery layer**. Subscribe an HTTPS endpoint; we POST HMAC-signed events on every accepted envelope, retry with exponential backoff, surface delivery health. |
-| **Is** | A **billing surface**. Lightning rail (BTCPay) is primary; Stripe is the USD parity rail. No token, no custody. |
-| **Isn't** | A *new protocol*. Every envelope console persists is identical to one a customer could publish themselves directly via `@orangecheck/agent-cli`. |
-| **Isn't** | A *signer*. Console never holds principal keys. Every delegation is BIP-322-signed in the customer's wallet (UniSat, Xverse, Leather, OKX, Phantom, or paste-in). |
-| **Isn't** | A *trust anchor*. Verifiers don't trust console — they trust the signatures on the envelopes console publishes. Drop the bundle into [@orangecheck/agent-core](/sdks/javascript) and verify offline. |
+|           |                                                                                                                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Is**    | A turnkey **operator dashboard** for OC Agent envelopes. Sign in with your Bitcoin address, register delegations, watch action receipts stream in, audit-export at any time.                         |
+| **Is**    | A **managed publisher**. We sign Nostr events for you (kind 30083 / 30084 / 30085 / 30086), submit OTS commitments to the calendar set, and re-publish on relay flake.                               |
+| **Is**    | A **webhook delivery layer**. Subscribe an HTTPS endpoint; we POST HMAC-signed events on every accepted envelope, retry with exponential backoff, surface delivery health.                           |
+| **Is**    | A **billing surface**. Lightning rail (BTCPay) is primary; Stripe is the USD parity rail. No token, no custody.                                                                                      |
+| **Isn't** | A _new protocol_. Every envelope console persists is identical to one a customer could publish themselves directly via `@orangecheck/agent-cli`.                                                     |
+| **Isn't** | A _signer_. Console never holds principal keys. Every delegation is BIP-322-signed in the customer's wallet (UniSat, Xverse, Leather, OKX, Phantom, or paste-in).                                    |
+| **Isn't** | A _trust anchor_. Verifiers don't trust console — they trust the signatures on the envelopes console publishes. Drop the bundle into [@orangecheck/agent-core](/sdks/javascript) and verify offline. |
 
 ## Where to go next
 
-- [Quickstart](/console/quickstart) — sign in, bootstrap your project, register your first delegation in five minutes.
-- [Integrations](/console/integrations) — drop-in adapters for Anthropic Tool Use, OpenAI function calling, Vercel AI SDK, LangGraph, and MCP. Three lines of config and your tool calls flow into console.
-- [API reference](/console/api) — OpenAPI 3.1 spec, Bearer-auth examples, error codes.
-- [Webhooks](/console/webhooks) — receive signed POSTs on every event your endpoint subscribes to.
-- [Audit export](/console/audit) — pull the bundle (NDJSON / JSON / CSV) and verify offline.
+- [Quickstart](/console/quickstart) — sign in, bootstrap your project, register
+  your first delegation in five minutes.
+- [Integrations](/console/integrations) — drop-in adapters for Anthropic Tool
+  Use, OpenAI function calling, Vercel AI SDK, LangGraph, and MCP. Three lines
+  of config and your tool calls flow into console.
+- [API reference](/console/api) — OpenAPI 3.1 spec, Bearer-auth examples, error
+  codes.
+- [Webhooks](/console/webhooks) — receive signed POSTs on every event your
+  endpoint subscribes to.
+- [Audit export](/console/audit) — pull the bundle (NDJSON / JSON / CSV) and
+  verify offline.
 
 ## Five-second mental model
 

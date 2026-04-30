@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'OC Me · SDK reference',
     description:
-        '@orangecheck/me-client v0.4.0 SDK reference. useOcSession, oc.session, oc.payment, oc.config, oc.webhook, oc.delegation, plus every type the SDK exports.',
+        '@orangecheck/me-client v0.5.0 SDK reference. useOcSession, oc.session, oc.payment, oc.config, oc.webhook, oc.delegation, oc.event, plus every type the SDK exports.',
 };
 
 # `@orangecheck/me-client` · SDK reference
 
-**v0.4.0 · MIT · 11 KB ESM · 7 KB DTS.**
+**v0.5.0 · MIT · 11 KB ESM · 7.7 KB DTS.**
 
 This is the canonical TypeScript SDK for integrating me.ochk.io. The same
 reference is mirrored at [me.ochk.io/sdk](https://me.ochk.io/sdk) — this
@@ -155,6 +155,39 @@ await oc.delegation.revoke(env.id);
 
 Max TTL 30 days. Revocation is instant — the verifier rejects any
 envelope signed after revocation regardless of the agent's state.
+
+## `oc.event.fire` · arbitrary billable subtypes (v0.5.0)
+
+The escape hatch when you want to bill a subtype that isn't covered by
+`oc.session.create` or `oc.payment.authorize` — `stamp_signing`,
+`attest_verification_at_gate`, `scoped_action_authorization`,
+`kyc_tier_upgrade`, etc. Class is determined by `SUBTYPE_CLASS`;
+cashback is computed via `computeFees()`; the envelope is recorded
+under your `project_key` and shows up in `/developer/projects/[id]/events`.
+
+```ts
+const stamp = await oc.event.fire({
+    project_key: 'pk_live_yourcompany',
+    subtype: 'stamp_signing',
+    action_label: 'review · march invoice',
+});
+// stamp.id, stamp.gross_fee_sats, stamp.user_earned_sats, stamp.verify_url
+
+// For percent_of_amount-priced subtypes, include the underlying amount:
+const verify = await oc.event.fire({
+    project_key: 'pk_live_yourcompany',
+    subtype: 'attest_verification_at_gate',
+    payment_amount_sats: 50_000,
+});
+```
+
+| Function | Signature | Note |
+| --- | --- | --- |
+| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<BillableEvent>` | Returns the canonical `BillableEvent` the server recorded. |
+
+`SignInOptions` and `PaymentAuthorizeOptions` also gain an optional
+`project_key` field in v0.5.0 — when set, sessions and payments are
+attributed to the project and recorded the same way.
 
 ## Types
 

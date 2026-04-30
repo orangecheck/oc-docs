@@ -15,13 +15,13 @@ webhooks.
 A hand-maintained OpenAPI 3.1 spec is served at:
 
 ```
-https://console.ochk.io/api/openapi.json
+https://console.ochk.io/api/openapi
 ```
 
 Browse it interactively with try-it-out at:
 
 ```
-https://console.ochk.io/docs/api
+https://console.ochk.io/api-explorer
 ```
 
 Generate a typed client for any language with
@@ -29,7 +29,7 @@ Generate a typed client for any language with
 
 ```bash
 openapi-generator-cli generate \
-    -i https://console.ochk.io/api/openapi.json \
+    -i https://console.ochk.io/api/openapi \
     -g python \
     -o ./oc-console-py
 ```
@@ -59,8 +59,9 @@ token returns 401; a malformed Bearer falls through to anonymous.
 | **Audit** | `GET /api/audit/export?format=ndjson\|json\|csv`, `GET /api/audit/bundles` |
 | **API tokens** | `GET/POST /api/tokens`, `PATCH/DELETE /api/tokens/{id}` |
 | **Webhooks** | `GET/POST /api/webhooks/endpoints`, `GET/PATCH/DELETE /api/webhooks/endpoints/{id}`, `GET /api/webhooks/deliveries`, `POST /api/webhooks/deliveries/{id}/retry` |
+| **Admin log** | `GET /api/admin/log?project_id=&limit=&before=&event_type=` — append-only audit trail of privilege-changing operations (rename / archive, member CRUD, token CRUD, webhook endpoint CRUD). |
 | **Billing** | `POST /api/billing/portal` (Stripe Customer Portal redirect), `POST /api/checkout/{stripe,lightning}` |
-| **Public** | `GET /api/health`, `GET /api/health/deep`, `GET /api/openapi.json`, `GET /api/auth/me`, `POST /api/auth/logout` |
+| **Public** | `GET /api/health`, `GET /api/health/deep`, `GET /api/openapi`, `GET /api/auth/me`, `POST /api/auth/logout` |
 
 ## Error envelope
 

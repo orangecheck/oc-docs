@@ -424,6 +424,38 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'console',
+        label: 'OC Console',
+        blurb: 'Managed infrastructure for the OC Agent family. The commercial layer.',
+        items: [
+            {
+                href: '/console',
+                label: 'Overview',
+                blurb: "What console is, what it isn't, and where it fits.",
+            },
+            {
+                href: '/console/quickstart',
+                label: 'Quickstart',
+                blurb: 'Sign in, bootstrap, register your first delegation, see receipts flow.',
+            },
+            {
+                href: '/console/integrations',
+                label: 'Integrations',
+                blurb: 'Drop-in adapters for Anthropic / OpenAI / Vercel AI SDK / LangGraph / MCP.',
+            },
+            {
+                href: '/console/webhooks',
+                label: 'Webhooks',
+                blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',
+            },
+            {
+                href: '/console/api',
+                label: 'API reference',
+                blurb: 'OpenAPI 3.1 spec, auth schemes, error codes, route catalog.',
+            },
+        ],
+    },
+    {
         slug: 'sdks',
         label: 'SDKs',
         blurb: 'Drop-in packages for every protocol.',

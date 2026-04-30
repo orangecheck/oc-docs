@@ -1,0 +1,147 @@
+export const metadata = {
+    title: 'Console API reference',
+    description: 'OpenAPI 3.1 spec, authentication, error codes, and the route catalog for console.ochk.io.',
+};
+
+# Console API reference
+
+console.ochk.io exposes a REST API for managing projects, registering
+signed delegations / actions / revocations / sub-delegations / federation
+envelopes, ingesting from CI/CD, downloading audit bundles, and managing
+webhooks.
+
+## OpenAPI spec
+
+A hand-maintained OpenAPI 3.1 spec is served at:
+
+```
+https://console.ochk.io/api/openapi.json
+```
+
+Browse it interactively with try-it-out at:
+
+```
+https://console.ochk.io/docs/api
+```
+
+Generate a typed client for any language with
+[openapi-generator](https://openapi-generator.tech/):
+
+```bash
+openapi-generator-cli generate \
+    -i https://console.ochk.io/api/openapi.json \
+    -g python \
+    -o ./oc-console-py
+```
+
+## Authentication
+
+Two schemes, mutually exclusive per request:
+
+| Scheme | Header | When to use |
+|---|---|---|
+| **Cookie** | `Cookie: oc_session=<JWT>` | Browser flows. Set automatically when you sign in at [ochk.io/signin](https://ochk.io/signin); valid for every `*.ochk.io` subdomain. |
+| **Bearer token** | `Authorization: Bearer ock_<64-hex>` | Server-side / CI / any non-browser caller. Mint at `/settings § 03`; plaintext returned ONCE at create. Authenticates as the project owner. |
+
+Tokens take precedence over the cookie if both are supplied. A revoked
+token returns 401; a malformed Bearer falls through to anonymous.
+
+## Route catalog
+
+| Group | Routes |
+|---|---|
+| **Projects** | `GET/POST /api/projects`, `GET/PATCH/DELETE /api/projects/{id}` |
+| **Members** | `GET/POST /api/members`, `PATCH/DELETE /api/members/{id}` |
+| **Delegations** | `GET/POST /api/delegations`, `GET /api/delegations/{id}`, `POST /api/delegations/federation` |
+| **Sub-delegations** | `GET/POST /api/subdelegations` (kind 30086, OC Agent v1.1) |
+| **Actions** | `GET/POST /api/actions` |
+| **Revocations** | `GET/POST /api/revocations` |
+| **Audit** | `GET /api/audit/export?format=ndjson\|json\|csv`, `GET /api/audit/bundles` |
+| **API tokens** | `GET/POST /api/tokens`, `PATCH/DELETE /api/tokens/{id}` |
+| **Webhooks** | `GET/POST /api/webhooks/endpoints`, `GET/PATCH/DELETE /api/webhooks/endpoints/{id}`, `GET /api/webhooks/deliveries`, `POST /api/webhooks/deliveries/{id}/retry` |
+| **Billing** | `POST /api/billing/portal` (Stripe Customer Portal redirect), `POST /api/checkout/{stripe,lightning}` |
+| **Public** | `GET /api/health`, `GET /api/health/deep`, `GET /api/openapi.json`, `GET /api/auth/me`, `POST /api/auth/logout` |
+
+## Error envelope
+
+Every non-2xx response uses a uniform shape:
+
+```json
+{
+    "ok": false,
+    "reason": "agent_must_match_delegation",
+    "detail": "optional human-readable detail"
+}
+```
+
+`reason` is a stable enum-like string — safe to switch on. `detail` is
+human-readable and may change without notice.
+
+### Reason catalog (the ones you'll see)
+
+| HTTP | Reason | Meaning |
+|---|---|---|
+| 400 | `id_mismatch` | Declared envelope id ≠ recomputed id from canonical inputs. Tamper detected. |
+| 400 | `descriptor_id_mismatch` | Federation: declared descriptor_id ≠ recomputed from inlined descriptor. |
+| 400 | `threshold_mismatch` | Federation: `sig.threshold` ≠ `descriptor.threshold`. |
+| 400 | `insufficient_signatures` | Federation: `len(signatures) < M`. |
+| 400 | `unknown_guardian` | Federation: a signing guardian is not in the descriptor. |
+| 400 | `duplicate_guardian` | Federation: two signatures share a guardian_address. |
+| 400 | `federation_principal_wrong_endpoint` | Single-address /api/delegations got a federation principal — POST to /api/delegations/federation instead. |
+| 400 | `canonicalization_failed` | Inputs don't form a valid canonical message (malformed timestamp, scope grammar, etc). |
+| 401 | `unauthenticated` | No valid cookie OR Bearer token. |
+| 403 | `principal_must_match_session` | Body declares a principal_address ≠ session.addr. Forgery defense. |
+| 403 | `principal_must_be_parent_agent` | Sub-delegation: signing principal isn't the parent's agent. |
+| 403 | `signer_must_be_principal` | Revocation: signer isn't the parent delegation's principal (v1.1). |
+| 403 | `signer_must_match_session` | Revocation: session.addr ≠ signer_address. |
+| 403 | `agent_must_match_delegation` | Action: signing agent ≠ parent delegation's agent. |
+| 403 | `role_forbidden` | Caller's project role doesn't permit the operation. |
+| 403 | `owner_role_requires_owner` | Privilege escalation: only an owner can mint or remove another owner. |
+| 404 | `not_found` | Including: project not visible to caller, delegation not in project, malformed id (no existence leak). |
+| 404 | `parent_not_found` | Sub-delegation: declared parent_id doesn't exist in this project. |
+| 404 | `delegation_not_found` | Action / revocation: declared delegation_id doesn't exist in this project. |
+| 409 | `already_registered` | Content-addressed PK collision — this exact envelope is already in the registry. |
+| 409 | `already_revoked` | Revocation already applied to this delegation. |
+| 409 | `already_a_member` | Member: (project_id, address) duplicate. |
+| 409 | `last_owner_cannot_remove` | Project foot-gun: refused to remove the last owner. |
+| 409 | `last_owner_cannot_demote` | Same — can't demote the last owner. |
+| 409 | `parent_inactive` | Sub-delegation: parent.status ≠ 'active'. |
+| 409 | `delegation_inactive` | Action: parent delegation has been revoked or expired. |
+| 503 | `database_not_configured` | Console is in v1.1 preview mode (no `DATABASE_URL`). The dashboard falls back to mock data. |
+| 503 | `webhook_master_key_unset` | Endpoint registration disabled (no `WEBHOOK_MASTER_KEY`). |
+| 503 | `stripe_not_configured` | Stripe checkout / portal disabled (no `STRIPE_SECRET_KEY`). |
+| 503 | `no_stripe_customer` | Customer Portal: this project hasn't paid via Stripe yet. |
+
+## Rate limiting
+
+Every route uses a per-IP, per-route token bucket. Limits are intentionally
+generous; you'll only see 429 if a single IP is hammering one route.
+
+```
+HTTP/1.1 429 Too Many Requests
+{ "ok": false, "reason": "rate_limited" }
+```
+
+Apply jitter + exponential backoff in your retries.
+
+## Same-origin enforcement
+
+Browser-driven `POST` / `PATCH` / `DELETE` requires the
+`Sec-Fetch-Site: same-origin` header (modern browsers send it
+automatically). Bearer-authenticated calls from a server runtime are
+exempt — the Bearer token is sufficient evidence of intent. Cross-origin
+browser POSTs return 403 `cross_site_blocked`.
+
+## Idempotency
+
+Every accepted envelope is content-addressed: its sha256 *is* its
+primary key. Re-POSTing the exact same envelope returns 409
+`already_registered`. This makes client-side retry safe — you can fire
+the same POST twice without persisting twice.
+
+## See also
+
+- [Integrations](/console/integrations) — the framework adapters that wrap these endpoints.
+- [Webhooks](/console/webhooks) — the inbound side: subscribe to events.
+- [`/agent/spec`](/agent/spec) — the underlying OC Agent envelope spec (canonical messages, scope grammar, signature rules).
+- [`/agent/sub-delegation`](/agent/sub-delegation) — kind 30086 chain semantics.

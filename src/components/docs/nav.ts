@@ -456,6 +456,48 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'me',
+        label: 'OC Me',
+        blurb: 'Consumer commercial product · bitcoin-backed identity that pays users in sats.',
+        items: [
+            {
+                href: '/me',
+                label: 'Overview',
+                blurb: "What me.ochk.io is, what it isn't, and where it fits.",
+            },
+            {
+                href: '/me/quickstart',
+                label: 'Quickstart',
+                blurb: 'Five minutes from npm install to first envelope.',
+            },
+            {
+                href: '/me/sdk',
+                label: 'SDK reference',
+                blurb: '@orangecheck/me-client v0.4.0 — every export with type signatures.',
+            },
+            {
+                href: '/me/integrations',
+                label: 'Integrations',
+                blurb: 'OAuth-peer pattern, sample integrator archetypes, cross-product flows.',
+            },
+            {
+                href: '/me/webhooks',
+                label: 'Webhooks',
+                blurb: 'Reception in Node + Rust, raw-body warning, retry semantics.',
+            },
+            {
+                href: '/me/api',
+                label: 'HTTP API',
+                blurb: 'Every me.ochk.io endpoint · auth, rate limits, response shapes.',
+            },
+            {
+                href: '/me/custody',
+                label: 'Federation custody',
+                blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
+            },
+        ],
+    },
+    {
         slug: 'sdks',
         label: 'SDKs',
         blurb: 'Drop-in packages for every protocol.',

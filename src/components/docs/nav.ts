@@ -1,17 +1,28 @@
 /**
  * Docs sitemap — source of truth for the sidebar, breadcrumbs, and prev/next.
  *
- * Organized for the ecosystem-first framing: shared concepts up top
- * (Getting Started / Ecosystem), then one section per sibling protocol
- * (Attest / Lock / Stamp / Vote / Agent), then SDKs and Reference. Every
- * entry in every section is a real .mdx file under src/pages/.
+ * Top-level reading order:
+ *   1. Getting started · Ecosystem (shared)              — landing + plumbing
+ *   2. Protocols · Attest / Lock / Stamp / Vote / Agent / Pledge — six siblings
+ *   3. Commercial products · Console / Me                — managed offerings
+ *   4. SDKs                                              — ship-ready packages
+ *   5. Company · Charter                                 — cross-product commitments
+ *   6. Reference · FAQ / Glossary                        — everything else
  *
- * When you edit this file, keep the following invariants:
- *   1. Every `href` MUST correspond to an existing `.mdx` file.
+ * Every entry MUST correspond to a real .mdx file under src/pages/. When
+ * you delete a page, remove the nav entry in the same commit. When you
+ * add a page, add the nav entry in the same commit so it shows up in the
+ * sidebar.
+ *
+ * Invariants:
+ *   1. Every `href` corresponds to an existing `.mdx` (or `.tsx`) file.
  *   2. Section slugs are the URL root for that section (e.g. `attest`
- *      maps to everything under `/attest/*`).
- *   3. Protocol sections should always lead with an overview page,
- *      followed by concepts, then API, then guides.
+ *      maps to everything under `/attest/*`). The exception is `company`,
+ *      which collects cross-product pages (charter today; legal/about
+ *      eventually) — its items live at the docs root, not under /company/*.
+ *   3. Protocol sections lead with overview → concepts → API → guides.
+ *   4. Commercial product sections (console, me) lead with overview →
+ *      quickstart → SDK reference → integrations → webhooks → API → custody.
  */
 
 export interface DocsItem {
@@ -350,6 +361,16 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'BNF for scopes, sub-scope containment, constraint semantics.',
             },
             {
+                href: '/agent/private-scope',
+                label: 'Private scope',
+                blurb: 'Scope tokens that never appear in the wire envelope; verifier resolves locally.',
+            },
+            {
+                href: '/agent/sub-delegation',
+                label: 'Sub-delegation (v1.1)',
+                blurb: 'Agents that delegate to other agents — additive extension on kind 30086.',
+            },
+            {
                 href: '/agent/protocol',
                 label: 'Protocol walkthrough',
                 blurb: 'The three envelopes and the two canonical flows.',
@@ -424,6 +445,80 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'console',
+        label: 'OC Console',
+        blurb: 'Managed infrastructure for the OC Agent family. The commercial layer.',
+        items: [
+            {
+                href: '/console',
+                label: 'Overview',
+                blurb: "What console is, what it isn't, and where it fits.",
+            },
+            {
+                href: '/console/quickstart',
+                label: 'Quickstart',
+                blurb: 'Sign in, bootstrap, register your first delegation, see receipts flow.',
+            },
+            {
+                href: '/console/integrations',
+                label: 'Integrations',
+                blurb: 'Drop-in adapters for Anthropic / OpenAI / Vercel AI SDK / LangGraph / MCP.',
+            },
+            {
+                href: '/console/webhooks',
+                label: 'Webhooks',
+                blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',
+            },
+            {
+                href: '/console/api',
+                label: 'API reference',
+                blurb: 'OpenAPI 3.1 spec, auth schemes, error codes, route catalog.',
+            },
+        ],
+    },
+    {
+        slug: 'me',
+        label: 'OC Me',
+        blurb: 'Consumer commercial product · bitcoin-backed identity that pays users in sats.',
+        items: [
+            {
+                href: '/me',
+                label: 'Overview',
+                blurb: "What me.ochk.io is, what it isn't, and where it fits.",
+            },
+            {
+                href: '/me/quickstart',
+                label: 'Quickstart',
+                blurb: 'Five minutes from npm install to first envelope.',
+            },
+            {
+                href: '/me/sdk',
+                label: 'SDK reference',
+                blurb: '@orangecheck/me-client v0.5.0 — every export, every type, every code sample.',
+            },
+            {
+                href: '/me/integrations',
+                label: 'Integrations',
+                blurb: 'OAuth-peer pattern, sample integrator archetypes, cross-product flows.',
+            },
+            {
+                href: '/me/webhooks',
+                label: 'Webhooks',
+                blurb: 'Reception in Node + Rust, raw-body warning, retry semantics.',
+            },
+            {
+                href: '/me/api',
+                label: 'HTTP API',
+                blurb: 'Every me.ochk.io endpoint · auth, rate limits, response shapes.',
+            },
+            {
+                href: '/me/custody',
+                label: 'Federation custody',
+                blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
+            },
+        ],
+    },
+    {
         slug: 'sdks',
         label: 'SDKs',
         blurb: 'Drop-in packages for every protocol.',
@@ -467,6 +562,18 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/sdks/error-codes',
                 label: 'Status & error codes',
                 blurb: 'Every reason string `/api/check` and the SDKs can return.',
+            },
+        ],
+    },
+    {
+        slug: 'company',
+        label: 'Company',
+        blurb: 'Cross-product commitments + governance.',
+        items: [
+            {
+                href: '/charter',
+                label: 'Charter',
+                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, console, every protocol sibling).',
             },
         ],
     },

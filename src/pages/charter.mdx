@@ -30,20 +30,20 @@ Anyone proposing otherwise is not OrangeCheck.
 ### 02 · No custody you didn't choose.
 
 OrangeCheck does not hold customer Bitcoin private keys, does not hold customer
-funds, and does not operate a custodial wallet you cannot graduate out of.
-On `me.ochk.io` the federation custody model is opt-in by default for users who
-don't want to manage keys, and self-custody graduation is a one-click path
-(same address, same history). On `console.ochk.io` and the protocol siblings,
-no custody — period. Bonded reputation is attestation-of-unspent: sats stay in
-the customer's own wallet, enforcement is by exposure, never by slashing.
+funds, and does not operate a custodial wallet you cannot graduate out of. On
+`me.ochk.io` the federation custody model is opt-in by default for users who
+don't want to manage keys, and self-custody graduation is a one-click path (same
+address, same history). On `console.ochk.io` and the protocol siblings, no
+custody — period. Bonded reputation is attestation-of-unspent: sats stay in the
+customer's own wallet, enforcement is by exposure, never by slashing.
 
 ### 03 · The protocol stays open.
 
 The wire format, scope grammar, audit-bundle structure, and Bitcoin-anchoring
 rules are defined by the open `oc-*-protocol` specs (`oc-attest-protocol`,
-`oc-lock-protocol`, `oc-vote-protocol`, `oc-stamp-protocol`, `oc-agent-protocol`,
-`oc-pledge-protocol`). Any change OrangeCheck wants goes through an open PR.
-No private extensions, no closed conformance vectors.
+`oc-lock-protocol`, `oc-vote-protocol`, `oc-stamp-protocol`,
+`oc-agent-protocol`, `oc-pledge-protocol`). Any change OrangeCheck wants goes
+through an open PR. No private extensions, no closed conformance vectors.
 
 ### 04 · The protocol sites stay free.
 
@@ -56,10 +56,10 @@ this, the spec stewardship governance ratifies first.
 
 ### 05 · Audit verifies without us.
 
-Every audit bundle, every receipt, every billable envelope OrangeCheck issues
-is verifiable offline, against Bitcoin headers, by anyone, forever. If
-OrangeCheck disappeared tomorrow, every receipt continues to verify. We sell
-operations, not lock-in. The protocol is the API.
+Every audit bundle, every receipt, every billable envelope OrangeCheck issues is
+verifiable offline, against Bitcoin headers, by anyone, forever. If OrangeCheck
+disappeared tomorrow, every receipt continues to verify. We sell operations, not
+lock-in. The protocol is the API.
 
 ### 06 · No agent-replacing-humans positioning.
 
@@ -71,31 +71,31 @@ real authority — which is human work being elevated, not erased.
 
 Lightning customers and sat-paid users are not a footnote. Every USD price is
 published with its sat equivalent on the same row. We do not surcharge
-Lightning, do not require fiat onramp, and do not treat sat-paid customers as
-a niche segment. On `me.ochk.io` specifically, every billable event has its
-gross fee, OC platform fee, user cashback, and integrator rebate published in
-sats — USD shown alongside, never as the canonical unit.
+Lightning, do not require fiat onramp, and do not treat sat-paid customers as a
+niche segment. On `me.ochk.io` specifically, every billable event has its gross
+fee, OC platform fee, user cashback, and integrator rebate published in sats —
+USD shown alongside, never as the canonical unit.
 
 ### 08 · Spec stewardship is public.
 
 Material changes to the spec stewardship structure are announced publicly and
 discussed in the `oc-protocol` governance forum before being adopted.
-OrangeCheck has one seat at that table; it is not the chair. Material
-changes to **this charter** itself follow the same path: a published proposal,
-a public review window, and a versioned re-ratification.
+OrangeCheck has one seat at that table; it is not the chair. Material changes to
+**this charter** itself follow the same path: a published proposal, a public
+review window, and a versioned re-ratification.
 
 ## How this applies per product
 
-- **`me.ochk.io`** — consumer commercial product. Federation custody by
-  default with self-custody graduation. Three-class billable event taxonomy
-  (A/B/C). Integrators set every per-event price; OC retains a fixed 20%
-  platform fee. Commitments **02** (custody you can graduate out of), **05**
-  (every billable envelope verifies offline), and **07** (sats first-class)
-  bind this product specifically.
+- **`me.ochk.io`** — consumer commercial product. Federation custody by default
+  with self-custody graduation. Three-class billable event taxonomy (A/B/C).
+  Integrators set every per-event price; OC retains a fixed 20% platform fee.
+  Commitments **02** (custody you can graduate out of), **05** (every billable
+  envelope verifies offline), and **07** (sats first-class) bind this product
+  specifically.
 - **`console.ochk.io`** — managed Agent + Pledge enterprise tier. No custody,
-  ever. Commitments **02** (no custody, period), **05** (audit verifies
-  without us), **06** (authority infrastructure positioning), and **08**
-  (one seat, not the chair) bind this product specifically.
+  ever. Commitments **02** (no custody, period), **05** (audit verifies without
+  us), **06** (authority infrastructure positioning), and **08** (one seat, not
+  the chair) bind this product specifically.
 - **Protocol siblings** — every `oc-*-protocol` spec repo + the matching
   `*.ochk.io` reference site. Commitments **03** (open spec), **04** (free
   forever), and **05** (offline-verifiable) bind these specifically.
@@ -116,9 +116,9 @@ the canonical mechanism by which any of the rules on this page can change.
 These commitments are made by the OrangeCheck founding team. Names will be
 appended here as public commitments are formalized.
 
-| Field            | Value                                                       |
-| ---------------- | ----------------------------------------------------------- |
-| Ratified         | v1 · 2026-04-28                                             |
-| Next review      | 2026-12-01 (or earlier if material change proposed)         |
-| Source of truth  | `oc-docs/src/pages/charter.mdx`                             |
-| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)    |
+| Field            | Value                                                    |
+| ---------------- | -------------------------------------------------------- |
+| Ratified         | v1 · 2026-04-28                                          |
+| Next review      | 2026-12-01 (or earlier if material change proposed)      |
+| Source of truth  | `oc-docs/src/pages/charter.mdx`                          |
+| Governance forum | [github.com/orangecheck](https://github.com/orangecheck) |

@@ -1,0 +1,128 @@
+import { ConsoleReasonCatalog } from '@/components/docs/ConsoleReasonCatalog';
+
+export const metadata = {
+    title: 'Console API reference',
+    description:
+        'OpenAPI 3.1 spec, authentication, error codes, and the route catalog for console.ochk.io.',
+};
+
+# Console API reference
+
+console.ochk.io exposes a REST API for managing projects, registering signed
+delegations / actions / revocations / sub-delegations / federation envelopes,
+ingesting from CI/CD, downloading audit bundles, and managing webhooks.
+
+## OpenAPI spec
+
+A hand-maintained OpenAPI 3.1 spec is served at:
+
+```
+https://console.ochk.io/api/openapi
+```
+
+Browse it interactively with try-it-out at:
+
+```
+https://console.ochk.io/api-explorer
+```
+
+Generate a typed client for any language with
+[openapi-generator](https://openapi-generator.tech/):
+
+```bash
+openapi-generator-cli generate \
+    -i https://console.ochk.io/api/openapi \
+    -g python \
+    -o ./oc-console-py
+```
+
+## Authentication
+
+Two schemes, mutually exclusive per request:
+
+| Scheme           | Header                               | When to use                                                                                                                                 |
+| ---------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cookie**       | `Cookie: oc_session=<JWT>`           | Browser flows. Set automatically when you sign in at [ochk.io/signin](https://ochk.io/signin); valid for every `*.ochk.io` subdomain.       |
+| **Bearer token** | `Authorization: Bearer ock_<64-hex>` | Server-side / CI / any non-browser caller. Mint at `/settings § 03`; plaintext returned ONCE at create. Authenticates as the project owner. |
+
+Tokens take precedence over the cookie if both are supplied. A revoked token
+returns 401; a malformed Bearer falls through to anonymous.
+
+## Route catalog
+
+| Group               | Routes                                                                                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Projects**        | `GET/POST /api/projects`, `GET/PATCH/DELETE /api/projects/{id}`                                                                                                                            |
+| **Members**         | `GET/POST /api/members`, `PATCH/DELETE /api/members/{id}`                                                                                                                                  |
+| **Delegations**     | `GET/POST /api/delegations`, `GET /api/delegations/{id}`, `POST /api/delegations/federation`                                                                                               |
+| **Sub-delegations** | `GET/POST /api/subdelegations` (kind 30086, OC Agent v1.1)                                                                                                                                 |
+| **Actions**         | `GET/POST /api/actions`                                                                                                                                                                    |
+| **Revocations**     | `GET/POST /api/revocations`                                                                                                                                                                |
+| **Audit**           | `GET /api/audit/export?format=ndjson\|json\|csv`, `GET /api/audit/bundles`                                                                                                                 |
+| **API tokens**      | `GET/POST /api/tokens`, `PATCH/DELETE /api/tokens/{id}`                                                                                                                                    |
+| **Webhooks**        | `GET/POST /api/webhooks/endpoints`, `GET/PATCH/DELETE /api/webhooks/endpoints/{id}`, `GET /api/webhooks/deliveries`, `POST /api/webhooks/deliveries/{id}/retry`                            |
+| **Admin log**       | `GET /api/admin/log?project_id=&limit=&before=&event_type=` — append-only audit trail of privilege-changing operations (rename / archive, member CRUD, token CRUD, webhook endpoint CRUD). |
+| **Billing**         | `POST /api/billing/portal` (Stripe Customer Portal redirect), `POST /api/checkout/{stripe,lightning}`                                                                                      |
+| **Public**          | `GET /api/health`, `GET /api/health/deep`, `GET /api/openapi`, `GET /api/auth/me`, `POST /api/auth/logout`                                                                                 |
+
+## Error envelope
+
+Every non-2xx response uses a uniform shape:
+
+```json
+{
+    "ok": false,
+    "reason": "agent_must_match_delegation",
+    "detail": "optional human-readable detail"
+}
+```
+
+`reason` is a stable enum-like string — safe to switch on. `detail` is
+human-readable and may change without notice.
+
+### Reason catalog
+
+The full set of stable `reason` strings the API can return, grouped by class.
+This table is auto-generated at build time from
+[`https://console.ochk.io/api/reasons`](https://console.ochk.io/api/reasons) —
+the typed source of truth lives at `src/server/api/reasons.ts` in
+[orangecheck/oc-console-web](https://github.com/orangecheck/oc-console-web).
+Adding a new reason there flows here on the next deploy.
+
+<ConsoleReasonCatalog />
+
+## Rate limiting
+
+Every route uses a per-IP, per-route token bucket. Limits are intentionally
+generous; you'll only see 429 if a single IP is hammering one route.
+
+```
+HTTP/1.1 429 Too Many Requests
+{ "ok": false, "reason": "rate_limited" }
+```
+
+Apply jitter + exponential backoff in your retries.
+
+## Same-origin enforcement
+
+Browser-driven `POST` / `PATCH` / `DELETE` requires the
+`Sec-Fetch-Site: same-origin` header (modern browsers send it automatically).
+Bearer-authenticated calls from a server runtime are exempt — the Bearer token
+is sufficient evidence of intent. Cross-origin browser POSTs return 403
+`cross_site_blocked`.
+
+## Idempotency
+
+Every accepted envelope is content-addressed: its sha256 _is_ its primary key.
+Re-POSTing the exact same envelope returns 409 `already_registered`. This makes
+client-side retry safe — you can fire the same POST twice without persisting
+twice.
+
+## See also
+
+- [Integrations](/console/integrations) — the framework adapters that wrap these
+  endpoints.
+- [Webhooks](/console/webhooks) — the inbound side: subscribe to events.
+- [`/agent/spec`](/agent/spec) — the underlying OC Agent envelope spec
+  (canonical messages, scope grammar, signature rules).
+- [`/agent/sub-delegation`](/agent/sub-delegation) — kind 30086 chain semantics.

@@ -1,0 +1,136 @@
+export const metadata = {
+    title: 'OC Me · Webhooks',
+    description:
+        'Webhook signature verification, raw-body warning, retry semantics, headers, and full reception samples in Node + Rust.',
+};
+
+# OC Me · Webhooks
+
+**Every billable envelope your project signs is delivered to your
+registered endpoints, signed with OC's federation Ed25519 key.** Verify
+the signature against the **raw** request body — frameworks that
+re-serialize before your handler will produce a different byte sequence
+and the signature will not validate.
+
+## Reception · Node + Express
+
+```ts
+import express from 'express';
+import { oc } from '@orangecheck/me-client';
+
+const app = express();
+app.use(express.text({ type: 'application/json' })); // raw body!
+
+app.post('/api/oc/webhook', async (req, res) => {
+    const result = await oc.webhook.verify(
+        req.body,
+        req.header('OC-Signature'),
+        req.header('OC-Key-Id')
+    );
+    if (!result.ok) return res.status(401).end(result.reason);
+
+    const envelope = JSON.parse(req.body);
+    // envelope.kind === 'oc-billable-event'
+    // envelope.subtype === 'session_creation' | 'payment_authorization' | …
+    // envelope.id is content-addressed — idempotent
+    await onOcEvent(envelope);
+    res.status(200).end();
+});
+```
+
+## Reception · Rust + Axum
+
+```rust
+use axum::{extract::State, http::StatusCode, response::IntoResponse};
+use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+
+async fn webhook(
+    State(pub_key): State<VerifyingKey>,
+    headers: axum::http::HeaderMap,
+    body: bytes::Bytes,
+) -> impl IntoResponse {
+    let sig_hex = headers.get("OC-Signature").and_then(|v| v.to_str().ok()).unwrap_or("");
+    let sig_bytes = hex::decode(sig_hex).unwrap_or_default();
+    let Ok(sig) = Signature::from_slice(&sig_bytes) else {
+        return StatusCode::UNAUTHORIZED;
+    };
+    if pub_key.verify(&body, &sig).is_err() {
+        return StatusCode::UNAUTHORIZED;
+    }
+    let envelope: serde_json::Value = serde_json::from_slice(&body).unwrap();
+    process_event(envelope).await;
+    StatusCode::OK
+}
+```
+
+## Headers OC sends
+
+| Header | Meaning |
+| --- | --- |
+| `OC-Signature` | Ed25519 signature, hex-encoded, computed over the raw body |
+| `OC-Key-Id` | `kid` of the OC public JWK that signed the event |
+| `OC-Envelope-Id` | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
+| `OC-Subtype` | Event subtype, copied for routing convenience |
+| `OC-Class` | A · B · C |
+| `OC-Delivery-Attempt` | 1-based retry counter |
+| `Content-Type` | `application/json` |
+
+## Delivery semantics
+
+| | |
+| --- | --- |
+| **Guarantee** | At-least-once. Idempotent on `envelope.id`. |
+| **Retry schedule** | Jittered exponential: 0s · 30s · 2m · 10m · 1h · 6h · 24h. |
+| **Ack** | Any 2xx. Anything else triggers retry. |
+| **Mute** | After 24h of failure the endpoint is muted. Envelopes still archive on `/api/envelope/[id]`. |
+
+## The raw-body trap
+
+> **Verify against the raw bytes, not the parsed JSON.**
+
+`JSON.parse(body)` then `JSON.stringify(value)` produces a *different
+byte sequence* — different key order, different whitespace, different
+number formatting. The signature is computed over the original bytes;
+re-serialized bytes will not match.
+
+| Framework | The fix |
+| --- | --- |
+| **Express** | `app.use(express.text({ type: '*/*' }))` — accept body as a raw string. |
+| **Next.js Pages API** | `export const config = { api: { bodyParser: false } }` — disable body parsing, then read the stream into a Buffer. |
+| **Fastify** | Use a `preParsing` hook to capture the raw body before parsing. |
+| **Hono** | `c.req.text()` to get the raw string. |
+| **Rust + Axum** | `body: bytes::Bytes` extractor, never `Json<…>`. |
+
+## Test fire from the dashboard
+
+[me.ochk.io/developer/webhooks](https://me.ochk.io/developer/webhooks)
+has a "test fire" button per registered endpoint. It POSTs a synthetic
+envelope with a placeholder signature so you can verify wiring before a
+real event lands. Receivers verifying with `@noble/curves` should reject
+the test signature (the placeholder is all zeros) — that's the correct
+behavior. Production envelopes carry valid sigs.
+
+## Handler patterns we recommend
+
+```ts
+// Idempotency · keep a small cache of recently seen envelope ids.
+const seen = new LRU<string, true>({ max: 10_000 });
+
+app.post('/api/oc/webhook', async (req, res) => {
+    const result = await oc.webhook.verify(req.body, req.header('OC-Signature'), req.header('OC-Key-Id'));
+    if (!result.ok) return res.status(401).end(result.reason);
+
+    const envelope = JSON.parse(req.body);
+    if (seen.has(envelope.id)) return res.status(200).end(); // already processed
+    seen.set(envelope.id, true);
+
+    try {
+        await onOcEvent(envelope);
+        res.status(200).end();
+    } catch (err) {
+        // Don't 5xx unless you actually want the retry; otherwise log + 200.
+        console.error(err);
+        res.status(500).end();
+    }
+});
+```

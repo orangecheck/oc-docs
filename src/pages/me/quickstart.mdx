@@ -6,13 +6,13 @@ export const metadata = {
 
 # OC Me · Quickstart
 
-**Five minutes from `npm install` to first envelope.** Every step has the
-exact code you ship. Mark a step done when you've actually shipped it.
+**Five minutes from `npm install` to first envelope.** Every step has the exact
+code you ship. Mark a step done when you've actually shipped it.
 
 ## 01 · install the SDK
 
-Two npm packages. `me-client` is the consumer SDK; `auth-client` is the
-React provider + hook (re-exported by `me-client` for convenience).
+Two npm packages. `me-client` is the consumer SDK; `auth-client` is the React
+provider + hook (re-exported by `me-client` for convenience).
 
 ```bash
 yarn add @orangecheck/me-client @orangecheck/auth-client
@@ -22,8 +22,8 @@ npm i @orangecheck/me-client @orangecheck/auth-client
 
 ## 02 · mount the provider
 
-Wrap your app once at the root. Defaults pin `authOrigin` to
-`https://ochk.io` — only override in dev/staging.
+Wrap your app once at the root. Defaults pin `authOrigin` to `https://ochk.io` —
+only override in dev/staging.
 
 ```tsx
 // _app.tsx (Next.js Pages router)
@@ -43,10 +43,9 @@ cross-subdomain session.
 
 ## 03 · drop the sign-in button
 
-OC is an OAuth peer. Render it next to your existing Google / Apple /
-magic-link options. First-time users get a federation-custodied bitcoin
-wallet provisioned silently — no seed phrase, no key handling, no
-"what is a sat" conversation.
+OC is an OAuth peer. Render it next to your existing Google / Apple / magic-link
+options. First-time users get a federation-custodied bitcoin wallet provisioned
+silently — no seed phrase, no key handling, no "what is a sat" conversation.
 
 ```tsx
 import { OcSignInButton } from '@orangecheck/me-client';
@@ -55,7 +54,9 @@ import { signIn } from 'next-auth/react';
 export function SignInOptions() {
     return (
         <div className="auth-options">
-            <button onClick={() => signIn('google')}>continue with google</button>
+            <button onClick={() => signIn('google')}>
+                continue with google
+            </button>
             <button onClick={() => signIn('apple')}>continue with apple</button>
             <button onClick={() => signIn('email')}>email magic link</button>
             <OcSignInButton scope={['identity']}>
@@ -66,18 +67,16 @@ export function SignInOptions() {
 }
 ```
 
-When a first-time user picks OC: they bounce to me.ochk.io/signin →
-federation provisions their wallet → they're signed back in on your site
-with an `oc_session` cookie → every billable event you emit credits sats
-to their balance. They never have to know about bitcoin until they want
-to graduate.
+When a first-time user picks OC: they bounce to me.ochk.io/signin → federation
+provisions their wallet → they're signed back in on your site with an
+`oc_session` cookie → every billable event you emit credits sats to their
+balance. They never have to know about bitcoin until they want to graduate.
 
 ## 04 · configure your prices
 
-Declare per-event prices and user-share splits. You choose the subtypes
-to bill, the price per event (sats or % of underlying amount), and how
-much flows back to the user. OC takes a fixed 20% platform fee — the
-rest is yours and your users'.
+Declare per-event prices and user-share splits. You choose the subtypes to bill,
+the price per event (sats or % of underlying amount), and how much flows back to
+the user. OC takes a fixed 20% platform fee — the rest is yours and your users'.
 
 ```ts
 import { oc } from '@orangecheck/me-client';
@@ -101,20 +100,20 @@ await oc.config.update({
 });
 ```
 
-The configurator at [me.ochk.io/integrate](https://me.ochk.io/integrate)
-is interactive — adjust prices and see the four-way split (gross · OC fee
-· user · your rebate) update live.
+The configurator at [me.ochk.io/integrate](https://me.ochk.io/integrate) is
+interactive — adjust prices and see the four-way split (gross · OC fee · user ·
+your rebate) update live.
 
 ## 05 · verify a webhook
 
-OC delivers every billable envelope to your registered endpoint, signed
-with the federation Ed25519 key. **Always verify against the raw body** —
-frameworks that re-serialize before your handler will produce a different
-byte sequence and the signature will not validate.
+OC delivers every billable envelope to your registered endpoint, signed with the
+federation Ed25519 key. **Always verify against the raw body** — frameworks that
+re-serialize before your handler will produce a different byte sequence and the
+signature will not validate.
 
 ```ts
-import express from 'express';
 import { oc } from '@orangecheck/me-client';
+import express from 'express';
 
 const app = express();
 app.use(express.text({ type: 'application/json' }));
@@ -144,6 +143,8 @@ comparisons against your actual stack come back in a business day.
 ## Next, deeper
 
 - [SDK reference](/me/sdk) — every export with type signatures
-- [Integrations guide](/me/integrations) — OAuth-peer pattern, sample configs, error handling
-- [Webhooks](/me/webhooks) — full reception sample (Node + Rust), delivery semantics
+- [Integrations guide](/me/integrations) — OAuth-peer pattern, sample configs,
+  error handling
+- [Webhooks](/me/webhooks) — full reception sample (Node + Rust), delivery
+  semantics
 - [API reference](/me/api) — every `/api/*` endpoint

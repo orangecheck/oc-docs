@@ -6,98 +6,101 @@ export const metadata = {
 
 # OC Me · HTTP API
 
-**The hosted me.ochk.io substrate exposes the contracts the SDK calls
-into.** The SDK is the canonical integration path; this page is the raw
-HTTP surface for clients that aren't TypeScript or that want to bypass
-the SDK.
+**The hosted me.ochk.io substrate exposes the contracts the SDK calls into.**
+The SDK is the canonical integration path; this page is the raw HTTP surface for
+clients that aren't TypeScript or that want to bypass the SDK.
 
-Every endpoint is at `https://me.ochk.io/api/...`. Auth is by
-cross-subdomain `oc_session` cookie (`Domain=.ochk.io`, HttpOnly,
-SameSite=Lax). Mutating endpoints are rate-limited per IP per bucket;
-limits are returned in `X-RateLimit-*` headers.
+Every endpoint is at `https://me.ochk.io/api/...`. Auth is by cross-subdomain
+`oc_session` cookie (`Domain=.ochk.io`, HttpOnly, SameSite=Lax). Mutating
+endpoints are rate-limited per IP per bucket; limits are returned in
+`X-RateLimit-*` headers.
 
 ## Public endpoints
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/health` | liveness probe |
-| `GET` | `/api/health/deep` | dependency probe |
-| `GET` | `/api/envelope/[id]` | canonical envelope JSON for a billable event |
-| `GET` | `/api/delegation/[id]` | canonical envelope for a delegation |
-| `GET` | `/api/payment/[id]` | canonical envelope for a payment |
-| `GET` | `/api/checkout/lightning/[hash]` | invoice status by `payment_hash` |
-| `GET` | `/api/platform-fee-policy` | published `PLATFORM_FEE_POLICY` |
-| `GET` | `/api/abuse-limits` | published per-class abuse rate limits |
-| `GET` | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup |
-| `GET` | `/api/stats/earned` | aggregate sat-earnings (last 7d, by class) |
-| `POST` | `/api/integrator-config` | validate an `IntegratorPriceConfig` (echoes on success) |
-| `POST` | `/api/checkout/lightning` | generate a BOLT-11 invoice (rate-limited 60/min) |
-| `POST` | `/api/checkout/stripe` | generate a Stripe checkout URL |
-| `POST` | `/api/contact` | contact form submission (Resend-backed) |
+| Method | Path                                   | Purpose                                                 |
+| ------ | -------------------------------------- | ------------------------------------------------------- |
+| `GET`  | `/api/health`                          | liveness probe                                          |
+| `GET`  | `/api/health/deep`                     | dependency probe                                        |
+| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event            |
+| `GET`  | `/api/delegation/[id]`                 | canonical envelope for a delegation                     |
+| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
+| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                        |
+| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
+| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
+| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                   |
+| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
+| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
+| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)        |
+| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                          |
+| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
 ## Authenticated endpoints (oc_session required)
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/auth/me` | crypto-only identity lookup; 401 otherwise |
-| `GET` | `/api/me/profile` | profile + onboarding state |
-| `GET` | `/api/me/balance` | sat balance + last-7d aggregate + by-class breakdown |
-| `GET` | `/api/me/sites` | list of sites the identity has signed in to |
-| `GET` | `/api/me/sites/[domain]` | per-site activity + IntegratorPriceConfig |
-| `GET` | `/api/me/notifications` | notifications feed |
-| `POST` | `/api/me/notifications` | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
-| `GET` | `/api/me/export` | GDPR-style account dump · downloadable JSON |
+| Method | Path                     | Purpose                                                          |
+| ------ | ------------------------ | ---------------------------------------------------------------- |
+| `GET`  | `/api/auth/me`           | crypto-only identity lookup; 401 otherwise                       |
+| `GET`  | `/api/me/profile`        | profile + onboarding state                                       |
+| `GET`  | `/api/me/balance`        | sat balance + last-7d aggregate + by-class breakdown             |
+| `GET`  | `/api/me/sites`          | list of sites the identity has signed in to                      |
+| `GET`  | `/api/me/sites/[domain]` | per-site activity + IntegratorPriceConfig                        |
+| `GET`  | `/api/me/notifications`  | notifications feed                                               |
+| `POST` | `/api/me/notifications`  | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
+| `GET`  | `/api/me/export`         | GDPR-style account dump · downloadable JSON                      |
 
 ## Authenticated · session lifecycle (Class C)
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/session/create` | open a Class C session — billable atom |
-| `POST` | `/api/session/refresh` | refresh inside the policy window — free |
-| `POST` | `/api/session/invalidate` | tear down — free, telemetry-only |
+| Method | Path                      | Purpose                                 |
+| ------ | ------------------------- | --------------------------------------- |
+| `POST` | `/api/session/create`     | open a Class C session — billable atom  |
+| `POST` | `/api/session/refresh`    | refresh inside the policy window — free |
+| `POST` | `/api/session/invalidate` | tear down — free, telemetry-only        |
 
 ## Authenticated · payment authorization (Class B)
 
-| Method | Path | Purpose |
-| --- | --- | --- |
+| Method | Path                     | Purpose                                                     |
+| ------ | ------------------------ | ----------------------------------------------------------- |
 | `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · Class B billable |
 
 ## Authenticated · agent delegation (Class A)
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `POST` | `/api/delegation/issue` | issue a delegation, rate-limited 20/min · Class A billable |
-| `GET` | `/api/delegation/list` | list delegations |
-| `POST` | `/api/delegation/revoke` | revoke a delegation, instant |
+| Method | Path                     | Purpose                                                    |
+| ------ | ------------------------ | ---------------------------------------------------------- |
+| `POST` | `/api/delegation/issue`  | issue a delegation, rate-limited 20/min · Class A billable |
+| `GET`  | `/api/delegation/list`   | list delegations                                           |
+| `POST` | `/api/delegation/revoke` | revoke a delegation, instant                               |
 
 ## Authenticated · integrator project lifecycle
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/developer/projects` | list every project owned by your identity |
-| `POST` | `/api/developer/projects` | create a project, rate-limited 5/min |
-| `GET` | `/api/developer/projects/[id]` | per-project state · owner-gated |
-| `POST` | `/api/developer/projects/[id]` | update IntegratorPriceConfig · owner-gated, validates |
-| `DELETE` | `/api/developer/projects/[id]` | delete project · owner-gated |
-| `GET` | `/api/developer/config` | sample integrator config (the demo dashboard) |
-| `POST` | `/api/developer/config` | validate + persist sample config |
-| `GET` | `/api/developer/keys` | list project signing keys (sample) |
-| `POST` | `/api/developer/webhook-test` | test-fire a synthetic envelope at a webhook |
+| Method   | Path                           | Purpose                                               |
+| -------- | ------------------------------ | ----------------------------------------------------- |
+| `GET`    | `/api/developer/projects`      | list every project owned by your identity             |
+| `POST`   | `/api/developer/projects`      | create a project, rate-limited 5/min                  |
+| `GET`    | `/api/developer/projects/[id]` | per-project state · owner-gated                       |
+| `POST`   | `/api/developer/projects/[id]` | update IntegratorPriceConfig · owner-gated, validates |
+| `DELETE` | `/api/developer/projects/[id]` | delete project · owner-gated                          |
+| `GET`    | `/api/developer/config`        | sample integrator config (the demo dashboard)         |
+| `POST`   | `/api/developer/config`        | validate + persist sample config                      |
+| `GET`    | `/api/developer/keys`          | list project signing keys (sample)                    |
+| `POST`   | `/api/developer/webhook-test`  | test-fire a synthetic envelope at a webhook           |
 
 ## Response shapes
 
-All authenticated 401s are `{ ok: false }` with `Cache-Control: no-store, private` and `Vary: Cookie`. All 422 validation failures return `{ error: string, details?: [{ subtype?: string, message: string }] }`. All 429 rate-limit responses include a `Retry-After` header in seconds.
+All authenticated 401s are `{ ok: false }` with
+`Cache-Control: no-store, private` and `Vary: Cookie`. All 422 validation
+failures return
+`{ error: string, details?: [{ subtype?: string, message: string }] }`. All 429
+rate-limit responses include a `Retry-After` header in seconds.
 
 ## Rate limits per bucket
 
-| Bucket | Limit | Window |
-| --- | --- | --- |
-| `payment.authorize` | 30 | 60s |
-| `delegation.issue` | 20 | 60s |
-| `checkout.lightning` | 60 | 60s |
-| `developer.projects.create` | 5 | 60s |
+| Bucket                      | Limit | Window |
+| --------------------------- | ----- | ------ |
+| `payment.authorize`         | 30    | 60s    |
+| `delegation.issue`          | 20    | 60s    |
+| `checkout.lightning`        | 60    | 60s    |
+| `developer.projects.create` | 5     | 60s    |
 
 Limits are per IP, per bucket. Headers `X-RateLimit-Limit`,
-`X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted on every
-rate-limited response. v1 buckets reset on cold start (per-instance
-in-memory); production fronts every endpoint with an edge-level limiter.
+`X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted on every rate-limited
+response. v1 buckets reset on cold start (per-instance in-memory); production
+fronts every endpoint with an edge-level limiter.

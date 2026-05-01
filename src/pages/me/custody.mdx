@@ -6,41 +6,39 @@ export const metadata = {
 
 # OC Me · Federation custody
 
-**me.ochk.io is federation-custodied by default, self-custody when
-ready.** This page is the user-facing explanation; the protocol-level
-contract is at
+**me.ochk.io is federation-custodied by default, self-custody when ready.** This
+page is the user-facing explanation; the protocol-level contract is at
 [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
 (v1.2-draft-1, additive extension).
 
 ## What "federation-custodied" means
 
-Your me.ochk.io identity is bound to a Bitcoin address, but the private
-key that controls it is held collectively by an M-of-N guardian set —
-no single guardian (and not OC the company) can spend or freeze. Recovery
-is by re-proving your email or phone, not by remembering twelve words.
+Your me.ochk.io identity is bound to a Bitcoin address, but the private key that
+controls it is held collectively by an M-of-N guardian set — no single guardian
+(and not OC the company) can spend or freeze. Recovery is by re-proving your
+email or phone, not by remembering twelve words.
 
-When you sign in, the federation guardians threshold-sign on your behalf.
-You don't see this. You never need to.
+When you sign in, the federation guardians threshold-sign on your behalf. You
+don't see this. You never need to.
 
 ## The three options at threshold
 
-| | signing_method | how it works |
-| --- | --- | --- |
-| **federation custody** (default) | `fedimint_threshold` | guardians collectively hold the key. recovery by re-proving email/phone. |
-| **fedimint client** | `fedimint_threshold` (different federation) | sweep to a fedimint federation you trust more (your community's, your country's, your own). |
-| **self-custody** | `bip-322` | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Alby, Sparrow, hardware wallet). only you can sign. |
+|                                  | signing_method                              | how it works                                                                                                              |
+| -------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **federation custody** (default) | `fedimint_threshold`                        | guardians collectively hold the key. recovery by re-proving email/phone.                                                  |
+| **fedimint client**              | `fedimint_threshold` (different federation) | sweep to a fedimint federation you trust more (your community's, your country's, your own).                               |
+| **self-custody**                 | `bip-322`                                   | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Alby, Sparrow, hardware wallet). only you can sign. |
 
-You can return to federation custody at any point — the protocol
-accommodates the round-trip via attestation re-issuance under the new
-custody descriptor.
+You can return to federation custody at any point — the protocol accommodates
+the round-trip via attestation re-issuance under the new custody descriptor.
 
 ## Graduation envelope
 
-Per the v1.2-draft-1 oc-attest extension, graduation publishes an
-envelope carrying both an M-of-N guardian quorum sig (federation
-releases custody) and a self-key sig (you prove you hold the key now).
-The envelope is anchored to a bitcoin block via OpenTimestamps so any
-verifier can confirm graduation happened at a specific time.
+Per the v1.2-draft-1 oc-attest extension, graduation publishes an envelope
+carrying both an M-of-N guardian quorum sig (federation releases custody) and a
+self-key sig (you prove you hold the key now). The envelope is anchored to a
+bitcoin block via OpenTimestamps so any verifier can confirm graduation happened
+at a specific time.
 
 ```json
 {
@@ -59,18 +57,17 @@ verifier can confirm graduation happened at a specific time.
 }
 ```
 
-| Field | Rule |
-| --- | --- |
-| `from_federation` | Content hash of the federation custody descriptor releasing the address. |
-| `to` | `"single-key"` (graduating to BIP-322) or `"federation"` (re-binding to a new descriptor). |
-| `proof` | M signatures from M of N declared guardians PLUS one self-key signature. |
-| `graduated_at` | ISO-8601 timestamp; the OTS proof anchors this to a Bitcoin block. |
+| Field             | Rule                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| `from_federation` | Content hash of the federation custody descriptor releasing the address.                   |
+| `to`              | `"single-key"` (graduating to BIP-322) or `"federation"` (re-binding to a new descriptor). |
+| `proof`           | M signatures from M of N declared guardians PLUS one self-key signature.                   |
+| `graduated_at`    | ISO-8601 timestamp; the OTS proof anchors this to a Bitcoin block.                         |
 
 ## Guardian descriptor
 
-A federation custody descriptor is a content-addressed canonical JSON
-object — same shape as oc-agent-protocol's federation principal,
-re-purposed for custody:
+A federation custody descriptor is a content-addressed canonical JSON object —
+same shape as oc-agent-protocol's federation principal, re-purposed for custody:
 
 ```json
 {
@@ -93,29 +90,33 @@ re-purposed for custody:
 }
 ```
 
-The descriptor id is `fed:` + lowercase hex `SHA-256(canonical_descriptor_bytes)`.
+The descriptor id is `fed:` + lowercase hex
+`SHA-256(canonical_descriptor_bytes)`.
 
 ## What stays the same when you graduate
 
-| Stays the same | Changes |
-| --- | --- |
-| Your bitcoin address (the canonical identifier) | The signing method (`fedimint_threshold` → `bip-322`) |
-| Your attest tier (`anonymous` / `bonded` / `kyc-light` / `kyc-strong`) | Who holds the private key (you, instead of the federation) |
-| Your /me/earn history, connected sites, agent delegations | How recovery works (you own backup; lose the key, lose the funds) |
-| Your sat-earning rate | The shape of `signing_method` in attestation envelopes |
+| Stays the same                                                         | Changes                                                           |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Your bitcoin address (the canonical identifier)                        | The signing method (`fedimint_threshold` → `bip-322`)             |
+| Your attest tier (`anonymous` / `bonded` / `kyc-light` / `kyc-strong`) | Who holds the private key (you, instead of the federation)        |
+| Your /me/earn history, connected sites, agent delegations              | How recovery works (you own backup; lose the key, lose the funds) |
+| Your sat-earning rate                                                  | The shape of `signing_method` in attestation envelopes            |
 
 ## Guardian rotation
 
-Guardian rotation produces a **new descriptor with a new id**. Old
-attestations remain verifiable against the old descriptor; new
-attestations bind to the new descriptor. Rotation envelopes are
-authenticated by M-of-N signatures from the **old** descriptor and
-OTS-anchored so any verifier can resolve the active descriptor at any
-historical instant.
+Guardian rotation produces a **new descriptor with a new id**. Old attestations
+remain verifiable against the old descriptor; new attestations bind to the new
+descriptor. Rotation envelopes are authenticated by M-of-N signatures from the
+**old** descriptor and OTS-anchored so any verifier can resolve the active
+descriptor at any historical instant.
 
 ## Reading further
 
-- [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md) — full v1.2-draft-1 spec
-- [`oc-agent-protocol/FEDERATION.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/FEDERATION.md) — sibling federation principal extension for delegations
-- [me.ochk.io/custody](https://me.ochk.io/custody) — product expression of this contract
-- [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — the live graduation flow
+- [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
+  — full v1.2-draft-1 spec
+- [`oc-agent-protocol/FEDERATION.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/FEDERATION.md)
+  — sibling federation principal extension for delegations
+- [me.ochk.io/custody](https://me.ochk.io/custody) — product expression of this
+  contract
+- [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — the live graduation
+  flow

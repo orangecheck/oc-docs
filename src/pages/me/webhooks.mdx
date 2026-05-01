@@ -6,17 +6,17 @@ export const metadata = {
 
 # OC Me · Webhooks
 
-**Every billable envelope your project signs is delivered to your
-registered endpoints, signed with OC's federation Ed25519 key.** Verify
-the signature against the **raw** request body — frameworks that
-re-serialize before your handler will produce a different byte sequence
-and the signature will not validate.
+**Every billable envelope your project signs is delivered to your registered
+endpoints, signed with OC's federation Ed25519 key.** Verify the signature
+against the **raw** request body — frameworks that re-serialize before your
+handler will produce a different byte sequence and the signature will not
+validate.
 
 ## Reception · Node + Express
 
 ```ts
-import express from 'express';
 import { oc } from '@orangecheck/me-client';
+import express from 'express';
 
 const app = express();
 app.use(express.text({ type: 'application/json' })); // raw body!
@@ -65,50 +65,50 @@ async fn webhook(
 
 ## Headers OC sends
 
-| Header | Meaning |
-| --- | --- |
-| `OC-Signature` | Ed25519 signature, hex-encoded, computed over the raw body |
-| `OC-Key-Id` | `kid` of the OC public JWK that signed the event |
-| `OC-Envelope-Id` | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
-| `OC-Subtype` | Event subtype, copied for routing convenience |
-| `OC-Class` | A · B · C |
-| `OC-Delivery-Attempt` | 1-based retry counter |
-| `Content-Type` | `application/json` |
+| Header                | Meaning                                                                         |
+| --------------------- | ------------------------------------------------------------------------------- |
+| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                      |
+| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                |
+| `OC-Envelope-Id`      | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
+| `OC-Subtype`          | Event subtype, copied for routing convenience                                   |
+| `OC-Class`            | A · B · C                                                                       |
+| `OC-Delivery-Attempt` | 1-based retry counter                                                           |
+| `Content-Type`        | `application/json`                                                              |
 
 ## Delivery semantics
 
-| | |
-| --- | --- |
-| **Guarantee** | At-least-once. Idempotent on `envelope.id`. |
-| **Retry schedule** | Jittered exponential: 0s · 30s · 2m · 10m · 1h · 6h · 24h. |
-| **Ack** | Any 2xx. Anything else triggers retry. |
-| **Mute** | After 24h of failure the endpoint is muted. Envelopes still archive on `/api/envelope/[id]`. |
+|                    |                                                                                              |
+| ------------------ | -------------------------------------------------------------------------------------------- |
+| **Guarantee**      | At-least-once. Idempotent on `envelope.id`.                                                  |
+| **Retry schedule** | Jittered exponential: 0s · 30s · 2m · 10m · 1h · 6h · 24h.                                   |
+| **Ack**            | Any 2xx. Anything else triggers retry.                                                       |
+| **Mute**           | After 24h of failure the endpoint is muted. Envelopes still archive on `/api/envelope/[id]`. |
 
 ## The raw-body trap
 
 > **Verify against the raw bytes, not the parsed JSON.**
 
-`JSON.parse(body)` then `JSON.stringify(value)` produces a *different
-byte sequence* — different key order, different whitespace, different
-number formatting. The signature is computed over the original bytes;
-re-serialized bytes will not match.
+`JSON.parse(body)` then `JSON.stringify(value)` produces a _different byte
+sequence_ — different key order, different whitespace, different number
+formatting. The signature is computed over the original bytes; re-serialized
+bytes will not match.
 
-| Framework | The fix |
-| --- | --- |
-| **Express** | `app.use(express.text({ type: '*/*' }))` — accept body as a raw string. |
+| Framework             | The fix                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Express**           | `app.use(express.text({ type: '*/*' }))` — accept body as a raw string.                                            |
 | **Next.js Pages API** | `export const config = { api: { bodyParser: false } }` — disable body parsing, then read the stream into a Buffer. |
-| **Fastify** | Use a `preParsing` hook to capture the raw body before parsing. |
-| **Hono** | `c.req.text()` to get the raw string. |
-| **Rust + Axum** | `body: bytes::Bytes` extractor, never `Json<…>`. |
+| **Fastify**           | Use a `preParsing` hook to capture the raw body before parsing.                                                    |
+| **Hono**              | `c.req.text()` to get the raw string.                                                                              |
+| **Rust + Axum**       | `body: bytes::Bytes` extractor, never `Json<…>`.                                                                   |
 
 ## Test fire from the dashboard
 
-[me.ochk.io/developer/webhooks](https://me.ochk.io/developer/webhooks)
-has a "test fire" button per registered endpoint. It POSTs a synthetic
-envelope with a placeholder signature so you can verify wiring before a
-real event lands. Receivers verifying with `@noble/curves` should reject
-the test signature (the placeholder is all zeros) — that's the correct
-behavior. Production envelopes carry valid sigs.
+[me.ochk.io/developer/webhooks](https://me.ochk.io/developer/webhooks) has a
+"test fire" button per registered endpoint. It POSTs a synthetic envelope with a
+placeholder signature so you can verify wiring before a real event lands.
+Receivers verifying with `@noble/curves` should reject the test signature (the
+placeholder is all zeros) — that's the correct behavior. Production envelopes
+carry valid sigs.
 
 ## Handler patterns we recommend
 
@@ -117,7 +117,11 @@ behavior. Production envelopes carry valid sigs.
 const seen = new LRU<string, true>({ max: 10_000 });
 
 app.post('/api/oc/webhook', async (req, res) => {
-    const result = await oc.webhook.verify(req.body, req.header('OC-Signature'), req.header('OC-Key-Id'));
+    const result = await oc.webhook.verify(
+        req.body,
+        req.header('OC-Signature'),
+        req.header('OC-Key-Id')
+    );
     if (!result.ok) return res.status(401).end(result.reason);
 
     const envelope = JSON.parse(req.body);

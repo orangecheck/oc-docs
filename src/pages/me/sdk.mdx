@@ -9,9 +9,8 @@ export const metadata = {
 **v0.5.0 · MIT · 11 KB ESM · 7.7 KB DTS.**
 
 This is the canonical TypeScript SDK for integrating me.ochk.io. The same
-reference is mirrored at [me.ochk.io/sdk](https://me.ochk.io/sdk) — this
-page is the docs.ochk.io copy organized alongside the other product
-references.
+reference is mirrored at [me.ochk.io/sdk](https://me.ochk.io/sdk) — this page is
+the docs.ochk.io copy organized alongside the other product references.
 
 ## install
 
@@ -19,8 +18,8 @@ references.
 yarn add @orangecheck/me-client @orangecheck/auth-client
 ```
 
-`@orangecheck/auth-client` is the React provider + hook. `me-client`
-re-exports it, so most code only needs to import from `me-client`.
+`@orangecheck/auth-client` is the React provider + hook. `me-client` re-exports
+it, so most code only needs to import from `me-client`.
 
 ## React surface
 
@@ -36,9 +35,9 @@ import { OcSessionProvider } from '@orangecheck/me-client';
 
 ### `useOcSession()` and `useOptionalOcSession()`
 
-Returns `{ status, account, signInUrl, signOut, refresh, error }`.
-Status is `loading | authenticated | anonymous | error`. Account is
-`null` when not authenticated.
+Returns `{ status, account, signInUrl, signOut, refresh, error }`. Status is
+`loading | authenticated | anonymous | error`. Account is `null` when not
+authenticated.
 
 ```tsx
 import { useOcSession } from '@orangecheck/me-client';
@@ -56,9 +55,9 @@ function Header() {
 }
 ```
 
-`useOptionalOcSession()` returns null instead of throwing — useful for
-libraries that want to read the session if it exists but shouldn't crash
-on apps that haven't mounted the provider.
+`useOptionalOcSession()` returns null instead of throwing — useful for libraries
+that want to read the session if it exists but shouldn't crash on apps that
+haven't mounted the provider.
 
 ## `oc.session.*` · session lifecycle (Class C billable atom)
 
@@ -76,11 +75,11 @@ await oc.session.refresh(session.id);
 await oc.session.invalidate(session.id);
 ```
 
-| Function | Signature | Note |
-| --- | --- | --- |
-| `oc.session.create(opts)` | `(SignInOptions) => Promise<Session>` | Class C billable. |
-| `oc.session.refresh(id)` | `(string) => Promise<Session>` | Free. |
-| `oc.session.invalidate(id)` | `(string) => Promise<void>` | Free. |
+| Function                    | Signature                             | Note              |
+| --------------------------- | ------------------------------------- | ----------------- |
+| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | Class C billable. |
+| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.             |
+| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.             |
 
 ## `oc.payment.authorize` · Class B billable atom
 
@@ -98,6 +97,9 @@ The user is prompted by me.ochk.io to consent before this resolves.
 ## `oc.config.*` · IntegratorPriceConfig CRUD
 
 ```ts
+// Validate without a round-trip
+import { validateIntegratorConfig } from '@orangecheck/me-client';
+
 const cfg = await oc.config.get();
 await oc.config.update({
     ...cfg,
@@ -111,35 +113,33 @@ await oc.config.update({
     },
 });
 
-// Validate without a round-trip
-import { validateIntegratorConfig } from '@orangecheck/me-client';
 const result = validateIntegratorConfig(cfg);
 if (!result.ok) console.error(result.errors);
 ```
 
-| Function | Signature | Note |
-| --- | --- | --- |
-| `oc.config.get()` | `() => Promise<IntegratorPriceConfig>` | |
-| `oc.config.update(cfg)` | `(IntegratorPriceConfig) => Promise<IntegratorPriceConfig>` | Throws on local invalidity; 422 on server rejection. |
-| `oc.config.validate(cfg)` | `(IntegratorPriceConfig) => ValidationResult` | No network call. |
+| Function                  | Signature                                                   | Note                                                 |
+| ------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| `oc.config.get()`         | `() => Promise<IntegratorPriceConfig>`                      |                                                      |
+| `oc.config.update(cfg)`   | `(IntegratorPriceConfig) => Promise<IntegratorPriceConfig>` | Throws on local invalidity; 422 on server rejection. |
+| `oc.config.validate(cfg)` | `(IntegratorPriceConfig) => ValidationResult`               | No network call.                                     |
 
 ## `oc.webhook.verify` · Ed25519 signature verification
 
 **Always pass the raw body bytes**, not the parsed JSON. Frameworks that
-re-serialize before your handler produce a different byte sequence and
-the signature will not validate.
+re-serialize before your handler produce a different byte sequence and the
+signature will not validate.
 
 ```ts
 const result = await oc.webhook.verify(
-    rawBody,    // string | Uint8Array
-    sigHex,     // OC-Signature header
-    kid         // OC-Key-Id header
+    rawBody, // string | Uint8Array
+    sigHex, // OC-Signature header
+    kid // OC-Key-Id header
 );
 if (!result.ok) return res.status(401).end(result.reason);
 ```
 
-Auto-fetches and caches `ochk.io/.well-known/jwks.json` for 1h when no
-`jwk` is passed.
+Auto-fetches and caches `ochk.io/.well-known/jwks.json` for 1h when no `jwk` is
+passed.
 
 ## `oc.delegation.*` · agent authority (Class A billable atom)
 
@@ -153,17 +153,17 @@ const env = await oc.delegation.issue({
 await oc.delegation.revoke(env.id);
 ```
 
-Max TTL 30 days. Revocation is instant — the verifier rejects any
-envelope signed after revocation regardless of the agent's state.
+Max TTL 30 days. Revocation is instant — the verifier rejects any envelope
+signed after revocation regardless of the agent's state.
 
 ## `oc.event.fire` · arbitrary billable subtypes (v0.5.0)
 
 The escape hatch when you want to bill a subtype that isn't covered by
 `oc.session.create` or `oc.payment.authorize` — `stamp_signing`,
 `attest_verification_at_gate`, `scoped_action_authorization`,
-`kyc_tier_upgrade`, etc. Class is determined by `SUBTYPE_CLASS`;
-cashback is computed via `computeFees()`; the envelope is recorded
-under your `project_key` and shows up in `/developer/projects/[id]/events`.
+`kyc_tier_upgrade`, etc. Class is determined by `SUBTYPE_CLASS`; cashback is
+computed via `computeFees()`; the envelope is recorded under your `project_key`
+and shows up in `/developer/projects/[id]/events`.
 
 ```ts
 const stamp = await oc.event.fire({
@@ -181,13 +181,13 @@ const verify = await oc.event.fire({
 });
 ```
 
-| Function | Signature | Note |
-| --- | --- | --- |
+| Function              | Signature                                      | Note                                                       |
+| --------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
 | `oc.event.fire(opts)` | `(FireEventOptions) => Promise<BillableEvent>` | Returns the canonical `BillableEvent` the server recorded. |
 
 `SignInOptions` and `PaymentAuthorizeOptions` also gain an optional
-`project_key` field in v0.5.0 — when set, sessions and payments are
-attributed to the project and recorded the same way.
+`project_key` field in v0.5.0 — when set, sessions and payments are attributed
+to the project and recorded the same way.
 
 ## Types
 
@@ -205,15 +205,18 @@ DelegationScope · DelegationEnvelope · IssueDelegationOptions
 
 ## Constants and helpers
 
-| Export | Signature |
-| --- | --- |
-| `PLATFORM_FEE_POLICY` | `{ pct: 0.2; min_floor_sats: 1; ratified: string }` |
-| `MIN_INTEGRATOR_PRICE_SATS` | `5` |
-| `computeFees(cfg, payment_amount_sats?)` | `(IntegratorEventConfig, number?) => ComputedFees` |
-| `validateIntegratorConfig(cfg)` | `(IntegratorPriceConfig) => ValidationResult` |
+| Export                                   | Signature                                           |
+| ---------------------------------------- | --------------------------------------------------- |
+| `PLATFORM_FEE_POLICY`                    | `{ pct: 0.2; min_floor_sats: 1; ratified: string }` |
+| `MIN_INTEGRATOR_PRICE_SATS`              | `5`                                                 |
+| `computeFees(cfg, payment_amount_sats?)` | `(IntegratorEventConfig, number?) => ComputedFees`  |
+| `validateIntegratorConfig(cfg)`          | `(IntegratorPriceConfig) => ValidationResult`       |
 
 ## Where it lives
 
-- **npm**: [@orangecheck/me-client](https://www.npmjs.com/package/@orangecheck/me-client)
-- **source**: [oc-packages/me-client](https://github.com/orangecheck/oc-packages/tree/main/me-client)
-- **canonical type module**: `@orangecheck/me-client/types` (mirror of `oc-me-web/src/lib/events/types.ts`)
+- **npm**:
+  [@orangecheck/me-client](https://www.npmjs.com/package/@orangecheck/me-client)
+- **source**:
+  [oc-packages/me-client](https://github.com/orangecheck/oc-packages/tree/main/me-client)
+- **canonical type module**: `@orangecheck/me-client/types` (mirror of
+  `oc-me-web/src/lib/events/types.ts`)

@@ -13,6 +13,7 @@ const PROTOCOLS: FooterLink[] = [
     { href: '/stamp', label: 'oc·stamp' },
     { href: '/agent', label: 'oc·agent' },
     { href: '/pledge', label: 'oc·pledge' },
+    { href: '/console', label: 'oc·console' },
 ];
 
 const DOCS: FooterLink[] = [
@@ -33,6 +34,7 @@ const ECOSYSTEM: FooterLink[] = [
     { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io' },
     { href: 'https://agent.ochk.io', label: 'agent.ochk.io' },
     { href: 'https://pledge.ochk.io', label: 'pledge.ochk.io' },
+    { href: 'https://console.ochk.io', label: 'console.ochk.io' },
     {
         href: 'https://github.com/orangecheck',
         label: 'github org',

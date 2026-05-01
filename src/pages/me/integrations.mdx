@@ -1,0 +1,110 @@
+export const metadata = {
+    title: 'OC Me · Integrations',
+    description:
+        'OAuth-peer pattern · sample IntegratorPriceConfig archetypes · zero-bitcoin-knowledge user flow · cross-product flows with console.ochk.io.',
+};
+
+# OC Me · Integrations
+
+**OC sits as a peer next to your existing OAuth providers.** A first-time
+user picking OC has a federation-custodied bitcoin wallet provisioned
+silently — no seed phrase, no key handling, no "what is a sat"
+conversation. Sat-earning starts on first session.
+
+## OAuth-peer pattern
+
+```tsx
+import { OcSignInButton } from '@orangecheck/me-client';
+import { signIn } from 'next-auth/react';
+
+export function SignInOptions() {
+    return (
+        <div className="auth-options">
+            <button onClick={() => signIn('google')}>continue with google</button>
+            <button onClick={() => signIn('apple')}>continue with apple</button>
+            <button onClick={() => signIn('email')}>email magic link</button>
+            <OcSignInButton scope={['identity']}>
+                sign in with oc · earn sats
+            </OcSignInButton>
+        </div>
+    );
+}
+```
+
+| What your user sees | What your user does NOT see |
+| --- | --- |
+| a button next to google / apple | a seed phrase |
+| one redirect to me.ochk.io | a wallet creation flow |
+| signed in on your site | a "buy bitcoin" CTA |
+| (eventually) a growing sat balance | any crypto vocabulary at all |
+
+When do they find out? When they want to.
+[me.ochk.io/me](https://me.ochk.io/me) shows their balance,
+[me.ochk.io/me/wallet](https://me.ochk.io/me/wallet) shows
+receive/send/withdraw,
+[me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) offers
+self-custody. None of this is in the OAuth path. None of it surfaces
+unless the user explicitly visits.
+
+## Sample integrator archetypes
+
+The configurator at [me.ochk.io/integrate](https://me.ochk.io/integrate)
+ships with six representative sample configurations. Different unit
+economics produce different choices — there's no "right" config OC sets,
+just the math.
+
+| Archetype | Domain | Account creation | Session | Payment | User share |
+| --- | --- | --- | --- | --- | --- |
+| **Lightning fintech** | breez.example | 2,100 sats | 80 sats | 0.50% | 70% |
+| **Cashback-heavy** | fold.example | 1,600 sats | 60 sats | 0.95% | 78% |
+| **Lightning-native social** | damus.example | — | 40 sats | — | 50% |
+| **Merchant SaaS · KYC-required** | zaprite.example | 5,300 sats | 75 sats | 0.85% | 55–65% |
+| **Community federation** | fedi.example | 850 sats | 50 sats | — | 78% |
+| **Creator platform** | creator.example | 1,100 sats | 35 sats | 0.65% | 60–70% |
+
+The config schema is open and self-served — see
+[/me/sdk](/me/sdk#oc-config--integratorpriceconfig-crud) for the full
+shape and [/developer/config](https://me.ochk.io/developer/config) for
+the inline editor.
+
+## Cross-product flows · me + console
+
+A consumer using me.ochk.io may sign into a SaaS that runs on
+console.ochk.io for managed agent infrastructure. The envelopes are the
+same primitive (oc-attest, oc-stamp, oc-agent) — the two products are
+two integration surfaces over identical contracts.
+
+| Flow | Surface |
+| --- | --- |
+| User signs into a SaaS using OC button | me.ochk.io provisions wallet · console.ochk.io receives session |
+| User authorizes an LLM agent inside the SaaS | console.ochk.io issues delegation · me.ochk.io shows it on /me/agents |
+| Agent takes a stamped action | console.ochk.io ingests · me.ochk.io credits sats per the SaaS's IntegratorPriceConfig |
+| User revokes the delegation | me.ochk.io publishes oc-agent-rev:[id] · console.ochk.io drops further envelopes |
+
+See [console.ochk.io integrations docs](/console/integrations) for the
+operator-side view.
+
+## Errors and edge cases
+
+| Error | Meaning | Fix |
+| --- | --- | --- |
+| `IntegratorPriceConfig invalid` (422) | Validation failed server-side. | Run `validateIntegratorConfig(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
+| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`. |
+| `rate_limit_exceeded` (429) | You exceeded a per-IP bucket. | Honor `Retry-After`; back off exponentially. |
+| `delegation not found` (404) | The id is unknown to OC's index. | Check the id; the SDK returned envelope is the source of truth. |
+
+## Self-host considerations
+
+me.ochk.io is one implementation of the canonical OC primitives. Anyone
+can run their own me-equivalent against the same envelope contracts —
+that's the product strategy. If you're considering self-hosting, the
+contracts to honor are at:
+
+- `oc-attest-protocol/SPEC.md` (identity)
+- `oc-attest-protocol/FEDERATION-CUSTODY.md` (v1.2-draft-1 federation custody)
+- `oc-stamp-protocol/SPEC.md` (anchored receipts)
+- `oc-agent-protocol/SPEC.md` + `FEDERATION.md` (delegations)
+- `oc-lock-protocol/SPEC.md` (encrypted DMs)
+
+The hosted me.ochk.io substrate is a convenience, not a moat. Charter
+commitment 04 keeps every reference site free and self-hostable forever.

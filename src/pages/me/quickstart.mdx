@@ -44,8 +44,15 @@ cross-subdomain session.
 ## 03 · drop the sign-in button
 
 OC is an OAuth peer. Render it next to your existing Google / Apple / magic-link
-options. First-time users get a federation-custodied bitcoin wallet provisioned
-silently — no seed phrase, no key handling, no "what is a sat" conversation.
+options. The me.ochk.io sign-in page offers two paths in-place:
+
+- **email-OTP** (default · most users) — type your email, paste the 6-digit
+  code; identity is `did:email:<sha256(email)>`. A federation-custodied wallet
+  is provisioned for the account; the user never sees a seed phrase unless they
+  explicitly graduate to self-custody later.
+- **BIP-322** (Bitcoin-savvy users) — paste a Bitcoin address, sign the
+  challenge in the user's wallet (UniSat, Xverse, Leather, Alby, etc.); the
+  identity is the address itself, self-custody from day one.
 
 ```tsx
 import { OcSignInButton } from '@orangecheck/me-client';
@@ -60,17 +67,23 @@ export function SignInOptions() {
             <button onClick={() => signIn('apple')}>continue with apple</button>
             <button onClick={() => signIn('email')}>email magic link</button>
             <OcSignInButton scope={['identity']}>
-                sign in with oc · earn sats
+                sign in with oc
             </OcSignInButton>
         </div>
     );
 }
 ```
 
-When a first-time user picks OC: they bounce to me.ochk.io/signin → federation
-provisions their wallet → they're signed back in on your site with an
-`oc_session` cookie → every billable event you emit credits sats to their
-balance. They never have to know about bitcoin until they want to graduate.
+When a user picks OC: they bounce to me.ochk.io/signin → pick email-OTP or
+BIP-322 → on success they're signed back in on your site with an `oc_session`
+cookie → every billable event you emit credits sats to the user's balance.
+
+> See
+> [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
+> for the honest current state of the federation-custody pipeline. The email-OTP
+> signup + session creation is live; the federation client scaffold is wired in
+> `oc-me-web/src/lib/fedimint`; Lightning send/receive and the graduation
+> withdraw envelope are in build (#130, #132).
 
 ## 04 · configure your prices
 

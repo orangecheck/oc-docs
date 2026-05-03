@@ -1,33 +1,48 @@
 export const metadata = {
     title: 'OC Me · Federation custody',
     description:
-        'Federation custody descriptor schema, M-of-N graduation envelopes, guardian rotation. Maps the v1.2-draft-1 oc-attest extension to the me.ochk.io product surface.',
+        'Federation custody descriptor schema, M-of-N graduation envelopes, guardian rotation. Maps the v1.2-draft-1 oc-attest extension to the me.ochk.io product surface — with honest disclosure of which pieces are live today.',
 };
 
 # OC Me · Federation custody
 
-**me.ochk.io is federation-custodied by default, self-custody when ready.** This
-page is the user-facing explanation; the protocol-level contract is at
+**me.ochk.io is built to be federation-custodied by default, with a self-custody
+graduation flow on demand.** This page is the user-facing explanation; the
+protocol-level contract is at
 [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
 (v1.2-draft-1, additive extension).
 
+> **Honest current state.** The non-custodial audit
+> ([`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md))
+> is the load-bearing reference for what is actually wired today. Read it before
+> integrating against the federation surface — the descriptor schema below is a
+> forward-looking contract, not a description of running guardians. The two
+> paths that DO exist today are: BIP-322 (you sign in directly with your Bitcoin
+> wallet, OC never holds keys) and email-OTP (a federation client scaffold is
+> wired in `oc-me-web/src/lib/fedimint`, but Lightning send/receive and the
+> graduation withdraw envelope are not yet shipped). Custodial state for
+> email-OTP users today is NOT a running guardian set — it is a state machine
+> that refuses to fabricate one.
+
 ## What "federation-custodied" means
 
-Your me.ochk.io identity is bound to a Bitcoin address, but the private key that
-controls it is held collectively by an M-of-N guardian set — no single guardian
-(and not OC the company) can spend or freeze. Recovery is by re-proving your
-email or phone, not by remembering twelve words.
+Your me.ochk.io identity is bound to a Bitcoin address (BIP-322 path) or a
+federation-issued ecash note set (email-OTP path). For the federation path, the
+private key that controls the underlying on-chain UTXOs is held collectively by
+an M-of-N guardian set — no single guardian (and not OC the company) can spend
+or freeze. Recovery is by re-proving your email, not by remembering twelve
+words.
 
 When you sign in, the federation guardians threshold-sign on your behalf. You
 don't see this. You never need to.
 
 ## The three options at threshold
 
-|                                  | signing_method                              | how it works                                                                                                              |
-| -------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **federation custody** (default) | `fedimint_threshold`                        | guardians collectively hold the key. recovery by re-proving email/phone.                                                  |
-| **fedimint client**              | `fedimint_threshold` (different federation) | sweep to a fedimint federation you trust more (your community's, your country's, your own).                               |
-| **self-custody**                 | `bip-322`                                   | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Alby, Sparrow, hardware wallet). only you can sign. |
+|                                  | signing_method                              | how it works                                                                                                              | live today?                                                                        |
+| -------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **federation custody** (default) | `fedimint_threshold`                        | guardians collectively hold the key. recovery by re-proving email.                                                        | client scaffold + state machine wired; production federation invite pending.       |
+| **fedimint client**              | `fedimint_threshold` (different federation) | sweep to a fedimint federation you trust more (your community's, your country's, your own).                               | once (1) is live; depends on graduation envelope.                                  |
+| **self-custody**                 | `bip-322`                                   | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Alby, Sparrow, hardware wallet). only you can sign. | sign-in is live (in-place, no redirect); explicit graduation envelope is in build. |
 
 You can return to federation custody at any point — the protocol accommodates
 the round-trip via attestation re-issuance under the new custody descriptor.
@@ -63,6 +78,11 @@ at a specific time.
 | `to`              | `"single-key"` (graduating to BIP-322) or `"federation"` (re-binding to a new descriptor). |
 | `proof`           | M signatures from M of N declared guardians PLUS one self-key signature.                   |
 | `graduated_at`    | ISO-8601 timestamp; the OTS proof anchors this to a Bitcoin block.                         |
+
+The envelope contract is finalized at the spec level and reflected in the
+[`/me/graduate`](https://me.ochk.io/me/graduate) UI. The producing path (quorum
+sig collection from a real federation) is the integration the
+production-federation invite unlocks.
 
 ## Guardian descriptor
 
@@ -116,7 +136,10 @@ descriptor at any historical instant.
   — full v1.2-draft-1 spec
 - [`oc-agent-protocol/FEDERATION.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/FEDERATION.md)
   — sibling federation principal extension for delegations
+- [`oc-me-web/NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
+  — the in-tree audit · what's actually wired today vs the contract above
 - [me.ochk.io/custody](https://me.ochk.io/custody) — product expression of this
-  contract
-- [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — the live graduation
-  flow
+  contract with live status pills per state
+- [me.ochk.io/security](https://me.ochk.io/security) — the OC_STORES table,
+  disappearance scenarios, recovery matrix per signin path
+- [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — the graduation flow

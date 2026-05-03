@@ -10,10 +10,29 @@ export const metadata = {
 The SDK is the canonical integration path; this page is the raw HTTP surface for
 clients that aren't TypeScript or that want to bypass the SDK.
 
-Every endpoint is at `https://me.ochk.io/api/...`. Auth is by cross-subdomain
-`oc_session` cookie (`Domain=.ochk.io`, HttpOnly, SameSite=Lax). Mutating
-endpoints are rate-limited per IP per bucket; limits are returned in
-`X-RateLimit-*` headers.
+Every endpoint is at `https://me.ochk.io/api/...` unless noted. Auth is by
+cross-subdomain `oc_session` cookie (`Domain=.ochk.io`, HttpOnly, SameSite=Lax)
+issued by the auth host at `https://ochk.io`. Mutating endpoints are
+rate-limited per IP per bucket; limits are returned in `X-RateLimit-*` headers.
+
+## Sign-in endpoints (auth host · `https://ochk.io`)
+
+The session cookie is issued by the family auth host, not by me.ochk.io
+directly. me.ochk.io's `/signin` page calls these endpoints cross-origin with
+credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
+
+| Method | Path                         | Purpose                                                                |
+| ------ | ---------------------------- | ---------------------------------------------------------------------- |
+| `POST` | `/api/auth/email-otp/start`  | issue a stateless OTP token + email a 6-digit code (rate-limited 5/hr) |
+| `POST` | `/api/auth/email-otp/verify` | verify `{email, code, token}`, upsert account, set `oc_session` cookie |
+| `GET`  | `/api/challenge`             | issue a fresh BIP-322 challenge to sign                                |
+| `POST` | `/api/auth/signin`           | verify a signed BIP-322 challenge, upsert account, set `oc_session`    |
+| `POST` | `/api/auth/logout`           | clear the `oc_session` cookie                                          |
+| `GET`  | `/api/auth/me`               | crypto-only identity lookup; 401 otherwise                             |
+
+> See
+> [`oc-me-web/src/pages/signin.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/pages/signin.tsx)
+> for the canonical client implementation against these endpoints.
 
 ## Public endpoints
 

@@ -118,7 +118,7 @@
             "id": "database_not_configured",
             "kind": "config",
             "status": 503,
-            "description": "DATABASE_URL unset — console is in v1.1 preview mode."
+            "description": "DATABASE_URL unset — fleet is in v1.1 preview mode."
         },
         {
             "id": "delegation_inactive",

@@ -4,7 +4,7 @@
  * Top-level reading order:
  *   1. Getting started · Ecosystem (shared)              — landing + plumbing
  *   2. Protocols · Attest / Lock / Stamp / Vote / Agent / Pledge — six siblings
- *   3. Commercial products · Console / Me                — managed offerings
+ *   3. Commercial products · Fleet / Me                — managed offerings
  *   4. SDKs                                              — ship-ready packages
  *   5. Company · Charter                                 — cross-product commitments
  *   6. Reference · FAQ / Glossary                        — everything else
@@ -21,7 +21,7 @@
  *      which collects cross-product pages (charter today; legal/about
  *      eventually) — its items live at the docs root, not under /company/*.
  *   3. Protocol sections lead with overview → concepts → API → guides.
- *   4. Commercial product sections (console, me) lead with overview →
+ *   4. Commercial product sections (fleet, me) lead with overview →
  *      quickstart → SDK reference → integrations → webhooks → API → custody.
  */
 
@@ -445,32 +445,32 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
-        slug: 'console',
-        label: 'OC Console',
+        slug: 'fleet',
+        label: 'OC Fleet',
         blurb: 'Managed infrastructure for the OC Agent family. The commercial layer.',
         items: [
             {
-                href: '/console',
+                href: '/fleet',
                 label: 'Overview',
-                blurb: "What console is, what it isn't, and where it fits.",
+                blurb: "What fleet is, what it isn't, and where it fits.",
             },
             {
-                href: '/console/quickstart',
+                href: '/fleet/quickstart',
                 label: 'Quickstart',
                 blurb: 'Sign in, bootstrap, register your first delegation, see receipts flow.',
             },
             {
-                href: '/console/integrations',
+                href: '/fleet/integrations',
                 label: 'Integrations',
                 blurb: 'Drop-in adapters for Anthropic / OpenAI / Vercel AI SDK / LangGraph / MCP.',
             },
             {
-                href: '/console/webhooks',
+                href: '/fleet/webhooks',
                 label: 'Webhooks',
                 blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',
             },
             {
-                href: '/console/api',
+                href: '/fleet/api',
                 label: 'API reference',
                 blurb: 'OpenAPI 3.1 spec, auth schemes, error codes, route catalog.',
             },
@@ -573,7 +573,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/charter',
                 label: 'Charter',
-                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, console, every protocol sibling).',
+                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, fleet, every protocol sibling).',
             },
         ],
     },

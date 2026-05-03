@@ -1,13 +1,13 @@
 /**
- * Renders the console.ochk.io subscribable webhook event catalog.
+ * Renders the fleet.ochk.io subscribable webhook event catalog.
  *
- * Source: src/generated/console-catalogs.json (built from
- * https://console.ochk.io/api/webhook-events at deploy time). The
+ * Source: src/generated/fleet-catalogs.json (built from
+ * https://fleet.ochk.io/api/webhook-events at deploy time). The
  * typed source of truth is src/lib/webhooks/events.ts in
- * oc-console-web. Coverage tests over there guarantee every
+ * oc-fleet-web. Coverage tests over there guarantee every
  * dispatchEvent() call uses an id from this catalog.
  */
-import catalogs from '@/generated/console-catalogs.json';
+import catalogs from '@/generated/fleet-catalogs.json';
 
 interface WebhookEventEntry {
     id: string;
@@ -15,14 +15,14 @@ interface WebhookEventEntry {
     payloadFields: string[];
 }
 
-export function ConsoleWebhookEventCatalog() {
+export function FleetWebhookEventCatalog() {
     const events = (catalogs.webhookEvents ?? []) as WebhookEventEntry[];
 
     if (events.length === 0) {
         return (
             <div className="text-muted-foreground my-6 rounded border border-dashed p-4 text-sm">
                 Catalog not available — the build-time fetch from
-                <code className="mx-1">https://console.ochk.io/api/webhook-events</code>
+                <code className="mx-1">https://fleet.ochk.io/api/webhook-events</code>
                 returned empty. Refresh once the endpoint deploys.
             </div>
         );
@@ -69,12 +69,12 @@ export function ConsoleWebhookEventCatalog() {
             </div>
             <p className="text-muted-foreground/70 text-[10.5px]">
                 {events.length} subscribable event types · auto-generated from{' '}
-                <a href="https://console.ochk.io/api/webhook-events" className="underline">
+                <a href="https://fleet.ochk.io/api/webhook-events" className="underline">
                     /api/webhook-events
                 </a>{' '}
                 at build time. Source of truth: <code>src/lib/webhooks/events.ts</code> in{' '}
-                <a href="https://github.com/orangecheck/oc-console-web" className="underline">
-                    orangecheck/oc-console-web
+                <a href="https://github.com/orangecheck/oc-fleet-web" className="underline">
+                    orangecheck/oc-fleet-web
                 </a>
                 .
             </p>

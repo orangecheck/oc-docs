@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · Integrations',
     description:
-        'OAuth-peer pattern · sample IntegratorPriceConfig archetypes · zero-bitcoin-knowledge user flow · cross-product flows with console.ochk.io.',
+        'OAuth-peer pattern · sample IntegratorPriceConfig archetypes · zero-bitcoin-knowledge user flow · cross-product flows with fleet.ochk.io.',
 };
 
 # OC Me · Integrations
@@ -65,21 +65,21 @@ The config schema is open and self-served — see
 [/me/sdk](/me/sdk#oc-config--integratorpriceconfig-crud) for the full shape and
 [/developer/config](https://me.ochk.io/developer/config) for the inline editor.
 
-## Cross-product flows · me + console
+## Cross-product flows · me + fleet
 
-A consumer using me.ochk.io may sign into a SaaS that runs on console.ochk.io
+A consumer using me.ochk.io may sign into a SaaS that runs on fleet.ochk.io
 for managed agent infrastructure. The envelopes are the same primitive
 (oc-attest, oc-stamp, oc-agent) — the two products are two integration surfaces
 over identical contracts.
 
 | Flow                                         | Surface                                                                                |
 | -------------------------------------------- | -------------------------------------------------------------------------------------- |
-| User signs into a SaaS using OC button       | me.ochk.io provisions wallet · console.ochk.io receives session                        |
-| User authorizes an LLM agent inside the SaaS | console.ochk.io issues delegation · me.ochk.io shows it on /me/agents                  |
-| Agent takes a stamped action                 | console.ochk.io ingests · me.ochk.io credits sats per the SaaS's IntegratorPriceConfig |
-| User revokes the delegation                  | me.ochk.io publishes oc-agent-rev:[id] · console.ochk.io drops further envelopes       |
+| User signs into a SaaS using OC button       | me.ochk.io provisions wallet · fleet.ochk.io receives session                        |
+| User authorizes an LLM agent inside the SaaS | fleet.ochk.io issues delegation · me.ochk.io shows it on /me/agents                  |
+| Agent takes a stamped action                 | fleet.ochk.io ingests · me.ochk.io credits sats per the SaaS's IntegratorPriceConfig |
+| User revokes the delegation                  | me.ochk.io publishes oc-agent-rev:[id] · fleet.ochk.io drops further envelopes       |
 
-See [console.ochk.io integrations docs](/console/integrations) for the
+See [fleet.ochk.io integrations docs](/fleet/integrations) for the
 operator-side view.
 
 ## Errors and edge cases

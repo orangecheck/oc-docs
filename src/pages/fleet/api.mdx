@@ -1,14 +1,14 @@
-import { ConsoleReasonCatalog } from '@/components/docs/ConsoleReasonCatalog';
+import { FleetReasonCatalog } from '@/components/docs/FleetReasonCatalog';
 
 export const metadata = {
-    title: 'Console API reference',
+    title: 'Fleet API reference',
     description:
-        'OpenAPI 3.1 spec, authentication, error codes, and the route catalog for console.ochk.io.',
+        'OpenAPI 3.1 spec, authentication, error codes, and the route catalog for fleet.ochk.io.',
 };
 
-# Console API reference
+# Fleet API reference
 
-console.ochk.io exposes a REST API for managing projects, registering signed
+fleet.ochk.io exposes a REST API for managing projects, registering signed
 delegations / actions / revocations / sub-delegations / federation envelopes,
 ingesting from CI/CD, downloading audit bundles, and managing webhooks.
 
@@ -17,13 +17,13 @@ ingesting from CI/CD, downloading audit bundles, and managing webhooks.
 A hand-maintained OpenAPI 3.1 spec is served at:
 
 ```
-https://console.ochk.io/api/openapi
+https://fleet.ochk.io/api/openapi
 ```
 
 Browse it interactively with try-it-out at:
 
 ```
-https://console.ochk.io/api-explorer
+https://fleet.ochk.io/api-explorer
 ```
 
 Generate a typed client for any language with
@@ -31,9 +31,9 @@ Generate a typed client for any language with
 
 ```bash
 openapi-generator-cli generate \
-    -i https://console.ochk.io/api/openapi \
+    -i https://fleet.ochk.io/api/openapi \
     -g python \
-    -o ./oc-console-py
+    -o ./oc-fleet-py
 ```
 
 ## Authentication
@@ -84,12 +84,12 @@ human-readable and may change without notice.
 
 The full set of stable `reason` strings the API can return, grouped by class.
 This table is auto-generated at build time from
-[`https://console.ochk.io/api/reasons`](https://console.ochk.io/api/reasons) —
+[`https://fleet.ochk.io/api/reasons`](https://fleet.ochk.io/api/reasons) —
 the typed source of truth lives at `src/server/api/reasons.ts` in
-[orangecheck/oc-console-web](https://github.com/orangecheck/oc-console-web).
+[orangecheck/oc-fleet-web](https://github.com/orangecheck/oc-fleet-web).
 Adding a new reason there flows here on the next deploy.
 
-<ConsoleReasonCatalog />
+<FleetReasonCatalog />
 
 ## Rate limiting
 
@@ -120,9 +120,9 @@ twice.
 
 ## See also
 
-- [Integrations](/console/integrations) — the framework adapters that wrap these
+- [Integrations](/fleet/integrations) — the framework adapters that wrap these
   endpoints.
-- [Webhooks](/console/webhooks) — the inbound side: subscribe to events.
+- [Webhooks](/fleet/webhooks) — the inbound side: subscribe to events.
 - [`/agent/spec`](/agent/spec) — the underlying OC Agent envelope spec
   (canonical messages, scope grammar, signature rules).
 - [`/agent/sub-delegation`](/agent/sub-delegation) — kind 30086 chain semantics.

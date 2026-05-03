@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * Build-time generator for the console catalogs that the docs hub
+ * Build-time generator forthe fleet catalogs that the docs hub
  * embeds: reasons, webhook events.
  *
- * Why: console.ochk.io maintains the typed source of truth at
+ * Why: fleet.ochk.io maintains the typed source of truth at
  *   src/server/api/reasons.ts
  *   src/lib/webhooks/events.ts
  * and surfaces JSON projections at /api/reasons and /api/webhook-events.
  *
- * Until this script existed, docs.ochk.io's /console/api page and
- * /console/webhooks page hand-maintained tables that mirrored the
+ * Until this script existed, docs.ochk.io's /fleet/api page and
+ * /fleet/webhooks page hand-maintained tables that mirrored the
  * typed catalog. Those drift the moment a new reason or event_type
- * lands on console without someone remembering to update mdx.
+ * lands on fleet without someone remembering to update mdx.
  *
  * This script runs as `prebuild`. It fetches the JSON from prod and
  * writes a static asset under src/generated/. On Vercel that runs
@@ -19,7 +19,7 @@
  * does the same. `yarn dev` skips it (the existing generated file is
  * checked in so dev and CI work without network).
  *
- * Defensive: if the fetch fails (console down, dev offline, etc.) we
+ * Defensive: if the fetch fails (fleet down, dev offline, etc.) we
  * keep whatever's currently in the generated file. Build doesn't
  * fail; the page renders the cached catalog. Worst case is staleness
  * for one deploy cycle.
@@ -32,17 +32,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..');
 const OUT_DIR = join(ROOT, 'src/generated');
-const OUT_PATH = join(OUT_DIR, 'console-catalogs.json');
+const OUT_PATH = join(OUT_DIR, 'fleet-catalogs.json');
 
 const SOURCES = [
     {
         key: 'reasons',
-        url: 'https://console.ochk.io/api/reasons',
+        url: 'https://fleet.ochk.io/api/reasons',
         responseField: 'reasons',
     },
     {
         key: 'webhookEvents',
-        url: 'https://console.ochk.io/api/webhook-events',
+        url: 'https://fleet.ochk.io/api/webhook-events',
         responseField: 'events',
     },
 ];

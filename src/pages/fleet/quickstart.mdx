@@ -1,22 +1,22 @@
 export const metadata = {
-    title: 'Console quickstart',
+    title: 'Fleet quickstart',
     description:
         'Sign in, bootstrap a project, register your first delegation, and see action receipts flow in. Five minutes.',
 };
 
-# Console quickstart
+# Fleet quickstart
 
 Five-minute path from never-heard-of-it to first stamped action receipt landing
 in your dashboard.
 
 ## 1. Sign in
 
-Open [console.ochk.io](https://console.ochk.io) and click **sign in**. The
+Open [fleet.ochk.io](https://fleet.ochk.io) and click **sign in**. The
 button routes to the family auth host at
 [ochk.io/signin](https://ochk.io/signin) where you authenticate with a BIP-322
 signature from any compatible wallet (UniSat, Xverse, Leather, OKX, Phantom, or
 paste-in). On success the auth host issues a cross-subdomain `oc_session` cookie
-and bounces you back to the console dashboard.
+and bounces you back tothe fleet dashboard.
 
 > **No password, no email**. Your Bitcoin address _is_ your identity. The auth
 > host stores nothing about you that isn't on-chain anyway.
@@ -43,7 +43,7 @@ Click **`/agents/new`** in the sidebar. The form asks for:
 | **bond_sats**     | Optional OC Pledge stake. Skip for v1.                                                                                                                                                    |
 
 Click **sign delegation in wallet**. Your wallet pops up showing the 64-hex
-envelope id; sign it; the envelope is POSTed to `/api/delegations`. Console:
+envelope id; sign it; the envelope is POSTed to `/api/delegations`. Fleet:
 
 - recomputes the id from canonical inputs and rejects on mismatch (tamper
   defense)
@@ -56,7 +56,7 @@ The agent table on `/agents` now shows your new delegation.
 ## 4. Wire your LLM tool calls
 
 Pick the adapter for your framework — install it, supply your agent keypair +
-the delegation envelope + a console API token, and every tool call gets a
+the delegation envelope + a fleet API token, and every tool call gets a
 stamped receipt automatically.
 
 ```ts
@@ -68,7 +68,7 @@ const { result, action, posted } = await invokeWithStampAndPost({
     delegation: signedDelegation,
     toolUse: claudeToolUseBlock,
     call: (toolUse) => myInvoiceCreateImpl(toolUse.input),
-    console: {
+    fleet: {
         apiToken: process.env.OC_TOKEN!, // ock_<64-hex>
         projectId: process.env.OC_PROJECT_ID!,
     },
@@ -76,10 +76,10 @@ const { result, action, posted } = await invokeWithStampAndPost({
 
 // `result` is whatever your tool returned.
 // `action` is the BIP-322-signed canonical envelope.
-// `posted` is { id, project_id, delegation_id } once console accepts it.
+// `posted` is { id, project_id, delegation_id } once fleet accepts it.
 ```
 
-The same `console: { apiToken, projectId }` knob works on
+The same `fleet: { apiToken, projectId }` knob works on
 [`@orangecheck/agent-openai`](https://www.npmjs.com/package/@orangecheck/agent-openai),
 [`@orangecheck/agent-vercel`](https://www.npmjs.com/package/@orangecheck/agent-vercel),
 [`@orangecheck/agent-langgraph`](https://www.npmjs.com/package/@orangecheck/agent-langgraph),
@@ -109,12 +109,12 @@ JSON / CSV.
 That's the whole loop. Real delegation envelope, real action envelopes, real
 Bitcoin anchor — verifiable offline against
 [`@orangecheck/agent-core`](https://www.npmjs.com/package/@orangecheck/agent-core),
-no console-side trust required.
+no fleet-side trust required.
 
 Where to go next:
 
-- [Concepts](/console#five-second-mental-model) — the data model behind it.
-- [Webhooks](/console/webhooks) — push events to your stack.
+- [Concepts](/fleet#five-second-mental-model) — the data model behind it.
+- [Webhooks](/fleet/webhooks) — push events to your stack.
 - [Federation](/agent/spec) — replace the principal with an M-of-N guardian set
   (v1.2).
-- [API reference](/console/api) — full OpenAPI 3.1 spec.
+- [API reference](/fleet/api) — full OpenAPI 3.1 spec.

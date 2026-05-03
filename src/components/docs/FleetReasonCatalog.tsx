@@ -1,17 +1,17 @@
 /**
- * Renders the console.ochk.io reason catalog.
+ * Renders the fleet.ochk.io reason catalog.
  *
- * Source data lives at src/generated/console-catalogs.json — refreshed
+ * Source data lives at src/generated/fleet-catalogs.json — refreshed
  * at build time by scripts/gen-catalogs.mjs which fetches from
- * https://console.ochk.io/api/reasons. Drift between code and docs is
+ * https://fleet.ochk.io/api/reasons. Drift between code and docs is
  * thereby mechanically impossible: every deploy of docs picks up the
  * latest typed catalog, and the typed catalog itself is enforced by
- * the contract tests in oc-console-web.
+ * the contract tests in oc-fleet-web.
  *
  * Renders as a sortable, kind-grouped table similar to the original
  * hand-maintained one — but every row is data-driven.
  */
-import catalogs from '@/generated/console-catalogs.json';
+import catalogs from '@/generated/fleet-catalogs.json';
 
 type ReasonKind =
     | 'auth'
@@ -55,7 +55,7 @@ const KIND_LABEL: Record<ReasonKind, string> = {
     internal: 'internal · 500',
 };
 
-export function ConsoleReasonCatalog() {
+export function FleetReasonCatalog() {
     const reasons = (catalogs.reasons ?? []) as ReasonEntry[];
     const grouped = new Map<ReasonKind, ReasonEntry[]>();
     for (const r of reasons) {
@@ -70,7 +70,7 @@ export function ConsoleReasonCatalog() {
         return (
             <div className="text-muted-foreground my-6 rounded border border-dashed p-4 text-sm">
                 Catalog not available — the build-time fetch from
-                <code className="mx-1">https://console.ochk.io/api/reasons</code>
+                <code className="mx-1">https://fleet.ochk.io/api/reasons</code>
                 returned empty. Refresh once the endpoint deploys.
             </div>
         );
@@ -126,12 +126,12 @@ export function ConsoleReasonCatalog() {
             })}
             <p className="text-muted-foreground/70 text-[10.5px]">
                 {reasons.length} reasons · auto-generated from{' '}
-                <a href="https://console.ochk.io/api/reasons" className="underline">
+                <a href="https://fleet.ochk.io/api/reasons" className="underline">
                     /api/reasons
                 </a>{' '}
                 at build time. Source of truth: <code>src/server/api/reasons.ts</code> in{' '}
-                <a href="https://github.com/orangecheck/oc-console-web" className="underline">
-                    orangecheck/oc-console-web
+                <a href="https://github.com/orangecheck/oc-fleet-web" className="underline">
+                    orangecheck/oc-fleet-web
                 </a>
                 .
             </p>

@@ -1,14 +1,14 @@
-import { ConsoleWebhookEventCatalog } from '@/components/docs/ConsoleWebhookEventCatalog';
+import { FleetWebhookEventCatalog } from '@/components/docs/FleetWebhookEventCatalog';
 
 export const metadata = {
-    title: 'Console webhooks',
+    title: 'Fleet webhooks',
     description:
         'Receive HMAC-signed POST deliveries on every accepted delegation, action, revocation, and sub-delegation. Drop-in verifier, exponential-backoff retry, delivery log.',
 };
 
-# Console webhooks
+# Fleet webhooks
 
-Subscribe an HTTPS endpoint at `/settings § 04 · webhook endpoints` and console
+Subscribe an HTTPS endpoint at `/settings § 04 · webhook endpoints` and fleet
 will POST a signed delivery on every event your endpoint subscribes to. Same
 wire format as Stripe / GitHub / BTCPay — the
 [`@orangecheck/webhook-verify`](https://www.npmjs.com/package/@orangecheck/webhook-verify)
@@ -17,13 +17,13 @@ package is a drop-in receiver for any Node / Edge / Workers runtime.
 ## Event catalog
 
 The full set of subscribable events. Auto-generated at build time from
-[`https://console.ochk.io/api/webhook-events`](https://console.ochk.io/api/webhook-events)
+[`https://fleet.ochk.io/api/webhook-events`](https://fleet.ochk.io/api/webhook-events)
 — the typed source of truth lives at `src/lib/webhooks/events.ts` in
-[orangecheck/oc-console-web](https://github.com/orangecheck/oc-console-web), and
+[orangecheck/oc-fleet-web](https://github.com/orangecheck/oc-fleet-web), and
 a CI contract test asserts every `dispatchEvent()` call uses an id from this
 catalog.
 
-<ConsoleWebhookEventCatalog />
+<FleetWebhookEventCatalog />
 
 Subscribe to any subset when you create the endpoint. New event types will be
 added; the subscription field is open-string so customers don't need a
@@ -47,7 +47,7 @@ didn't subscribe to).
 `envelope` is the same byte-identical canonical envelope you'd get from
 `/api/audit/export` or from a Nostr relay subscribed to the project's kind.
 Verify offline with [`@orangecheck/agent-core`](/sdks/javascript) — no
-console-side trust.
+fleet-side trust.
 
 ## Headers
 
@@ -98,7 +98,7 @@ byte-by-byte probe the expected signature.
 
 ## The signing secret
 
-When you create an endpoint, console returns the signing secret **once** in the
+When you create an endpoint, fleet returns the signing secret **once** in the
 201 response. Store it in your CI's secrets manager immediately; we never echo
 it again.
 

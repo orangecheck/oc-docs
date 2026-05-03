@@ -1,163 +1,163 @@
 export const metadata = {
     title: 'OC Me · Quickstart',
     description:
-        'Five-minute integration walkthrough for me.ochk.io. Install SDK, mount provider, drop the sign-in button, configure prices, verify webhooks, ship.',
+        'Seven-step integration walkthrough for me.ochk.io. Create project, verify domain, install SDK, drop popup signin, wrap server route, smoke-test, flip live. Self-serve end-to-end — no human required.',
 };
 
 # OC Me · Quickstart
 
-**Five minutes from `npm install` to first envelope.** Every step has the exact
-code you ship. Mark a step done when you've actually shipped it.
+**Seven steps from cold to shipped.** Each one is its own surface in the
+integrator console. None of them hides behind a sales call. You can stop at any
+point; nothing is destructive.
 
-## 01 · install the SDK
+## 01 · create your project
 
-Two npm packages. `me-client` is the consumer SDK; `auth-client` is the React
-provider + hook (re-exported by `me-client` for convenience).
+Sign in at [me.ochk.io](https://me.ochk.io) (email-OTP or BIP-322). Your OC
+identity **is** your integrator account — no separate developer signup. Run the
+three-step wizard at [`/me/projects/new`](https://me.ochk.io/me/projects/new):
+name, domain, mode. You get a `project_key` and a public JWK URL pattern.
+
+```text
+display_name: YourCompany
+domain: yourcompany.com
+mode: test          # first 1,000 sessions free
+→ project_key: pk_test_a4f9k2x...
+```
+
+## 02 · verify your domain
+
+Until verified, your `project_key` cannot fire **live** envelopes against your
+domain. Add either record below, then click "verify now" on `/me/projects/[id]`.
+Backend tries DNS first, falls back to fetching your homepage. Test mode is
+unrestricted; this gate applies to live mode only.
+
+```text
+# DNS TXT at yourcompany.com (apex)
+oc-verify=<token>
+
+# OR meta tag in <head> at https://yourcompany.com/
+<meta name="oc-domain-verify" content="<token>" />
+```
+
+## 03 · install the SDK
+
+One npm package, three subpath entry points.
 
 ```bash
 yarn add @orangecheck/me-client @orangecheck/auth-client
-# or
-npm i @orangecheck/me-client @orangecheck/auth-client
 ```
 
-## 02 · mount the provider
+| Entry point                     | What it has                                  |
+| ------------------------------- | -------------------------------------------- |
+| `@orangecheck/me-client`        | React surface (provider + hook + button)     |
+| `@orangecheck/me-client/server` | server-side verification (zero JWK handling) |
+| `@orangecheck/me-client/popup`  | browser-only signin orchestrator             |
 
-Wrap your app once at the root. Defaults pin `authOrigin` to `https://ochk.io` —
-only override in dev/staging.
+## 04 · drop the popup signin
 
-```tsx
-// _app.tsx (Next.js Pages router)
-import { OcSessionProvider } from '@orangecheck/me-client';
-
-export default function App({ Component, pageProps }) {
-    return (
-        <OcSessionProvider>
-            <Component {...pageProps} />
-        </OcSessionProvider>
-    );
-}
-```
-
-Every component below it can call `useOcSession()` to read the live
-cross-subdomain session.
-
-## 03 · drop the sign-in button
-
-OC is an OAuth peer. Render it next to your existing Google / Apple / magic-link
-options. The me.ochk.io sign-in page offers two paths in-place:
-
-- **email-OTP** (default · most users) — type your email, paste the 6-digit
-  code; identity is `did:email:<sha256(email)>`. A federation-custodied wallet
-  is provisioned for the account; the user never sees a seed phrase unless they
-  explicitly graduate to self-custody later.
-- **BIP-322** (Bitcoin-savvy users) — paste a Bitcoin address, sign the
-  challenge in the user's wallet (UniSat, Xverse, Leather, Alby, etc.); the
-  identity is the address itself, self-custody from day one.
-
-```tsx
-import { OcSignInButton } from '@orangecheck/me-client';
-import { signIn } from 'next-auth/react';
-
-export function SignInOptions() {
-    return (
-        <div className="auth-options">
-            <button onClick={() => signIn('google')}>
-                continue with google
-            </button>
-            <button onClick={() => signIn('apple')}>continue with apple</button>
-            <button onClick={() => signIn('email')}>email magic link</button>
-            <OcSignInButton scope={['identity']}>
-                sign in with oc
-            </OcSignInButton>
-        </div>
-    );
-}
-```
-
-When a user picks OC: they bounce to me.ochk.io/signin → pick email-OTP or
-BIP-322 → on success they're signed back in on your site with an `oc_session`
-cookie → every billable event you emit credits sats to the user's balance.
-
-> See
-> [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
-> for the honest current state of the federation-custody pipeline. The email-OTP
-> signup + session creation is live; the federation client scaffold is wired in
-> `oc-me-web/src/lib/fedimint`; Lightning send/receive and the graduation
-> withdraw envelope are in build (#130, #132).
-
-## 04 · configure your prices
-
-Declare per-event prices and user-share splits. You choose the subtypes to bill,
-the price per event (sats or % of underlying amount), and how much flows back to
-the user. OC takes a fixed 20% platform fee — the rest is yours and your users'.
+Add a button. Inside the click handler, call `signInWithOc()`. A 480x720
+me.ochk.io popup opens, user signs in, popup `postMessage`s the session token
+back to your page, closes itself. Same shape Google and GitHub use.
 
 ```ts
-import { oc } from '@orangecheck/me-client';
+import { signInWithOc } from '@orangecheck/me-client/popup';
 
-await oc.config.update({
-    project_key: 'pk_live_yourcompany',
-    display_name: 'YourCompany',
-    domain: 'yourcompany.example',
-    events: {
-        session_creation: {
-            enabled: true,
-            site_pays: { kind: 'fixed_sats', sats: 60 },
-            user_share_pct: 0.65,
-        },
-        payment_authorization: {
-            enabled: true,
-            site_pays: { kind: 'percent_of_amount', pct: 0.0075 },
-            user_share_pct: 0.65,
-        },
-    },
+document.querySelector('#signin')!.addEventListener('click', async () => {
+    const result = await signInWithOc();
+    if (!result) return; // user cancelled or popup blocked
+    localStorage.setItem('oc-token', result.token);
+    location.assign('/dashboard');
 });
 ```
 
-The configurator at [me.ochk.io/integrate](https://me.ochk.io/integrate) is
-interactive — adjust prices and see the four-way split (gross · OC fee · user ·
-your rebate) update live.
+## 05 · verify the session server-side
 
-## 05 · verify a webhook
-
-OC delivers every billable envelope to your registered endpoint, signed with the
-federation Ed25519 key. **Always verify against the raw body** — frameworks that
-re-serialize before your handler will produce a different byte sequence and the
-signature will not validate.
+Wrap your protected routes with the framework adapter for your stack. The
+wrapper handles JWKS retrieval + caching internally. **You never touch a JWK env
+var or `/.well-known/jwks.json`.**
 
 ```ts
-import { oc } from '@orangecheck/me-client';
-import express from 'express';
+// Next.js Pages — pages/api/auth/me.ts
+import { withOcAuth } from '@orangecheck/me-client/server';
 
-const app = express();
-app.use(express.text({ type: 'application/json' }));
-
-app.post('/api/oc/webhook', async (req, res) => {
-    const result = await oc.webhook.verify(
-        req.body,
-        req.header('OC-Signature'),
-        req.header('OC-Key-Id')
-    );
-    if (!result.ok) return res.status(401).end(result.reason);
-
-    const envelope = JSON.parse(req.body);
-    await onOcEvent(envelope);
-    res.status(200).end();
+export default withOcAuth(async (req, res) => {
+    if (!req.ocSession) return res.status(401).json({ ok: false });
+    res.status(200).json({
+        ok: true,
+        account: {
+            id: req.ocSession.sub,
+            btc_address: req.ocSession.addr,
+            display_name: req.ocSession.name ?? null,
+            nostr_npub: req.ocSession.npub ?? null,
+        },
+    });
 });
 ```
 
-## 06 · ship
+Express:
 
-Request your project_key at
-[me.ochk.io/contact?topic=integration](https://me.ochk.io/contact?topic=integration).
-Mount the SDK, watch envelopes land on
-[me.ochk.io/developer/events](https://me.ochk.io/developer/events). Paired
-comparisons against your actual stack come back in a business day.
+```ts
+import { ocAuthExpress } from '@orangecheck/me-client/server';
 
-## Next, deeper
+app.use(ocAuthExpress());
+```
+
+Hono / Workers / Bun / Deno:
+
+```ts
+import { ocAuthHono } from '@orangecheck/me-client/server';
+
+app.use('*', ocAuthHono());
+```
+
+The per-stack snippet generator on `/me/projects/[id]` has the copy-paste blocks
+pre-filled with your `project_key`.
+
+## 06 · smoke-test the loop
+
+On `/me/projects/[id]`, the smoke-test panel fires a real envelope under your
+`project_key` (same pipeline as production: signed, co-signed, OTS-anchored,
+fanned out to webhooks). See it land in the live event stream within seconds.
+
+```text
+[ fire test envelope → ]
+  subtype: session_creation
+  ↓
+  envelope id: oc-me-tx7m4f9k
+  webhooks_fired: 0  (none registered yet)
+  → live in /verify/[id]
+```
+
+Register a webhook URL on the same page, click "test fire" on the webhook row to
+confirm delivery + signature verification before you wire it into your backend.
+
+## 07 · flip to live
+
+Set per-event prices in the config editor on `/me/projects/[id]`. Choose how
+much of each fee streams to your user vs your rebate. Once the project is in
+`live` mode AND domain-verified, envelopes ship.
+
+```text
+mode: live
+session_creation:       60 sats · user_share 65%
+payment_authorization:  0.75% of amount · user_share 65%
+```
+
+OC keeps a fixed 20% platform fee; the remaining 80% splits between the user
+(your call) and your rebate (whatever's left).
+
+## reference: see it working
+
+[me-demo.ochk.io](https://me-demo.ochk.io) is a live OC integration we built
+ourselves — a fictional newsletter site (Lumen Notes) styled deliberately
+not-OrangeCheck. The signin button there uses the exact `signInWithOc()` popup
+shipped in step 04; the loop works end-to-end. Source at
+[`github.com/orangecheck/oc-me-demo-web`](https://github.com/orangecheck/oc-me-demo-web).
+
+## next, deeper
 
 - [SDK reference](/me/sdk) — every export with type signatures
 - [Integrations guide](/me/integrations) — OAuth-peer pattern, sample configs,
   error handling
-- [Webhooks](/me/webhooks) — full reception sample (Node + Rust), delivery
-  semantics
+- [Webhooks](/me/webhooks) — full reception sample, delivery semantics
 - [API reference](/me/api) — every `/api/*` endpoint

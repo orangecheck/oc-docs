@@ -11,13 +11,35 @@ picking OC has a federation-custodied bitcoin wallet provisioned silently — no
 seed phrase, no key handling, no "what is a sat" conversation. Sat-earning
 starts on first session.
 
+## See it live first
+
+Before you read another paragraph,
+[**me-demo.ochk.io**](https://me-demo.ochk.io) is a real OC integration we built
+ourselves — a fictional newsletter site (Lumen Notes), styled deliberately
+not-OrangeCheck. The signin button there opens the OC popup. Sign in once and
+you'll see the whole loop end-to-end. Source at
+[`github.com/orangecheck/oc-me-demo-web`](https://github.com/orangecheck/oc-me-demo-web).
+~280 lines of meaningful integration code, including the `/api/auth/me` wrapper
+and the popup-signin handler.
+
 ## OAuth-peer pattern
 
 ```tsx
-import { OcSignInButton } from '@orangecheck/me-client';
+import { signInWithOc } from '@orangecheck/me-client/popup';
 import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 
 export function SignInOptions() {
+    const [busy, setBusy] = useState(false);
+    async function onOc() {
+        setBusy(true);
+        const result = await signInWithOc();
+        setBusy(false);
+        if (result) {
+            localStorage.setItem('oc-token', result.token);
+            location.assign('/dashboard');
+        }
+    }
     return (
         <div className="auth-options">
             <button onClick={() => signIn('google')}>
@@ -25,9 +47,9 @@ export function SignInOptions() {
             </button>
             <button onClick={() => signIn('apple')}>continue with apple</button>
             <button onClick={() => signIn('email')}>email magic link</button>
-            <OcSignInButton scope={['identity']}>
-                sign in with oc · earn sats
-            </OcSignInButton>
+            <button onClick={onOc} disabled={busy}>
+                {busy ? 'opening…' : 'sign in with oc'}
+            </button>
         </div>
     );
 }
@@ -67,20 +89,22 @@ The config schema is open and self-served — see
 
 ## Cross-product flows · me + fleet
 
-A consumer using me.ochk.io may sign into a SaaS that runs on fleet.ochk.io
-for managed agent infrastructure. The envelopes are the same primitive
-(oc-attest, oc-stamp, oc-agent) — the two products are two integration surfaces
-over identical contracts.
+A consumer using me.ochk.io may sign into a SaaS that runs on fleet.ochk.io for
+managed agent infrastructure. The envelopes are the same primitive (oc-attest,
+oc-stamp, oc-agent) — the two products are two integration surfaces over
+identical contracts.
 
-| Flow                                         | Surface                                                                                |
-| -------------------------------------------- | -------------------------------------------------------------------------------------- |
-| User signs into a SaaS using OC button       | me.ochk.io provisions wallet · fleet.ochk.io receives session                        |
-| User authorizes an LLM agent inside the SaaS | fleet.ochk.io issues delegation · me.ochk.io shows it on /me/agents                  |
-| Agent takes a stamped action                 | fleet.ochk.io ingests · me.ochk.io credits sats per the SaaS's IntegratorPriceConfig |
-| User revokes the delegation                  | me.ochk.io publishes oc-agent-rev:[id] · fleet.ochk.io drops further envelopes       |
+| Flow                                   | Surface                                                                               |
+| -------------------------------------- | ------------------------------------------------------------------------------------- |
+| User signs into a SaaS using OC button | me.ochk.io issues the session · fleet.ochk.io receives it via the family cookie / JWT |
+| Agent takes a stamped action           | fleet.ochk.io publishes the envelope · me.ochk.io credits sats per the SaaS's pricing |
+| User revokes a delegation              | fleet.ochk.io publishes oc-agent-rev:[id] · the verifier drops further envelopes      |
 
-See [fleet.ochk.io integrations docs](/fleet/integrations) for the
-operator-side view.
+Agent delegation lifecycle (issuance, revocation, list, audit) lives on
+fleet.ochk.io — that's the enterprise managed Agent product. me.ochk.io handles
+the wallet, identity, and billing substrate underneath. See
+[fleet.ochk.io integrations docs](/fleet/integrations) for the operator-side
+view.
 
 ## Errors and edge cases
 

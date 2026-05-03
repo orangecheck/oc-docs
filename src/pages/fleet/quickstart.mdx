@@ -11,12 +11,11 @@ in your dashboard.
 
 ## 1. Sign in
 
-Open [fleet.ochk.io](https://fleet.ochk.io) and click **sign in**. The
-button routes to the family auth host at
-[ochk.io/signin](https://ochk.io/signin) where you authenticate with a BIP-322
-signature from any compatible wallet (UniSat, Xverse, Leather, OKX, Phantom, or
-paste-in). On success the auth host issues a cross-subdomain `oc_session` cookie
-and bounces you back tothe fleet dashboard.
+Open [fleet.ochk.io](https://fleet.ochk.io) and click **sign in**. The button
+routes to the family auth host at [ochk.io/signin](https://ochk.io/signin) where
+you authenticate with a BIP-322 signature from any compatible wallet (UniSat,
+Xverse, Leather, OKX, Phantom, or paste-in). On success the auth host issues a
+cross-subdomain `oc_session` cookie and bounces you back tothe fleet dashboard.
 
 > **No password, no email**. Your Bitcoin address _is_ your identity. The auth
 > host stores nothing about you that isn't on-chain anyway.
@@ -56,8 +55,8 @@ The agent table on `/agents` now shows your new delegation.
 ## 4. Wire your LLM tool calls
 
 Pick the adapter for your framework — install it, supply your agent keypair +
-the delegation envelope + a fleet API token, and every tool call gets a
-stamped receipt automatically.
+the delegation envelope + a fleet API token, and every tool call gets a stamped
+receipt automatically.
 
 ```ts
 // Anthropic Tool Use

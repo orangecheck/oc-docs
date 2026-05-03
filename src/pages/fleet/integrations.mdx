@@ -8,20 +8,19 @@ export const metadata = {
 
 Five framework adapters and one shared client. Pick the one that matches your
 stack; install it; wire three lines of config; every LLM tool call becomes a
-BIP-322-signed action receipt that flows into your fleet project
-automatically.
+BIP-322-signed action receipt that flows into your fleet project automatically.
 
 ## The packages
 
-| Package                                                                                                | Wraps                                                                                   | npm      |
-| ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | -------- |
-| [`@orangecheck/agent-anthropic`](https://www.npmjs.com/package/@orangecheck/agent-anthropic)           | Anthropic Messages API tool_use blocks                                                  | `0.1.0+` |
-| [`@orangecheck/agent-openai`](https://www.npmjs.com/package/@orangecheck/agent-openai)                 | OpenAI Chat Completions function-call / Responses tool_call                             | `0.1.0+` |
-| [`@orangecheck/agent-vercel`](https://www.npmjs.com/package/@orangecheck/agent-vercel)                 | Vercel AI SDK `tool()` definitions                                                      | `0.1.0+` |
-| [`@orangecheck/agent-langgraph`](https://www.npmjs.com/package/@orangecheck/agent-langgraph)           | LangGraph tool-node executes                                                            | `0.1.0+` |
-| [`@orangecheck/agent-mcp`](https://www.npmjs.com/package/@orangecheck/agent-mcp)                       | Model Context Protocol invocations                                                      | `0.1.0+` |
+| Package                                                                                            | Wraps                                                                                   | npm      |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------- |
+| [`@orangecheck/agent-anthropic`](https://www.npmjs.com/package/@orangecheck/agent-anthropic)       | Anthropic Messages API tool_use blocks                                                  | `0.1.0+` |
+| [`@orangecheck/agent-openai`](https://www.npmjs.com/package/@orangecheck/agent-openai)             | OpenAI Chat Completions function-call / Responses tool_call                             | `0.1.0+` |
+| [`@orangecheck/agent-vercel`](https://www.npmjs.com/package/@orangecheck/agent-vercel)             | Vercel AI SDK `tool()` definitions                                                      | `0.1.0+` |
+| [`@orangecheck/agent-langgraph`](https://www.npmjs.com/package/@orangecheck/agent-langgraph)       | LangGraph tool-node executes                                                            | `0.1.0+` |
+| [`@orangecheck/agent-mcp`](https://www.npmjs.com/package/@orangecheck/agent-mcp)                   | Model Context Protocol invocations                                                      | `0.1.0+` |
 | [`@orangecheck/agent-fleet-client`](https://www.npmjs.com/package/@orangecheck/agent-fleet-client) | Shared HTTP client (used by every adapter; install directly if you're rolling your own) | `0.1.0+` |
-| [`@orangecheck/webhook-verify`](https://www.npmjs.com/package/@orangecheck/webhook-verify)             | Drop-in HMAC verifier for receiving fleet webhooks                                    | `0.1.0+` |
+| [`@orangecheck/webhook-verify`](https://www.npmjs.com/package/@orangecheck/webhook-verify)         | Drop-in HMAC verifier for receiving fleet webhooks                                      | `0.1.0+` |
 
 Every framework adapter exposes the same shape:
 
@@ -206,9 +205,9 @@ await postActionToFleet(stampedAction, {
 });
 ```
 
-The client also exposes `postDelegationToFleet`, `postRevocationToFleet`,
-and `postSubdelegationToFleet` if you prefer to drive the registry yourself
-instead of going through the dashboard.
+The client also exposes `postDelegationToFleet`, `postRevocationToFleet`, and
+`postSubdelegationToFleet` if you prefer to drive the registry yourself instead
+of going through the dashboard.
 
 ## Authentication
 

@@ -11,8 +11,10 @@ The SDK is the canonical integration path; this page is the raw HTTP surface for
 clients that aren't TypeScript or that want to bypass the SDK.
 
 Every endpoint is at `https://me.ochk.io/api/...` unless noted. Auth is by
-cross-subdomain `oc_session` cookie (`Domain=.ochk.io`, HttpOnly, SameSite=Lax)
-issued by the auth host at `https://ochk.io`. Mutating endpoints are
+cross-subdomain `oc_session` cookie (`Domain=.ochk.io`, HttpOnly, SameSite=None,
+Secure) issued by the auth host at `https://ochk.io`, OR by an
+`Authorization: Bearer <jwt>` header (cross-domain integrators that captured the
+session token from the popup-signin postMessage). Mutating endpoints are
 rate-limited per IP per bucket; limits are returned in `X-RateLimit-*` headers.
 
 ## Sign-in endpoints (auth host · `https://ochk.io`)
@@ -36,22 +38,22 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 
 ## Public endpoints
 
-| Method | Path                                   | Purpose                                                 |
-| ------ | -------------------------------------- | ------------------------------------------------------- |
-| `GET`  | `/api/health`                          | liveness probe                                          |
-| `GET`  | `/api/health/deep`                     | dependency probe                                        |
-| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event            |
-| `GET`  | `/api/delegation/[id]`                 | canonical envelope for a delegation                     |
-| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
-| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                        |
-| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
-| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
-| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                   |
-| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
-| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
-| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)        |
-| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                          |
-| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
+| Method | Path                                   | Purpose                                                                            |
+| ------ | -------------------------------------- | ---------------------------------------------------------------------------------- |
+| `GET`  | `/api/health`                          | liveness probe                                                                     |
+| `GET`  | `/api/health/deep`                     | dependency probe                                                                   |
+| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event                                       |
+| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                                                   |
+| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                                                   |
+| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                                                    |
+| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                                              |
+| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                                              |
+| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)                                         |
+| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success)                            |
+| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)                                   |
+| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                                                     |
+| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                                            |
+| `POST` | `/api/integrator/event`                | fire a billable event under a project_key (live mode requires domain verification) |
 
 ## Authenticated endpoints (oc_session required)
 
@@ -80,27 +82,22 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 | ------ | ------------------------ | ----------------------------------------------------------- |
 | `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · Class B billable |
 
-## Authenticated · agent delegation (Class A)
-
-| Method | Path                     | Purpose                                                    |
-| ------ | ------------------------ | ---------------------------------------------------------- |
-| `POST` | `/api/delegation/issue`  | issue a delegation, rate-limited 20/min · Class A billable |
-| `GET`  | `/api/delegation/list`   | list delegations                                           |
-| `POST` | `/api/delegation/revoke` | revoke a delegation, instant                               |
-
 ## Authenticated · integrator project lifecycle
 
-| Method   | Path                           | Purpose                                               |
-| -------- | ------------------------------ | ----------------------------------------------------- |
-| `GET`    | `/api/developer/projects`      | list every project owned by your identity             |
-| `POST`   | `/api/developer/projects`      | create a project, rate-limited 5/min                  |
-| `GET`    | `/api/developer/projects/[id]` | per-project state · owner-gated                       |
-| `POST`   | `/api/developer/projects/[id]` | update IntegratorPriceConfig · owner-gated, validates |
-| `DELETE` | `/api/developer/projects/[id]` | delete project · owner-gated                          |
-| `GET`    | `/api/developer/config`        | sample integrator config (the demo dashboard)         |
-| `POST`   | `/api/developer/config`        | validate + persist sample config                      |
-| `GET`    | `/api/developer/keys`          | list project signing keys (sample)                    |
-| `POST`   | `/api/developer/webhook-test`  | test-fire a synthetic envelope at a webhook           |
+| Method   | Path                              | Purpose                                                                                                              |
+| -------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/api/me/projects`                | list every project owned by your identity                                                                            |
+| `POST`   | `/api/me/projects`                | create a project, rate-limited 5/min                                                                                 |
+| `GET`    | `/api/me/projects/[id]`           | per-project state · owner-gated                                                                                      |
+| `POST`   | `/api/me/projects/[id]`           | update IntegratorPriceConfig · owner-gated, validates                                                                |
+| `DELETE` | `/api/me/projects/[id]`           | delete project · owner-gated                                                                                         |
+| `POST`   | `/api/me/projects/[id]/verify`    | run a domain-ownership check (DNS TXT, falls back to meta tag) · owner-gated, rate-limited 5/min                     |
+| `DELETE` | `/api/me/projects/[id]/verify`    | reissue the verification token (rotate / retry from scratch) · owner-gated                                           |
+| `POST`   | `/api/me/projects/[id]/test-fire` | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox |
+| `GET`    | `/api/me/projects/[id]/events`    | live event stream for this project · owner-gated                                                                     |
+| `GET`    | `/api/me/projects/[id]/webhooks`  | list registered webhooks · owner-gated                                                                               |
+| `POST`   | `/api/me/projects/[id]/webhooks`  | register a webhook URL · owner-gated                                                                                 |
+| `POST`   | `/api/developer/webhook-test`     | test-fire a synthetic envelope at a registered webhook                                                               |
 
 ## Response shapes
 

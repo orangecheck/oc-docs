@@ -16,7 +16,7 @@ starts on first session.
 Before you read another paragraph,
 [**me-demo.ochk.io**](https://me-demo.ochk.io) is a real OC integration we built
 ourselves — a fictional newsletter site (Lumen Notes), styled deliberately
-not-OrangeCheck. The signin button there opens the OC popup. Sign in once and
+not-orangecheck. The signin button there opens the OC popup. Sign in once and
 you'll see the whole loop end-to-end. Source at
 [`github.com/orangecheck/oc-me-demo-web`](https://github.com/orangecheck/oc-me-demo-web).
 ~280 lines of meaningful integration code, including the `/api/auth/me` wrapper
@@ -110,10 +110,10 @@ view.
 
 | Error                                               | Meaning                                                                               | Fix                                                                                                         |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                        | Run `validateIntegratorConfig(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
+| `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                        | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
 | `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`.                                             |
 | `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                         | Honor `Retry-After`; back off exponentially.                                                                |
-| `delegation not found` (404)                        | The id is unknown to OC's index.                                                      | Check the id; the SDK returned envelope is the source of truth.                                             |
+| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Run domain verification at `me.ochk.io/me/projects/<key>` (DNS TXT or meta tag), then retry.                |
 
 ## Self-host considerations
 

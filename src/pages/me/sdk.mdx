@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'OC Me · SDK reference',
     description:
-        '@orangecheck/me-client v0.6.0 SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). useOcSession, oc.session, oc.payment, oc.event, plus every type the SDK exports.',
+        '@orangecheck/me-client v0.7.0 SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). useOcSession, oc.session, oc.payment, oc.event, oc.webhook, oc.config — plus every type the SDK exports.',
 };
 
 # `@orangecheck/me-client` · SDK reference
 
-**v0.6.0 · MIT.**
+**v0.7.0 · MIT.**
 
 This is the canonical TypeScript SDK for integrating me.ochk.io. Three entry
 points, three audiences:
@@ -183,34 +183,31 @@ const result = await oc.payment.authorize({
 
 The user is prompted by me.ochk.io to consent before this resolves.
 
-## `oc.config.*` · IntegratorPriceConfig CRUD
+## `oc.config.validate` · local IntegratorPriceConfig validator
+
+Pre-flight your config against the same rules the server enforces — no network
+call, no round-trip. Per-project read/write is owner-gated and lives at
+`/api/me/projects/[id]` (or
+[me.ochk.io/me/projects/`<key>`](https://me.ochk.io/me/projects) in the UI);
+the SDK intentionally doesn't include a global `oc.config.update()`
+because configs are per-project, not per-account.
 
 ```ts
-// Validate without a round-trip
-import { validateIntegratorConfig } from '@orangecheck/me-client';
+import { oc } from '@orangecheck/me-client';
+import type { IntegratorPriceConfig } from '@orangecheck/me-client';
 
-const cfg = await oc.config.get();
-await oc.config.update({
-    ...cfg,
-    events: {
-        ...cfg.events,
-        payment_authorization: {
-            enabled: true,
-            site_pays: { kind: 'percent_of_amount', pct: 0.0085 },
-            user_share_pct: 0.65,
-        },
-    },
-});
-
-const result = validateIntegratorConfig(cfg);
+const cfg: IntegratorPriceConfig = {
+    /* … */
+};
+const result = oc.config.validate(cfg);
 if (!result.ok) console.error(result.errors);
 ```
 
-| Function                  | Signature                                                   | Note                                                 |
-| ------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
-| `oc.config.get()`         | `() => Promise<IntegratorPriceConfig>`                      |                                                      |
-| `oc.config.update(cfg)`   | `(IntegratorPriceConfig) => Promise<IntegratorPriceConfig>` | Throws on local invalidity; 422 on server rejection. |
-| `oc.config.validate(cfg)` | `(IntegratorPriceConfig) => ValidationResult`               | No network call.                                     |
+| Function                  | Signature                                     | Note            |
+| ------------------------- | --------------------------------------------- | --------------- |
+| `oc.config.validate(cfg)` | `(IntegratorPriceConfig) => ValidationResult` | No network call. |
+
+The same function is also exported as the top-level `validateIntegratorConfig`.
 
 ## `oc.webhook.verify` · Ed25519 signature verification
 
@@ -228,24 +225,16 @@ if (!result.ok) return res.status(401).end(result.reason);
 ```
 
 Auto-fetches and caches `ochk.io/.well-known/jwks.json` for 1h when no `jwk` is
-passed.
+passed. Stale-on-error: a transient JWKS outage returns the previous cached
+entry rather than rejecting every webhook.
 
-## `oc.delegation.*` · agent authority (Class A billable atom)
+> Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
+> [agent.ochk.io](https://agent.ochk.io) / [docs.ochk.io/agent](/agent), not
+> on me.ochk.io. me-client doesn't ship a delegation namespace; reach for
+> `@orangecheck/agent-client` if you need to issue or revoke agent
+> delegations from your integration.
 
-```ts
-const env = await oc.delegation.issue({
-    agent_id: 'agent-pubkey-or-did',
-    scope: ['inbox.read', 'attest.verify'],
-    expires_at: new Date(Date.now() + 7 * 86400_000).toISOString(),
-});
-// later
-await oc.delegation.revoke(env.id);
-```
-
-Max TTL 30 days. Revocation is instant — the verifier rejects any envelope
-signed after revocation regardless of the agent's state.
-
-## `oc.event.fire` · arbitrary billable subtypes (v0.5.0)
+## `oc.event.fire` · arbitrary billable subtypes
 
 The escape hatch when you want to bill a subtype that isn't covered by
 `oc.session.create` or `oc.payment.authorize` — `stamp_signing`,
@@ -274,10 +263,6 @@ const verify = await oc.event.fire({
 | --------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
 | `oc.event.fire(opts)` | `(FireEventOptions) => Promise<BillableEvent>` | Returns the canonical `BillableEvent` the server recorded. |
 
-`SignInOptions` and `PaymentAuthorizeOptions` also gain an optional
-`project_key` field in v0.5.0 — when set, sessions and payments are attributed
-to the project and recorded the same way.
-
 ## Types
 
 Every type the SDK exports:
@@ -287,10 +272,13 @@ EventClass · EventSubtype · ClassASubtype · ClassBSubtype · ClassCSubtype
 AttestTier · SiteFeeShape · IntegratorEventConfig · IntegratorPriceConfig
 ComputedFees · ValidationResult · BillableEvent · Session · SessionPolicy
 SignInOptions · PaymentAuthorizeOptions · PaymentResult · TelemetryEvent
-OcAccount · OcSessionState · OcSessionStatus · OcAuthConfig
-OcPublicJwk · VerifyResult
-DelegationScope · DelegationEnvelope · IssueDelegationOptions
+FireEventOptions · OcPublicJwk · VerifyOptions · VerifyResult
 ```
+
+`@orangecheck/me-client` re-exports the React surface from
+`@orangecheck/auth-client`, so `OcAccount`, `OcSessionState`, `OcSessionStatus`,
+and `OcAuthConfig` are available at runtime via that re-export — import them
+directly from `@orangecheck/auth-client` for stable typed access.
 
 ## Constants and helpers
 
@@ -300,6 +288,8 @@ DelegationScope · DelegationEnvelope · IssueDelegationOptions
 | `MIN_INTEGRATOR_PRICE_SATS`              | `5`                                                 |
 | `computeFees(cfg, payment_amount_sats?)` | `(IntegratorEventConfig, number?) => ComputedFees`  |
 | `validateIntegratorConfig(cfg)`          | `(IntegratorPriceConfig) => ValidationResult`       |
+| `setBearerToken(token)`                  | `(string \| null) => void` · cross-domain auth      |
+| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`             |
 
 ## Where it lives
 

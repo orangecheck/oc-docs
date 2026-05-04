@@ -111,12 +111,18 @@ rate-limit responses include a `Retry-After` header in seconds.
 
 | Bucket                      | Limit | Window |
 | --------------------------- | ----- | ------ |
+| `integrator.event`          | 120   | 60s    |
 | `payment.authorize`         | 30    | 60s    |
-| `delegation.issue`          | 20    | 60s    |
+| `wallet.send`               | 30    | 60s    |
 | `checkout.lightning`        | 60    | 60s    |
+| `me.attest-tier`            | 5     | 60s    |
+| `webhooks.register`         | 10    | 60s    |
+| `projects.test-fire`        | 20    | 60s    |
 | `developer.projects.create` | 5     | 60s    |
+| `verify-domain:<addr>`      | 5     | 60s    |
 
-Limits are per IP, per bucket. Headers `X-RateLimit-Limit`,
-`X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted on every rate-limited
-response. v1 buckets reset on cold start (per-instance in-memory); production
-fronts every endpoint with an edge-level limiter.
+Limits are per IP, per bucket (except `verify-domain` which is per-account so
+DNS retries don't get throttled by a noisy neighbor). Headers
+`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted
+on every rate-limited response. v1 buckets reset on cold start (per-instance
+in-memory); production fronts every endpoint with an edge-level limiter.

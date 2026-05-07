@@ -1,0 +1,151 @@
+export const metadata = {
+    title: 'OC Me · Federation Charter',
+    description:
+        'Canonical charter every guardian on a me.ochk.io federation ratifies. Hash + version land on each federation record; signatures are public commitments verifiable offline.',
+};
+
+# OC Me · Federation Charter
+
+**Version v1 (placeholder · pending federation provisioning).**
+
+This page is the **canonical text** every guardian on a me.ochk.io federation
+ratifies before going live. The SHA-256 of this page's content is the
+`charter_hash` recorded against each federation in the directory at
+[me.ochk.io/me/operator/federations](https://me.ochk.io/me/operator/federations).
+Operators verify the hash matches the bytes they read here before signing —
+that's the trust dance.
+
+> **Status note · 2026-05.** No federation has gone live yet. The version
+> below ships as a placeholder so the charter-ratification surface renders
+> honestly; **do not sign against this hash**. The first real charter lands
+> alongside the first federation provisioning ceremony, with v1 frozen +
+> hashed at that moment. Until then, the placeholder hash flips ratification
+> CTAs to disabled in the portal.
+
+## How to verify before signing
+
+You should compute the hash yourself. Don't trust the value displayed on
+[me.ochk.io/me/operator/federations](https://me.ochk.io/me/operator/federations);
+verify it matches what you read on this page.
+
+```bash
+# fetch the canonical text
+curl -s https://docs.ochk.io/me/operator/charter > charter.txt
+shasum -a 256 charter.txt
+# expected: matches the federation's charter_hash field
+```
+
+Then sign in the portal (verify-then-sign flow) or via the kit:
+
+```bash
+oc-guardian charter sign \
+  --federation oc-me-v1 \
+  --version v1 \
+  --hash <hash from above>
+```
+
+Either path produces a byte-identical `charter-sign` envelope. The federation
+verifies the Ed25519 signature against your operator pubkey and adds you to
+its ratification roster. From that moment on, your commitment is public and
+recoverable from any node that has the envelope.
+
+## The Charter
+
+> _Note: the text below is illustrative until v1 freezes. The frozen v1 will
+> replace this with the exact bytes that hash into the federation records._
+
+### Article 1 · Custody
+
+Each guardian on this federation holds a share of the threshold key. No
+single guardian holds the funds; no out-of-band key escrow exists. The
+federation as a whole can move funds only with a threshold-quorum of
+guardian signatures (specifics in §3 below).
+
+OC the company is not a guardian on this federation unless explicitly
+listed in the federation record's guardian roster. When OC operates a
+guardian node on this federation, it is one of N — never a majority of M
+in any M-of-N quorum.
+
+### Article 2 · Operator obligations
+
+A guardian on this federation commits to:
+
+- **Uptime ≥ 99.5%** rolling 30-day window. Maintenance windows publishable
+  via `oc-guardian incident publish` with severity=info.
+- **Incident disclosure within 72 hours** for any event that affects
+  threshold availability or share security. Public, operator-signed,
+  permanent.
+- **Charter ratification** before joining; **re-ratification** within 14
+  days of any charter amendment (new version, new hash).
+- **No share-pull without quorum** — guardians cannot execute share
+  recovery / rotation without an M-of-N envelope authorizing the action.
+- **Hardware key control** — the operator key authorizing federation
+  actions stays on operator-controlled storage (browser IDB, kit OS
+  keychain, hardware token, etc.). OC the company cannot sign as you.
+
+### Article 3 · Threshold
+
+The federation operates an M-of-N threshold scheme as recorded in the
+federation directory entry (e.g. "3-of-4"). Any state-changing federation
+action requires M valid signatures from distinct guardian operator keys.
+
+A guardian whose key is compromised initiates a `share-rotation` ceremony
+within 24 hours of disclosure; the new key is published via a
+`charter-sign` envelope under the new pubkey, replacing the old.
+
+### Article 4 · User-facing properties
+
+The federation guarantees to its users (the consumers signing in via
+[me.ochk.io](https://me.ochk.io)):
+
+- **Self-custody graduation** is always available. A user can sweep their
+  balance to a self-held BIP-322 wallet or to an external Fedimint client
+  without OC's permission, federation-quorum-signed.
+- **Verifiable transactions.** Every billable event the federation issues
+  carries an Ed25519 signature anchored periodically to Bitcoin via OTS
+  and published on Nostr. Users verify offline.
+- **Privacy.** The federation does not collect user PII beyond what's
+  cryptographically necessary (Ed25519 pubkey, BIP-322 verification
+  payload). No KYC by default; KYC tiers (when activated) route through a
+  third-party verifier; OC never holds the PII.
+
+### Article 5 · Exit
+
+Guardians may exit via a signed `exit-handoff` envelope. The federation
+must accept the exit within 14 days, redistribute the share to a
+replacement guardian (or shrink the threshold via `charter-sign` to a new
+version), and publish the transition publicly.
+
+Forced exit (federation removing a guardian for charter violation) requires
+M-of-N quorum of remaining guardians and a public `incident publish` with
+severity=critical naming the violation.
+
+### Article 6 · Amendment
+
+This charter can be amended by `charter-sign` ratification of a new version
+by ≥ M of the N current guardians. Amendments are versioned (v1, v1.1, v2,
+…); old signatures stay valid for their version. Operators are notified of
+new versions via the email on file and have 14 days to re-ratify or initiate
+exit.
+
+### Article 7 · Bitcoin loadbearing
+
+The federation's economic loop closes on Bitcoin sats — no token, no
+points, no airdrop. All settlement is in sats; USD displays are derived
+from current spot for human readability only.
+
+## Signature roster
+
+Operators who have ratified the current version land on the ratification
+grid at [me.ochk.io/me/operator/ceremonies](https://me.ochk.io/me/operator/ceremonies)
+and on [me.ochk.io/me/operator/charter](https://me.ochk.io/me/operator/charter)
+(deprecated alias; redirects to /ceremonies). Anyone can independently
+verify the roster by fetching `/api/operator/charter?federation=<slug>` and
+checking each signature against the corresponding operator pubkey from the
+public registry.
+
+## Where the kit lives
+
+- **Source:** [github.com/orangecheck/oc-guardian-kit](https://github.com/orangecheck/oc-guardian-kit)
+- **Releases:** signed binaries with cosign + SLSA-L3 provenance
+- **Bypass docs:** [me.ochk.io/operator/bypass](https://me.ochk.io/operator/bypass)

@@ -516,6 +516,26 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'Federation custody',
                 blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
             },
+            {
+                href: '/me/operator',
+                label: 'Operator program',
+                blurb: 'Apply, get accepted, run a guardian. Lifecycle in-browser; bypass parity via the kit.',
+            },
+            {
+                href: '/me/operator/charter',
+                label: 'Federation charter',
+                blurb: 'Canonical text every guardian ratifies. Hash + version live on each federation record.',
+            },
+            {
+                href: '/me/operator/runbook',
+                label: 'Operator runbook',
+                blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, healthz.',
+            },
+            {
+                href: '/me/operator/in-browser',
+                label: 'In-browser flow',
+                blurb: 'How the portal runs the entire operator lifecycle without a CLI. Storage, round-trip, recovery.',
+            },
         ],
     },
     {

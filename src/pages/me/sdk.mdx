@@ -263,6 +263,90 @@ const verify = await oc.event.fire({
 | --------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
 | `oc.event.fire(opts)` | `(FireEventOptions) => Promise<BillableEvent>` | Returns the canonical `BillableEvent` the server recorded. |
 
+## `oc.scope.*` · privacy-preserving scope grants
+
+OC's privacy default: signing into your site reveals only an anonymous
+**per-integrator subject** (`sub`). The user's master identity (BIP-322
+address or email) stays private; you cannot correlate users across
+sites. To read additional fields (their email, attest tier, bitcoin
+address, display name) you must explicitly request a scope and the
+user must explicitly consent.
+
+Full design at [PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).
+
+### `oc.scope.granted`
+
+Read what scopes the currently-signed-in user has already granted to
+your project. Returns the per-integrator `sub` plus any granted
+field values.
+
+```ts
+import { oc } from '@orangecheck/me-client';
+
+const { sub, scopes_granted, scopes } = await oc.scope.granted({
+    project_key: 'pk_live_yourcompany',
+});
+
+// `sub` is the per-integrator anonymous id you should key user
+// records on (NOT the master addr · OC doesn't reveal it).
+console.log(sub); // "sub_3K7xQ2mN1pYwB8tRvE…"
+
+// `scopes` is a partial map · only fields whose scope the user has
+// granted are present.
+console.log(scopes.email);       // "user@example.com" · or undefined
+console.log(scopes.attest_tier); // "bonded" · or undefined
+```
+
+### `oc.scope.request`
+
+Redirect the user to me.ochk.io's consent prompt. After they decide,
+browser returns to `return_to`. Subsequent `oc.scope.granted()` calls
+reflect their decisions.
+
+```ts
+oc.scope.request(['email', 'attest_tier'], {
+    project_key: 'pk_live_yourcompany',
+    return_to: window.location.href,
+});
+// ↑ this navigates · the line after never runs
+```
+
+The user picks **grant once** (1h expiry), **grant always** (until
+revoked), or **deny** per scope. Every grant is revocable any time
+on `me.ochk.io/me/identity`.
+
+### Valid scopes
+
+| Scope             | Reveals                                                                 | Use case                                                       |
+| ----------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)                          | On-chain holdings verification, payment-channel co-signing     |
+| `email`           | Email address (email-OTP users only)                                    | Transactional email · receipts, password reset                 |
+| `attest_tier`     | Current `AttestTier` (`anonymous` / `bonded` / `kyc_light` / `kyc_strong`) | Sybil-resistance gating, regulated KYC flows                   |
+| `display_name`    | A user-chosen handle (separate from real identity)                      | Forum / social integrations where some name is needed          |
+
+### Migration from `user_address` (≤ 0.9.0)
+
+Pre-0.10.0 webhook payloads delivered the user's master address as
+`user_address`. From 0.10.0 onward, payloads use `sub` (per-integrator)
++ optional `scopes` (granted fields). To migrate:
+
+1. Update SDK to `^0.10.0`.
+2. Switch from `event.user_address` → `event.sub` for user records in
+   your database.
+3. If you actually need the user's email or address, call
+   `oc.scope.request(['email'])` and read `event.scopes.email` /
+   `oc.scope.granted().scopes.email`.
+
+The `user_address` field is retired from outgoing payloads in the
+matching me.ochk.io deploy. Existing rows in your database keyed on
+old `user_address` values stay valid; just expect new events to use
+`sub`.
+
+| Function                               | Signature                                                              | Note                                                          |
+| -------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `oc.scope.granted(opts)`               | `(GrantedOptions) => Promise<GrantedResult>`                           | Read currently-granted scopes for the signed-in user.         |
+| `oc.scope.request(scopes, opts)`       | `(Scope[], RequestOptions) => never`                                   | Redirect to consent prompt · throws after navigation.         |
+
 ## Types
 
 Every type the SDK exports:
@@ -273,6 +357,7 @@ AttestTier · SiteFeeShape · IntegratorEventConfig · IntegratorPriceConfig
 ComputedFees · ValidationResult · BillableEvent · Session · SessionPolicy
 SignInOptions · PaymentAuthorizeOptions · PaymentResult · TelemetryEvent
 FireEventOptions · OcPublicJwk · VerifyOptions · VerifyResult
+Scope · GrantedOptions · GrantedResult · RequestOptions
 ```
 
 `@orangecheck/me-client` re-exports the React surface from

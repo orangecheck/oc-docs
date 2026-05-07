@@ -13,19 +13,19 @@ need to mint one first.
 ## 1. Install
 
 ```bash
-yarn add @orangecheck/pledge @orangecheck/auth-client
+yarn add @orangecheck/pledge-core @orangecheck/auth-client
 ```
 
-The SDK reaches `v0.1.0-beta` shortly. While it ships, the protocol spec is
-already
-[frozen](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md)
-and 28 conformance vectors are public — any conforming implementation (yours
-included) will produce byte-identical canonical messages.
+The SDK is at `v1.0.0` and tracks
+[`oc-pledge-protocol@v1.0`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md).
+28 conformance vectors are public; the cross-impl gate in oc-packages CI
+ensures both this SDK and the Python `orangecheck.pledge` sub-module
+produce byte-identical canonical messages on every PR.
 
 ## 2. Construct a pledge
 
 ```ts
-import { createPledge } from '@orangecheck/pledge';
+import { createPledge } from '@orangecheck/pledge-core';
 
 const { envelope, canonical_message, pledge_id } = await createPledge({
     swearer: 'bc1qexampleaddress…',

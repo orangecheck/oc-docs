@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: publishAttestation()",
+    description: "Auto-generated API reference for Function: publishAttestation(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / publishAttestation
+
+# Function: publishAttestation()
+
+```ts
+function publishAttestation(options: PublishAttestationOptions): Promise<PublishResult>;
+```
+
+Defined in: [attestation.ts:159](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/attestation.ts#L159)
+
+Publish an attestation to Nostr relays
+
+Uses NIP-07 if available, falls back to ephemeral key for demo
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `options` | `PublishAttestationOptions` | Publishing options |
+
+## Returns
+
+`Promise`\<`PublishResult`\>
+
+Object with successful and failed relay URLs
+
+## Throws
+
+If signing fails
+
+## Example
+
+```typescript
+const result = await publishAttestation({
+  envelope,
+  npub: 'npub1...',
+  relays: ['wss://relay.damus.io'],
+});
+console.log('Published to:', result.success);
+```

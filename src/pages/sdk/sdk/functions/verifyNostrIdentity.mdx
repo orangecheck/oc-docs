@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Function: verifyNostrIdentity()",
+    description: "Auto-generated API reference for Function: verifyNostrIdentity(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / verifyNostrIdentity
+
+# Function: verifyNostrIdentity()
+
+```ts
+function verifyNostrIdentity(
+   attestationId: string, 
+   npub: string, 
+relays?: string[]): Promise<NostrVerificationResult>;
+```
+
+Defined in: [identity/nostr.ts:242](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/nostr.ts#L242)
+
+Verify that a user controls a Nostr identity
+
+Verification method:
+1. Query Nostr relays for kind 1 (text note) events from the claimed npub
+2. Check if any event content contains the attestation ID
+3. Verify the event signature
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `attestationId` | `string` | The attestation ID to look for |
+| `npub` | `string` | The Nostr public key (npub format or hex) |
+| `relays?` | `string`[] | Optional list of relays to query |
+
+## Returns
+
+`Promise`\<[`NostrVerificationResult`](../interfaces/NostrVerificationResult.mdx)\>
+
+Verification result with proof event if verified

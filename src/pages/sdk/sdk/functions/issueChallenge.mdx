@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: issueChallenge()",
+    description: "Auto-generated API reference for Function: issueChallenge(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / issueChallenge
+
+# Function: issueChallenge()
+
+```ts
+function issueChallenge(opts: IssueChallengeOptions): Challenge;
+```
+
+Defined in: [challenge.ts:86](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/challenge.ts#L86)
+
+Build a new signed-challenge message. The server MUST remember the nonce
+it issued against the session (Redis, signed cookie, DB) so it can detect
+replay or a different nonce coming back on verify.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`IssueChallengeOptions`](../interfaces/IssueChallengeOptions.mdx) |
+
+## Returns
+
+[`Challenge`](../interfaces/Challenge.mdx)

@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: queryByIdentity()",
+    description: "Auto-generated API reference for Function: queryByIdentity(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / queryByIdentity
+
+# Function: queryByIdentity()
+
+```ts
+function queryByIdentity(
+   protocol: string, 
+   identifier: string, 
+relays?: string[]): Promise<NostrEvent[]>;
+```
+
+Defined in: [nostr.ts:388](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/nostr.ts#L388)
+
+Query relays for attestations by identity (any protocol)
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `protocol` | `string` | `undefined` |
+| `identifier` | `string` | `undefined` |
+| `relays` | `string`[] | `DEFAULT_RELAYS` |
+
+## Returns
+
+`Promise`\<[`NostrEvent`](../interfaces/NostrEvent.mdx)[]\>

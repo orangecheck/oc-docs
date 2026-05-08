@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: isNostrIdentityVerified()",
+    description: "Auto-generated API reference for Function: isNostrIdentityVerified(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / isNostrIdentityVerified
+
+# Function: isNostrIdentityVerified()
+
+```ts
+function isNostrIdentityVerified(
+   attestationId: string, 
+   npub: string, 
+   cachedEvents: NostrEvent[]): boolean;
+```
+
+Defined in: [identity/nostr.ts:321](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/nostr.ts#L321)
+
+Check if a Nostr identity is already verified
+This is a quick check that doesn't re-query relays
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `attestationId` | `string` |
+| `npub` | `string` |
+| `cachedEvents` | [`NostrEvent`](../interfaces/NostrEvent.mdx)[] |
+
+## Returns
+
+`boolean`

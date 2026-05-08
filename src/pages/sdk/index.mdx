@@ -1,0 +1,39 @@
+export const metadata = {
+    title: 'SDK reference',
+    description:
+        "Auto-generated TypeScript API reference for every @orangecheck/* package. Source-of-truth for every export, type, and signature; regenerated from the TypeScript source on every release.",
+};
+
+# SDK reference — `@orangecheck/*`
+
+This section is the **auto-generated** TypeScript API reference for every package published from [`oc-packages`](https://github.com/orangecheck/oc-packages). Every export, every type, every signature, every JSDoc paragraph — pulled from the TypeScript source via [TypeDoc](https://typedoc.org/) on every release.
+
+The discipline:
+
+- **TSDoc comments in source code are the source of truth.** Anyone who wants to update a function's documentation edits the `.ts` file. The page here updates itself on the next release.
+- **Per-package READMEs are short.** Tagline + install + 30-second example + a link back here. Detailed API surface lives only here.
+- **Hand-written narrative lives elsewhere.** Quickstart pages, conceptual docs, "why this protocol" prose stays under each protocol's section ([OC Attest](/attest), [OC Pledge](/pledge), [OC Vote](/vote), etc.). This section is reference, not narrative.
+- **CI gates drift.** PRs in `oc-packages` that change the public API surface but not the corresponding generated MDX in `oc-docs` fail the build. (Phase 3 of the rollout — landing soon.)
+
+## Currently published
+
+| Package | Version | Reference |
+|---|---|---|
+| [`@orangecheck/sdk`](/sdk/sdk/README) | latest | TypeScript core — `check`, `verify`, `createAttestation`, scoring, identity verification |
+
+The other ~30 packages in [`oc-packages`](https://github.com/orangecheck/oc-packages) are pending Phase 2 of the rollout. Their existing READMEs in `oc-packages/<pkg>/README.md` are the authoritative reference until they migrate here.
+
+## How a generated page is laid out
+
+Every page derives from a `.ts` source file. Here's what each section contains:
+
+- **Function pages** show signature, parameters table, return type, type parameters, examples from the JSDoc.
+- **Interface pages** show every property, its type, its JSDoc description, and any inherited members.
+- **Type alias pages** show the resolved type plus JSDoc.
+- **Variable pages** show the constant's type and value (when it's a literal).
+
+All of this comes from the TypeScript source file at the GitHub permalink shown in the page's "Defined in" line.
+
+## Find what you need
+
+Use the sidebar to drill into a specific package, or the [pickup guide at `/sdks`](/sdks) for the curated overview of which package to use for which job.

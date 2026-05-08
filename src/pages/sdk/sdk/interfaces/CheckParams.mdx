@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: CheckParams",
+    description: "Auto-generated API reference for Interface: CheckParams. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / CheckParams
+
+# Interface: CheckParams
+
+Defined in: [check.ts:23](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L23)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-addr"></a> `addr?` | `string` | Bitcoin address to look up. | [check.ts:25](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L25) |
+| <a id="property-id"></a> `id?` | `string` | Content-addressed attestation ID (hex). | [check.ts:27](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L27) |
+| <a id="property-identity"></a> `identity?` | \&#123; `identifier`: `string`; `protocol`: `string`; \&#125; | Identity binding, e.g. `{ protocol: 'github', identifier: 'alice' }`. | [check.ts:29](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L29) |
+| `identity.identifier` | `string` | - | [check.ts:29](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L29) |
+| `identity.protocol` | `string` | - | [check.ts:29](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L29) |
+| <a id="property-mindays"></a> `minDays?` | `number` | Minimum days unspent to pass. Default 0. | [check.ts:33](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L33) |
+| <a id="property-minsats"></a> `minSats?` | `number` | Minimum sats bonded to pass. Default 0. | [check.ts:31](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L31) |
+| <a id="property-relays"></a> `relays?` | `string`[] | Optional relay overrides for discovery. | [check.ts:35](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L35) |
+| <a id="property-verifyoptions"></a> `verifyOptions?` | [`VerifyOptions`](VerifyOptions.mdx) | Optional verify-time options (esplora bases, test mode). | [check.ts:37](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L37) |

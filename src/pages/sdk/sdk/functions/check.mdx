@@ -1,0 +1,55 @@
+export const metadata = {
+    title: "Function: check()",
+    description: "Auto-generated API reference for Function: check(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / check
+
+# Function: check()
+
+```ts
+function check(params: CheckParams): Promise<CheckResult>;
+```
+
+Defined in: [check.ts:61](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/check.ts#L61)
+
+@orangecheck/sdk
+
+Proof of Bitcoin stake for the open web.
+
+The three functions you'll use most:
+
+  check()             — the sybil-gate primitive. Pass in an address + thresholds,
+                        get back &#123; ok, sats, days, score &#125;.
+  verify()            — verify a raw (addr, msg, sig) attestation. No Nostr round-trip.
+  createAttestation() — build a signed JSON envelope from a canonical message + signature.
+
+Everything else below is the building blocks those three are made of, re-exported
+for integrators who need finer control.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `params` | [`CheckParams`](../interfaces/CheckParams.mdx) |
+
+## Returns
+
+`Promise`\<[`CheckResult`](../interfaces/CheckResult.mdx)\>
+
+## Example
+
+```ts
+import { check } from '@orangecheck/sdk';
+
+  const result = await check({
+    addr: 'bc1q...',
+    minSats: 100_000,
+    minDays: 30,
+  });
+  if (result.ok) letThemThrough();
+```

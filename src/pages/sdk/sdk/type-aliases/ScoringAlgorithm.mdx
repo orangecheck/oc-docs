@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Type Alias: ScoringAlgorithm",
+    description: "Auto-generated API reference for Type Alias: ScoringAlgorithm. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / ScoringAlgorithm
+
+# Type Alias: ScoringAlgorithm
+
+```ts
+type ScoringAlgorithm = "v0" | "tier" | "none";
+```
+
+Defined in: [scoring.ts:12](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/scoring.ts#L12)
+
+OrangeCheck Scoring
+
+The protocol registers exactly one scoring algorithm: `v0`. A `tier` helper
+is also provided for UI convenience. RPs with specialized needs compute
+their own score against raw metrics — the protocol does not ship an
+algorithm zoo.
+
+See: docs/oc-protocol/registry/scoring.md

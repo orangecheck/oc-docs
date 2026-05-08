@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: parseIdentities()",
+    description: "Auto-generated API reference for Function: parseIdentities(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / parseIdentities
+
+# Function: parseIdentities()
+
+```ts
+function parseIdentities(identitiesStr: string): IdentityBinding[];
+```
+
+Defined in: [canonical.ts:111](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/canonical.ts#L111)
+
+Parse identities from comma-separated protocol:identifier format
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `identitiesStr` | `string` | Comma-separated identity string |
+
+## Returns
+
+[`IdentityBinding`](../interfaces/IdentityBinding.mdx)[]
+
+Array of identity bindings
+
+## Throws
+
+If identity format is invalid

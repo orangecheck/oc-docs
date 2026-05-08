@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: generateAttestationId()",
+    description: "Auto-generated API reference for Function: generateAttestationId(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / generateAttestationId
+
+# Function: generateAttestationId()
+
+```ts
+function generateAttestationId(message: string): Promise<string>;
+```
+
+Defined in: [canonical.ts:214](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/canonical.ts#L214)
+
+Generate attestation ID from canonical message
+
+attestation_id = SHA-256(canonical_message)
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `message` | `string` | Canonical message string |
+
+## Returns
+
+`Promise`\<`string`\>
+
+Lowercase hex SHA-256 hash

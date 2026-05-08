@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: getVerificationSummary()",
+    description: "Auto-generated API reference for Function: getVerificationSummary(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / getVerificationSummary
+
+# Function: getVerificationSummary()
+
+```ts
+function getVerificationSummary(results: Map<string, VerificationResult>): {
+  failed: number;
+  pending: number;
+  total: number;
+  verified: number;
+};
+```
+
+Defined in: [identity/index.ts:222](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/index.ts#L222)
+
+Get summary of verification results
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `results` | `Map`\<`string`, [`VerificationResult`](../type-aliases/VerificationResult.mdx)\> |
+
+## Returns
+
+```ts
+{
+  failed: number;
+  pending: number;
+  total: number;
+  verified: number;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `failed` | `number` | [identity/index.ts:225](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/index.ts#L225) |
+| `pending` | `number` | [identity/index.ts:226](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/index.ts#L226) |
+| `total` | `number` | [identity/index.ts:223](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/index.ts#L223) |
+| `verified` | `number` | [identity/index.ts:224](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/index.ts#L224) |

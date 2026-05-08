@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: verifyTwitterIdentity()",
+    description: "Auto-generated API reference for Function: verifyTwitterIdentity(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / verifyTwitterIdentity
+
+# Function: verifyTwitterIdentity()
+
+```ts
+function verifyTwitterIdentity(
+   attestationId: string, 
+   handle: string, 
+tweetUrl?: string): Promise<TwitterVerificationResult>;
+```
+
+Defined in: [identity/twitter.ts:31](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/identity/twitter.ts#L31)
+
+Verify Twitter identity via manual tweet URL
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `attestationId` | `string` | The attestation ID to look for |
+| `handle` | `string` | The Twitter handle (with or without @) |
+| `tweetUrl?` | `string` | Optional tweet URL provided by user |
+
+## Returns
+
+`Promise`\<[`TwitterVerificationResult`](../interfaces/TwitterVerificationResult.mdx)\>
+
+Verification result

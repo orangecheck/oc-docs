@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: createAttestationEnvelope()",
+    description: "Auto-generated API reference for Function: createAttestationEnvelope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / createAttestationEnvelope
+
+# Function: createAttestationEnvelope()
+
+```ts
+function createAttestationEnvelope(
+   message: string, 
+   signature: string, 
+   scheme: Scheme, 
+   address: string, 
+   identities: IdentityBinding[], 
+extensions?: Extensions): Promise<AttestationEnvelope>;
+```
+
+Defined in: [canonical.ts:239](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/canonical.ts#L239)
+
+Create an attestation envelope for publishing
+
+This wraps the canonical message with metadata for Nostr publishing
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `message` | `string` | Canonical message |
+| `signature` | `string` | BIP-322 or legacy signature |
+| `scheme` | [`Scheme`](../type-aliases/Scheme.mdx) | Signature scheme used |
+| `address` | `string` | Bitcoin address |
+| `identities` | [`IdentityBinding`](../interfaces/IdentityBinding.mdx)[] | Identity bindings |
+| `extensions` | `Extensions` | Optional extensions |
+
+## Returns
+
+`Promise`\<[`AttestationEnvelope`](../interfaces/AttestationEnvelope.mdx)\>
+
+Attestation envelope ready for publishing

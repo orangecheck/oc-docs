@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: buildCanonicalMessage()",
+    description: "Auto-generated API reference for Function: buildCanonicalMessage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / buildCanonicalMessage
+
+# Function: buildCanonicalMessage()
+
+```ts
+function buildCanonicalMessage(
+   input: CanonicalInput, 
+   extensions?: Extensions, 
+   options?: BuildOptions): string;
+```
+
+Defined in: [canonical.ts:161](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/canonical.ts#L161)
+
+Build a canonical message following OrangeCheck Protocol v0 specification
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | `CanonicalInput` | Canonical input with address and identities |
+| `extensions` | `Extensions` | Optional extension key-value pairs |
+| `options` | `BuildOptions` | Optional deterministic overrides (testing only) |
+
+## Returns
+
+`string`
+
+Canonical message string with LF line endings

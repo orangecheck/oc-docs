@@ -1,0 +1,108 @@
+export const metadata = {
+    title: "@orangecheck/sdk",
+    description: "Auto-generated API reference for @orangecheck/sdk. Source: TypeScript types in oc-packages.",
+};
+
+**@orangecheck/sdk**
+
+***
+
+# @orangecheck/sdk
+
+## Interfaces
+
+- [AttestationEnvelope](interfaces/AttestationEnvelope.mdx)
+- [Challenge](interfaces/Challenge.mdx)
+- [CheckParams](interfaces/CheckParams.mdx)
+- [CheckResult](interfaces/CheckResult.mdx)
+- [DnsVerificationResult](interfaces/DnsVerificationResult.mdx)
+- [GitHubVerificationResult](interfaces/GitHubVerificationResult.mdx)
+- [IdentityBinding](interfaces/IdentityBinding.mdx)
+- [IssueChallengeOptions](interfaces/IssueChallengeOptions.mdx)
+- [Metrics](interfaces/Metrics.mdx)
+- [NostrEvent](interfaces/NostrEvent.mdx)
+- [NostrVerificationResult](interfaces/NostrVerificationResult.mdx)
+- [StatusMeta](interfaces/StatusMeta.mdx)
+- [TwitterVerificationResult](interfaces/TwitterVerificationResult.mdx)
+- [VerifyChallengeOptions](interfaces/VerifyChallengeOptions.mdx)
+- [VerifyChallengeResult](interfaces/VerifyChallengeResult.mdx)
+- [VerifyIdentityOptions](interfaces/VerifyIdentityOptions.mdx)
+- [VerifyInput](interfaces/VerifyInput.mdx)
+- [VerifyOptions](interfaces/VerifyOptions.mdx)
+- [VerifyOutcome](interfaces/VerifyOutcome.mdx)
+
+## Type Aliases
+
+- [IdentityProtocol](type-aliases/IdentityProtocol.mdx)
+- [Network](type-aliases/Network.mdx)
+- [Scheme](type-aliases/Scheme.mdx)
+- [ScoringAlgorithm](type-aliases/ScoringAlgorithm.mdx)
+- [Severity](type-aliases/Severity.mdx)
+- [StatusCode](type-aliases/StatusCode.mdx)
+- [VerificationResult](type-aliases/VerificationResult.mdx)
+- [VerifyChallengeReason](type-aliases/VerifyChallengeReason.mdx)
+
+## Variables
+
+- [DEFAULT\_RELAYS](variables/DEFAULT_RELAYS.mdx)
+- [STATUS\_META](variables/STATUS_META.mdx)
+
+## Functions
+
+- [buildCanonicalMessage](functions/buildCanonicalMessage.mdx)
+- [check](functions/check.mdx)
+- [computeAllScores](functions/computeAllScores.mdx)
+- [computeScore](functions/computeScore.mdx)
+- [createAttestation](functions/createAttestation.mdx)
+- [createAttestationEnvelope](functions/createAttestationEnvelope.mdx)
+- [createAttestationEvent](functions/createAttestationEvent.mdx)
+- [discoverAttestations](functions/discoverAttestations.mdx)
+- [extractAttestationIdFromUrl](functions/extractAttestationIdFromUrl.mdx)
+- [formatIdentities](functions/formatIdentities.mdx)
+- [formatIdentitiesForDisplay](functions/formatIdentitiesForDisplay.mdx)
+- [generateAttestationId](functions/generateAttestationId.mdx)
+- [generateGistTemplate](functions/generateGistTemplate.mdx)
+- [generateTweetText](functions/generateTweetText.mdx)
+- [generateWellKnownContent](functions/generateWellKnownContent.mdx)
+- [getAttestationsForAddress](functions/getAttestationsForAddress.mdx)
+- [getAttestationsForIdentity](functions/getAttestationsForIdentity.mdx)
+- [getDnsVerificationInstructions](functions/getDnsVerificationInstructions.mdx)
+- [getGistCreationUrl](functions/getGistCreationUrl.mdx)
+- [getGitHubVerificationInstructions](functions/getGitHubVerificationInstructions.mdx)
+- [getManualVerificationInstructions](functions/getManualVerificationInstructions.mdx)
+- [getNip07Info](functions/getNip07Info.mdx)
+- [getNostrPublicKey](functions/getNostrPublicKey.mdx)
+- [getNostrVerificationInstructions](functions/getNostrVerificationInstructions.mdx)
+- [getTweetUrl](functions/getTweetUrl.mdx)
+- [getTwitterComposeUrl](functions/getTwitterComposeUrl.mdx)
+- [getTwitterVerificationInstructions](functions/getTwitterVerificationInstructions.mdx)
+- [getVerificationInstructions](functions/getVerificationInstructions.mdx)
+- [getVerificationSummary](functions/getVerificationSummary.mdx)
+- [getVerificationUrl](functions/getVerificationUrl.mdx)
+- [getWellKnownUrl](functions/getWellKnownUrl.mdx)
+- [isDnsIdentityVerified](functions/isDnsIdentityVerified.mdx)
+- [isGitHubIdentityVerified](functions/isGitHubIdentityVerified.mdx)
+- [isNip07Available](functions/isNip07Available.mdx)
+- [isNostrIdentityVerified](functions/isNostrIdentityVerified.mdx)
+- [issueChallenge](functions/issueChallenge.mdx)
+- [isValidDomain](functions/isValidDomain.mdx)
+- [isValidTweetUrl](functions/isValidTweetUrl.mdx)
+- [parseAttestationFromEvent](functions/parseAttestationFromEvent.mdx)
+- [parseIdentities](functions/parseIdentities.mdx)
+- [publishAttestation](functions/publishAttestation.mdx)
+- [publishToRelays](functions/publishToRelays.mdx)
+- [queryByAddress](functions/queryByAddress.mdx)
+- [queryByAttestationId](functions/queryByAttestationId.mdx)
+- [queryByIdentity](functions/queryByIdentity.mdx)
+- [requiresManualVerification](functions/requiresManualVerification.mdx)
+- [signNostrEvent](functions/signNostrEvent.mdx)
+- [supportsAutomaticVerification](functions/supportsAutomaticVerification.mdx)
+- [verify](functions/verify.mdx)
+- [verifyAllIdentities](functions/verifyAllIdentities.mdx)
+- [verifyAttestationById](functions/verifyAttestationById.mdx)
+- [verifyChallenge](functions/verifyChallenge.mdx)
+- [verifyDnsIdentity](functions/verifyDnsIdentity.mdx)
+- [verifyGitHubIdentity](functions/verifyGitHubIdentity.mdx)
+- [verifyIdentity](functions/verifyIdentity.mdx)
+- [verifyNostrIdentity](functions/verifyNostrIdentity.mdx)
+- [verifyTwitterIdentity](functions/verifyTwitterIdentity.mdx)

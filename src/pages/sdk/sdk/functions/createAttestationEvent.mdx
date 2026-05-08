@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: createAttestationEvent()",
+    description: "Auto-generated API reference for Function: createAttestationEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / createAttestationEvent
+
+# Function: createAttestationEvent()
+
+```ts
+function createAttestationEvent(envelope: AttestationEnvelope, pubkey: string): Omit<NostrEvent, "id" | "sig">;
+```
+
+Defined in: [nostr.ts:40](https://github.com/orangecheck/oc-packages/blob/972bc39c1a55e1bfb1c53d8b267e04a656012ad7/sdk/src/nostr.ts#L40)
+
+Create a NIP-78 event for an OrangeCheck attestation
+
+Kind: 30078 (Parameterized Replaceable Event)
+d-tag: attestation_id (makes it replaceable by attestation ID)
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `envelope` | [`AttestationEnvelope`](../interfaces/AttestationEnvelope.mdx) | Attestation envelope |
+| `pubkey` | `string` | Nostr public key (hex format) |
+
+## Returns
+
+`Omit`\<[`NostrEvent`](../interfaces/NostrEvent.mdx), `"id"` \| `"sig"`\>
+
+Unsigned Nostr event

@@ -609,6 +609,28 @@ export const DOCS_NAV: DocsSection[] = [
             },
         ],
     },
+    // <!-- AUTOGEN-SDK-START — contents managed by oc-packages/scripts/gen-docs.mjs.
+    // Do not edit manually; the docs:gen orchestrator overwrites this section on
+    // every release tag. See docs strategy in oc-packages/SDK_DOCS.md. -->
+    {
+        slug: 'sdk',
+        label: 'SDK reference',
+        blurb: 'Auto-generated TypeScript API reference for every @orangecheck/* package.',
+        items: [
+            {
+                href: '/sdk',
+                label: 'Overview',
+                blurb: 'How the auto-generated reference is laid out, and how it stays in sync with the TS source.',
+            },
+            {
+                href: '/sdk/sdk/README',
+                label: '@orangecheck/sdk',
+                blurb: 'TypeScript core — check, verify, createAttestation, scoring, identity helpers.',
+            },
+        ],
+    },
+    // <!-- AUTOGEN-SDK-END -->
+
     {
         slug: 'reference',
         label: 'Reference',

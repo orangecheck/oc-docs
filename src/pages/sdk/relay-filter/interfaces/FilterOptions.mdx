@@ -11,18 +11,18 @@ export const metadata = {
 
 # Interface: FilterOptions
 
-Defined in: [types.ts:14](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L14)
+Defined in: [types.ts:14](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L14)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-allowkinds">&lt;/a> `allowKinds?` | `number`[] | Event kinds that bypass the filter. Useful for bootstrapping — e.g., allow kind-0 profile metadata and kind-3 contact lists so users can publish their handles before they've created a proof. Default: `[0, 3, 10002]` (profile meta, contacts, relay list). | [types.ts:27](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L27) |
-| &lt;a id="property-allowpubkeys">&lt;/a> `allowPubkeys?` | `string`[] | Pubkeys that bypass the filter entirely. Accepts hex or npub. Useful for operator / admin keys. | [types.ts:33](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L33) |
-| &lt;a id="property-cachemax">&lt;/a> `cacheMax?` | `number` | Max cache entries. Default 1_000. | [types.ts:41](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L41) |
-| &lt;a id="property-cachettlms">&lt;/a> `cacheTtlMs?` | `number` | How long the filter caches a per-pubkey decision. Default 60_000 ms (matches /api/check's cache). | [types.ts:39](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L39) |
-| &lt;a id="property-failopen">&lt;/a> `failOpen?` | `boolean` | If the OrangeCheck lookup throws (relays unreachable, network down), let the event through. Default `false` — we fail closed. | [types.ts:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L47) |
-| &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [types.ts:18](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L18) |
-| &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded for the pubkey's attestation. Default 0. | [types.ts:16](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L16) |
-| &lt;a id="property-ondecision">&lt;/a> `onDecision?` | (`event`: [`MinimalNostrEvent`](MinimalNostrEvent.mdx), `decision`: [`FilterDecision`](FilterDecision.mdx)) => `void` | Called with each decision. Use for logging / metrics. | [types.ts:53](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L53) |
-| &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override the discovery relays used by the SDK's check(). | [types.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L50) |
+| &lt;a id="property-allowkinds">&lt;/a> `allowKinds?` | `number`[] | Event kinds that bypass the filter. Useful for bootstrapping — e.g., allow kind-0 profile metadata and kind-3 contact lists so users can publish their handles before they've created a proof. Default: `[0, 3, 10002]` (profile meta, contacts, relay list). | [types.ts:27](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L27) |
+| &lt;a id="property-allowpubkeys">&lt;/a> `allowPubkeys?` | `string`[] | Pubkeys that bypass the filter entirely. Accepts hex or npub. Useful for operator / admin keys. | [types.ts:33](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L33) |
+| &lt;a id="property-cachemax">&lt;/a> `cacheMax?` | `number` | Max cache entries. Default 1_000. | [types.ts:41](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L41) |
+| &lt;a id="property-cachettlms">&lt;/a> `cacheTtlMs?` | `number` | How long the filter caches a per-pubkey decision. Default 60_000 ms (matches /api/check's cache). | [types.ts:39](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L39) |
+| &lt;a id="property-failopen">&lt;/a> `failOpen?` | `boolean` | If the OrangeCheck lookup throws (relays unreachable, network down), let the event through. Default `false` — we fail closed. | [types.ts:47](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L47) |
+| &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [types.ts:18](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L18) |
+| &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded for the pubkey's attestation. Default 0. | [types.ts:16](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L16) |
+| &lt;a id="property-ondecision">&lt;/a> `onDecision?` | (`event`: [`MinimalNostrEvent`](MinimalNostrEvent.mdx), `decision`: [`FilterDecision`](FilterDecision.mdx)) => `void` | Called with each decision. Use for logging / metrics. | [types.ts:53](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L53) |
+| &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override the discovery relays used by the SDK's check(). | [types.ts:50](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L50) |

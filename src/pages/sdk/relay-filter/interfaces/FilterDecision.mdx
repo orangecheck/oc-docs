@@ -11,14 +11,14 @@ export const metadata = {
 
 # Interface: FilterDecision
 
-Defined in: [types.ts:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L56)
+Defined in: [types.ts:56](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L56)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-action">&lt;/a> `action` | `"accept"` \| `"reject"` \| `"shadowReject"` | `accept` — relay SHOULD accept the event. `reject` — relay MUST reject, returning `msg` to the client. `shadowReject` — relay should accept but silently discard (drop without informing the client). Strfry supports this; most others treat it as `reject`. Use sparingly — it hides errors from honest users. | [types.ts:64](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L64) |
-| &lt;a id="property-check">&lt;/a> `check?` | `CheckResult` | Underlying SDK result when a lookup happened. | [types.ts:78](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L78) |
-| &lt;a id="property-message">&lt;/a> `message?` | `string` | Human-readable message to send the client on reject. | [types.ts:76](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L76) |
-| &lt;a id="property-pubkey">&lt;/a> `pubkey?` | `string` | The pubkey that was looked up (hex). | [types.ts:80](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L80) |
-| &lt;a id="property-reason">&lt;/a> `reason` | \| `"ok"` \| `"allowed_kind"` \| `"allowed_pubkey"` \| `"no_attestation"` \| `"below_threshold"` \| `"invalid_proof"` \| `"lookup_error"` \| `"fail_open"` | Why this decision was made. | [types.ts:66](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/relay-filter/src/types.ts#L66) |
+| &lt;a id="property-action">&lt;/a> `action` | `"accept"` \| `"reject"` \| `"shadowReject"` | `accept` — relay SHOULD accept the event. `reject` — relay MUST reject, returning `msg` to the client. `shadowReject` — relay should accept but silently discard (drop without informing the client). Strfry supports this; most others treat it as `reject`. Use sparingly — it hides errors from honest users. | [types.ts:64](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L64) |
+| &lt;a id="property-check">&lt;/a> `check?` | `CheckResult` | Underlying SDK result when a lookup happened. | [types.ts:78](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L78) |
+| &lt;a id="property-message">&lt;/a> `message?` | `string` | Human-readable message to send the client on reject. | [types.ts:76](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L76) |
+| &lt;a id="property-pubkey">&lt;/a> `pubkey?` | `string` | The pubkey that was looked up (hex). | [types.ts:80](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L80) |
+| &lt;a id="property-reason">&lt;/a> `reason` | \| `"ok"` \| `"allowed_kind"` \| `"allowed_pubkey"` \| `"no_attestation"` \| `"below_threshold"` \| `"invalid_proof"` \| `"lookup_error"` \| `"fail_open"` | Why this decision was made. | [types.ts:66](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L66) |

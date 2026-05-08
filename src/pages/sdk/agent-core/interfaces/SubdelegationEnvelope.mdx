@@ -11,22 +11,22 @@ export const metadata = {
 
 # Interface: SubdelegationEnvelope
 
-Defined in: [agent-core/src/types.ts:167](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L167)
+Defined in: [agent-core/src/types.ts:167](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L167)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-agent">&lt;/a> `agent` | [`ActorRef`](ActorRef.mdx) | The recipient sub-agent. | [agent-core/src/types.ts:175](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L175) |
-| &lt;a id="property-expires_at">&lt;/a> `expires_at` | `string` | - | [agent-core/src/types.ts:184](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L184) |
-| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [agent-core/src/types.ts:170](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L170) |
-| &lt;a id="property-issued_at">&lt;/a> `issued_at` | `string` | - | [agent-core/src/types.ts:183](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L183) |
-| &lt;a id="property-kind">&lt;/a> `kind` | `"agent-subdelegation"` | - | [agent-core/src/types.ts:169](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L169) |
-| &lt;a id="property-nonce">&lt;/a> `nonce` | `string` | - | [agent-core/src/types.ts:185](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L185) |
-| &lt;a id="property-parent_id">&lt;/a> `parent_id` | `string` | - | [agent-core/src/types.ts:171](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L171) |
-| &lt;a id="property-principal">&lt;/a> `principal` | [`ActorRef`](ActorRef.mdx) | The sub-principal — equal to parent.agent.address. | [agent-core/src/types.ts:173](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L173) |
-| &lt;a id="property-revocation">&lt;/a> `revocation` | [`DelegationRevocationRef`](DelegationRevocationRef.mdx) | - | [agent-core/src/types.ts:186](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L186) |
-| &lt;a id="property-scopes">&lt;/a> `scopes?` | `string`[] | v1.0 / v1.1 public mode: each scope MUST be a sub-scope of some scope on the parent. v1.2 private mode: omitted; `scopes_encrypted` set. | [agent-core/src/types.ts:180](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L180) |
-| &lt;a id="property-scopes_encrypted">&lt;/a> `scopes_encrypted?` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | v1.2 private mode — same shape as the root delegation field. | [agent-core/src/types.ts:182](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L182) |
-| &lt;a id="property-sig">&lt;/a> `sig` | [`Signature`](Signature.mdx) | - | [agent-core/src/types.ts:187](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L187) |
-| &lt;a id="property-v">&lt;/a> `v` | `1` | - | [agent-core/src/types.ts:168](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L168) |
+| &lt;a id="property-agent">&lt;/a> `agent` | [`ActorRef`](ActorRef.mdx) | The recipient sub-agent. | [agent-core/src/types.ts:175](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L175) |
+| &lt;a id="property-expires_at">&lt;/a> `expires_at` | `string` | - | [agent-core/src/types.ts:184](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L184) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [agent-core/src/types.ts:170](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L170) |
+| &lt;a id="property-issued_at">&lt;/a> `issued_at` | `string` | - | [agent-core/src/types.ts:183](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L183) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"agent-subdelegation"` | - | [agent-core/src/types.ts:169](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L169) |
+| &lt;a id="property-nonce">&lt;/a> `nonce` | `string` | - | [agent-core/src/types.ts:185](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L185) |
+| &lt;a id="property-parent_id">&lt;/a> `parent_id` | `string` | - | [agent-core/src/types.ts:171](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L171) |
+| &lt;a id="property-principal">&lt;/a> `principal` | [`ActorRef`](ActorRef.mdx) | The sub-principal — equal to parent.agent.address. | [agent-core/src/types.ts:173](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L173) |
+| &lt;a id="property-revocation">&lt;/a> `revocation` | [`DelegationRevocationRef`](DelegationRevocationRef.mdx) | - | [agent-core/src/types.ts:186](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L186) |
+| &lt;a id="property-scopes">&lt;/a> `scopes?` | `string`[] | v1.0 / v1.1 public mode: each scope MUST be a sub-scope of some scope on the parent. v1.2 private mode: omitted; `scopes_encrypted` set. | [agent-core/src/types.ts:180](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L180) |
+| &lt;a id="property-scopes_encrypted">&lt;/a> `scopes_encrypted?` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | v1.2 private mode — same shape as the root delegation field. | [agent-core/src/types.ts:182](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L182) |
+| &lt;a id="property-sig">&lt;/a> `sig` | [`Signature`](Signature.mdx) | - | [agent-core/src/types.ts:187](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L187) |
+| &lt;a id="property-v">&lt;/a> `v` | `1` | - | [agent-core/src/types.ts:168](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L168) |

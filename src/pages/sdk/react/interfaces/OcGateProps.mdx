@@ -11,21 +11,21 @@ export const metadata = {
 
 # Interface: OcGateProps
 
-Defined in: [src/gate.tsx:23](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L23)
+Defined in: [src/gate.tsx:23](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L23)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address. Pick one of address / attestationId / identity. | [src/gate.tsx:25](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L25) |
-| &lt;a id="property-attestationid">&lt;/a> `attestationId?` | `string` | Attestation ID (SHA-256 hex). | [src/gate.tsx:27](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L27) |
-| &lt;a id="property-children">&lt;/a> `children?` | \| `ReactNode` \| ((`result`: [`CheckResult`](CheckResult.mdx)) => `ReactNode`) | Rendered when the check passes. The resolved CheckResult is passed through. | [src/gate.tsx:37](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L37) |
-| &lt;a id="property-fallback">&lt;/a> `fallback?` | \| `ReactNode` \| ((`result`: [`CheckResult`](CheckResult.mdx) \| `null`) => `ReactNode`) | Rendered when the check fails. Receives the CheckResult so you can explain why. | [src/gate.tsx:41](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L41) |
-| &lt;a id="property-identity">&lt;/a> `identity?` | \&#123; `identifier`: `string`; `protocol`: `string`; \&#125; | Identity binding, e.g. `{ protocol: 'github', identifier: 'alice' }`. | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L29) |
-| `identity.identifier` | `string` | - | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L29) |
-| `identity.protocol` | `string` | - | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L29) |
-| &lt;a id="property-loading">&lt;/a> `loading?` | `ReactNode` | Rendered while the check is pending. Default `null`. | [src/gate.tsx:39](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L39) |
-| &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [src/gate.tsx:34](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L34) |
-| &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded. Default 0. | [src/gate.tsx:32](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L32) |
-| &lt;a id="property-onresult">&lt;/a> `onResult?` | (`result`: [`CheckResult`](CheckResult.mdx)) => `void` | Optional callback when the check resolves (pass or fail). | [src/gate.tsx:44](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L44) |
-| &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override discovery relays. | [src/gate.tsx:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/gate.tsx#L47) |
+| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address. Pick one of address / attestationId / identity. | [src/gate.tsx:25](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L25) |
+| &lt;a id="property-attestationid">&lt;/a> `attestationId?` | `string` | Attestation ID (SHA-256 hex). | [src/gate.tsx:27](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L27) |
+| &lt;a id="property-children">&lt;/a> `children?` | \| `ReactNode` \| ((`result`: [`CheckResult`](CheckResult.mdx)) => `ReactNode`) | Rendered when the check passes. The resolved CheckResult is passed through. | [src/gate.tsx:37](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L37) |
+| &lt;a id="property-fallback">&lt;/a> `fallback?` | \| `ReactNode` \| ((`result`: [`CheckResult`](CheckResult.mdx) \| `null`) => `ReactNode`) | Rendered when the check fails. Receives the CheckResult so you can explain why. | [src/gate.tsx:41](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L41) |
+| &lt;a id="property-identity">&lt;/a> `identity?` | \&#123; `identifier`: `string`; `protocol`: `string`; \&#125; | Identity binding, e.g. `{ protocol: 'github', identifier: 'alice' }`. | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L29) |
+| `identity.identifier` | `string` | - | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L29) |
+| `identity.protocol` | `string` | - | [src/gate.tsx:29](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L29) |
+| &lt;a id="property-loading">&lt;/a> `loading?` | `ReactNode` | Rendered while the check is pending. Default `null`. | [src/gate.tsx:39](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L39) |
+| &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [src/gate.tsx:34](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L34) |
+| &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded. Default 0. | [src/gate.tsx:32](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L32) |
+| &lt;a id="property-onresult">&lt;/a> `onResult?` | (`result`: [`CheckResult`](CheckResult.mdx)) => `void` | Optional callback when the check resolves (pass or fail). | [src/gate.tsx:44](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L44) |
+| &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override discovery relays. | [src/gate.tsx:47](https://github.com/orangecheck/oc-packages/blob/main/react/src/gate.tsx#L47) |

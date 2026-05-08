@@ -15,7 +15,7 @@ export const metadata = {
 function verifyOcToken(token: string, options?: VerifyOcOptions): Promise<SessionPayload | null>;
 ```
 
-Defined in: [src/index.ts:364](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L364)
+Defined in: [src/index.ts:364](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L364)
 
 Verify a JWT issued by an OC auth host. Lazy-fetches the JWKS from
 `<issuer>/.well-known/jwks.json`, picks the key whose `kid` matches

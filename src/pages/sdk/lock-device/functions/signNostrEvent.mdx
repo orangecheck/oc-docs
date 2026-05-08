@@ -15,7 +15,7 @@ export const metadata = {
 function signNostrEvent(event: Omit<NostrEvent, "id" | "sig">, nostrSkHex: string): NostrEvent;
 ```
 
-Defined in: [index.ts:131](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-device/src/index.ts#L131)
+Defined in: [index.ts:131](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/index.ts#L131)
 
 Sign a Nostr event with a Schnorr key (derived via deriveNostrKey). Produces
 the full NostrEvent with id and sig.

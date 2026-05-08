@@ -11,17 +11,17 @@ export const metadata = {
 
 # Interface: VerifyChallengeOptions
 
-Defined in: [challenge.ts:179](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L179)
+Defined in: [challenge.ts:179](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L179)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-clockskewms">&lt;/a> `clockSkewMs?` | `number` | Tolerance on expiry check in ms. Default 0. | [challenge.ts:198](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L198) |
-| &lt;a id="property-expectedaudience">&lt;/a> `expectedAudience?` | `string` | If set, require the challenge's `audience:` extension to match. | [challenge.ts:188](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L188) |
-| &lt;a id="property-expectednonce">&lt;/a> `expectedNonce?` | `string` | If set, require the challenge's `nonce:` to match. Use this to defeat replay — pair with server-side nonce storage (Redis / signed cookie). | [challenge.ts:195](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L195) |
-| &lt;a id="property-expectedpurpose">&lt;/a> `expectedPurpose?` | `string` | If set, require the challenge's `purpose:` extension to match. | [challenge.ts:190](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L190) |
-| &lt;a id="property-message">&lt;/a> `message` | `string` | The signed canonical challenge text, exactly as issued. | [challenge.ts:181](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L181) |
-| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Freeze `now` for tests. | [challenge.ts:200](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L200) |
-| &lt;a id="property-scheme">&lt;/a> `scheme?` | [`Scheme`](../type-aliases/Scheme.mdx) | Scheme override. Default 'bip322'. | [challenge.ts:185](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L185) |
-| &lt;a id="property-signature">&lt;/a> `signature` | `string` | BIP-322 or legacy signature. | [challenge.ts:183](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/challenge.ts#L183) |
+| &lt;a id="property-clockskewms">&lt;/a> `clockSkewMs?` | `number` | Tolerance on expiry check in ms. Default 0. | [challenge.ts:198](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L198) |
+| &lt;a id="property-expectedaudience">&lt;/a> `expectedAudience?` | `string` | If set, require the challenge's `audience:` extension to match. | [challenge.ts:188](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L188) |
+| &lt;a id="property-expectednonce">&lt;/a> `expectedNonce?` | `string` | If set, require the challenge's `nonce:` to match. Use this to defeat replay — pair with server-side nonce storage (Redis / signed cookie). | [challenge.ts:195](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L195) |
+| &lt;a id="property-expectedpurpose">&lt;/a> `expectedPurpose?` | `string` | If set, require the challenge's `purpose:` extension to match. | [challenge.ts:190](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L190) |
+| &lt;a id="property-message">&lt;/a> `message` | `string` | The signed canonical challenge text, exactly as issued. | [challenge.ts:181](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L181) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Freeze `now` for tests. | [challenge.ts:200](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L200) |
+| &lt;a id="property-scheme">&lt;/a> `scheme?` | [`Scheme`](../type-aliases/Scheme.mdx) | Scheme override. Default 'bip322'. | [challenge.ts:185](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L185) |
+| &lt;a id="property-signature">&lt;/a> `signature` | `string` | BIP-322 or legacy signature. | [challenge.ts:183](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L183) |

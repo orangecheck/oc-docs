@@ -11,18 +11,18 @@ export const metadata = {
 
 # Interface: CheckResult
 
-Defined in: [check.ts:40](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L40)
+Defined in: [check.ts:40](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L40)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address of the attestation. | [check.ts:52](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L52) |
-| &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (if one was found). | [check.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L50) |
-| &lt;a id="property-days">&lt;/a> `days` | `number` | Days since the youngest UTXO in the bonded set was confirmed. | [check.ts:46](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L46) |
-| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding.mdx)[] | Self-asserted identity bindings. Verify independently. | [check.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L54) |
-| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network.mdx) | Network the address belongs to. | [check.ts:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L56) |
-| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff signature valid AND thresholds met. | [check.ts:42](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L42) |
-| &lt;a id="property-reasons">&lt;/a> `reasons?` | `string`[] | Present when `ok === false`. Codes explain why. | [check.ts:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L58) |
-| &lt;a id="property-sats">&lt;/a> `sats` | `number` | Sats bonded on-chain for the bonded UTXO set. | [check.ts:44](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L44) |
-| &lt;a id="property-score">&lt;/a> `score` | `number` | Reference `score_v0` for this attestation. | [check.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/sdk/src/check.ts#L48) |
+| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address of the attestation. | [check.ts:52](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L52) |
+| &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (if one was found). | [check.ts:50](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L50) |
+| &lt;a id="property-days">&lt;/a> `days` | `number` | Days since the youngest UTXO in the bonded set was confirmed. | [check.ts:46](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L46) |
+| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding.mdx)[] | Self-asserted identity bindings. Verify independently. | [check.ts:54](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L54) |
+| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network.mdx) | Network the address belongs to. | [check.ts:56](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L56) |
+| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff signature valid AND thresholds met. | [check.ts:42](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L42) |
+| &lt;a id="property-reasons">&lt;/a> `reasons?` | `string`[] | Present when `ok === false`. Codes explain why. | [check.ts:58](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L58) |
+| &lt;a id="property-sats">&lt;/a> `sats` | `number` | Sats bonded on-chain for the bonded UTXO set. | [check.ts:44](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L44) |
+| &lt;a id="property-score">&lt;/a> `score` | `number` | Reference `score_v0` for this attestation. | [check.ts:48](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L48) |

@@ -11,19 +11,19 @@ export const metadata = {
 
 # Interface: SealInput
 
-Defined in: [lock-core/src/types.ts:64](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L64)
+Defined in: [lock-core/src/types.ts:64](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L64)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-expiresat">&lt;/a> `expiresAt?` | `Date` \| `null` | - | [lock-core/src/types.ts:78](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L78) |
-| &lt;a id="property-hint">&lt;/a> `hint?` | `string` | - | [lock-core/src/types.ts:77](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L77) |
-| &lt;a id="property-kind">&lt;/a> `kind?` | [`EnvelopeKind`](../type-aliases/EnvelopeKind.mdx) | - | [lock-core/src/types.ts:76](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L76) |
-| &lt;a id="property-payload">&lt;/a> `payload` | `Uint8Array` | - | [lock-core/src/types.ts:65](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L65) |
-| &lt;a id="property-payment">&lt;/a> `payment?` | [`EnvelopePayment`](EnvelopePayment.mdx) \| `null` | - | [lock-core/src/types.ts:79](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L79) |
-| &lt;a id="property-recipients">&lt;/a> `recipients` | [`DeviceRecord`](DeviceRecord.mdx)[] | - | [lock-core/src/types.ts:75](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L75) |
-| &lt;a id="property-sender">&lt;/a> `sender` | \&#123; `address`: `string`; `attestation_id?`: `string`; `signMessage`: (`msg`: `string`) => `Promise`\&lt;`string`\>; \&#125; | - | [lock-core/src/types.ts:66](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L66) |
-| `sender.address` | `string` | - | [lock-core/src/types.ts:67](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L67) |
-| `sender.attestation_id?` | `string` | - | [lock-core/src/types.ts:68](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L68) |
-| `sender.signMessage` | (`msg`: `string`) => `Promise`\&lt;`string`\> | Returns a BIP-322 base64 signature of the given message bytes as UTF-8. Exactly one call per seal (over the envelope id). | [lock-core/src/types.ts:73](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-core/src/types.ts#L73) |
+| &lt;a id="property-expiresat">&lt;/a> `expiresAt?` | `Date` \| `null` | - | [lock-core/src/types.ts:78](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L78) |
+| &lt;a id="property-hint">&lt;/a> `hint?` | `string` | - | [lock-core/src/types.ts:77](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L77) |
+| &lt;a id="property-kind">&lt;/a> `kind?` | [`EnvelopeKind`](../type-aliases/EnvelopeKind.mdx) | - | [lock-core/src/types.ts:76](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L76) |
+| &lt;a id="property-payload">&lt;/a> `payload` | `Uint8Array` | - | [lock-core/src/types.ts:65](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L65) |
+| &lt;a id="property-payment">&lt;/a> `payment?` | [`EnvelopePayment`](EnvelopePayment.mdx) \| `null` | - | [lock-core/src/types.ts:79](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L79) |
+| &lt;a id="property-recipients">&lt;/a> `recipients` | [`DeviceRecord`](DeviceRecord.mdx)[] | - | [lock-core/src/types.ts:75](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L75) |
+| &lt;a id="property-sender">&lt;/a> `sender` | \&#123; `address`: `string`; `attestation_id?`: `string`; `signMessage`: (`msg`: `string`) => `Promise`\&lt;`string`\>; \&#125; | - | [lock-core/src/types.ts:66](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L66) |
+| `sender.address` | `string` | - | [lock-core/src/types.ts:67](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L67) |
+| `sender.attestation_id?` | `string` | - | [lock-core/src/types.ts:68](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L68) |
+| `sender.signMessage` | (`msg`: `string`) => `Promise`\&lt;`string`\> | Returns a BIP-322 base64 signature of the given message bytes as UTF-8. Exactly one call per seal (over the envelope id). | [lock-core/src/types.ts:73](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L73) |

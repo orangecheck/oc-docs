@@ -11,14 +11,14 @@ export const metadata = {
 
 # Interface: SubmitOptions
 
-Defined in: [submit.ts:13](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L13)
+Defined in: [submit.ts:13](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L13)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-calendars">&lt;/a> `calendars?` | readonly (`string` \| [`CalendarClient`](CalendarClient.mdx))[] | Calendars to submit to. Defaults to DEFAULT_CALENDARS. Can be strings (URLs) or pre-built CalendarClient instances. | [submit.ts:18](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L18) |
-| &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Optional custom fetch passed through to calendar clients. | [submit.ts:26](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L26) |
-| &lt;a id="property-minsuccesses">&lt;/a> `minSuccesses?` | `number` | Minimum number of calendars that must succeed. Defaults to 1. If fewer than `minSuccesses` calendars respond with a proof, submit() throws an aggregate error. | [submit.ts:24](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L24) |
-| &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [submit.ts:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L29) |
-| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout per calendar. Default 30_000ms. | [submit.ts:28](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L28) |
+| &lt;a id="property-calendars">&lt;/a> `calendars?` | readonly (`string` \| [`CalendarClient`](CalendarClient.mdx))[] | Calendars to submit to. Defaults to DEFAULT_CALENDARS. Can be strings (URLs) or pre-built CalendarClient instances. | [submit.ts:18](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L18) |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Optional custom fetch passed through to calendar clients. | [submit.ts:26](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L26) |
+| &lt;a id="property-minsuccesses">&lt;/a> `minSuccesses?` | `number` | Minimum number of calendars that must succeed. Defaults to 1. If fewer than `minSuccesses` calendars respond with a proof, submit() throws an aggregate error. | [submit.ts:24](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L24) |
+| &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [submit.ts:29](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L29) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout per calendar. Default 30_000ms. | [submit.ts:28](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L28) |

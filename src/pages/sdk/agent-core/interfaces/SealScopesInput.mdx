@@ -11,17 +11,17 @@ export const metadata = {
 
 # Interface: SealScopesInput
 
-Defined in: [agent-core/src/private-scope.ts:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L47)
+Defined in: [agent-core/src/private-scope.ts:47](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L47)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-expiresat">&lt;/a> `expiresAt?` | `Date` \| `null` | Optional expiry on the OC Lock envelope itself. Independent of the delegation's expires_at; usually left null. | [agent-core/src/private-scope.ts:57](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L57) |
-| &lt;a id="property-hint">&lt;/a> `hint?` | `string` | Optional human hint stored in the OC Lock envelope. | [agent-core/src/private-scope.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L54) |
-| &lt;a id="property-recipients">&lt;/a> `recipients` | `DeviceRecord`[] | Authorized decryptors. Must include at least the agent. | [agent-core/src/private-scope.ts:52](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L52) |
-| &lt;a id="property-scopes">&lt;/a> `scopes` | `string`[] | - | [agent-core/src/private-scope.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L48) |
-| &lt;a id="property-sender">&lt;/a> `sender` | \&#123; `address`: `string`; `attestation_id?`: `string`; `signMessage`: (`msg`: `string`) => `Promise`\&lt;`string`\>; \&#125; | Principal / sender — the same address that signs the OC Agent envelope. | [agent-core/src/private-scope.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L50) |
+| &lt;a id="property-expiresat">&lt;/a> `expiresAt?` | `Date` \| `null` | Optional expiry on the OC Lock envelope itself. Independent of the delegation's expires_at; usually left null. | [agent-core/src/private-scope.ts:57](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L57) |
+| &lt;a id="property-hint">&lt;/a> `hint?` | `string` | Optional human hint stored in the OC Lock envelope. | [agent-core/src/private-scope.ts:54](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L54) |
+| &lt;a id="property-recipients">&lt;/a> `recipients` | `DeviceRecord`[] | Authorized decryptors. Must include at least the agent. | [agent-core/src/private-scope.ts:52](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L52) |
+| &lt;a id="property-scopes">&lt;/a> `scopes` | `string`[] | - | [agent-core/src/private-scope.ts:48](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L48) |
+| &lt;a id="property-sender">&lt;/a> `sender` | \&#123; `address`: `string`; `attestation_id?`: `string`; `signMessage`: (`msg`: `string`) => `Promise`\&lt;`string`\>; \&#125; | Principal / sender — the same address that signs the OC Agent envelope. | [agent-core/src/private-scope.ts:50](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L50) |
 | `sender.address` | `string` | - | agent-core/node\_modules/@orangecheck/lock-core/dist/types.d.ts:54 |
 | `sender.attestation_id?` | `string` | - | agent-core/node\_modules/@orangecheck/lock-core/dist/types.d.ts:55 |
 | `sender.signMessage` | (`msg`: `string`) => `Promise`\&lt;`string`\> | - | agent-core/node\_modules/@orangecheck/lock-core/dist/types.d.ts:56 |

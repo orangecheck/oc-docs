@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: VerifyEventResult
 
-Defined in: [me-client/src/event.ts:183](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L183)
+Defined in: [me-client/src/event.ts:183](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L183)
 
 Result of replay-verifying a billable envelope against the
  integrator's price config. Every field returned tells the caller
@@ -21,6 +21,6 @@ Result of replay-verifying a billable envelope against the
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-expected">&lt;/a> `expected` | \| \&#123; `gross_fee_sats`: `number`; `platform_fee_sats`: `number`; `site_rebate_sats`: `number`; `user_earned_sats`: `number`; \&#125; \| `null` | What computeFees() returned for the envelope's subtype + amount, given the integrator's current price config. Useful for the /audit divergence tracker — render expected vs actual side by side. Null when the subtype isn't enabled for this integrator. | [me-client/src/event.ts:205](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L205) |
-| &lt;a id="property-issues">&lt;/a> `issues` | \&#123; `actual`: `number` \| `null`; `expected`: `number` \| `null`; `field`: \| `"gross_fee_sats"` \| `"platform_fee_sats"` \| `"user_earned_sats"` \| `"site_rebate_sats"` \| `"subtype_disabled"` \| `"subtype_unconfigured"` \| `"percent_amount_missing"`; `message`: `string`; \&#125;[] | Issues found during verification, with field-level granularity so callers can highlight exactly which line is off. | [me-client/src/event.ts:188](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L188) |
-| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff every expected fee equals the recorded fee. | [me-client/src/event.ts:185](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L185) |
+| &lt;a id="property-expected">&lt;/a> `expected` | \| \&#123; `gross_fee_sats`: `number`; `platform_fee_sats`: `number`; `site_rebate_sats`: `number`; `user_earned_sats`: `number`; \&#125; \| `null` | What computeFees() returned for the envelope's subtype + amount, given the integrator's current price config. Useful for the /audit divergence tracker — render expected vs actual side by side. Null when the subtype isn't enabled for this integrator. | [me-client/src/event.ts:205](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L205) |
+| &lt;a id="property-issues">&lt;/a> `issues` | \&#123; `actual`: `number` \| `null`; `expected`: `number` \| `null`; `field`: \| `"gross_fee_sats"` \| `"platform_fee_sats"` \| `"user_earned_sats"` \| `"site_rebate_sats"` \| `"subtype_disabled"` \| `"subtype_unconfigured"` \| `"percent_amount_missing"`; `message`: `string`; \&#125;[] | Issues found during verification, with field-level granularity so callers can highlight exactly which line is off. | [me-client/src/event.ts:188](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L188) |
+| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff every expected fee equals the recorded fee. | [me-client/src/event.ts:185](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L185) |

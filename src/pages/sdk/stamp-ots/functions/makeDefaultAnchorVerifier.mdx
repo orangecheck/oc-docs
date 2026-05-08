@@ -17,7 +17,7 @@ function makeDefaultAnchorVerifier(opts: {
 }): Promise<(proofB64: string, blockHeight: number, blockHash: string, envelopeId: string) => Promise<boolean>>;
 ```
 
-Defined in: [anchor.ts:128](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/anchor.ts#L128)
+Defined in: [anchor.ts:128](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L128)
 
 Default anchor verifier that dynamically imports the `opentimestamps` npm
 package and wires it into `makeAnchorVerifier`. The import is lazy so

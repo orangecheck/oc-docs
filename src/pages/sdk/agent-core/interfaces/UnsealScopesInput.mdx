@@ -11,15 +11,15 @@ export const metadata = {
 
 # Interface: UnsealScopesInput
 
-Defined in: [agent-core/src/private-scope.ts:78](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L78)
+Defined in: [agent-core/src/private-scope.ts:78](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L78)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-device">&lt;/a> `device` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | - | [agent-core/src/private-scope.ts:80](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L80) |
+| &lt;a id="property-device">&lt;/a> `device` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | - | [agent-core/src/private-scope.ts:80](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L80) |
 | `device.device_id` | `string` | - | agent-core/node\_modules/@orangecheck/lock-core/dist/types.d.ts:67 |
 | `device.secretKey` | `Uint8Array` | - | agent-core/node\_modules/@orangecheck/lock-core/dist/types.d.ts:68 |
-| &lt;a id="property-envelope">&lt;/a> `envelope` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | - | [agent-core/src/private-scope.ts:79](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L79) |
-| &lt;a id="property-skipsenderverification">&lt;/a> `skipSenderVerification?` | `boolean` | Skip the inner sender-signature check entirely. Default false. | [agent-core/src/private-scope.ts:85](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L85) |
-| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | BIP-322 verifier callback. If omitted, the embedded LockEnvelope's signature is NOT checked — useful for inspection or test paths. | [agent-core/src/private-scope.ts:83](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L83) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | - | [agent-core/src/private-scope.ts:79](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L79) |
+| &lt;a id="property-skipsenderverification">&lt;/a> `skipSenderVerification?` | `boolean` | Skip the inner sender-signature check entirely. Default false. | [agent-core/src/private-scope.ts:85](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L85) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | BIP-322 verifier callback. If omitted, the embedded LockEnvelope's signature is NOT checked — useful for inspection or test paths. | [agent-core/src/private-scope.ts:83](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/private-scope.ts#L83) |

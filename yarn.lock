@@ -603,15 +603,15 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-0.4.1.tgz#a0dea3044bf016b1066219756b21651cdb24e012"
-  integrity sha512-dhmwlAsa+vbZh+ekFbFOqIJUVM9luTK5+Q4o/3+fCZ5w8w6SLzla8+XBF2hM/5/mMsDUeIGtAIc+my7pd4OxAg==
+"@orangecheck/auth-client@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-0.5.1.tgz#764b5cc65e93a5200b4bb8666c2fabbbbe0de3ef"
+  integrity sha512-FwGWP9ntLAMROECT8WpPppzBBwcgVpY5H/pxD8/xkcM3BZ1AT6FeHFQImKihykJ5eTiD1aHkrAVQsZQGwb4Lrw==
 
-"@orangecheck/auth-core@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-0.2.0.tgz#906077916120f5085c5a431c740f8372ea3c2c78"
-  integrity sha512-EJpCQ53jlvbp7nLWAtfTixsdtK9emFCL32AAieRr69Mt7P022HzCVlBZAAyYdZ3r+u8yjzDTkD/3gMtXZQIJbw==
+"@orangecheck/auth-core@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-0.4.1.tgz#bb867e5bffda9ba788f0fd396250957fde23af36"
+  integrity sha512-nmZsOysHPEmiKQ9lq0E/8afMZFRhEaagF6LWtKykknGUO7MQvZhv4v8Rf8ZqFvntAozAQ1mkCUW8RTAX7LgOqw==
   dependencies:
     jose "^6.2.2"
 

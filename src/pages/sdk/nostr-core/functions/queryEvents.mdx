@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Function: queryEvents()",
+    description: "Auto-generated API reference for Function: queryEvents(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README.mdx)
+
+***
+
+[@orangecheck/nostr-core](../README.mdx) / queryEvents
+
+# Function: queryEvents()
+
+```ts
+function queryEvents(
+   filter: Filter, 
+   relays?: readonly string[], 
+timeoutMs?: number): Promise<QueryResult>;
+```
+
+Defined in: [index.ts:292](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/nostr-core/src/index.ts#L292)
+
+Issue a NIP-01 REQ across all `relays` in parallel. Returns deduplicated
+events sorted newest-first plus per-relay status.
+
+Default timeout 1500ms — short enough that a momentary blip on any one
+relay (including relay.ochk.io) never holds up the racing reads. Pass an
+explicit `timeoutMs` for slow filters or for use cases where waiting on
+the slowest relay matters.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `filter` | [`Filter`](../interfaces/Filter.mdx) | `undefined` |
+| `relays` | readonly `string`[] | `DEFAULT_RELAYS` |
+| `timeoutMs` | `number` | `1500` |
+
+## Returns
+
+`Promise`\&lt;[`QueryResult`](../interfaces/QueryResult.mdx)\>

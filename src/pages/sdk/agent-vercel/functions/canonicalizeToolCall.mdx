@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: canonicalizeToolCall()",
+    description: "Auto-generated API reference for Function: canonicalizeToolCall(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-vercel**](../README.mdx)
+
+***
+
+[@orangecheck/agent-vercel](../README.mdx) / canonicalizeToolCall
+
+# Function: canonicalizeToolCall()
+
+```ts
+function canonicalizeToolCall(c: VercelToolCall): Uint8Array;
+```
+
+Defined in: [index.ts:63](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-vercel/src/index.ts#L63)
+
+Produce the canonical bytes for a Vercel AI SDK tool call.
+
+Shape (RFC 8785 canonical JSON, then trailing LF):
+  &#123;
+    "args":    &lt;canonical JSON of args>,
+    "call_id": &lt;callId>,
+    "verb":    &lt;verb>
+  &#125;
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `c` | [`VercelToolCall`](../interfaces/VercelToolCall.mdx) |
+
+## Returns
+
+`Uint8Array`

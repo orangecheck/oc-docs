@@ -1,0 +1,62 @@
+export const metadata = {
+    title: "Function: wrapPledgeEnvelope()",
+    description: "Auto-generated API reference for Function: wrapPledgeEnvelope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / wrapPledgeEnvelope
+
+# Function: wrapPledgeEnvelope()
+
+```ts
+function wrapPledgeEnvelope(
+   input: PledgeCanonicalInput, 
+   sigValue: string, 
+   opts?: {
+  sigPubkey?: string;
+  viaDelegation?: {
+     agentAddress: string;
+     delegationId: string;
+  };
+}): PledgeEnvelope;
+```
+
+Defined in: [pledge-core/src/pledge.ts:146](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/pledge.ts#L146)
+
+Build a pledge envelope from a canonical input + an externally-obtained
+BIP-322 signature. Companion to ``createPledge`` for callers who sign
+outside the SDK — typically web apps that use a wallet-extension's
+``signMessage`` API directly rather than wrapping it as a Bip322Signer.
+
+The caller is responsible for:
+  - Producing ``sigValue`` over the lowercase-hex pledge id (SPEC §3.5).
+    Compute the id via ``computePledgeId(input)`` first; pass that exact
+    hex string to the wallet's signMessage.
+  - Identifying which address signed (``sigPubkey``). For non-agent
+    pledges this MUST equal ``input.swearer``. For agent pledges
+    (viaDelegation set), ``sigPubkey`` SHOULD equal ``viaDelegation.agentAddress``
+    since that's the cryptographic signer; verifiers under SPEC §7.3 use
+    ``agent_address`` from the envelope as the BIP-322 verification key
+    regardless of what's in ``sig.pubkey``.
+
+Throws ``PledgeError`` if the canonical input is invalid (same gates as
+``createPledge``).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`PledgeCanonicalInput`](../interfaces/PledgeCanonicalInput.mdx) |
+| `sigValue` | `string` |
+| `opts?` | \&#123; `sigPubkey?`: `string`; `viaDelegation?`: \&#123; `agentAddress`: `string`; `delegationId`: `string`; \&#125;; \&#125; |
+| `opts.sigPubkey?` | `string` |
+| `opts.viaDelegation?` | \&#123; `agentAddress`: `string`; `delegationId`: `string`; \&#125; |
+| `opts.viaDelegation.agentAddress?` | `string` |
+| `opts.viaDelegation.delegationId?` | `string` |
+
+## Returns
+
+[`PledgeEnvelope`](../interfaces/PledgeEnvelope.mdx)

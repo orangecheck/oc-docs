@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Function: verifyOcToken()",
+    description: "Auto-generated API reference for Function: verifyOcToken(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / verifyOcToken
+
+# Function: verifyOcToken()
+
+```ts
+function verifyOcToken(token: string, options?: VerifyOcOptions): Promise<SessionPayload | null>;
+```
+
+Defined in: [src/index.ts:364](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L364)
+
+Verify a JWT issued by an OC auth host. Lazy-fetches the JWKS from
+`<issuer>/.well-known/jwks.json`, picks the key whose `kid` matches
+the token's protected header, and verifies the signature.
+
+Returns the payload on success, `null` on any failure (bad signature,
+expired, wrong issuer, kid not in JWKS, malformed). Never throws.
+
+Integrators don't need to handle JWKs, env vars, or rotation — the
+cache picks up new keys automatically when they appear in the JWKS
+response. Stale tokens signed under a retired key continue to verify
+as long as the retired key is still published in the JWKS (standard
+key-rotation overlap window).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `token` | `string` |
+| `options` | [`VerifyOcOptions`](../interfaces/VerifyOcOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`SessionPayload`](../interfaces/SessionPayload.mdx) \| `null`\>

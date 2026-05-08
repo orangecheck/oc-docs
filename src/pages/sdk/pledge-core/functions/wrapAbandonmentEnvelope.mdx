@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: wrapAbandonmentEnvelope()",
+    description: "Auto-generated API reference for Function: wrapAbandonmentEnvelope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / wrapAbandonmentEnvelope
+
+# Function: wrapAbandonmentEnvelope()
+
+```ts
+function wrapAbandonmentEnvelope(
+   input: AbandonmentCanonicalInput, 
+   sigValue: string, 
+   swearerAddress: string): AbandonmentEnvelope;
+```
+
+Defined in: [pledge-core/src/abandonment.ts:77](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/abandonment.ts#L77)
+
+Build an abandonment envelope from a canonical input + an externally-
+obtained BIP-322 signature. Companion to ``createAbandonment`` for
+external-sig flows.
+
+The caller must:
+  - Compute the id via ``computeAbandonmentId(input)`` first.
+  - Sign the lowercase-hex id with the original pledge's swearer key
+    (SPEC §5.3 — abandonments are principal-only; agents MUST NOT sign).
+  - Pass ``swearerAddress`` as the address that signed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`AbandonmentCanonicalInput`](../interfaces/AbandonmentCanonicalInput.mdx) |
+| `sigValue` | `string` |
+| `swearerAddress` | `string` |
+
+## Returns
+
+[`AbandonmentEnvelope`](../interfaces/AbandonmentEnvelope.mdx)

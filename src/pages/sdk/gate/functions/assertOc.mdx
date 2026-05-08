@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: assertOc()",
+    description: "Auto-generated API reference for Function: assertOc(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / assertOc
+
+# Function: assertOc()
+
+```ts
+function assertOc(req: MinimalReq, opts: GateOptions): Promise<GateDecision>;
+```
+
+Defined in: [core.ts:131](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/core.ts#L131)
+
+Run the OrangeCheck lookup + threshold comparison for a request, without
+touching the response. Framework-agnostic. Use this directly in Fastify,
+Hono, Workers, or anywhere Express middleware doesn't fit.
+
+  const decision = await assertOc(req, &#123; minSats: 100_000, address: &#123; from: 'header' &#125; &#125;);
+  if (!decision.ok) return res.status(403).json(&#123; error: decision.reason &#125;);
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `req` | [`MinimalReq`](../interfaces/MinimalReq.mdx) |
+| `opts` | [`GateOptions`](../interfaces/GateOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`GateDecision`](../interfaces/GateDecision.mdx)\>

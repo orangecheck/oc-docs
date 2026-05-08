@@ -1,0 +1,46 @@
+export const metadata = {
+    title: "Interface: ScopesEncryptedEnvelope",
+    description: "Auto-generated API reference for Interface: ScopesEncryptedEnvelope. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / ScopesEncryptedEnvelope
+
+# Interface: ScopesEncryptedEnvelope
+
+Defined in: [agent-core/src/types.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L54)
+
+v1.2 private-scope mode: a wholesale OC Lock v2 LockEnvelope wrapping the
+canonical scope list as its payload. We re-import the LockEnvelope type
+structurally rather than depending on the @orangecheck/lock-core type — agent-
+core's type surface stays loose so verifiers can be authored in either an
+agent-only or full-family setup.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-alg">&lt;/a> `alg` | \&#123; `aead`: `"aes-256-gcm"`; `kdf`: `"hkdf-sha256"`; `kem`: `"x25519"`; \&#125; | [agent-core/src/types.ts:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L58) |
+| `alg.aead` | `"aes-256-gcm"` | [agent-core/src/types.ts:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L58) |
+| `alg.kdf` | `"hkdf-sha256"` | [agent-core/src/types.ts:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L58) |
+| `alg.kem` | `"x25519"` | [agent-core/src/types.ts:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L58) |
+| &lt;a id="property-ciphertext">&lt;/a> `ciphertext` | `string` | [agent-core/src/types.ts:68](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L68) |
+| &lt;a id="property-created_at">&lt;/a> `created_at` | `string` | [agent-core/src/types.ts:71](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L71) |
+| &lt;a id="property-expires_at">&lt;/a> `expires_at` | `string` \| `null` | [agent-core/src/types.ts:72](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L72) |
+| &lt;a id="property-from">&lt;/a> `from` | \&#123; `address`: `string`; `attestation_id?`: `string`; \&#125; | [agent-core/src/types.ts:59](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L59) |
+| `from.address` | `string` | [agent-core/src/types.ts:59](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L59) |
+| `from.attestation_id?` | `string` | [agent-core/src/types.ts:59](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L59) |
+| &lt;a id="property-hint">&lt;/a> `hint?` | `string` | [agent-core/src/types.ts:70](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L70) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | [agent-core/src/types.ts:57](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L57) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"identity"` | [agent-core/src/types.ts:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L56) |
+| &lt;a id="property-nonce_ct">&lt;/a> `nonce_ct` | `string` | [agent-core/src/types.ts:69](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L69) |
+| &lt;a id="property-payment">&lt;/a> `payment` | `unknown` | [agent-core/src/types.ts:73](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L73) |
+| &lt;a id="property-recipients">&lt;/a> `recipients` | \&#123; `address`: `string`; `device_id`: `string`; `device_pk`: `string`; `eph_pk`: `string`; `nonce_kek`: `string`; `wrapped_key`: `string`; \&#125;[] | [agent-core/src/types.ts:60](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L60) |
+| &lt;a id="property-sig">&lt;/a> `sig` | \&#123; `alg`: `"bip322"`; `pubkey`: `string`; `value`: `string`; \&#125; | [agent-core/src/types.ts:74](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L74) |
+| `sig.alg` | `"bip322"` | [agent-core/src/types.ts:74](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L74) |
+| `sig.pubkey` | `string` | [agent-core/src/types.ts:74](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L74) |
+| `sig.value` | `string` | [agent-core/src/types.ts:74](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L74) |
+| &lt;a id="property-v">&lt;/a> `v` | `2` | [agent-core/src/types.ts:55](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L55) |

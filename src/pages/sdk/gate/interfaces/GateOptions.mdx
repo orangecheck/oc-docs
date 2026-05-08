@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Interface: GateOptions",
+    description: "Auto-generated API reference for Interface: GateOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / GateOptions
+
+# Interface: GateOptions
+
+Defined in: [types.ts:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L47)
+
+Config for a single gated route.
+
+You MUST pick exactly one of `address` / `attestationId` / `identity`
+— that's the field the gate uses to look the subject up.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-address">&lt;/a> `address?` | [`SubjectSource`](../type-aliases/SubjectSource.mdx) | Pull a Bitcoin address from the request. | [types.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L54) |
+| &lt;a id="property-attestationid">&lt;/a> `attestationId?` | [`SubjectSource`](../type-aliases/SubjectSource.mdx) | Pull an attestation ID (SHA-256 hex) from the request. | [types.ts:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L56) |
+| &lt;a id="property-cachemax">&lt;/a> `cacheMax?` | `number` | Max cache entries. Default 1_000. | [types.ts:66](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L66) |
+| &lt;a id="property-cachettlms">&lt;/a> `cacheTtlMs?` | `number` | In-process cache TTL for lookup results. Default 60_000 ms. | [types.ts:64](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L64) |
+| &lt;a id="property-exposesubject">&lt;/a> `exposeSubject?` | `boolean` | Include the resolved `subject` / `subjectKind` in the default 403 body. Default `false` — echoing a cookie-bound address discloses it to anyone who can hit the endpoint. Flip to `true` only when the subject was already caller-supplied (e.g., `from: 'header'`). | [types.ts:100](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L100) |
+| &lt;a id="property-failopen">&lt;/a> `failOpen?` | `boolean` | If the OrangeCheck lookup throws (relays unreachable, etc.), let the request through. Default `false` — degraded-mode should be explicit. | [types.ts:72](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L72) |
+| &lt;a id="property-identity">&lt;/a> `identity?` | [`SubjectSource`](../type-aliases/SubjectSource.mdx) | Pull an identity binding from the request in `protocol:identifier` form, e.g. `github:alice`. | [types.ts:61](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L61) |
+| &lt;a id="property-lookuptimeoutms">&lt;/a> `lookupTimeoutMs?` | `number` | Hard deadline for the upstream lookup. Default 5_000 ms. Beyond this the gate returns `lookup_error` (fail-closed unless `failOpen` is set). | [types.ts:81](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L81) |
+| &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [types.ts:51](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L51) |
+| &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded. Default 0 (any proof passes on stake). | [types.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L49) |
+| &lt;a id="property-onblocked">&lt;/a> `onBlocked?` | (`req`: [`MinimalReq`](MinimalReq.mdx), `res`: [`MinimalRes`](MinimalRes.mdx), `decision`: [`GateDecision`](GateDecision.mdx)) => `void` | Custom "blocked" handler. If omitted, the gate sends a 403 JSON body. | [types.ts:110](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L110) |
+| &lt;a id="property-ondecision">&lt;/a> `onDecision?` | (`req`: [`MinimalReq`](MinimalReq.mdx), `decision`: [`GateDecision`](GateDecision.mdx)) => `void` | Called with the decision before the response is sent. Use for logging. | [types.ts:105](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L105) |
+| &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override the Nostr relays used for discovery. | [types.ts:75](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L75) |
+| &lt;a id="property-trustunsafesources">&lt;/a> `trustUnsafeSources?` | `boolean` | `header` / `query` / `cookie` / `body` subject sources are **untrusted** by default — anyone can set them. Passing `trustUnsafeSources: true` acknowledges that your application verified the address some other way (e.g., from a signed session cookie), or that you're OK with letting callers self-declare. The gate will still log a startup warning unless this flag is set on an explicitly-untrusted source. Custom `from` functions are always considered trusted (you wrote them). | [types.ts:92](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L92) |

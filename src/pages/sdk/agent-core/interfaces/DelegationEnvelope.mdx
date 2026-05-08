@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Interface: DelegationEnvelope",
+    description: "Auto-generated API reference for Interface: DelegationEnvelope. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / DelegationEnvelope
+
+# Interface: DelegationEnvelope
+
+Defined in: [agent-core/src/types.ts:77](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L77)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-agent">&lt;/a> `agent` | [`ActorRef`](ActorRef.mdx) | - | [agent-core/src/types.ts:82](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L82) |
+| &lt;a id="property-bond">&lt;/a> `bond` | [`DelegationBond`](DelegationBond.mdx) \| `null` | - | [agent-core/src/types.ts:100](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L100) |
+| &lt;a id="property-expires_at">&lt;/a> `expires_at` | `string` | - | [agent-core/src/types.ts:102](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L102) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [agent-core/src/types.ts:80](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L80) |
+| &lt;a id="property-issued_at">&lt;/a> `issued_at` | `string` | - | [agent-core/src/types.ts:101](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L101) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"agent-delegation"` | - | [agent-core/src/types.ts:79](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L79) |
+| &lt;a id="property-nonce">&lt;/a> `nonce` | `string` | - | [agent-core/src/types.ts:103](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L103) |
+| &lt;a id="property-principal">&lt;/a> `principal` | [`ActorRef`](ActorRef.mdx) | - | [agent-core/src/types.ts:81](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L81) |
+| &lt;a id="property-revocation">&lt;/a> `revocation` | [`DelegationRevocationRef`](DelegationRevocationRef.mdx) | - | [agent-core/src/types.ts:104](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L104) |
+| &lt;a id="property-scopes">&lt;/a> `scopes?` | `string`[] | v1.0 / v1.1 public mode: sorted lexicographically in the canonical message; stored in sorted order on the envelope too. v1.2 private mode: this field is OMITTED from the envelope JSON; `scopes_encrypted` is set instead. After decryption, the recovered scope list takes this field's place in the in-memory envelope object for the remainder of verification. | [agent-core/src/types.ts:92](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L92) |
+| &lt;a id="property-scopes_encrypted">&lt;/a> `scopes_encrypted?` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | v1.2 private mode (PRIVATE-SCOPE.md §1.1): an OC Lock v2 envelope wrapping the canonical scope-list bytes as its payload, sealed to one or more recipients (typically the agent ± named verifiers). MUTUALLY EXCLUSIVE with `scopes`. | [agent-core/src/types.ts:99](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L99) |
+| &lt;a id="property-sig">&lt;/a> `sig` | [`Signature`](Signature.mdx) | - | [agent-core/src/types.ts:105](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L105) |
+| &lt;a id="property-v">&lt;/a> `v` | `1` | - | [agent-core/src/types.ts:78](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L78) |

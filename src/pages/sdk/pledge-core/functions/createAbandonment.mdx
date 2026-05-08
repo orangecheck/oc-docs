@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: createAbandonment()",
+    description: "Auto-generated API reference for Function: createAbandonment(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / createAbandonment
+
+# Function: createAbandonment()
+
+```ts
+function createAbandonment(input: CreateAbandonmentInput): Promise<AbandonmentEnvelope>;
+```
+
+Defined in: [pledge-core/src/abandonment.ts:36](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/abandonment.ts#L36)
+
+Build, validate, and sign an abandonment envelope.
+
+SPEC §5: abandonment counts as `broken` in the public ledger. Agents MUST
+NOT publish abandonments in v0.1 — only the original swearer (principal)
+may sign. The SDK enforces this by requiring `swearerSigner.address` to
+equal the address that signed the original pledge, but it cannot verify
+cross-envelope reference here (the original pledge isn't an input). Callers
+MUST cross-check against the referenced pledge before relying on the
+resulting envelope.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`CreateAbandonmentInput`](../interfaces/CreateAbandonmentInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`AbandonmentEnvelope`](../interfaces/AbandonmentEnvelope.mdx)\>

@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: parseFunctionCall()",
+    description: "Auto-generated API reference for Function: parseFunctionCall(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-openai**](../README.mdx)
+
+***
+
+[@orangecheck/agent-openai](../README.mdx) / parseFunctionCall
+
+# Function: parseFunctionCall()
+
+```ts
+function parseFunctionCall(raw: unknown): OpenAiFunctionCall;
+```
+
+Defined in: [index.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L54)
+
+Normalize either a Chat Completions `tool_call` or a Responses
+`function_call` item into our canonical &#123;id, name, arguments&#125; shape.
+
+Accepts:
+  - &#123; id, function: &#123; name, arguments &#125; &#125;                      (Chat Completions)
+  - &#123; call_id, name, arguments &#125;                               (Responses, function_call)
+  - &#123; id, name, arguments &#125;                                    (already normalized)
+
+`arguments` may be either a JSON string (OpenAI's wire shape) or an
+already-parsed object (your post-processing). Both work.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `raw` | `unknown` |
+
+## Returns
+
+[`OpenAiFunctionCall`](../interfaces/OpenAiFunctionCall.mdx)

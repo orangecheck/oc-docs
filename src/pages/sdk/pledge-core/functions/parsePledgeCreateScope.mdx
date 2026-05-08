@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: parsePledgeCreateScope()",
+    description: "Auto-generated API reference for Function: parsePledgeCreateScope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / parsePledgeCreateScope
+
+# Function: parsePledgeCreateScope()
+
+```ts
+function parsePledgeCreateScope(scope: string): Record<string, string> | null;
+```
+
+Defined in: [pledge-core/src/delegation.ts:90](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/delegation.ts#L90)
+
+Parse a single scope string. Returns the constraint map iff the scope's
+product:verb is `pledge:create`; null for any other scope (caller skips
+those). Tolerates whitespace inside parens; rejects malformed syntax by
+returning null (the scope is treated as non-matching rather than
+surfacing a parse error — matches OC Agent's permissive scope mode).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | `string` |
+
+## Returns
+
+`Record`\&lt;`string`, `string`\> \| `null`

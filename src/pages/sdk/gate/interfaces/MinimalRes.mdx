@@ -1,0 +1,84 @@
+export const metadata = {
+    title: "Interface: MinimalRes",
+    description: "Auto-generated API reference for Interface: MinimalRes. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / MinimalRes
+
+# Interface: MinimalRes
+
+Defined in: [types.ts:33](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L33)
+
+Shape that the gate middleware writes to. Works with Express `res`
+or Next.js `NextApiResponse`.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-end">&lt;/a> `end?` | (...`args`: `any`[]) => `void` | [types.ts:38](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L38) |
+
+## Methods
+
+### json()
+
+```ts
+json(body: unknown): void | MinimalRes;
+```
+
+Defined in: [types.ts:35](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L35)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `body` | `unknown` |
+
+#### Returns
+
+`void` \| `MinimalRes`
+
+***
+
+### setHeader()
+
+```ts
+setHeader(name: string, value: string | number | readonly string[]): void | MinimalRes;
+```
+
+Defined in: [types.ts:36](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L36)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `name` | `string` |
+| `value` | `string` \| `number` \| readonly `string`[] |
+
+#### Returns
+
+`void` \| `MinimalRes`
+
+***
+
+### status()
+
+```ts
+status(code: number): MinimalRes;
+```
+
+Defined in: [types.ts:34](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L34)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `code` | `number` |
+
+#### Returns
+
+`MinimalRes`

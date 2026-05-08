@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Function: canonicalizeInvocation()",
+    description: "Auto-generated API reference for Function: canonicalizeInvocation(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-mcp**](../README.mdx)
+
+***
+
+[@orangecheck/agent-mcp](../README.mdx) / canonicalizeInvocation
+
+# Function: canonicalizeInvocation()
+
+```ts
+function canonicalizeInvocation(inv: McpInvocation): Uint8Array;
+```
+
+Defined in: [index.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-mcp/src/index.ts#L54)
+
+Produce the canonical bytes for an MCP invocation. The bytes are what the
+action envelope's `content.hash` is a SHA-256 of.
+
+Shape:
+  &#123;
+    "arguments": &lt;canonical JSON of args>,
+    "server":    &lt;server url>,
+    "tool":      &lt;tool name>
+  &#125;
+
+The shape is intentionally minimal so verifiers can reconstruct it without
+knowing anything server- or tool-specific.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `inv` | [`McpInvocation`](../interfaces/McpInvocation.mdx) |
+
+## Returns
+
+`Uint8Array`

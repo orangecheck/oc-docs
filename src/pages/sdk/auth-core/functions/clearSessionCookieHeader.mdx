@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Function: clearSessionCookieHeader()",
+    description: "Auto-generated API reference for Function: clearSessionCookieHeader(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / clearSessionCookieHeader
+
+# Function: clearSessionCookieHeader()
+
+```ts
+function clearSessionCookieHeader(opts?: Pick<CookieOptions, "domain" | "path" | "secure">): string;
+```
+
+Defined in: [src/index.ts:226](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L226)
+
+Clear the session cookie. Must match the Domain used when it was set.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | `Pick`\&lt;[`CookieOptions`](../interfaces/CookieOptions.mdx), `"domain"` \| `"path"` \| `"secure"`\> |
+
+## Returns
+
+`string`

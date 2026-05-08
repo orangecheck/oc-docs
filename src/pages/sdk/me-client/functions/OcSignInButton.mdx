@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: OcSignInButton()",
+    description: "Auto-generated API reference for Function: OcSignInButton(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / OcSignInButton
+
+# Function: OcSignInButton()
+
+```ts
+function OcSignInButton(__namedParameters: OcSignInButtonProps): Element;
+```
+
+Defined in: [me-client/src/SignInButton.tsx:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/SignInButton.tsx#L29)
+
+Drop-in Sign-in-with-OC button. Triggers the me.ochk.io consent flow
+for the requested scope, opens (or refreshes) a session, and calls
+onSignin(session) on success. Class C billable event for the
+integrating site; cashback flows to the user.
+
+Mounting requires &lt;OcSessionProvider> from @orangecheck/auth-client
+somewhere up the React tree so the resulting session can be read by
+useOcSession() across the rest of the app.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`OcSignInButtonProps`](../interfaces/OcSignInButtonProps.mdx) |
+
+## Returns
+
+`Element`

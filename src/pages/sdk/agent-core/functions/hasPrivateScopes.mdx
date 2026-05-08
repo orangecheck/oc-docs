@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: hasPrivateScopes()",
+    description: "Auto-generated API reference for Function: hasPrivateScopes(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / hasPrivateScopes
+
+# Function: hasPrivateScopes()
+
+```ts
+function hasPrivateScopes<T>(envelope: T): envelope is T & { scopes_encrypted: ScopesEncryptedEnvelope };
+```
+
+Defined in: [agent-core/src/private-scope.ts:118](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L118)
+
+Convenience predicate.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` *extends* \&#123; `scopes?`: `string`[]; `scopes_encrypted?`: [`ScopesEncryptedEnvelope`](../interfaces/ScopesEncryptedEnvelope.mdx); \&#125; |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `envelope` | `T` |
+
+## Returns
+
+`envelope is T & { scopes_encrypted: ScopesEncryptedEnvelope }`

@@ -1,0 +1,24 @@
+export const metadata = {
+    title: "Interface: AnchorVerificationInput",
+    description: "Auto-generated API reference for Interface: AnchorVerificationInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / AnchorVerificationInput
+
+# Interface: AnchorVerificationInput
+
+Defined in: [types.ts:45](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L45)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-blockhash">&lt;/a> `blockHash` | `string` | Declared block hash (hex) from the envelope. | [types.ts:53](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L53) |
+| &lt;a id="property-blockheight">&lt;/a> `blockHeight` | `number` | Declared block height from the envelope. | [types.ts:51](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L51) |
+| &lt;a id="property-digest">&lt;/a> `digest` | `Uint8Array` | 32-byte digest that the proof commits to. | [types.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L49) |
+| &lt;a id="property-headersource">&lt;/a> `headerSource?` | [`BlockHeaderSource`](BlockHeaderSource.mdx) | Optional block header source. If provided, the verifier uses this to fetch the header at `blockHeight` and compare its Merkle root to the one derived from walking the proof. If omitted, the verifier MAY still parse the proof and report structural validity but CANNOT report a bound anchor. | [types.ts:62](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L62) |
+| &lt;a id="property-proofbytes">&lt;/a> `proofBytes` | `Uint8Array` | Raw OTS proof bytes (base64-decoded by the caller). | [types.ts:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L47) |

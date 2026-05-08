@@ -1,0 +1,48 @@
+export const metadata = {
+    title: "Function: validateCanonicalInput()",
+    description: "Auto-generated API reference for Function: validateCanonicalInput(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-core**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-core](../README.mdx) / validateCanonicalInput
+
+# Function: validateCanonicalInput()
+
+```ts
+function validateCanonicalInput(input: CanonicalMessageInput): 
+  | {
+  ok: true;
+}
+  | {
+  ok: false;
+  reason: string;
+};
+```
+
+Defined in: [stamp-core/src/canonical.ts:44](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-core/src/canonical.ts#L44)
+
+Check whether a CanonicalMessageInput is well-formed per the spec's field
+rules (§3, §4). Returns `{ok: true}` if every field is valid, or
+`{ok: false, reason}` pointing at the first violation.
+
+Called by `stamp()` before producing the canonical bytes. Exposed for
+UIs that want to preview validity without throwing.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`CanonicalMessageInput`](../interfaces/CanonicalMessageInput.mdx) |
+
+## Returns
+
+  \| \&#123;
+  `ok`: `true`;
+\&#125;
+  \| \&#123;
+  `ok`: `false`;
+  `reason`: `string`;
+\&#125;

@@ -1,0 +1,113 @@
+export const metadata = {
+    title: "@orangecheck/pledge-core",
+    description: "Auto-generated API reference for @orangecheck/pledge-core. Source: TypeScript types in oc-packages.",
+};
+
+**@orangecheck/pledge-core**
+
+***
+
+# @orangecheck/pledge-core
+
+## Classes
+
+- [PledgeError](classes/PledgeError.mdx)
+
+## Interfaces
+
+- [AbandonmentCanonicalInput](interfaces/AbandonmentCanonicalInput.mdx)
+- [AbandonmentEnvelope](interfaces/AbandonmentEnvelope.mdx)
+- [AbandonmentSignature](interfaces/AbandonmentSignature.mdx)
+- [AttestationLookupResult](interfaces/AttestationLookupResult.mdx)
+- [Bip322Signer](interfaces/Bip322Signer.mdx)
+- [ClassifyStateInput](interfaces/ClassifyStateInput.mdx)
+- [CreateAbandonmentInput](interfaces/CreateAbandonmentInput.mdx)
+- [CreateOutcomeInput](interfaces/CreateOutcomeInput.mdx)
+- [CreatePledgeInput](interfaces/CreatePledgeInput.mdx)
+- [DelegationLookupResult](interfaces/DelegationLookupResult.mdx)
+- [OutcomeCanonicalInput](interfaces/OutcomeCanonicalInput.mdx)
+- [OutcomeEnvelope](interfaces/OutcomeEnvelope.mdx)
+- [OutcomeEvidence](interfaces/OutcomeEvidence.mdx)
+- [OutcomeSignature](interfaces/OutcomeSignature.mdx)
+- [PledgeBond](interfaces/PledgeBond.mdx)
+- [PledgeCanonicalInput](interfaces/PledgeCanonicalInput.mdx)
+- [PledgeDispute](interfaces/PledgeDispute.mdx)
+- [PledgeEnvelope](interfaces/PledgeEnvelope.mdx)
+- [PledgeResolution](interfaces/PledgeResolution.mdx)
+- [PledgeSignature](interfaces/PledgeSignature.mdx)
+- [PledgeSwearer](interfaces/PledgeSwearer.mdx)
+- [VerifyAbandonmentInput](interfaces/VerifyAbandonmentInput.mdx)
+- [VerifyAbandonmentOk](interfaces/VerifyAbandonmentOk.mdx)
+- [VerifyBondErr](interfaces/VerifyBondErr.mdx)
+- [VerifyBondInput](interfaces/VerifyBondInput.mdx)
+- [VerifyBondOk](interfaces/VerifyBondOk.mdx)
+- [VerifyErr](interfaces/VerifyErr.mdx)
+- [VerifyOutcomeInput](interfaces/VerifyOutcomeInput.mdx)
+- [VerifyOutcomeOk](interfaces/VerifyOutcomeOk.mdx)
+- [VerifyPledgeInput](interfaces/VerifyPledgeInput.mdx)
+- [VerifyPledgeOk](interfaces/VerifyPledgeOk.mdx)
+
+## Type Aliases
+
+- [AttestationLookup](type-aliases/AttestationLookup.mdx)
+- [DelegationLookup](type-aliases/DelegationLookup.mdx)
+- [DisputeMechanism](type-aliases/DisputeMechanism.mdx)
+- [JsonValue](type-aliases/JsonValue.mdx)
+- [OutcomeKind](type-aliases/OutcomeKind.mdx)
+- [PledgeErrorCode](type-aliases/PledgeErrorCode.mdx)
+- [PledgeResolvesAt](type-aliases/PledgeResolvesAt.mdx)
+- [PledgeState](type-aliases/PledgeState.mdx)
+- [ResolutionMechanism](type-aliases/ResolutionMechanism.mdx)
+- [ResolutionValidateResult](type-aliases/ResolutionValidateResult.mdx)
+- [ScopeCheckResult](type-aliases/ScopeCheckResult.mdx)
+- [ValidateResult](type-aliases/ValidateResult.mdx)
+- [VerifyAbandonmentResult](type-aliases/VerifyAbandonmentResult.mdx)
+- [VerifyBip322](type-aliases/VerifyBip322.mdx)
+- [VerifyBondResult](type-aliases/VerifyBondResult.mdx)
+- [VerifyOutcomeResult](type-aliases/VerifyOutcomeResult.mdx)
+- [VerifyPledgeResult](type-aliases/VerifyPledgeResult.mdx)
+
+## Variables
+
+- [ENVELOPE\_VERSION](variables/ENVELOPE_VERSION.mdx)
+- [RESOLUTION\_MECHANISMS](variables/RESOLUTION_MECHANISMS.mdx)
+
+## Functions
+
+- [bondConstraints](functions/bondConstraints.mdx)
+- [canonicalAbandonmentMessage](functions/canonicalAbandonmentMessage.mdx)
+- [canonicalAbandonmentMessageBytes](functions/canonicalAbandonmentMessageBytes.mdx)
+- [canonicalize](functions/canonicalize.mdx)
+- [canonicalizeAbandonmentEnvelope](functions/canonicalizeAbandonmentEnvelope.mdx)
+- [canonicalizeOutcomeEnvelope](functions/canonicalizeOutcomeEnvelope.mdx)
+- [canonicalizePledgeEnvelope](functions/canonicalizePledgeEnvelope.mdx)
+- [canonicalOutcomeMessage](functions/canonicalOutcomeMessage.mdx)
+- [canonicalOutcomeMessageBytes](functions/canonicalOutcomeMessageBytes.mdx)
+- [canonicalPledgeMessage](functions/canonicalPledgeMessage.mdx)
+- [canonicalPledgeMessageBytes](functions/canonicalPledgeMessageBytes.mdx)
+- [checkPledgeCreateScope](functions/checkPledgeCreateScope.mdx)
+- [classifyState](functions/classifyState.mdx)
+- [computeAbandonmentId](functions/computeAbandonmentId.mdx)
+- [computeOutcomeId](functions/computeOutcomeId.mdx)
+- [computePledgeId](functions/computePledgeId.mdx)
+- [createAbandonment](functions/createAbandonment.mdx)
+- [createOutcome](functions/createOutcome.mdx)
+- [createPledge](functions/createPledge.mdx)
+- [generateNonce](functions/generateNonce.mdx)
+- [hexEncode](functions/hexEncode.mdx)
+- [isoUtcGreaterThan](functions/isoUtcGreaterThan.mdx)
+- [outcomeRequiresSignature](functions/outcomeRequiresSignature.mdx)
+- [outcomesContradict](functions/outcomesContradict.mdx)
+- [parsePledgeCreateScope](functions/parsePledgeCreateScope.mdx)
+- [sha256Hex](functions/sha256Hex.mdx)
+- [validateAbandonmentInput](functions/validateAbandonmentInput.mdx)
+- [validateOutcomeInput](functions/validateOutcomeInput.mdx)
+- [validatePledgeInput](functions/validatePledgeInput.mdx)
+- [validateResolutionQuery](functions/validateResolutionQuery.mdx)
+- [verifyAbandonment](functions/verifyAbandonment.mdx)
+- [verifyBond](functions/verifyBond.mdx)
+- [verifyOutcome](functions/verifyOutcome.mdx)
+- [verifyPledge](functions/verifyPledge.mdx)
+- [wrapAbandonmentEnvelope](functions/wrapAbandonmentEnvelope.mdx)
+- [wrapOutcomeEnvelope](functions/wrapOutcomeEnvelope.mdx)
+- [wrapPledgeEnvelope](functions/wrapPledgeEnvelope.mdx)

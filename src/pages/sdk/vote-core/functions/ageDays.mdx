@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: ageDays()",
+    description: "Auto-generated API reference for Function: ageDays(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README.mdx)
+
+***
+
+[@orangecheck/vote-core](../README.mdx) / ageDays
+
+# Function: ageDays()
+
+```ts
+function ageDays(u: Utxo, snapshot: number): number;
+```
+
+Defined in: [weight.ts:13](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/vote-core/src/weight.ts#L13)
+
+Age of a UTXO in days at snapshot block, per SPEC §7.3.
+  age_days(u, H) = max(0, floor((H - u.confirmed_height) * 600 / 86400))
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `u` | [`Utxo`](../interfaces/Utxo.mdx) |
+| `snapshot` | `number` |
+
+## Returns
+
+`number`

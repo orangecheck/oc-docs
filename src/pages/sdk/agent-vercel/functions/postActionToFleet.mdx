@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: postActionToFleet()",
+    description: "Auto-generated API reference for Function: postActionToFleet(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-vercel**](../README.mdx)
+
+***
+
+[@orangecheck/agent-vercel](../README.mdx) / postActionToFleet
+
+# Function: postActionToFleet()
+
+```ts
+function postActionToFleet(action: ActionEnvelope, client: FleetClient): Promise<PostActionResult>;
+```
+
+Defined in: [index.ts:260](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-vercel/src/index.ts#L260)
+
+POST a stamped action envelope to fleet.ochk.io/api/actions. The
+fleet re-derives the action id, validates agent-must-match-
+delegation, persists, fans out to Nostr (kind 30084), submits to
+OC Stamp, and triggers any subscribed webhooks. Throws on non-2xx
+with the server's reason string.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `action` | `ActionEnvelope` |
+| `client` | [`FleetClient`](../interfaces/FleetClient.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`PostActionResult`](../interfaces/PostActionResult.mdx)\>

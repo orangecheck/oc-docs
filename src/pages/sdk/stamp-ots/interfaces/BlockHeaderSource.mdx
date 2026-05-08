@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Interface: BlockHeaderSource",
+    description: "Auto-generated API reference for Interface: BlockHeaderSource. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / BlockHeaderSource
+
+# Interface: BlockHeaderSource
+
+Defined in: [types.ts:65](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L65)
+
+## Methods
+
+### getHeaderAt()
+
+```ts
+getHeaderAt(height: number): Promise<Uint8Array<ArrayBufferLike> | null>;
+```
+
+Defined in: [types.ts:67](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L67)
+
+Return the 80-byte raw block header at the given height, or null if unknown.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `height` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\> \| `null`\>

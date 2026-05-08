@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: VerifyOptions",
+    description: "Auto-generated API reference for Interface: VerifyOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / VerifyOptions
+
+# Interface: VerifyOptions
+
+Defined in: [me-client/src/webhook.ts:46](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/webhook.ts#L46)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Override the auth host issuer. Defaults to https://ochk.io. | [me-client/src/webhook.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/webhook.ts#L48) |
+| &lt;a id="property-jwk">&lt;/a> `jwk?` | [`OcPublicJwk`](OcPublicJwk.mdx) | Pass a JWK directly to skip the network fetch entirely. Useful for tests, edge runtimes that can't fetch, or integrators that ship the public key alongside their webhook handler. | [me-client/src/webhook.ts:52](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/webhook.ts#L52) |
+| &lt;a id="property-jwkscachettlms">&lt;/a> `jwksCacheTtlMs?` | `number` | JWKS cache TTL in ms. Defaults to 1 hour. Stale-on-error: a transient JWKS outage falls back to the previous cached value rather than rejecting every webhook. | [me-client/src/webhook.ts:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/webhook.ts#L56) |

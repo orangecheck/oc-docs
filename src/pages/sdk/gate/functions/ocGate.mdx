@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: ocGate()",
+    description: "Auto-generated API reference for Function: ocGate(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / ocGate
+
+# Function: ocGate()
+
+```ts
+function ocGate(opts: GateOptions): (req: MinimalReq, res: MinimalRes, next: (err?: unknown) => void) => Promise<void>;
+```
+
+Defined in: [express.ts:23](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/express.ts#L23)
+
+Express / Connect / Next-pages-API middleware.
+
+  import &#123; ocGate &#125; from '@orangecheck/gate';
+
+  app.post(
+    '/post',
+    ocGate(&#123;
+      minSats: 100_000,
+      minDays: 30,
+      address: &#123; from: 'header' &#125;,   // reads X-OC-Address
+    &#125;),
+    postHandler,
+  );
+
+On block: sends `403 { error: '<reason>', orangecheck: <CheckResult|null> }`
+unless `opts.onBlocked` is provided.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`GateOptions`](../interfaces/GateOptions.mdx) |
+
+## Returns
+
+(`req`: [`MinimalReq`](../interfaces/MinimalReq.mdx), `res`: [`MinimalRes`](../interfaces/MinimalRes.mdx), `next`: (`err?`: `unknown`) => `void`) => `Promise`\&lt;`void`\>

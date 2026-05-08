@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Interface: UseOcAddressSuggestionOptions",
+    description: "Auto-generated API reference for Interface: UseOcAddressSuggestionOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / UseOcAddressSuggestionOptions
+
+# Interface: UseOcAddressSuggestionOptions
+
+Defined in: [src/components.tsx:448](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L448)
+
+Bitcoin-address `<input>` that, when the user is signed in via `oc_session`,
+surfaces their address as a one-click suggestion on focus.
+
+Behaviour:
+- On focus, if logged-in AND the typed value is a prefix of the session
+  address (or empty), show a small popover with `bc1q…7ke3` as a clickable
+  suggestion.
+- Click / Enter on the suggestion fills the field with the full address.
+- Down-arrow from the input highlights the suggestion; Up-arrow clears the
+  highlight; Escape closes the popover; clicking outside closes the popover.
+- When the user types something that's no longer a prefix of the session
+  address, the popover hides itself out of the way.
+- When the field already contains the session address exactly, no popover.
+
+Style-agnostic: minimal inline styles for positioning only. Style the parts
+via `wrapperClassName` / `popoverClassName` / `suggestionClassName`, or via
+the `[data-oc-address-input]`, `[data-oc-address-popover]`, and
+`[data-oc-address-suggestion]` data attributes.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-onvaluechange">&lt;/a> `onValueChange` | (`value`: `string`) => `void` | Called when the user selects the suggestion (or you may also call it from the input's onChange). | [src/components.tsx:452](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L452) |
+| &lt;a id="property-popoverclassname">&lt;/a> `popoverClassName?` | `string` | className applied to the suggestion popover. Style with `[data-oc-address-popover]` otherwise. | [src/components.tsx:456](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L456) |
+| &lt;a id="property-suggestionclassname">&lt;/a> `suggestionClassName?` | `string` | className applied to the suggestion button. Style with `[data-oc-address-suggestion]` otherwise. | [src/components.tsx:458](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L458) |
+| &lt;a id="property-suggestionlabel">&lt;/a> `suggestionLabel?` | `string` | Label shown above the suggested address in the popover. Defaults to `use your address`. | [src/components.tsx:454](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L454) |
+| &lt;a id="property-value">&lt;/a> `value` | `string` | Current value of the input. | [src/components.tsx:450](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L450) |

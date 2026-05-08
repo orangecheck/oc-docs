@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Function: createPledge()",
+    description: "Auto-generated API reference for Function: createPledge(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / createPledge
+
+# Function: createPledge()
+
+```ts
+function createPledge(input: CreatePledgeInput): Promise<PledgeEnvelope>;
+```
+
+Defined in: [pledge-core/src/pledge.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/pledge.ts#L49)
+
+Build, validate, and sign a pledge envelope.
+
+Two signing paths:
+  - Direct (most common): swearer signs themselves. Pass `swearerSigner`
+    whose `address` matches the canonical message's swearer.
+  - Agent (SPEC §7.3): an agent signs on behalf of a principal under an
+    OC Agent delegation. Pass `viaDelegation` with the delegation id and
+    the agent's signer. The envelope carries `via_delegation` and
+    `agent_address` but those fields are NOT in the canonical message —
+    they're verifier-checked claims, not signed bytes.
+
+Returns the fully-formed envelope. Throws PledgeError on validation
+failure, never on signature failure (signing is the caller's adapter).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`CreatePledgeInput`](../interfaces/CreatePledgeInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`PledgeEnvelope`](../interfaces/PledgeEnvelope.mdx)\>

@@ -1,0 +1,50 @@
+export const metadata = {
+    title: "Function: withOcGate()",
+    description: "Auto-generated API reference for Function: withOcGate(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / withOcGate
+
+# Function: withOcGate()
+
+```ts
+function withOcGate<H>(handler: H, opts: GateOptions): H;
+```
+
+Defined in: [next.ts:27](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/next.ts#L27)
+
+Next.js Pages Router API wrapper.
+
+  import &#123; withOcGate &#125; from '@orangecheck/gate';
+
+  async function handler(req, res) &#123;
+    // The decision is attached to req when the gate lets the call through.
+    res.json(&#123; hello: (req as any).orangecheck.sats &#125;);
+  &#125;
+
+  export default withOcGate(handler, &#123;
+    minSats: 100_000,
+    minDays: 30,
+    address: &#123; from: 'query', name: 'addr' &#125;,
+  &#125;);
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `H` *extends* (`req`: `any`, `res`: `any`) => `any` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `handler` | `H` |
+| `opts` | [`GateOptions`](../interfaces/GateOptions.mdx) |
+
+## Returns
+
+`H`

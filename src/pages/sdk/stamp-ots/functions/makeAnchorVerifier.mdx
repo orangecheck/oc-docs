@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: makeAnchorVerifier()",
+    description: "Auto-generated API reference for Function: makeAnchorVerifier(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / makeAnchorVerifier
+
+# Function: makeAnchorVerifier()
+
+```ts
+function makeAnchorVerifier(cfg: AnchorVerifierConfig): (proofB64: string, blockHeight: number, blockHash: string, envelopeId: string) => Promise<boolean>;
+```
+
+Defined in: [anchor.ts:62](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/anchor.ts#L62)
+
+Build a concrete anchor verifier from a proof walker plus a header source.
+
+The returned function matches the `verifyOtsAnchor` shape expected by
+`@orangecheck/stamp-core`'s `verify()`:
+
+  (proofB64, blockHeight, blockHash, envelopeId) => Promise&lt;boolean>
+
+Wire it in as:
+
+  verify(&#123; envelope, verifyOtsAnchor: makeAnchorVerifier(&#123;...&#125;) &#125;)
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `cfg` | [`AnchorVerifierConfig`](../interfaces/AnchorVerifierConfig.mdx) |
+
+## Returns
+
+(`proofB64`: `string`, `blockHeight`: `number`, `blockHash`: `string`, `envelopeId`: `string`) => `Promise`\&lt;`boolean`\>

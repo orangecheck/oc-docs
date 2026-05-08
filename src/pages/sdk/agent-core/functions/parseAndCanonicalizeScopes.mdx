@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: parseAndCanonicalizeScopes()",
+    description: "Auto-generated API reference for Function: parseAndCanonicalizeScopes(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / parseAndCanonicalizeScopes
+
+# Function: parseAndCanonicalizeScopes()
+
+```ts
+function parseAndCanonicalizeScopes(scopes: string[]): {
+  canonical: string[];
+  parsed: Scope[];
+};
+```
+
+Defined in: [agent-core/src/canonical.ts:45](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/canonical.ts#L45)
+
+Same as `canonicalizeScopes` but returns `Scope` objects too, for callers
+that need them.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scopes` | `string`[] |
+
+## Returns
+
+```ts
+{
+  canonical: string[];
+  parsed: Scope[];
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `canonical` | `string`[] | [agent-core/src/canonical.ts:45](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/canonical.ts#L45) |
+| `parsed` | [`Scope`](../interfaces/Scope.mdx)[] | [agent-core/src/canonical.ts:45](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/canonical.ts#L45) |

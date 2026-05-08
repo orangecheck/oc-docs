@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: OcAccountChip()",
+    description: "Auto-generated API reference for Function: OcAccountChip(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / OcAccountChip
+
+# Function: OcAccountChip()
+
+```ts
+function OcAccountChip(__namedParameters: OcAccountChipProps): 
+  | ReactElement<any, string | JSXElementConstructor<any>>
+  | null;
+```
+
+Defined in: [src/components.tsx:60](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L60)
+
+Single header-account affordance for every ochk.io subdomain.
+
+  anonymous → "sign in" link
+  signed in → pill `bc1q…7ke3 ▾` that opens a popover with:
+              • § signed in  (label)
+              • full address (monospace, break-all)
+              • → dashboard
+              • → sign out
+
+The popover closes on outside click or Escape. Reasonable inline styles
+cover the dark-mode default; override per-part via the className props
+or via the `[data-oc-account-chip-*]` data attributes.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`OcAccountChipProps`](../interfaces/OcAccountChipProps.mdx) |
+
+## Returns
+
+  \| `ReactElement`\&lt;`any`, `string` \| `JSXElementConstructor`\&lt;`any`\>\>
+  \| `null`

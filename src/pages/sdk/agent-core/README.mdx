@@ -1,0 +1,105 @@
+export const metadata = {
+    title: "@orangecheck/agent-core",
+    description: "Auto-generated API reference for @orangecheck/agent-core. Source: TypeScript types in oc-packages.",
+};
+
+**@orangecheck/agent-core**
+
+***
+
+# @orangecheck/agent-core
+
+## Classes
+
+- [AgentError](classes/AgentError.mdx)
+- [ScopeParseError](classes/ScopeParseError.mdx)
+
+## Interfaces
+
+- [ActionCanonicalInput](interfaces/ActionCanonicalInput.mdx)
+- [ActionContent](interfaces/ActionContent.mdx)
+- [ActionEnvelope](interfaces/ActionEnvelope.mdx)
+- [ActionOts](interfaces/ActionOts.mdx)
+- [ActorRef](interfaces/ActorRef.mdx)
+- [DelegationBond](interfaces/DelegationBond.mdx)
+- [DelegationCanonicalInput](interfaces/DelegationCanonicalInput.mdx)
+- [DelegationEnvelope](interfaces/DelegationEnvelope.mdx)
+- [DelegationRevocationRef](interfaces/DelegationRevocationRef.mdx)
+- [RevocationCanonicalInput](interfaces/RevocationCanonicalInput.mdx)
+- [RevocationEnvelope](interfaces/RevocationEnvelope.mdx)
+- [Scope](interfaces/Scope.mdx)
+- [ScopeConstraint](interfaces/ScopeConstraint.mdx)
+- [ScopesEncryptedEnvelope](interfaces/ScopesEncryptedEnvelope.mdx)
+- [SealScopesInput](interfaces/SealScopesInput.mdx)
+- [Signature](interfaces/Signature.mdx)
+- [SubdelegationCanonicalInput](interfaces/SubdelegationCanonicalInput.mdx)
+- [SubdelegationEnvelope](interfaces/SubdelegationEnvelope.mdx)
+- [UnsealedScopes](interfaces/UnsealedScopes.mdx)
+- [UnsealScopesInput](interfaces/UnsealScopesInput.mdx)
+- [ValidationOptions](interfaces/ValidationOptions.mdx)
+- [VerifyActionInput](interfaces/VerifyActionInput.mdx)
+- [VerifyActionOkExtra](interfaces/VerifyActionOkExtra.mdx)
+- [VerifyBase](interfaces/VerifyBase.mdx)
+- [VerifyDelegationInput](interfaces/VerifyDelegationInput.mdx)
+- [VerifyErr](interfaces/VerifyErr.mdx)
+- [VerifyOk](interfaces/VerifyOk.mdx)
+- [VerifyRevocationInput](interfaces/VerifyRevocationInput.mdx)
+- [VerifySubdelegationInput](interfaces/VerifySubdelegationInput.mdx)
+
+## Type Aliases
+
+- [AgentErrorCode](type-aliases/AgentErrorCode.mdx)
+- [ChainLink](type-aliases/ChainLink.mdx)
+- [EnvelopeKind](type-aliases/EnvelopeKind.mdx)
+- [RevocationHolder](type-aliases/RevocationHolder.mdx)
+- [ScopeOp](type-aliases/ScopeOp.mdx)
+- [VerifyActionResult](type-aliases/VerifyActionResult.mdx)
+- [VerifyDelegationResult](type-aliases/VerifyDelegationResult.mdx)
+- [VerifyRevocationResult](type-aliases/VerifyRevocationResult.mdx)
+- [VerifySubdelegationResult](type-aliases/VerifySubdelegationResult.mdx)
+
+## Variables
+
+- [DEFAULT\_MAX\_CHAIN\_DEPTH](variables/DEFAULT_MAX_CHAIN_DEPTH.mdx)
+- [ENVELOPE\_VERSION](variables/ENVELOPE_VERSION.mdx)
+- [REGISTERED\_SCOPES](variables/REGISTERED_SCOPES.mdx)
+
+## Functions
+
+- [actionCanonicalBytes](functions/actionCanonicalBytes.mdx)
+- [actionCanonicalMessage](functions/actionCanonicalMessage.mdx)
+- [canonicalActionBytes](functions/canonicalActionBytes.mdx)
+- [canonicalDelegationBytes](functions/canonicalDelegationBytes.mdx)
+- [canonicalize](functions/canonicalize.mdx)
+- [canonicalizeAction](functions/canonicalizeAction.mdx)
+- [canonicalizeDelegation](functions/canonicalizeDelegation.mdx)
+- [canonicalizeRevocation](functions/canonicalizeRevocation.mdx)
+- [canonicalizeScope](functions/canonicalizeScope.mdx)
+- [canonicalizeScopes](functions/canonicalizeScopes.mdx)
+- [canonicalizeScopeString](functions/canonicalizeScopeString.mdx)
+- [canonicalRevocationBytes](functions/canonicalRevocationBytes.mdx)
+- [computeActionId](functions/computeActionId.mdx)
+- [computeDelegationId](functions/computeDelegationId.mdx)
+- [computeRevocationId](functions/computeRevocationId.mdx)
+- [computeSubdelegationId](functions/computeSubdelegationId.mdx)
+- [decodeScopesPayload](functions/decodeScopesPayload.mdx)
+- [delegationCanonicalBytes](functions/delegationCanonicalBytes.mdx)
+- [delegationCanonicalMessage](functions/delegationCanonicalMessage.mdx)
+- [encodeScopesPayload](functions/encodeScopesPayload.mdx)
+- [hasPrivateScopes](functions/hasPrivateScopes.mdx)
+- [hexEncode](functions/hexEncode.mdx)
+- [isSubScope](functions/isSubScope.mdx)
+- [parseAndCanonicalizeScopes](functions/parseAndCanonicalizeScopes.mdx)
+- [parseScope](functions/parseScope.mdx)
+- [revocationCanonicalBytes](functions/revocationCanonicalBytes.mdx)
+- [revocationCanonicalMessage](functions/revocationCanonicalMessage.mdx)
+- [sealScopes](functions/sealScopes.mdx)
+- [sha256Hex](functions/sha256Hex.mdx)
+- [subdelegationCanonicalBytes](functions/subdelegationCanonicalBytes.mdx)
+- [subdelegationCanonicalMessage](functions/subdelegationCanonicalMessage.mdx)
+- [unsealScopes](functions/unsealScopes.mdx)
+- [validateScope](functions/validateScope.mdx)
+- [verifyAction](functions/verifyAction.mdx)
+- [verifyDelegation](functions/verifyDelegation.mdx)
+- [verifyRevocation](functions/verifyRevocation.mdx)
+- [verifySubdelegation](functions/verifySubdelegation.mdx)

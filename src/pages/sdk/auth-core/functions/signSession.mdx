@@ -1,0 +1,54 @@
+export const metadata = {
+    title: "Function: signSession()",
+    description: "Auto-generated API reference for Function: signSession(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / signSession
+
+# Function: signSession()
+
+```ts
+function signSession(
+   claims: {
+  addr: string;
+  home_federation?: string | null;
+  jti: string;
+  name?: string | null;
+  npub?: string | null;
+  signing_method?: "fedimint_threshold" | "fedimint_client" | "bip322" | null;
+  sub: string;
+}, 
+   cfg: SignConfig, 
+ttlSeconds: number): Promise<string>;
+```
+
+Defined in: [src/index.ts:148](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L148)
+
+Mint a fresh oc_session JWT. Only called on the auth host (the only
+place that holds the private key).
+
+The caller owns persisting `jti` to a revocation list if they want
+revocation semantics — auth-core is deliberately stateless.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `claims` | \&#123; `addr`: `string`; `home_federation?`: `string` \| `null`; `jti`: `string`; `name?`: `string` \| `null`; `npub?`: `string` \| `null`; `signing_method?`: `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null`; `sub`: `string`; \&#125; |
+| `claims.addr` | `string` |
+| `claims.home_federation?` | `string` \| `null` |
+| `claims.jti` | `string` |
+| `claims.name?` | `string` \| `null` |
+| `claims.npub?` | `string` \| `null` |
+| `claims.signing_method?` | `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null` |
+| `claims.sub` | `string` |
+| `cfg` | [`SignConfig`](../interfaces/SignConfig.mdx) |
+| `ttlSeconds` | `number` |
+
+## Returns
+
+`Promise`\&lt;`string`\>

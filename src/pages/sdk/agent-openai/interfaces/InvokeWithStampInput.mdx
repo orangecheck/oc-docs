@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Interface: InvokeWithStampInput<T>",
+    description: "Auto-generated API reference for Interface: InvokeWithStampInput<T>. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-openai**](../README.mdx)
+
+***
+
+[@orangecheck/agent-openai](../README.mdx) / InvokeWithStampInput
+
+# Interface: InvokeWithStampInput\&lt;T\>
+
+Defined in: [index.ts:187](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L187)
+
+## Extends
+
+- [`StampFunctionCallInput`](StampFunctionCallInput.mdx)
+
+## Extended by
+
+- [`InvokeWithStampAndPostInput`](InvokeWithStampAndPostInput.mdx)
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-agent">&lt;/a> `agent` | `SignerRef` | - | [`StampFunctionCallInput`](StampFunctionCallInput.mdx).[`agent`](StampFunctionCallInput.mdx#property-agent) | [index.ts:145](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L145) |
+| &lt;a id="property-call">&lt;/a> `call` | `unknown` | Either a normalized `OpenAiFunctionCall` or a raw OpenAI tool_call / function_call object. | [`StampFunctionCallInput`](StampFunctionCallInput.mdx).[`call`](StampFunctionCallInput.mdx#property-call) | [index.ts:148](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L148) |
+| &lt;a id="property-delegation">&lt;/a> `delegation` | `DelegationEnvelope` | - | [`StampFunctionCallInput`](StampFunctionCallInput.mdx).[`delegation`](StampFunctionCallInput.mdx#property-delegation) | [index.ts:146](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L146) |
+| &lt;a id="property-execute">&lt;/a> `execute` | (`call`: [`OpenAiFunctionCall`](OpenAiFunctionCall.mdx)) => `Promise`\&lt;`T`\> | Your handler. Receives the normalized OpenAiFunctionCall. | - | [index.ts:189](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L189) |
+| &lt;a id="property-scopeexercised">&lt;/a> `scopeExercised?` | `string` | Defaults to `openai:function(name=<name>)` — the tightest admissible sub-scope. | [`StampFunctionCallInput`](StampFunctionCallInput.mdx).[`scopeExercised`](StampFunctionCallInput.mdx#property-scopeexercised) | [index.ts:150](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L150) |
+| &lt;a id="property-signedat">&lt;/a> `signedAt?` | `Date` | - | [`StampFunctionCallInput`](StampFunctionCallInput.mdx).[`signedAt`](StampFunctionCallInput.mdx#property-signedat) | [index.ts:151](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-openai/src/index.ts#L151) |

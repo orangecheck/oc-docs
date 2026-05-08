@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: readSessionCookie()",
+    description: "Auto-generated API reference for Function: readSessionCookie(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / readSessionCookie
+
+# Function: readSessionCookie()
+
+```ts
+function readSessionCookie(cookieHeader: string | null | undefined): string | null;
+```
+
+Defined in: [src/index.ts:238](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L238)
+
+Read the oc_session token out of a raw `Cookie:` header string.
+Returns `null` if the cookie is missing or empty.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `cookieHeader` | `string` \| `null` \| `undefined` |
+
+## Returns
+
+`string` \| `null`

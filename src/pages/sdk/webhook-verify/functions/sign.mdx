@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: sign()",
+    description: "Auto-generated API reference for Function: sign(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/webhook-verify**](../README.mdx)
+
+***
+
+[@orangecheck/webhook-verify](../README.mdx) / sign
+
+# Function: sign()
+
+```ts
+function sign(secret: string, rawBody: string | Uint8Array<ArrayBufferLike>): string;
+```
+
+Defined in: [index.ts:91](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/webhook-verify/src/index.ts#L91)
+
+Compute the expected signature for a given body. Useful for tests on
+the customer side — generate the sig, attach it to a fake request,
+verify the receiver accepts it.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `secret` | `string` |
+| `rawBody` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\> |
+
+## Returns
+
+`string`

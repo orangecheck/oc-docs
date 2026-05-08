@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: invokeWithStamp()",
+    description: "Auto-generated API reference for Function: invokeWithStamp(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-anthropic**](../README.mdx)
+
+***
+
+[@orangecheck/agent-anthropic](../README.mdx) / invokeWithStamp
+
+# Function: invokeWithStamp()
+
+```ts
+function invokeWithStamp<T>(input: InvokeWithStampInput<T>): Promise<InvokeWithStampResult<T>>;
+```
+
+Defined in: [index.ts:141](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-anthropic/src/index.ts#L141)
+
+Stamp the tool_use first, then execute the handler. The stamped envelope
+is returned alongside the result so the caller can ship them together —
+e.g. as a side-channel to an audit log, or as the `_oc_agent` metadata on
+the tool_result content block back to Claude.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`InvokeWithStampInput`](../interfaces/InvokeWithStampInput.mdx)\&lt;`T`\> |
+
+## Returns
+
+`Promise`\&lt;[`InvokeWithStampResult`](../interfaces/InvokeWithStampResult.mdx)\&lt;`T`\>\>

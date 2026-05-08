@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Type Alias: UtxoLookup",
+    description: "Auto-generated API reference for Type Alias: UtxoLookup. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README.mdx)
+
+***
+
+[@orangecheck/vote-core](../README.mdx) / UtxoLookup
+
+# Type Alias: UtxoLookup
+
+```ts
+type UtxoLookup = (addr: string, snapshot: number) => 
+  | Utxo[]
+| Promise<Utxo[]>;
+```
+
+Defined in: [types.ts:80](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/vote-core/src/types.ts#L80)
+
+`(addr, snapshot_height) -> list of UTXOs controlled by addr at that height`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `addr` | `string` |
+| `snapshot` | `number` |
+
+## Returns
+
+  \| [`Utxo`](../interfaces/Utxo.mdx)[]
+  \| `Promise`\&lt;[`Utxo`](../interfaces/Utxo.mdx)[]\>

@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Variable: PLATFORMFEEPOLICY",
+    description: "Auto-generated API reference for Variable: PLATFORMFEEPOLICY. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / PLATFORM\_FEE\_POLICY
+
+# Variable: PLATFORM\_FEE\_POLICY
+
+```ts
+const PLATFORM_FEE_POLICY: {
+  min_floor_sats: 1;
+  pct: 0.2;
+  ratified: "2026-04-30";
+};
+```
+
+Defined in: [me-client/src/types.ts:19](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/types.ts#L19)
+
+Canonical types for me.ochk.io integrators.
+
+Mirrors the source of truth at oc-me-web/src/lib/events/types.ts. Two
+layers:
+  - Platform-level (PLATFORM_FEE_POLICY, MIN_INTEGRATOR_PRICE_SATS) —
+    fixed by OC, surfaced as constants here so integrators can validate
+    their config client-side before posting it.
+  - Integrator-level (IntegratorPriceConfig) — every integrator declares
+    their own per-event prices and user-share splits.
+
+Per Addendum 01: every chargeable event is in exactly one of three
+classes. Sites pay for sessions and actions, not for clicks. Free
+events never instantiate a BillableEvent.
+
+## Type Declaration
+
+| Name | Type | Default value | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-min_floor_sats">&lt;/a> `min_floor_sats` | `1` | `1` | Absolute minimum platform fee, in sats. | [me-client/src/types.ts:23](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/types.ts#L23) |
+| &lt;a id="property-pct">&lt;/a> `pct` | `0.2` | `0.2` | Fraction of every gross_fee that OC retains. | [me-client/src/types.ts:21](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/types.ts#L21) |
+| &lt;a id="property-ratified">&lt;/a> `ratified` | `"2026-04-30"` | `'2026-04-30'` | Date this policy was last ratified. Changes require a versioned @orangecheck/me-client release. | [me-client/src/types.ts:26](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/types.ts#L26) |

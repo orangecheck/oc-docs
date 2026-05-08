@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Interface: VerifySubdelegationInput",
+    description: "Auto-generated API reference for Interface: VerifySubdelegationInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / VerifySubdelegationInput
+
+# Interface: VerifySubdelegationInput
+
+Defined in: [agent-core/src/verify.ts:800](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L800)
+
+## Extends
+
+- [`VerifyBase`](VerifyBase.mdx)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-decryptscopeswith">&lt;/a> `decryptScopesWith?` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | v1.2 private-scope decryption key for the subdelegation envelope itself. Not used for the parent — the caller hydrates the parent. | - | [agent-core/src/verify.ts:817](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L817) |
+| `decryptScopesWith.device_id` | `string` | - | - | [agent-core/src/verify.ts:818](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L818) |
+| `decryptScopesWith.secretKey` | `Uint8Array` | - | - | [agent-core/src/verify.ts:819](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L819) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`SubdelegationEnvelope`](SubdelegationEnvelope.mdx) | - | - | [agent-core/src/verify.ts:801](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L801) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Defaults to new Date(). | - | [agent-core/src/verify.ts:812](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L812) |
+| &lt;a id="property-parent">&lt;/a> `parent` | [`ChainLink`](../type-aliases/ChainLink.mdx) | The immediate parent envelope. Required for linkage / containment checks. If the parent is itself v1.2 private-mode (`scopes_encrypted`) the caller MUST pre-hydrate it (e.g., via verifyDelegation's returned envelope) — the chain walker reads `parent.scopes` directly. | - | [agent-core/src/verify.ts:808](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L808) |
+| &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase.mdx).[`scopeMode`](VerifyBase.mdx#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L50) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyBase`](VerifyBase.mdx).[`skipSignatureVerification`](VerifyBase.mdx#property-skipsignatureverification) | [agent-core/src/verify.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L49) |
+| &lt;a id="property-skiptemporalcheck">&lt;/a> `skipTemporalCheck?` | `boolean` | Skip the "now ∈ [issued, expires)" check. Useful for inspection. | - | [agent-core/src/verify.ts:810](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L810) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | - | [`VerifyBase`](VerifyBase.mdx).[`verifyBip322`](VerifyBase.mdx#property-verifybip322) | [agent-core/src/verify.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L48) |

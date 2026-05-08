@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: wrapOutcomeEnvelope()",
+    description: "Auto-generated API reference for Function: wrapOutcomeEnvelope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / wrapOutcomeEnvelope
+
+# Function: wrapOutcomeEnvelope()
+
+```ts
+function wrapOutcomeEnvelope(input: OutcomeCanonicalInput, sigValue?: string): OutcomeEnvelope;
+```
+
+Defined in: [pledge-core/src/outcome.ts:127](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/outcome.ts#L127)
+
+Build an outcome envelope from a canonical input + an optional externally-
+obtained BIP-322 signature. Companion to ``createOutcome`` for external-sig
+flows.
+
+Discriminator (SPEC §4.3):
+  - resolved_by === "deterministic": pass ``sigValue=undefined``.
+    Envelope.sig will be null.
+  - resolved_by === &lt;address>: pass ``sigValue`` (the BIP-322 over the
+    lowercase-hex outcome id). Envelope.sig.pubkey defaults to
+    ``resolved_by``.
+
+Throws PledgeError on invalid input or sig/no-sig mismatch with the
+deterministic discriminator.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`OutcomeCanonicalInput`](../interfaces/OutcomeCanonicalInput.mdx) |
+| `sigValue?` | `string` |
+
+## Returns
+
+[`OutcomeEnvelope`](../interfaces/OutcomeEnvelope.mdx)

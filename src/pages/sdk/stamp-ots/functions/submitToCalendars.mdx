@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: submitToCalendars()",
+    description: "Auto-generated API reference for Function: submitToCalendars(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / submitToCalendars
+
+# Function: submitToCalendars()
+
+```ts
+function submitToCalendars(idHex: string, opts?: SubmitOptions): Promise<OtsProof>;
+```
+
+Defined in: [submit.ts:43](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/submit.ts#L43)
+
+Submit the envelope `id` (64-hex) to OTS calendars and return an OtsProof in
+pending state. The caller merges this into the envelope's `ots` field.
+
+Implementation note: the raw proof bytes returned by OTS calendars are not
+a superset of the digest alone — they encode the calendar's commitment.
+Because different calendars return different pending-proof bytes for the
+same digest, we carry the FIRST successful calendar's bytes in the
+envelope. Upgrade (see upgrade.ts) can fetch richer proofs from any of the
+submitted-to calendars later.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `idHex` | `string` |
+| `opts` | [`SubmitOptions`](../interfaces/SubmitOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`OtsProof`](../interfaces/OtsProof.mdx)\>

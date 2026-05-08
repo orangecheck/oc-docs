@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Function: outcomeRequiresSignature()",
+    description: "Auto-generated API reference for Function: outcomeRequiresSignature(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / outcomeRequiresSignature
+
+# Function: outcomeRequiresSignature()
+
+```ts
+function outcomeRequiresSignature(input: {
+  resolved_by: string;
+}): boolean;
+```
+
+Defined in: [pledge-core/src/outcome.ts:36](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/outcome.ts#L36)
+
+SPEC §4.3 — does this outcome envelope require a BIP-322 signature?
+
+Discriminator is `resolved_by`, not `mechanism`. The five deterministic
+mechanisms always have resolved_by="deterministic" and sig=null.
+counterparty_signs normally has resolved_by=&lt;counterparty.address> and a
+signature — UNLESS the outcome is `expired_unresolved`, in which case the
+verifier deterministically classifies the deadline passing without a
+counterparty signature, so resolved_by="deterministic" and sig=null
+(test vector v16 pins this nuance).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | \&#123; `resolved_by`: `string`; \&#125; |
+| `input.resolved_by` | `string` |
+
+## Returns
+
+`boolean`

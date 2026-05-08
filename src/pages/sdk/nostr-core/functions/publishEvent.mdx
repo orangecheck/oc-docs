@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: publishEvent()",
+    description: "Auto-generated API reference for Function: publishEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README.mdx)
+
+***
+
+[@orangecheck/nostr-core](../README.mdx) / publishEvent
+
+# Function: publishEvent()
+
+```ts
+function publishEvent(
+   event: NostrEvent, 
+   relays?: readonly string[], 
+timeoutMs?: number): Promise<PublishResult[]>;
+```
+
+Defined in: [index.ts:270](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/nostr-core/src/index.ts#L270)
+
+Publish a NIP-01 event to all `relays` in parallel. Returns one
+`PublishResult` per relay. Default timeout 5000ms.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `event` | [`NostrEvent`](../interfaces/NostrEvent.mdx) | `undefined` |
+| `relays` | readonly `string`[] | `DEFAULT_RELAYS` |
+| `timeoutMs` | `number` | `5000` |
+
+## Returns
+
+`Promise`\&lt;[`PublishResult`](../interfaces/PublishResult.mdx)[]\>

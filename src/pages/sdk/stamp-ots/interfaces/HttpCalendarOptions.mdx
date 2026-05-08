@@ -1,0 +1,21 @@
+export const metadata = {
+    title: "Interface: HttpCalendarOptions",
+    description: "Auto-generated API reference for Interface: HttpCalendarOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / HttpCalendarOptions
+
+# Interface: HttpCalendarOptions
+
+Defined in: [calendar.ts:20](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/calendar.ts#L20)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Custom fetch implementation. Defaults to global `fetch`. Useful in environments that need a specific adapter (Node &lt; 18, Cloudflare Workers, proxies). | [calendar.ts:26](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/calendar.ts#L26) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout in milliseconds. Default 30_000. | [calendar.ts:28](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/calendar.ts#L28) |

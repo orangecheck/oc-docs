@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: VerifyActionOkExtra",
+    description: "Auto-generated API reference for Interface: VerifyActionOkExtra. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / VerifyActionOkExtra
+
+# Interface: VerifyActionOkExtra
+
+Defined in: [agent-core/src/types.ts:276](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L276)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-anchor">&lt;/a> `anchor` | \| \&#123; `status`: `"none"`; \&#125; \| \&#123; `status`: `"pending"`; \&#125; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; `status`: `"confirmed"`; `verified`: `boolean`; \&#125; | - | [agent-core/src/types.ts:286](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L286) |
+| &lt;a id="property-chain">&lt;/a> `chain` | [`SubdelegationEnvelope`](SubdelegationEnvelope.mdx)[] | The sub-delegation chain `[S_1, …, S_leaf]`. Empty when the action cites the root directly. The action's authority leaf is `chain[chain.length - 1] ?? delegation`. | [agent-core/src/types.ts:284](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L284) |
+| &lt;a id="property-delegation">&lt;/a> `delegation` | [`DelegationEnvelope`](DelegationEnvelope.mdx) | The ROOT delegation rooting the authority chain. | [agent-core/src/types.ts:278](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L278) |
+| &lt;a id="property-scopeexercised">&lt;/a> `scopeExercised` | `string` | - | [agent-core/src/types.ts:285](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/types.ts#L285) |

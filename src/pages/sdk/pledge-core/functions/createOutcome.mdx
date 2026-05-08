@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: createOutcome()",
+    description: "Auto-generated API reference for Function: createOutcome(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / createOutcome
+
+# Function: createOutcome()
+
+```ts
+function createOutcome(input: CreateOutcomeInput): Promise<OutcomeEnvelope>;
+```
+
+Defined in: [pledge-core/src/outcome.ts:51](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/outcome.ts#L51)
+
+Build, validate, and (when required) sign an outcome envelope.
+
+For deterministic mechanisms (chain_state, nostr_event_exists,
+stamp_published, http_get_hash, dns_record, vote_resolves), pass no signer
+— the SDK leaves sig === null per §4.3.
+
+For counterparty_signs, pass the counterparty's signer (whose `address`
+equals input.resolved_by). The signature commits to the lowercase hex of
+the outcome id.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`CreateOutcomeInput`](../interfaces/CreateOutcomeInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`OutcomeEnvelope`](../interfaces/OutcomeEnvelope.mdx)\>

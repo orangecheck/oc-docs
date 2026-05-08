@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: makeDefaultAnchorVerifier()",
+    description: "Auto-generated API reference for Function: makeDefaultAnchorVerifier(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / makeDefaultAnchorVerifier
+
+# Function: makeDefaultAnchorVerifier()
+
+```ts
+function makeDefaultAnchorVerifier(opts: {
+  headerSource: BlockHeaderSource;
+}): Promise<(proofB64: string, blockHeight: number, blockHash: string, envelopeId: string) => Promise<boolean>>;
+```
+
+Defined in: [anchor.ts:128](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/anchor.ts#L128)
+
+Default anchor verifier that dynamically imports the `opentimestamps` npm
+package and wires it into `makeAnchorVerifier`. The import is lazy so
+consumers who only need calendar submission don't pay the dep cost.
+
+Install `opentimestamps` alongside `@orangecheck/stamp-ots` to use this:
+
+  npm i @orangecheck/stamp-ots opentimestamps
+
+Then:
+
+  const verifyOtsAnchor = await makeDefaultAnchorVerifier(&#123; headerSource &#125;);
+  await verify(&#123; envelope, verifyOtsAnchor &#125;);
+
+Throws if `opentimestamps` isn't resolvable. That's intentional — callers
+who haven't installed it should use `makeAnchorVerifier` with their own
+walker instead, so the failure surfaces immediately rather than silently
+reporting every stamp as unverified.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | \&#123; `headerSource`: [`BlockHeaderSource`](../interfaces/BlockHeaderSource.mdx); \&#125; |
+| `opts.headerSource` | [`BlockHeaderSource`](../interfaces/BlockHeaderSource.mdx) |
+
+## Returns
+
+`Promise`\&lt;(`proofB64`: `string`, `blockHeight`: `number`, `blockHash`: `string`, `envelopeId`: `string`) => `Promise`\&lt;`boolean`\>\>

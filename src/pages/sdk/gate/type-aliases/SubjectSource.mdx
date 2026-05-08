@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Type Alias: SubjectSource",
+    description: "Auto-generated API reference for Type Alias: SubjectSource. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / SubjectSource
+
+# Type Alias: SubjectSource
+
+```ts
+type SubjectSource = 
+  | {
+  from: "header";
+  name?: string;
+}
+  | {
+  from: "cookie";
+  name?: string;
+}
+  | {
+  from: "query";
+  name?: string;
+}
+  | {
+  from: "body";
+  path?: string;
+}
+  | {
+  from: (req: any) => string | undefined;
+};
+```
+
+Defined in: [types.ts:7](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/types.ts#L7)
+
+Where to pull the subject (address / attestation-id / identity) from
+on an incoming request.

@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: encodeScopesPayload()",
+    description: "Auto-generated API reference for Function: encodeScopesPayload(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / encodeScopesPayload
+
+# Function: encodeScopesPayload()
+
+```ts
+function encodeScopesPayload(scopes: string[]): Uint8Array;
+```
+
+Defined in: [agent-core/src/private-scope.ts:28](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L28)
+
+The plaintext payload sealed inside the OC Lock envelope. Canonical JSON
+array of scope strings. Scopes are first put in canonical form (constraints
+sorted by key) and the array is sorted lexicographically — same discipline
+as v1.0 public-mode `scopes` field, so that the canonical-message bytes
+match byte-for-byte across modes.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scopes` | `string`[] |
+
+## Returns
+
+`Uint8Array`

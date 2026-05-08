@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: stampInvocation()",
+    description: "Auto-generated API reference for Function: stampInvocation(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-mcp**](../README.mdx)
+
+***
+
+[@orangecheck/agent-mcp](../README.mdx) / stampInvocation
+
+# Function: stampInvocation()
+
+```ts
+function stampInvocation(input: StampInvocationInput): Promise<ActionEnvelope>;
+```
+
+Defined in: [index.ts:104](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-mcp/src/index.ts#L104)
+
+Stamp an MCP invocation without actually calling it. Useful when the caller
+wants the signed envelope for out-of-band auditing before (or independent of)
+running the tool.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`StampInvocationInput`](../interfaces/StampInvocationInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;`ActionEnvelope`\>

@@ -1,0 +1,25 @@
+export const metadata = {
+    title: "Interface: FireEventOptions",
+    description: "Auto-generated API reference for Interface: FireEventOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / FireEventOptions
+
+# Interface: FireEventOptions
+
+Defined in: [me-client/src/event.ts:38](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L38)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-action_label">&lt;/a> `action_label?` | `string` | Human-readable action label that appears on the envelope. Optional but encouraged — it's what the user sees in their /me/earn ledger. | [me-client/src/event.ts:46](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L46) |
+| &lt;a id="property-metadata">&lt;/a> `metadata?` | `Record`\&lt;`string`, `unknown`\> | Free-form metadata stored on the envelope. Public — anyone who GETs /api/envelope/&lt;id> sees it. Don't put secrets here. | [me-client/src/event.ts:57](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L57) |
+| &lt;a id="property-payment_amount_sats">&lt;/a> `payment_amount_sats?` | `number` | For percent_of_amount-priced subtypes, the underlying amount the fee is computed against. Required for those subtypes. | [me-client/src/event.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L49) |
+| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | Your project_key (e.g. `pk_live_yourcompany`). Required. | [me-client/src/event.ts:40](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L40) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | Canonical billable subtype. Class is inferred by the server. | [me-client/src/event.ts:42](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L42) |
+| &lt;a id="property-user_address">&lt;/a> `user_address?` | `string` | Override the user identity the envelope is credited to. Default is the currently-authenticated user (cookie / Bearer). Pass this only when firing on a user's behalf in a server-to-server flow — the project must have an explicit allowlist. | [me-client/src/event.ts:54](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/event.ts#L54) |

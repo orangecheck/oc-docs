@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Interface: VerifyActionInput",
+    description: "Auto-generated API reference for Interface: VerifyActionInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / VerifyActionInput
+
+# Interface: VerifyActionInput
+
+Defined in: [agent-core/src/verify.ts:237](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L237)
+
+## Extends
+
+- [`VerifyBase`](VerifyBase.mdx)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-action">&lt;/a> `action` | [`ActionEnvelope`](ActionEnvelope.mdx) | - | - | [agent-core/src/verify.ts:238](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L238) |
+| &lt;a id="property-content">&lt;/a> `content?` | `Uint8Array`\&lt;`ArrayBufferLike`\> | - | - | [agent-core/src/verify.ts:263](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L263) |
+| &lt;a id="property-decryptscopeswith">&lt;/a> `decryptScopesWith?` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | v1.2 private-scope decryption key. Applied to the root delegation AND every subdelegation in the chain that carries `scopes_encrypted`. If a link is private-mode and no key matches its recipients, verification fails E_SCOPES_UNREADABLE — the chain's transitive narrowing cannot be checked without the plaintext. | - | [agent-core/src/verify.ts:274](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L274) |
+| `decryptScopesWith.device_id` | `string` | - | - | [agent-core/src/verify.ts:275](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L275) |
+| `decryptScopesWith.secretKey` | `Uint8Array` | - | - | [agent-core/src/verify.ts:276](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L276) |
+| &lt;a id="property-delegation">&lt;/a> `delegation` | [`DelegationEnvelope`](DelegationEnvelope.mdx) | The ROOT delegation rooting the authority chain. Always required. | - | [agent-core/src/verify.ts:240](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L240) |
+| &lt;a id="property-maxchaindepth">&lt;/a> `maxChainDepth?` | `number` | Maximum permitted chain depth (number of subdelegations). Default `DEFAULT_MAX_CHAIN_DEPTH` (5). Verifiers MAY lower; MUST NOT raise silently above their advertised cap. Chains exceeding this fail with E_SUBDELEGATION_DEPTH_EXCEEDED before any per-link work is performed. | - | [agent-core/src/verify.ts:256](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L256) |
+| &lt;a id="property-resolveanchorblockheight">&lt;/a> `resolveAnchorBlockHeight?` | (`env`: \| [`ActionEnvelope`](ActionEnvelope.mdx) \| [`RevocationEnvelope`](RevocationEnvelope.mdx)) => `number` \| `null` | If action and revocation are both OTS-anchored, pass a function that returns the comparable block height of each via proof parsing. Defaults: use envelope.ots.block_height. | - | [agent-core/src/verify.ts:266](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L266) |
+| &lt;a id="property-revocations">&lt;/a> `revocations?` | [`RevocationEnvelope`](RevocationEnvelope.mdx)[] | Known revocations targeting any envelope in the chain (root + each subdelegation). The verifier checks every link per SUB-DELEGATION.md §2.2 step 5 — a revocation against ANY link invalidates the action. | - | [agent-core/src/verify.ts:262](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L262) |
+| &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase.mdx).[`scopeMode`](VerifyBase.mdx#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L50) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyBase`](VerifyBase.mdx).[`skipSignatureVerification`](VerifyBase.mdx#property-skipsignatureverification) | [agent-core/src/verify.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L49) |
+| &lt;a id="property-subdelegationchain">&lt;/a> `subdelegationChain?` | [`SubdelegationEnvelope`](SubdelegationEnvelope.mdx)[] | Optional v1.1 sub-delegation chain from S_1 (immediate child of `delegation`) to S_leaf (the envelope `action.delegation_id` cites). When provided, the verifier walks each link checking parent-id linkage, principal-equals- parent-agent, scope containment, and temporal containment. The action's delegation_id MUST equal the leaf's id; the action's signer MUST equal the leaf's agent. See SUB-DELEGATION.md §2.2. | - | [agent-core/src/verify.ts:249](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L249) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | - | [`VerifyBase`](VerifyBase.mdx).[`verifyBip322`](VerifyBase.mdx#property-verifybip322) | [agent-core/src/verify.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L48) |
+| &lt;a id="property-verifyotsanchor">&lt;/a> `verifyOtsAnchor?` | (`proofB64`: `string`, `blockHeight`: `number`, `blockHash`: `string`) => `Promise`\&lt;`boolean`\> | - | - | [agent-core/src/verify.ts:264](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L264) |

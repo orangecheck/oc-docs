@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: buildDeviceEvent()",
+    description: "Auto-generated API reference for Function: buildDeviceEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README.mdx)
+
+***
+
+[@orangecheck/lock-device](../README.mdx) / buildDeviceEvent
+
+# Function: buildDeviceEvent()
+
+```ts
+function buildDeviceEvent(params: {
+  address: string;
+  bindingSigBase64: string;
+  bindingStatement: string;
+  createdAtUnix?: number;
+  device_id: string;
+  device_pk: string;
+}): Omit<NostrEvent, "id" | "sig" | "pubkey"> & {
+  pubkey?: undefined;
+};
+```
+
+Defined in: [index.ts:102](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/lock-device/src/index.ts#L102)
+
+Build a kind-30078 addressable event announcing a device binding.
+The caller must supply the BIP-322 signature produced by the user's Bitcoin
+wallet (we cannot sign BIP-322 in this package — that requires a wallet).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `params` | \&#123; `address`: `string`; `bindingSigBase64`: `string`; `bindingStatement`: `string`; `createdAtUnix?`: `number`; `device_id`: `string`; `device_pk`: `string`; \&#125; |
+| `params.address` | `string` |
+| `params.bindingSigBase64` | `string` |
+| `params.bindingStatement` | `string` |
+| `params.createdAtUnix?` | `number` |
+| `params.device_id` | `string` |
+| `params.device_pk` | `string` |
+
+## Returns
+
+`Omit`\&lt;[`NostrEvent`](../interfaces/NostrEvent.mdx), `"id"` \| `"sig"` \| `"pubkey"`\> & \&#123;
+  `pubkey?`: `undefined`;
+\&#125;

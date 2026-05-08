@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Interface: VerifyDelegationInput",
+    description: "Auto-generated API reference for Interface: VerifyDelegationInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / VerifyDelegationInput
+
+# Interface: VerifyDelegationInput
+
+Defined in: [agent-core/src/verify.ts:66](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L66)
+
+## Extends
+
+- [`VerifyBase`](VerifyBase.mdx)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-decryptscopeswith">&lt;/a> `decryptScopesWith?` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | v1.2 private-scope decryption key. When the envelope carries `scopes_encrypted`, the verifier MUST supply a device key matching one of the recipient entries to recover the plaintext scope list. Without this, verification returns `E_SCOPES_UNREADABLE`. | - | [agent-core/src/verify.ts:78](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L78) |
+| `decryptScopesWith.device_id` | `string` | - | - | [agent-core/src/verify.ts:79](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L79) |
+| `decryptScopesWith.secretKey` | `Uint8Array` | - | - | [agent-core/src/verify.ts:80](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L80) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`DelegationEnvelope`](DelegationEnvelope.mdx) | - | - | [agent-core/src/verify.ts:67](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L67) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Current time for temporal checks; defaults to new Date(). | - | [agent-core/src/verify.ts:69](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L69) |
+| &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase.mdx).[`scopeMode`](VerifyBase.mdx#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L50) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyBase`](VerifyBase.mdx).[`skipSignatureVerification`](VerifyBase.mdx#property-skipsignatureverification) | [agent-core/src/verify.ts:49](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L49) |
+| &lt;a id="property-skiptemporalcheck">&lt;/a> `skipTemporalCheck?` | `boolean` | Skip temporal checks entirely (useful for inspecting historical envelopes). | - | [agent-core/src/verify.ts:71](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L71) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | - | [`VerifyBase`](VerifyBase.mdx).[`verifyBip322`](VerifyBase.mdx#property-verifybip322) | [agent-core/src/verify.ts:48](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L48) |

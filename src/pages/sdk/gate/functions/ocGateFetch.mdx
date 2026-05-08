@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: ocGateFetch()",
+    description: "Auto-generated API reference for Function: ocGateFetch(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/gate**](../README.mdx)
+
+***
+
+[@orangecheck/gate](../README.mdx) / ocGateFetch
+
+# Function: ocGateFetch()
+
+```ts
+function ocGateFetch(req: Request, opts: GateOptions): Promise<GateDecision>;
+```
+
+Defined in: [next.ts:69](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/gate/src/next.ts#L69)
+
+Framework-agnostic Fetch-style guard — for Next App Router route handlers,
+Cloudflare Workers, Hono, Bun, and friends.
+
+  export async function POST(req: Request) &#123;
+    const decision = await ocGateFetch(req, &#123;
+      minSats: 100_000,
+      address: &#123; from: 'header' &#125;,
+    &#125;);
+    if (!decision.ok) &#123;
+      return new Response(JSON.stringify(&#123; error: decision.reason &#125;), &#123; status: 403 &#125;);
+    &#125;
+    // ... proceed
+  &#125;
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `req` | `Request` |
+| `opts` | [`GateOptions`](../interfaces/GateOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`GateDecision`](../interfaces/GateDecision.mdx)\>

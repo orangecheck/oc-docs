@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Interface: UseOcAddressSuggestionReturn",
+    description: "Auto-generated API reference for Interface: UseOcAddressSuggestionReturn. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / UseOcAddressSuggestionReturn
+
+# Interface: UseOcAddressSuggestionReturn
+
+Defined in: [src/components.tsx:461](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L461)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-inputprops">&lt;/a> `inputProps` | \&#123; `aria-activedescendant`: `string` \| `undefined`; `aria-controls`: `string` \| `undefined`; `aria-expanded`: `boolean`; `aria-haspopup`: `"listbox"`; `autoComplete`: `"off"`; `onBlur`: (`e`: `FocusEvent`\&lt;`HTMLInputElement`\>) => `void`; `onFocus`: (`e`: `FocusEvent`\&lt;`HTMLInputElement`\>) => `void`; `onKeyDown`: (`e`: `KeyboardEvent`\&lt;`HTMLInputElement`\>) => `void`; `role`: `"combobox"`; `spellCheck`: `false`; \&#125; | Props to spread onto your `<input>` element. Adds focus/blur/keydown handlers and the combobox ARIA attributes. Combine with your existing `value`/`onChange` props — this hook does NOT control them. | [src/components.tsx:467](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L467) |
+| `inputProps.aria-activedescendant` | `string` \| `undefined` | - | [src/components.tsx:475](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L475) |
+| `inputProps.aria-controls` | `string` \| `undefined` | - | [src/components.tsx:474](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L474) |
+| `inputProps.aria-expanded` | `boolean` | - | [src/components.tsx:473](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L473) |
+| `inputProps.aria-haspopup` | `"listbox"` | - | [src/components.tsx:472](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L472) |
+| `inputProps.autoComplete` | `"off"` | - | [src/components.tsx:476](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L476) |
+| `inputProps.onBlur` | (`e`: `FocusEvent`\&lt;`HTMLInputElement`\>) => `void` | - | [src/components.tsx:469](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L469) |
+| `inputProps.onFocus` | (`e`: `FocusEvent`\&lt;`HTMLInputElement`\>) => `void` | - | [src/components.tsx:468](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L468) |
+| `inputProps.onKeyDown` | (`e`: `KeyboardEvent`\&lt;`HTMLInputElement`\>) => `void` | - | [src/components.tsx:470](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L470) |
+| `inputProps.role` | `"combobox"` | - | [src/components.tsx:471](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L471) |
+| `inputProps.spellCheck` | `false` | - | [src/components.tsx:477](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L477) |
+| &lt;a id="property-popover">&lt;/a> `popover` | `ReactNode` | The suggestion popover. Render directly after your `<input>`, inside a `position: relative` container so the popover anchors below the input. Returns `null` when there's no suggestion to show. | [src/components.tsx:484](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L484) |

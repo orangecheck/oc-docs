@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: verifySessionToken()",
+    description: "Auto-generated API reference for Function: verifySessionToken(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / verifySessionToken
+
+# Function: verifySessionToken()
+
+```ts
+function verifySessionToken(token: string, cfg: VerifyConfig): Promise<SessionPayload | null>;
+```
+
+Defined in: [src/index.ts:177](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L177)
+
+Crypto-only JWT verify. Returns the payload on success, `null` on
+any failure (bad signature, expired, wrong issuer, malformed).
+
+Safe for consumer subdomains — they only need the public JWK.
+Revocation-aware checks live on the auth host.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `token` | `string` |
+| `cfg` | [`VerifyConfig`](../interfaces/VerifyConfig.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`SessionPayload`](../interfaces/SessionPayload.mdx) \| `null`\>

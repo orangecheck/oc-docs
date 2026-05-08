@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: isWalletDetected()",
+    description: "Auto-generated API reference for Function: isWalletDetected(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README.mdx)
+
+***
+
+[@orangecheck/wallet-adapter](../README.mdx) / isWalletDetected
+
+# Function: isWalletDetected()
+
+```ts
+function isWalletDetected(id: WalletId): boolean;
+```
+
+Defined in: [detect.ts:135](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/wallet-adapter/src/detect.ts#L135)
+
+@orangecheck/wallet-adapter
+
+Normalize browser Bitcoin wallets behind a single `sign(message)` API.
+
+  import &#123; getSigner, detectWallets &#125; from '@orangecheck/wallet-adapter';
+
+  const wallets = detectWallets();                  // which wallets are installed?
+  const sign    = getSigner('unisat', &#123; address &#125;); // get a SignFn
+  const sig     = await sign(challenge.message);    // one-liner to get a BIP-322 sig
+
+Pairs cleanly with `<OcChallengeButton sign={sign}>` from @orangecheck/react.
+
+For a pre-built React UI that detects installed wallets and lets the user
+pick one, import from `@orangecheck/wallet-adapter/react`:
+
+  import &#123; OcWalletButton &#125; from '@orangecheck/wallet-adapter/react';
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | [`WalletId`](../type-aliases/WalletId.mdx) |
+
+## Returns
+
+`boolean`

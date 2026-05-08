@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: toStampOts()",
+    description: "Auto-generated API reference for Function: toStampOts(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / toStampOts
+
+# Function: toStampOts()
+
+```ts
+function toStampOts(p: OtsProof): StampOts;
+```
+
+Defined in: [types.ts:81](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L81)
+
+Convert an OtsProof (library type) to the StampOts field shape that the
+envelope carries. The two are isomorphic; this function exists to keep
+stamp-core's type surface narrow.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `p` | [`OtsProof`](../interfaces/OtsProof.mdx) |
+
+## Returns
+
+`StampOts`

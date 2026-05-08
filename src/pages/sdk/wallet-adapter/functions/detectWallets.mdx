@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Function: detectWallets()",
+    description: "Auto-generated API reference for Function: detectWallets(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README.mdx)
+
+***
+
+[@orangecheck/wallet-adapter](../README.mdx) / detectWallets
+
+# Function: detectWallets()
+
+```ts
+function detectWallets(): WalletInfo[];
+```
+
+Defined in: [detect.ts:127](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/wallet-adapter/src/detect.ts#L127)
+
+Returns every supported wallet with a `detected` flag. Use in UIs to show
+"Install UniSat" vs "Sign with UniSat" depending on whether the extension
+is present.
+
+  const wallets = detectWallets();
+  wallets.find((w) => w.detected && !w.isManual)   // prefer installed ones
+
+## Returns
+
+[`WalletInfo`](../interfaces/WalletInfo.mdx)[]

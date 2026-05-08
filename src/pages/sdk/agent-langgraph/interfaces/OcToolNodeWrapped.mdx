@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: OcToolNodeWrapped<TArgs, TResult>",
+    description: "Auto-generated API reference for Interface: OcToolNodeWrapped<TArgs, TResult>. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-langgraph**](../README.mdx)
+
+***
+
+[@orangecheck/agent-langgraph](../README.mdx) / OcToolNodeWrapped
+
+# Interface: OcToolNodeWrapped\&lt;TArgs, TResult\>
+
+Defined in: [index.ts:158](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-langgraph/src/index.ts#L158)
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `TArgs` *extends* `Record`\&lt;`string`, `unknown`\> |
+| `TResult` |
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-execute">&lt;/a> `execute` | (`args`: `TArgs`, `ctx`: [`AgentContext`](AgentContext.mdx) & \&#123; `callId`: `string`; `fleet?`: [`FleetClient`](FleetClient.mdx); `graphState`: `Record`\&lt;`string`, `unknown`\>; \&#125;) => `Promise`\&lt;\&#123; `action`: `ActionEnvelope`; `posted`: [`PostActionResult`](PostActionResult.mdx) \| `null`; `result`: `TResult`; \&#125;\> | The execute fn your LangGraph node calls. Receives args + a context object with the agent ref, delegation, callId, current graph state, and an optional `fleet` field that triggers fire-and-forget POST to fleet.ochk.io/api/actions after the underlying execute returns. | [index.ts:166](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-langgraph/src/index.ts#L166) |
+| &lt;a id="property-verb">&lt;/a> `verb` | `string` | - | [index.ts:159](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-langgraph/src/index.ts#L159) |

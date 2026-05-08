@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: VerifyPledgeInput",
+    description: "Auto-generated API reference for Interface: VerifyPledgeInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / VerifyPledgeInput
+
+# Interface: VerifyPledgeInput
+
+Defined in: [pledge-core/src/types.ts:276](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/types.ts#L276)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-delegationlookup">&lt;/a> `delegationLookup?` | [`DelegationLookup`](../type-aliases/DelegationLookup.mdx) | Optional — when present AND envelope.via_delegation is set, verifyPledge runs SPEC §7.3 steps 1–5: resolve the delegation, confirm principal == swearer, agent == agent_address, expires_at > sworn_at, and that scopes contain a `pledge:create(...)` whose constraints fit the pledge's bond / mechanism / counterparty. Without this hook, agent-delegated pledges still verify at the envelope-shape + BIP-322 layer (§7.3 step 6), but the §7.3 1–5 chain is skipped. Surface a delegationLookup adapter (e.g. one that uses `@orangecheck/agent-core`'s `verifyDelegation`) for full scope enforcement. | [pledge-core/src/types.ts:295](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/types.ts#L295) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`PledgeEnvelope`](PledgeEnvelope.mdx) | - | [pledge-core/src/types.ts:277](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/types.ts#L277) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | Default false. Set true to bypass BIP-322 entirely. | [pledge-core/src/types.ts:281](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/types.ts#L281) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | [`VerifyBip322`](../type-aliases/VerifyBip322.mdx) | Optional — omit to skip BIP-322 verification (e.g. for test vectors with placeholder sigs). | [pledge-core/src/types.ts:279](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/types.ts#L279) |

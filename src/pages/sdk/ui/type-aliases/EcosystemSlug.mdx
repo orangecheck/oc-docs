@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Type Alias: EcosystemSlug",
+    description: "Auto-generated API reference for Type Alias: EcosystemSlug. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/ui**](../README.mdx)
+
+***
+
+[@orangecheck/ui](../README.mdx) / EcosystemSlug
+
+# Type Alias: EcosystemSlug
+
+```ts
+type EcosystemSlug = 
+  | "home"
+  | "docs"
+  | "fleet"
+  | "attest"
+  | "lock"
+  | "vote"
+  | "stamp"
+  | "agent"
+  | "pledge";
+```
+
+Defined in: [ecosystem-switcher.tsx:18](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/ui/src/ecosystem-switcher.tsx#L18)
+
+EcosystemSwitcher — cross-product dropdown for jumping between every
+site in the OrangeCheck family. Drop one into every site's LayoutHeader
+and mark the active site via the `current` prop.
+
+  &lt;EcosystemSwitcher current="lock" />
+
+The component is dependency-self-contained: no Radix, no Headless UI,
+just outside-click + Escape handling so it works identically in every
+site without forcing a peer-dep upgrade. Every link stays in-tab — the
+family is one app from the user's POV.

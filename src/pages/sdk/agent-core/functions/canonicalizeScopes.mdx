@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: canonicalizeScopes()",
+    description: "Auto-generated API reference for Function: canonicalizeScopes(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / canonicalizeScopes
+
+# Function: canonicalizeScopes()
+
+```ts
+function canonicalizeScopes(scopes: string[]): string[];
+```
+
+Defined in: [agent-core/src/canonical.ts:36](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/canonical.ts#L36)
+
+Canonicalize and sort a list of scope strings for the delegation canonical
+message. Each scope is first parsed, then re-emitted in canonical form
+(constraints sorted by key), and the whole list is sorted lexicographically.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scopes` | `string`[] |
+
+## Returns
+
+`string`[]

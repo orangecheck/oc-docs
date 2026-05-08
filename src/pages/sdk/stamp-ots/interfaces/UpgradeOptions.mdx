@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: UpgradeOptions",
+    description: "Auto-generated API reference for Interface: UpgradeOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / UpgradeOptions
+
+# Interface: UpgradeOptions
+
+Defined in: [upgrade.ts:17](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/upgrade.ts#L17)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Optional custom fetch passed through to calendar clients. | [upgrade.ts:27](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/upgrade.ts#L27) |
+| &lt;a id="property-parseanchor">&lt;/a> `parseAnchor` | (`proofBytes`: `Uint8Array`) => `Promise`\&lt; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; \&#125; \| `null`\> | A parser that, given proof bytes, returns `{blockHeight, blockHash}` if the proof is fully anchored, or null if it's still pending. Callers plug in their own parser (e.g., via the `opentimestamps` npm package). This keeps @orangecheck/stamp-ots free of heavy parser deps. | [upgrade.ts:25](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/upgrade.ts#L25) |
+| &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [upgrade.ts:30](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/upgrade.ts#L30) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout per calendar. Default 30_000ms. | [upgrade.ts:29](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/upgrade.ts#L29) |

@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: verifyBond()",
+    description: "Auto-generated API reference for Function: verifyBond(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / verifyBond
+
+# Function: verifyBond()
+
+```ts
+function verifyBond(input: VerifyBondInput): Promise<VerifyBondResult>;
+```
+
+Defined in: [pledge-core/src/bond.ts:31](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/bond.ts#L31)
+
+Run §8 verifyBond against a caller-supplied attestation lookup.
+
+Returns:
+  &#123; ok: true, sats_bonded, days_unspent &#125; when the bond clears all gates.
+
+  &#123; ok: false, code, message &#125; with one of:
+    - E_BOND_NOT_FOUND          attestation lookup returned null
+    - E_BOND_ADDRESS_MISMATCH   attestation.address != pledge.swearer
+    - E_BOND_SPENT              utxo spent at or before `now`
+    - E_BOND_INSUFFICIENT_SATS  sats_bonded &lt; pledge.bond.min_sats
+    - E_BOND_INSUFFICIENT_DAYS  days_unspent &lt; pledge.bond.min_days
+
+Note that bond verification is a *live* check — the result depends on
+chain state at `now`, not at the moment the pledge was sworn. SPEC §8
+mandates this for any consequential decision.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`VerifyBondInput`](../interfaces/VerifyBondInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`VerifyBondResult`](../type-aliases/VerifyBondResult.mdx)\>

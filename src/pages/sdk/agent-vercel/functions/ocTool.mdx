@@ -1,0 +1,63 @@
+export const metadata = {
+    title: "Function: ocTool()",
+    description: "Auto-generated API reference for Function: ocTool(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-vercel**](../README.mdx)
+
+***
+
+[@orangecheck/agent-vercel](../README.mdx) / ocTool
+
+# Function: ocTool()
+
+```ts
+function ocTool<TArgs, TResult>(input: OcToolInput<TArgs, TResult>): OcToolWrapped<TArgs, TResult>;
+```
+
+Defined in: [index.ts:199](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-vercel/src/index.ts#L199)
+
+Wrap a tool() definition so its execute path is scope-checked and
+envelope-emitting. The exact glue depends on which AI-SDK release you're
+on — the typical pattern is:
+
+  const tools = &#123;
+    'invoice.create': tool(&#123;
+      description: '…',
+      parameters:  schema,
+      execute:     async (args, &#123; toolCallId &#125;) => &#123;
+        const &#123; result, action &#125; = await invoiceCreate.execute(args, &#123;
+          agent, delegation, callId: toolCallId,
+        &#125;);
+        await yourAuditPipeline.append(action);
+        return result;
+      &#125;,
+    &#125;),
+  &#125;;
+
+  const invoiceCreate = ocTool(&#123;
+    verb: 'invoice.create',
+    parameters: schema,
+    execute: async (args) => myInvoiceCreateImpl(args),
+  &#125;);
+
+The `ocTool` value is provider/SDK-agnostic — bring your own glue around
+it. v1 of the adapter intentionally does not import `ai` so it works on
+any release.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `TArgs` *extends* `Record`\&lt;`string`, `unknown`\> |
+| `TResult` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`OcToolInput`](../interfaces/OcToolInput.mdx)\&lt;`TArgs`, `TResult`\> |
+
+## Returns
+
+[`OcToolWrapped`](../interfaces/OcToolWrapped.mdx)\&lt;`TArgs`, `TResult`\>

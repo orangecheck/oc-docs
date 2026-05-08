@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: verifySubdelegation()",
+    description: "Auto-generated API reference for Function: verifySubdelegation(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / verifySubdelegation
+
+# Function: verifySubdelegation()
+
+```ts
+function verifySubdelegation(input: VerifySubdelegationInput): Promise<VerifySubdelegationResult>;
+```
+
+Defined in: [agent-core/src/verify.ts:829](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/verify.ts#L829)
+
+Verify a single sub-delegation envelope against its immediate parent.
+Includes the standalone temporal-validity check (`now ∈ [issued, expires)`)
+unless `skipTemporalCheck` is set. Useful for pre-flighting a chain link
+outside of action verification.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`VerifySubdelegationInput`](../interfaces/VerifySubdelegationInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`VerifySubdelegationResult`](../type-aliases/VerifySubdelegationResult.mdx)\>

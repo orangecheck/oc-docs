@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Type Alias: SiteFeeShape",
+    description: "Auto-generated API reference for Type Alias: SiteFeeShape. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / SiteFeeShape
+
+# Type Alias: SiteFeeShape
+
+```ts
+type SiteFeeShape = 
+  | {
+  kind: "fixed_sats";
+  sats: number;
+}
+  | {
+  kind: "percent_of_amount";
+  pct: number;
+};
+```
+
+Defined in: [me-client/src/types.ts:60](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/me-client/src/types.ts#L60)
+
+The shape of a per-event fee — either a fixed sats amount or a percent
+ of the underlying transaction amount (used for payments + pledges).

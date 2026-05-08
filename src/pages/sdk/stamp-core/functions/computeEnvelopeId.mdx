@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: computeEnvelopeId()",
+    description: "Auto-generated API reference for Function: computeEnvelopeId(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-core**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-core](../README.mdx) / computeEnvelopeId
+
+# Function: computeEnvelopeId()
+
+```ts
+function computeEnvelopeId(input: CanonicalMessageInput): string;
+```
+
+Defined in: [stamp-core/src/canonical.ts:79](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-core/src/canonical.ts#L79)
+
+Compute the envelope id as lowercase hex of sha256(canonical_message_bytes).
+Pure function — the single source of truth for identity derivation.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`CanonicalMessageInput`](../interfaces/CanonicalMessageInput.mdx) |
+
+## Returns
+
+`string`

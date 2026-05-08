@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Interface: OcChallengeButtonProps",
+    description: "Auto-generated API reference for Interface: OcChallengeButtonProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/react**](../README.mdx)
+
+***
+
+[@orangecheck/react](../README.mdx) / OcChallengeButtonProps
+
+# Interface: OcChallengeButtonProps
+
+Defined in: [src/challenge.tsx:34](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L34)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-address">&lt;/a> `address` | `string` | Bitcoin address the user claims to control. | [src/challenge.tsx:36](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L36) |
+| &lt;a id="property-apibase">&lt;/a> `apiBase?` | `string` | Verifier base URL. Default `https://ochk.io`. | [src/challenge.tsx:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L50) |
+| &lt;a id="property-audience">&lt;/a> `audience?` | `string` | Optional origin-binding. | [src/challenge.tsx:43](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L43) |
+| &lt;a id="property-children">&lt;/a> `children?` | `ReactNode` | Override button contents. | [src/challenge.tsx:56](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L56) |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | className for the root button. | [src/challenge.tsx:58](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L58) |
+| &lt;a id="property-disabled">&lt;/a> `disabled?` | `boolean` | - | [src/challenge.tsx:60](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L60) |
+| &lt;a id="property-onerror">&lt;/a> `onError?` | (`err`: `Error`) => `void` | Called when any step fails. | [src/challenge.tsx:53](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L53) |
+| &lt;a id="property-onverified">&lt;/a> `onVerified` | (`result`: [`OcChallengeVerified`](OcChallengeVerified.mdx)) => `void` | Called when verification succeeds with the proven address. | [src/challenge.tsx:40](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L40) |
+| &lt;a id="property-purpose">&lt;/a> `purpose?` | `string` | Optional purpose label. | [src/challenge.tsx:45](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L45) |
+| &lt;a id="property-sign">&lt;/a> `sign` | (`message`: `string`) => `Promise`\&lt;`string`\> | Wallet signing adapter. Given a canonical message, returns a BIP-322 signature. | [src/challenge.tsx:38](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L38) |
+| &lt;a id="property-style">&lt;/a> `style?` | `CSSProperties` | - | [src/challenge.tsx:59](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L59) |
+| &lt;a id="property-ttlseconds">&lt;/a> `ttlSeconds?` | `number` | Challenge TTL in seconds. Default: server default (300). | [src/challenge.tsx:47](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/react/src/challenge.tsx#L47) |

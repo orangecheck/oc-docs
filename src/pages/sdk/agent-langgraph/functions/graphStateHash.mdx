@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: graphStateHash()",
+    description: "Auto-generated API reference for Function: graphStateHash(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-langgraph**](../README.mdx)
+
+***
+
+[@orangecheck/agent-langgraph](../README.mdx) / graphStateHash
+
+# Function: graphStateHash()
+
+```ts
+function graphStateHash(state: Record<string, unknown>): string;
+```
+
+Defined in: [index.ts:44](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-langgraph/src/index.ts#L44)
+
+Compute a stable hash of a LangGraph state object. Use canonical JSON
+(RFC 8785) so reordered keys / repeated serializations produce the same
+hash. Returns `sha256:<64-hex>`.
+
+Most LangGraph deployments persist the state object via a checkpointer
+(in-memory, postgres, redis, etc.). The state-hash here is over the
+checkpointer's serialized state at the moment the tool node fires.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `state` | `Record`\&lt;`string`, `unknown`\> |
+
+## Returns
+
+`string`

@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Function: getOcSession()",
+    description: "Auto-generated API reference for Function: getOcSession(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / getOcSession
+
+# Function: getOcSession()
+
+```ts
+function getOcSession(headers: 
+  | SessionRequestHeaders
+| Headers, options?: VerifyOcOptions): Promise<SessionPayload | null>;
+```
+
+Defined in: [src/index.ts:420](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-core/src/index.ts#L420)
+
+Verify the OC session for a request. Accepts either a plain object
+with `cookie` / `authorization` properties (Express / Next.js / etc.)
+or a Web Headers object (Hono / edge / Fetch API). Reads the session
+from the Cookie header first; falls back to a `Authorization: Bearer
+&lt;token>` header so cross-domain integrators (different eTLD+1, no
+.ochk.io cookie) can verify the same way.
+
+Returns `null` for unauthenticated, missing, or invalid requests.
+Never throws.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `headers` | \| [`SessionRequestHeaders`](../interfaces/SessionRequestHeaders.mdx) \| `Headers` |
+| `options` | [`VerifyOcOptions`](../interfaces/VerifyOcOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`SessionPayload`](../interfaces/SessionPayload.mdx) \| `null`\>

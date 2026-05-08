@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: sealScopes()",
+    description: "Auto-generated API reference for Function: sealScopes(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / sealScopes
+
+# Function: sealScopes()
+
+```ts
+function sealScopes(input: SealScopesInput): Promise<ScopesEncryptedEnvelope>;
+```
+
+Defined in: [agent-core/src/private-scope.ts:64](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/private-scope.ts#L64)
+
+Seal a scope list to one or more recipients. Returns the OC Lock envelope
+to be embedded as `delegation.scopes_encrypted`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`SealScopesInput`](../interfaces/SealScopesInput.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`ScopesEncryptedEnvelope`](../interfaces/ScopesEncryptedEnvelope.mdx)\>

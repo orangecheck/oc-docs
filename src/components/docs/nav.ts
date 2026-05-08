@@ -609,9 +609,9 @@ export const DOCS_NAV: DocsSection[] = [
             },
         ],
     },
-    // <!-- AUTOGEN-SDK-START — contents managed by oc-packages/scripts/gen-docs.mjs.
+    // AUTOGEN-SDK-START — contents managed by oc-packages/scripts/gen-docs.mjs.
     // Do not edit manually; the docs:gen orchestrator overwrites this section on
-    // every release tag. See docs strategy in oc-packages/SDK_DOCS.md. -->
+    // every release tag.
     {
         slug: 'sdk',
         label: 'SDK reference',
@@ -622,14 +622,152 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'Overview',
                 blurb: 'How the auto-generated reference is laid out, and how it stays in sync with the TS source.',
             },
+            // ── core ───────────────────────────────────────────────────
             {
                 href: '/sdk/sdk/README',
                 label: '@orangecheck/sdk',
                 blurb: 'TypeScript core — check, verify, createAttestation, scoring, identity helpers.',
             },
+            {
+                href: '/sdk/auth-core/README',
+                label: '@orangecheck/auth-core',
+                blurb: 'Ed25519 JWT verify + cookie helpers — consumer half of the ochk.io auth host.',
+            },
+            {
+                href: '/sdk/auth-client/README',
+                label: '@orangecheck/auth-client',
+                blurb: 'React provider + hooks for cross-subdomain auth via the ochk.io host.',
+            },
+            {
+                href: '/sdk/nostr-core/README',
+                label: '@orangecheck/nostr-core',
+                blurb: 'Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).',
+            },
+            // ── agent (oc-agent-protocol) ──────────────────────────────
+            {
+                href: '/sdk/agent-core/README',
+                label: '@orangecheck/agent-core',
+                blurb: 'OC Agent canonical messages, envelope formats, scope grammar, verification.',
+            },
+            {
+                href: '/sdk/agent-signer/README',
+                label: '@orangecheck/agent-signer',
+                blurb: 'Producer-side signer — wraps a wallet to emit agent-action envelopes.',
+            },
+            {
+                href: '/sdk/agent-mcp/README',
+                label: '@orangecheck/agent-mcp',
+                blurb: 'Model Context Protocol bindings for agent envelopes.',
+            },
+            {
+                href: '/sdk/agent-anthropic/README',
+                label: '@orangecheck/agent-anthropic',
+                blurb: 'Adapter for Anthropic SDK tool-use canonicalization.',
+            },
+            {
+                href: '/sdk/agent-openai/README',
+                label: '@orangecheck/agent-openai',
+                blurb: 'Adapter for OpenAI SDK tool-call canonicalization.',
+            },
+            {
+                href: '/sdk/agent-langgraph/README',
+                label: '@orangecheck/agent-langgraph',
+                blurb: 'Adapter for LangGraph tool-call canonicalization.',
+            },
+            {
+                href: '/sdk/agent-vercel/README',
+                label: '@orangecheck/agent-vercel',
+                blurb: 'Adapter for Vercel AI SDK tool-call canonicalization.',
+            },
+            // ── lock (oc-lock-protocol) ────────────────────────────────
+            {
+                href: '/sdk/lock-core/README',
+                label: '@orangecheck/lock-core',
+                blurb: 'OC Lock envelope format, canonicalization, seal, unseal.',
+            },
+            {
+                href: '/sdk/lock-crypto/README',
+                label: '@orangecheck/lock-crypto',
+                blurb: 'Crypto primitives for OC Lock — X25519, AEAD, KDF.',
+            },
+            {
+                href: '/sdk/lock-device/README',
+                label: '@orangecheck/lock-device',
+                blurb: 'Device-key management for OC Lock recipients.',
+            },
+            // ── stamp (oc-stamp-protocol) ──────────────────────────────
+            {
+                href: '/sdk/stamp-core/README',
+                label: '@orangecheck/stamp-core',
+                blurb: 'OC Stamp envelope format, canonicalization, verification.',
+            },
+            {
+                href: '/sdk/stamp-ots/README',
+                label: '@orangecheck/stamp-ots',
+                blurb: 'OpenTimestamps anchor pipeline for OC Stamp envelopes.',
+            },
+            // ── vote (oc-vote-protocol) ────────────────────────────────
+            {
+                href: '/sdk/vote-core/README',
+                label: '@orangecheck/vote-core',
+                blurb: 'OC Vote canonicalization, ids, weight modes, deterministic tally.',
+            },
+            {
+                href: '/sdk/vote-react/README',
+                label: '@orangecheck/vote-react',
+                blurb: 'React components for OC Vote — badge, poll, useTally.',
+            },
+            // ── pledge (oc-pledge-protocol) ────────────────────────────
+            {
+                href: '/sdk/pledge-core/README',
+                label: '@orangecheck/pledge-core',
+                blurb: 'OC Pledge canonical messages, envelope formats, state machine, bond verification.',
+            },
+            // ── me (me.ochk.io consumer product) ───────────────────────
+            {
+                href: '/sdk/me-client/README',
+                label: '@orangecheck/me-client',
+                blurb: 'me.ochk.io client SDK — auth, accounts, billable events.',
+            },
+            // ── integrations + UI ──────────────────────────────────────
+            {
+                href: '/sdk/gate/README',
+                label: '@orangecheck/gate',
+                blurb: 'HTTP middleware for Express / Next / Fastify / Hono.',
+            },
+            {
+                href: '/sdk/airdrop-gate/README',
+                label: '@orangecheck/airdrop-gate',
+                blurb: 'Sybil-resistant airdrop allowlist filter.',
+            },
+            {
+                href: '/sdk/relay-filter/README',
+                label: '@orangecheck/relay-filter',
+                blurb: 'Strfry write-policy plugin to gate Nostr relays by OC attestation.',
+            },
+            {
+                href: '/sdk/wallet-adapter/README',
+                label: '@orangecheck/wallet-adapter',
+                blurb: 'Normalize UniSat / Xverse / Leather / OKX behind one sign API.',
+            },
+            {
+                href: '/sdk/webhook-verify/README',
+                label: '@orangecheck/webhook-verify',
+                blurb: 'HMAC verification helpers for OC webhook deliveries.',
+            },
+            {
+                href: '/sdk/react/README',
+                label: '@orangecheck/react',
+                blurb: 'Generic React components — OcBadge, OcGate, OcChallengeButton.',
+            },
+            {
+                href: '/sdk/ui/README',
+                label: '@orangecheck/ui',
+                blurb: 'Shared shadcn-style UI primitives across the family.',
+            },
         ],
     },
-    // <!-- AUTOGEN-SDK-END -->
+    // AUTOGEN-SDK-END
 
     {
         slug: 'reference',

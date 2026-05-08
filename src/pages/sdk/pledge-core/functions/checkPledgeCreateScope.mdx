@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: checkPledgeCreateScope()",
+    description: "Auto-generated API reference for Function: checkPledgeCreateScope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / checkPledgeCreateScope
+
+# Function: checkPledgeCreateScope()
+
+```ts
+function checkPledgeCreateScope(pledge: PledgeEnvelope, delegation: DelegationLookupResult): ScopeCheckResult;
+```
+
+Defined in: [pledge-core/src/delegation.ts:50](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/pledge-core/src/delegation.ts#L50)
+
+Find the first `pledge:create(...)` scope in the delegation and verify the
+pledge satisfies all its constraints. SPEC §7.3.
+
+Returns ok with the matched raw scope string, or err with
+E_DELEGATION_SCOPE_VIOLATED naming the failed constraint.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `pledge` | [`PledgeEnvelope`](../interfaces/PledgeEnvelope.mdx) |
+| `delegation` | [`DelegationLookupResult`](../interfaces/DelegationLookupResult.mdx) |
+
+## Returns
+
+[`ScopeCheckResult`](../type-aliases/ScopeCheckResult.mdx)

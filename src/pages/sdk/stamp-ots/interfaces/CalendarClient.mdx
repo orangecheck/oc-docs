@@ -1,0 +1,75 @@
+export const metadata = {
+    title: "Interface: CalendarClient",
+    description: "Auto-generated API reference for Interface: CalendarClient. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README.mdx)
+
+***
+
+[@orangecheck/stamp-ots](../README.mdx) / CalendarClient
+
+# Interface: CalendarClient
+
+Defined in: [types.ts:21](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L21)
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-url">&lt;/a> `url` | `readonly` | `string` | Base URL of the calendar, e.g. "https://alice.btc.calendar.opentimestamps.org". | [types.ts:23](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L23) |
+
+## Methods
+
+### fetchProof()
+
+```ts
+fetchProof(digest: Uint8Array, signal?: AbortSignal): Promise<Uint8Array<ArrayBufferLike> | null>;
+```
+
+Defined in: [types.ts:42](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L42)
+
+Fetch the current (possibly upgraded) proof for a previously-submitted
+digest. Returns null if the calendar has no proof for this digest yet.
+
+OTS calendar HTTP API: GET &lt;url>/timestamp/&lt;hex(digest)>, returns the
+proof bytes or 404.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `digest` | `Uint8Array` |
+| `signal?` | `AbortSignal` |
+
+#### Returns
+
+`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\> \| `null`\>
+
+***
+
+### submit()
+
+```ts
+submit(digest: Uint8Array, signal?: AbortSignal): Promise<Uint8Array<ArrayBufferLike>>;
+```
+
+Defined in: [types.ts:33](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/stamp-ots/src/types.ts#L33)
+
+Submit a 32-byte digest to the calendar for aggregation. Returns the raw
+pending proof bytes.
+
+OTS calendar HTTP API: POST &lt;url>/digest with the raw bytes as the body,
+Content-Type: application/vnd.opentimestamps.v1, returns the proof bytes
+as the response body.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `digest` | `Uint8Array` |
+| `signal?` | `AbortSignal` |
+
+#### Returns
+
+`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\>\>

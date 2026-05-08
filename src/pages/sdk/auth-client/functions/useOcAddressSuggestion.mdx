@@ -1,0 +1,57 @@
+export const metadata = {
+    title: "Function: useOcAddressSuggestion()",
+    description: "Auto-generated API reference for Function: useOcAddressSuggestion(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / useOcAddressSuggestion
+
+# Function: useOcAddressSuggestion()
+
+```ts
+function useOcAddressSuggestion(options: UseOcAddressSuggestionOptions): UseOcAddressSuggestionReturn;
+```
+
+Defined in: [src/components.tsx:517](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/auth-client/src/components.tsx#L517)
+
+Hook variant of `OcAddressInput`. Use when you want to keep your existing
+styled `<input>` (e.g. shadcn `<Input>`) and just bolt on the
+session-address suggestion behaviour.
+
+Wrap your input in a `position: relative` container, spread `inputProps`
+onto the input, and render `{popover}` immediately after. The hook's
+focus / blur / keydown handlers are composed via `inputProps` — they call
+any handlers you've already passed to your input only when you wire them
+yourself in addition to spreading `inputProps`.
+
+Example:
+```tsx
+const { inputProps, popover } = useOcAddressSuggestion({
+    value: addr,
+    onValueChange: setAddr,
+});
+return (
+    <div className="relative">
+        <Input
+            value={addr}
+            onChange={(e) => setAddr(e.target.value)}
+            {...inputProps}
+            placeholder="bc1q…"
+        />
+        {popover}
+    </div>
+);
+```
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`UseOcAddressSuggestionOptions`](../interfaces/UseOcAddressSuggestionOptions.mdx) |
+
+## Returns
+
+[`UseOcAddressSuggestionReturn`](../interfaces/UseOcAddressSuggestionReturn.mdx)

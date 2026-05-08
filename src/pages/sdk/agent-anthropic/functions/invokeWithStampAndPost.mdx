@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: invokeWithStampAndPost()",
+    description: "Auto-generated API reference for Function: invokeWithStampAndPost(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-anthropic**](../README.mdx)
+
+***
+
+[@orangecheck/agent-anthropic](../README.mdx) / invokeWithStampAndPost
+
+# Function: invokeWithStampAndPost()
+
+```ts
+function invokeWithStampAndPost<T>(input: InvokeWithStampAndPostInput<T>): Promise<InvokeWithStampAndPostResult<T>>;
+```
+
+Defined in: [index.ts:243](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-anthropic/src/index.ts#L243)
+
+Convenience: stamp the tool_use, execute the handler, AND post the
+stamped envelope to fleet. Three roundtrips → one call. If `fleet`
+is omitted, this is identical to invokeWithStamp + posted=null.
+
+The post happens AFTER the call so a failing post doesn't prevent the
+tool from running. If you need pre-authorization (the post must
+succeed before the call runs), use stampToolUse + postActionToFleet
++ your call() in that order.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`InvokeWithStampAndPostInput`](../interfaces/InvokeWithStampAndPostInput.mdx)\&lt;`T`\> |
+
+## Returns
+
+`Promise`\&lt;[`InvokeWithStampAndPostResult`](../interfaces/InvokeWithStampAndPostResult.mdx)\&lt;`T`\>\>

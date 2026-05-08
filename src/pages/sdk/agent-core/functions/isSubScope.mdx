@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: isSubScope()",
+    description: "Auto-generated API reference for Function: isSubScope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / isSubScope
+
+# Function: isSubScope()
+
+```ts
+function isSubScope(exercised: Scope, granted: Scope): boolean;
+```
+
+Defined in: [agent-core/src/scope.ts:268](https://github.com/orangecheck/oc-packages/blob/0a6814a09006a93c94e9919f2dd5f1fbb4c3c62a/agent-core/src/scope.ts#L268)
+
+Is `exercised` a sub-scope of `granted`?
+Returns true iff every constraint of `granted` admits the corresponding constraint
+(or absence) in `exercised`, per SPEC §7.4.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `exercised` | [`Scope`](../interfaces/Scope.mdx) |
+| `granted` | [`Scope`](../interfaces/Scope.mdx) |
+
+## Returns
+
+`boolean`

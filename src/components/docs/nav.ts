@@ -598,6 +598,18 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'infrastructure',
+        label: 'Infrastructure',
+        blurb: 'The shared services every protocol runs on.',
+        items: [
+            {
+                href: '/infrastructure/relay',
+                label: 'relay.ochk.io',
+                blurb: "OC's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy.",
+            },
+        ],
+    },
+    {
         slug: 'reference',
         label: 'Reference',
         blurb: 'Glossary, FAQ, error codes, everything else.',

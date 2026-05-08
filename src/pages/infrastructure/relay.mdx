@@ -1,0 +1,123 @@
+export const metadata = {
+    title: 'relay.ochk.io — first-party Nostr relay',
+    description:
+        "OrangeCheck's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy. strfry on Fly.io. Source: orangecheck/oc-relay-infra.",
+};
+
+# relay.ochk.io — the OrangeCheck family Nostr relay
+
+`wss://relay.ochk.io` is the family's first-party Nostr relay. Every OC web app
+publishes to it (alongside ≥4 public relays), and every OC client app reads
+from it (alongside the public set, racing for first response). It exists for
+reliability and family-curated indexing — not as a trust anchor.
+
+> **Hard architectural invariant: relay.ochk.io is never the only copy of
+> anything.** Every event is also published to public relays. Every read also
+> queries public relays. If relay.ochk.io disappeared tomorrow, every OC
+> envelope is still verifiable from any public relay. See
+> [BYPASS.md](https://github.com/orangecheck/oc-relay-infra/blob/main/BYPASS.md).
+
+## What it does
+
+It's a [strfry](https://github.com/hoytech/strfry) instance running on Fly.io
+(region `fra`), configured with two non-default policies:
+
+1. **Kind allowlist (30078–30086).** Events outside the canonical OC family
+   range are rejected at the C++ ingest layer with
+   `{"reason": "blocked: not an oc family event"}`.
+2. **`d`-tag prefix gate.** Even within the allowed kinds, only events whose
+   `d` tag starts with a canonical OC namespace prefix are accepted. The gate
+   is enforced by a [Deno write-policy plugin](https://github.com/orangecheck/oc-relay-infra/blob/main/policy/oc-dtag-filter.ts):
+
+| kind | sub-protocol | required `d`-tag prefix |
+|---|---|---|
+| 30078 | OC Attest / OC Lock / OC Pledge | `oc-attest:`, `oc-lock:`, `oc-pledge:`, `oc-pledge-outcome:`, `oc-pledge-abandonment:` |
+| 30080 | OC Vote · poll | `oc-vote-poll:` |
+| 30081 | OC Vote · ballot | `oc-vote-ballot:` |
+| 30082 | OC Vote · reveal | `oc-vote-reveal:` |
+| 30083 | OC Stamp · stamp / OC Agent · delegation | `oc-stamp:` or `oc-agent-del:` |
+| 30084 | OC Agent · action | `oc-agent-act:` |
+| 30085 | OC Agent · revocation | `oc-agent-rev:` |
+| 30086 | OC Agent · sub-delegation | `oc-agent-sub:` |
+
+Together, those two gates mean **every event served from relay.ochk.io is by
+construction an OrangeCheck family event**. Spam is structurally impossible
+without anyone deciding what's spam — the policy is shape-only, never content.
+
+## What it doesn't do
+
+- **It does not read content.** The policy plugin gates by `kind` and the
+  literal `d`-tag bytes, never the envelope body. If you want semantic
+  rejection, you want a verifier; the relay enforces shape.
+- **It does not require auth.** No NIP-42 challenge on the read or write
+  path. Anyone, anywhere, with any pubkey, can publish a family-shaped event
+  or query for one.
+- **It does not charge.** Free, anonymous, public.
+- **It does not act as a custodian or trust anchor.** Relays are commodity
+  infrastructure. Trust anchors are Bitcoin (BIP-322 attestations) and
+  Nostr-published envelopes (offline-verifiable forever).
+- **It does not replace public relays.** Every OC web app's `DEFAULT_RELAYS`
+  ships with five entries — four public (`relay.nostr.band`, `nos.lol`,
+  `relay.primal.net`, `offchain.pub`) plus relay.ochk.io. The `@orangecheck/nostr-core`
+  package has a build-time TypeScript invariant that fails the build if a
+  future engineer reduces the set to relay.ochk.io alone.
+
+## Where it sits in the stack
+
+```
+       ┌─────────── browser / SDK ───────────┐
+       │  publish(event)         query(filter) │
+       └────────┬────────────────┬────────────┘
+                │                │
+       publishes to ALL    races EOSE on ALL
+                │                │
+       ┌────────┴───── DEFAULT_RELAYS ────────┐
+       │                                       │
+       │  wss://relay.nostr.band  (public)     │
+       │  wss://nos.lol            (public)    │
+       │  wss://relay.primal.net   (public)    │
+       │  wss://offchain.pub       (public)    │
+       │  wss://relay.ochk.io      (OC-curated)│
+       └───────────────────────────────────────┘
+```
+
+Reads race all five and resolve on the first `EOSE`; the racing-read default
+timeout is 1500ms, so a momentary blip on any one relay (including ours)
+never holds up the page. Writes hit all five; the publish call returns one
+result per relay so callers can show "published to 4/5 relays."
+
+## Operational
+
+- **Source repo:** [orangecheck/oc-relay-infra](https://github.com/orangecheck/oc-relay-infra) — public, MIT.
+- **Relay implementation:** [strfry](https://github.com/hoytech/strfry) 0.9.7
+  pinned by tag.
+- **Hosting:** Fly.io, single region `fra` (Frankfurt). 50 GiB Fly Volume on
+  LMDB. Dedicated IPv4 + IPv6.
+- **TLS:** Let's Encrypt via Fly's edge.
+- **Status:** [`https://oc-relay-ochk.fly.dev/`](https://oc-relay-ochk.fly.dev/) (raw fly.dev hostname; canonical hostname is `relay.ochk.io`).
+- **Abuse policy:** [ABUSE.md](https://github.com/orangecheck/oc-relay-infra/blob/main/ABUSE.md) — what we accept, takedown procedure, transparency log.
+- **Bypass charter:** [BYPASS.md](https://github.com/orangecheck/oc-relay-infra/blob/main/BYPASS.md) — every feature has a public-relay equivalent by design.
+
+## What this means for verifiers
+
+If you're building a verifier for OC envelopes, **do not query only
+relay.ochk.io**. The protocol's offline-verifiable promise rests on the event
+being available somewhere on Nostr; if your verifier can only see ours, you've
+broken that promise. Use [`@orangecheck/nostr-core`](https://www.npmjs.com/package/@orangecheck/nostr-core)
+or any equivalent client that races multiple public relays.
+
+If you're operating an enterprise integration where uptime matters and you
+want a deterministic write target, do publish to relay.ochk.io as one of
+many — but don't publish to relay.ochk.io alone. The same architectural
+invariant applies to consumers as it does to OC's own apps.
+
+## NIP support
+
+NIP-11 self-report from the live relay: `[1, 2, 4, 9, 11, 20, 22, 28, 40, 70]`.
+Notably **NIP-45 (COUNT) is not supported** — strfry doesn't ship it. If you
+need event counts, use a REQ with `limit` and count client-side
+(see [`oc-www`'s family-stats endpoint](https://github.com/orangecheck/oc-www/blob/main/src/pages/api/family-stats.ts) for the pattern).
+
+NIP-77 (negentropy sync) is supported. We expect to backfill historical OC
+envelopes from public relays via `strfry sync` once a meaningful share of the
+public set ships negentropy support — most don't yet (mid-2026).

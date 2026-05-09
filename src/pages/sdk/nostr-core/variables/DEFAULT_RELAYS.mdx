@@ -15,9 +15,19 @@ export const metadata = {
 const DEFAULT_RELAYS: readonly string[];
 ```
 
-Defined in: [index.ts:66](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L66)
+Defined in: [index.ts:75](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L75)
 
 Default relay set for OrangeCheck family Nostr publishes + queries.
 
 Frozen at runtime; consumers MAY pass an explicit `relays` arg to any
 function in this package to override.
+
+## Example
+
+```ts
+import { DEFAULT_RELAYS, publishEvent } from '@orangecheck/nostr-core';
+
+const results = await publishEvent(myEvent);
+// → publishes to all 5 relays in DEFAULT_RELAYS in parallel
+console.log(`accepted on ${results.filter(r => r.ok).length}/${results.length}`);
+```

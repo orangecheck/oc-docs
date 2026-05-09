@@ -21,6 +21,9 @@ const oc: {
      fireBatch: (options: FireBatchOptions) => Promise<FireBatchResponse>;
      verify: (envelope: BillableEvent, config: IntegratorPriceConfig, payment_amount_sats?: number) => VerifyEventResult;
   };
+  family: {
+     scopes: (verb: FamilyVerb, options?: FamilyScopesOptions) => Promise<FamilyScopesResult>;
+  };
   federations: {
      defaultLive: () => Promise<Federation | null>;
      get: (slug: string) => Promise<Federation | null>;
@@ -32,6 +35,9 @@ const oc: {
   };
   scope: {
      granted: (options: GrantedOptions) => Promise<GrantedResult>;
+     parseTrustAttestationCount: (value: string) => 
+        | TrustAttestationCount
+       | null;
      request: (scopes: Scope[], options: RequestOptions) => never;
   };
   session: {
@@ -46,37 +52,41 @@ const oc: {
 };
 ```
 
-Defined in: [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107)
+Defined in: [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119)
 
 Convenience namespace mirroring the public API surface in /integrate
  code samples — `oc.session.create()`, `oc.payment.authorize()`,
  `oc.event.fire()`, `oc.config.validate()`, `oc.webhook.verify()`,
- `oc.federations.live()`, `oc.scope.granted()` / `oc.scope.request()`.
+ `oc.federations.live()`, `oc.scope.granted()` / `oc.scope.request()`,
+ `oc.family.scopes()`.
 
 ## Type Declaration
 
 | Name | Type | Default value | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-config">&lt;/a> `config` | \&#123; `validate`: (`cfg`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx)) => [`ValidationResult`](../interfaces/ValidationResult.mdx); \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
+| &lt;a id="property-config">&lt;/a> `config` | \&#123; `validate`: (`cfg`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx)) => [`ValidationResult`](../interfaces/ValidationResult.mdx); \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
 | `config.validate()` | (`cfg`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx)) => [`ValidationResult`](../interfaces/ValidationResult.mdx) | - | [me-client/src/config.ts:25](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L25) |
-| &lt;a id="property-event">&lt;/a> `event` | \&#123; `fire`: (`options`: [`FireEventOptions`](../interfaces/FireEventOptions.mdx)) => `Promise`\&lt;[`BillableEvent`](../interfaces/BillableEvent.mdx)\>; `fireBatch`: (`options`: `FireBatchOptions`) => `Promise`\&lt;`FireBatchResponse`\>; `verify`: (`envelope`: [`BillableEvent`](../interfaces/BillableEvent.mdx), `config`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx), `payment_amount_sats?`: `number`) => [`VerifyEventResult`](../interfaces/VerifyEventResult.mdx); \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
-| `event.fire()` | (`options`: [`FireEventOptions`](../interfaces/FireEventOptions.mdx)) => `Promise`\&lt;[`BillableEvent`](../interfaces/BillableEvent.mdx)\> | - | [me-client/src/event.ts:329](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L329) |
-| `event.fireBatch()` | (`options`: `FireBatchOptions`) => `Promise`\&lt;`FireBatchResponse`\> | - | [me-client/src/event.ts:329](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L329) |
-| `event.verify()` | (`envelope`: [`BillableEvent`](../interfaces/BillableEvent.mdx), `config`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx), `payment_amount_sats?`: `number`) => [`VerifyEventResult`](../interfaces/VerifyEventResult.mdx) | - | [me-client/src/event.ts:329](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L329) |
-| &lt;a id="property-federations">&lt;/a> `federations` | \&#123; `defaultLive`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\>; `get`: (`slug`: `string`) => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\>; `list`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\>; `live`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\>; \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
+| &lt;a id="property-event">&lt;/a> `event` | \&#123; `fire`: (`options`: [`FireEventOptions`](../interfaces/FireEventOptions.mdx)) => `Promise`\&lt;[`BillableEvent`](../interfaces/BillableEvent.mdx)\>; `fireBatch`: (`options`: `FireBatchOptions`) => `Promise`\&lt;`FireBatchResponse`\>; `verify`: (`envelope`: [`BillableEvent`](../interfaces/BillableEvent.mdx), `config`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx), `payment_amount_sats?`: `number`) => [`VerifyEventResult`](../interfaces/VerifyEventResult.mdx); \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
+| `event.fire()` | (`options`: [`FireEventOptions`](../interfaces/FireEventOptions.mdx)) => `Promise`\&lt;[`BillableEvent`](../interfaces/BillableEvent.mdx)\> | - | [me-client/src/event.ts:343](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L343) |
+| `event.fireBatch()` | (`options`: `FireBatchOptions`) => `Promise`\&lt;`FireBatchResponse`\> | - | [me-client/src/event.ts:343](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L343) |
+| `event.verify()` | (`envelope`: [`BillableEvent`](../interfaces/BillableEvent.mdx), `config`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx), `payment_amount_sats?`: `number`) => [`VerifyEventResult`](../interfaces/VerifyEventResult.mdx) | - | [me-client/src/event.ts:343](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L343) |
+| &lt;a id="property-family">&lt;/a> `family` | \&#123; `scopes`: (`verb`: [`FamilyVerb`](../type-aliases/FamilyVerb.mdx), `options?`: [`FamilyScopesOptions`](../interfaces/FamilyScopesOptions.mdx)) => `Promise`\&lt;[`FamilyScopesResult`](../interfaces/FamilyScopesResult.mdx)\>; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
+| `family.scopes()` | (`verb`: [`FamilyVerb`](../type-aliases/FamilyVerb.mdx), `options?`: [`FamilyScopesOptions`](../interfaces/FamilyScopesOptions.mdx)) => `Promise`\&lt;[`FamilyScopesResult`](../interfaces/FamilyScopesResult.mdx)\> | - | [me-client/src/family.ts:110](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L110) |
+| &lt;a id="property-federations">&lt;/a> `federations` | \&#123; `defaultLive`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\>; `get`: (`slug`: `string`) => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\>; `list`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\>; `live`: () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\>; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
 | `federations.defaultLive()` | () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\> | - | [me-client/src/federations.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/federations.ts#L51) |
 | `federations.get()` | (`slug`: `string`) => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx) \| `null`\> | - | [me-client/src/federations.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/federations.ts#L51) |
 | `federations.list()` | () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\> | - | [me-client/src/federations.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/federations.ts#L51) |
 | `federations.live()` | () => `Promise`\&lt;[`Federation`](../interfaces/Federation.mdx)[]\> | - | [me-client/src/federations.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/federations.ts#L51) |
-| &lt;a id="property-payment">&lt;/a> `payment` | \&#123; `authorize`: (`opts`: [`PaymentAuthorizeOptions`](../interfaces/PaymentAuthorizeOptions.mdx)) => `Promise`\&lt;[`PaymentResult`](../interfaces/PaymentResult.mdx)\>; \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
+| &lt;a id="property-payment">&lt;/a> `payment` | \&#123; `authorize`: (`opts`: [`PaymentAuthorizeOptions`](../interfaces/PaymentAuthorizeOptions.mdx)) => `Promise`\&lt;[`PaymentResult`](../interfaces/PaymentResult.mdx)\>; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
 | `payment.authorize()` | (`opts`: [`PaymentAuthorizeOptions`](../interfaces/PaymentAuthorizeOptions.mdx)) => `Promise`\&lt;[`PaymentResult`](../interfaces/PaymentResult.mdx)\> | - | [me-client/src/payment.ts:25](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/payment.ts#L25) |
-| &lt;a id="property-scope">&lt;/a> `scope` | \&#123; `granted`: (`options`: [`GrantedOptions`](../interfaces/GrantedOptions.mdx)) => `Promise`\&lt;[`GrantedResult`](../interfaces/GrantedResult.mdx)\>; `request`: (`scopes`: [`Scope`](../type-aliases/Scope.mdx)[], `options`: [`RequestOptions`](../interfaces/RequestOptions.mdx)) => `never`; \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
-| `scope.granted()` | (`options`: [`GrantedOptions`](../interfaces/GrantedOptions.mdx)) => `Promise`\&lt;[`GrantedResult`](../interfaces/GrantedResult.mdx)\> | - | [me-client/src/scope.ts:144](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L144) |
-| `scope.request()` | (`scopes`: [`Scope`](../type-aliases/Scope.mdx)[], `options`: [`RequestOptions`](../interfaces/RequestOptions.mdx)) => `never` | - | [me-client/src/scope.ts:144](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L144) |
-| &lt;a id="property-session">&lt;/a> `session` | \&#123; `create`: (`opts`: [`SignInOptions`](../interfaces/SignInOptions.mdx)) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\>; `invalidate`: (`sessionId`: `string`) => `Promise`\&lt;`void`\>; `refresh`: (`sessionId`: `string`) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\>; \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
+| &lt;a id="property-scope">&lt;/a> `scope` | \&#123; `granted`: (`options`: [`GrantedOptions`](../interfaces/GrantedOptions.mdx)) => `Promise`\&lt;[`GrantedResult`](../interfaces/GrantedResult.mdx)\>; `parseTrustAttestationCount`: (`value`: `string`) => \| [`TrustAttestationCount`](../interfaces/TrustAttestationCount.mdx) \| `null`; `request`: (`scopes`: [`Scope`](../type-aliases/Scope.mdx)[], `options`: [`RequestOptions`](../interfaces/RequestOptions.mdx)) => `never`; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
+| `scope.granted()` | (`options`: [`GrantedOptions`](../interfaces/GrantedOptions.mdx)) => `Promise`\&lt;[`GrantedResult`](../interfaces/GrantedResult.mdx)\> | - | [me-client/src/scope.ts:193](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L193) |
+| `scope.parseTrustAttestationCount()` | (`value`: `string`) => \| [`TrustAttestationCount`](../interfaces/TrustAttestationCount.mdx) \| `null` | - | [me-client/src/scope.ts:193](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L193) |
+| `scope.request()` | (`scopes`: [`Scope`](../type-aliases/Scope.mdx)[], `options`: [`RequestOptions`](../interfaces/RequestOptions.mdx)) => `never` | - | [me-client/src/scope.ts:193](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L193) |
+| &lt;a id="property-session">&lt;/a> `session` | \&#123; `create`: (`opts`: [`SignInOptions`](../interfaces/SignInOptions.mdx)) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\>; `invalidate`: (`sessionId`: `string`) => `Promise`\&lt;`void`\>; `refresh`: (`sessionId`: `string`) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\>; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
 | `session.create()` | (`opts`: [`SignInOptions`](../interfaces/SignInOptions.mdx)) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\> | - | [me-client/src/session.ts:77](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/session.ts#L77) |
 | `session.invalidate()` | (`sessionId`: `string`) => `Promise`\&lt;`void`\> | - | [me-client/src/session.ts:77](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/session.ts#L77) |
 | `session.refresh()` | (`sessionId`: `string`) => `Promise`\&lt;[`Session`](../interfaces/Session.mdx)\> | - | [me-client/src/session.ts:77](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/session.ts#L77) |
-| &lt;a id="property-webhook">&lt;/a> `webhook` | \&#123; `fetchJwks`: (`issuer`: `string`) => `Promise`\&lt;`void`\>; `verify`: (`rawBody`: `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\>, `sigHex`: `string`, `kid`: `string`, `options`: [`VerifyOptions`](../interfaces/VerifyOptions.mdx)) => `Promise`\&lt;[`VerifyResult`](../interfaces/VerifyResult.mdx)\>; \&#125; | - | [me-client/src/index.ts:107](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L107) |
+| &lt;a id="property-webhook">&lt;/a> `webhook` | \&#123; `fetchJwks`: (`issuer`: `string`) => `Promise`\&lt;`void`\>; `verify`: (`rawBody`: `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\>, `sigHex`: `string`, `kid`: `string`, `options`: [`VerifyOptions`](../interfaces/VerifyOptions.mdx)) => `Promise`\&lt;[`VerifyResult`](../interfaces/VerifyResult.mdx)\>; \&#125; | - | [me-client/src/index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/index.ts#L119) |
 | `webhook.fetchJwks()` | (`issuer`: `string`) => `Promise`\&lt;`void`\> | `fetchJwksForce` | [me-client/src/webhook.ts:221](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/webhook.ts#L221) |
 | `webhook.verify()` | (`rawBody`: `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\>, `sigHex`: `string`, `kid`: `string`, `options`: [`VerifyOptions`](../interfaces/VerifyOptions.mdx)) => `Promise`\&lt;[`VerifyResult`](../interfaces/VerifyResult.mdx)\> | - | [me-client/src/webhook.ts:221](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/webhook.ts#L221) |

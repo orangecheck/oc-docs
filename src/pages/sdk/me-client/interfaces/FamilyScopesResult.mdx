@@ -1,0 +1,26 @@
+export const metadata = {
+    title: "Interface: FamilyScopesResult",
+    description: "Auto-generated API reference for Interface: FamilyScopesResult. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / FamilyScopesResult
+
+# Interface: FamilyScopesResult
+
+Defined in: [me-client/src/family.ts:50](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L50)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-family_product">&lt;/a> `family_product` | \&#123; `name`: `string`; `origin`: `string`; `verb`: [`FamilyVerb`](../type-aliases/FamilyVerb.mdx); \&#125; | Sibling product the grants are scoped to (echoed for logging / debug). | [me-client/src/family.ts:57](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L57) |
+| `family_product.name` | `string` | - | [me-client/src/family.ts:59](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L59) |
+| `family_product.origin` | `string` | - | [me-client/src/family.ts:60](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L60) |
+| `family_product.verb` | [`FamilyVerb`](../type-aliases/FamilyVerb.mdx) | - | [me-client/src/family.ts:58](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L58) |
+| &lt;a id="property-scopes">&lt;/a> `scopes` | `Partial`\&lt;`Record`\&lt;[`Scope`](../type-aliases/Scope.mdx), `string`\>\> | Resolved values for the granted scopes. Only fields whose scope is in `scopes_granted` are present. | [me-client/src/family.ts:67](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L67) |
+| &lt;a id="property-scopes_granted">&lt;/a> `scopes_granted` | [`Scope`](../type-aliases/Scope.mdx)[] | Scopes the user has actively granted to this sibling. Subset of the requested set, filtered for not-revoked + not-expired. | [me-client/src/family.ts:64](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L64) |
+| &lt;a id="property-sub">&lt;/a> `sub` | `string` | Per-sibling stable subject for the currently-signed-in user. Anonymous · derived from master_addr + the family:&lt;verb> project_key. Sibling backends key on this. | [me-client/src/family.ts:54](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/family.ts#L54) |

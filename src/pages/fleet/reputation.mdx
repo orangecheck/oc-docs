@@ -1,0 +1,164 @@
+export const metadata = {
+    title: 'Fleet · bonded reputation',
+    description:
+        'Compose, persist, surface, and verify OC Pledge envelopes via fleet.ochk.io. Premium tier on top of the open oc-pledge-protocol.',
+};
+
+# Bonded reputation on fleet
+
+Fleet's bonded-reputation surface is a managed wrapper around the open
+[`oc-pledge-protocol`](https://github.com/orangecheck/oc-pledge-protocol). The
+load-bearing properties (canonical id, BIP-322 signature, public Nostr
+publication, offline verifiability) are all in the protocol; fleet adds
+persistence, dashboard surfaces, audit-bundle inclusion, and webhooks for
+operators who want one place to see the loop.
+
+> **Trust model unchanged.** Every pledge fleet persists is also published to
+> the public Nostr relay set. Anyone can verify any pledge offline against the
+> swearer's BIP-322 key without trusting fleet — fleet is one source of truth
+> among many, not the source.
+
+## The loop
+
+```
+   compose ── sign ── publish ── persist ── surface ── verify
+   /reputation   wallet   nostr     fleet      dashboard   anyone
+   /compose                         /api/pledges          /verify
+```
+
+1. **Compose.**
+   [`/reputation/compose`](https://fleet.ochk.io/reputation/compose) walks the
+   operator through proposition, resolution mechanism, bond, and timing. The
+   composer derives the canonical message + id locally; nothing is sent to fleet
+   until step 4.
+2. **Sign.** The wallet (UniSat / Xverse / Leather / OKX / Phantom or pasted)
+   produces a BIP-322 signature over the canonical message. Fleet never sees the
+   private key.
+3. **Publish.** The signed envelope is posted to the family's Nostr relay set as
+   a kind 30078 event with `oc-pledge:<id>` as the `d` tag.
+4. **Persist.** The envelope is POSTed to
+   [`/api/pledges`](https://fleet.ochk.io/api-explorer#/pledges/post-pledges) so
+   it shows up in fleet surfaces. The server re-derives the id from canonical
+   inputs and rejects mismatches (tamper guard); BIP-322 is not re-verified
+   server-side because the published Nostr envelope is verifiable offline. Fires
+   a `pledge.registered` webhook.
+5. **Surface.** Three views:
+    - **Dashboard.** [`/dashboard`](https://fleet.ochk.io/dashboard) → § bonded
+      reputation card lists the 5 most-recent pledges with status pills.
+    - **Project listing.**
+      [`/reputation/list`](https://fleet.ochk.io/reputation/list) is the full
+      filterable table (status filter + free-text search). Each row clicks
+      through to the canonical detail page.
+    - **Audit timeline.** [`/audit`](https://fleet.ochk.io/audit) merges pledges
+      into the same timeline as delegations / actions / revocations / admin
+      events. The `pledge` filter isolates the slice.
+6. **Verify.** Three paths:
+    - **Public detail.**
+      [`/reputation/p/<id>`](https://fleet.ochk.io/reputation/p/) shows the
+      envelope, the canonical message, the verify-offline recipe, and a "open at
+      pledge.ochk.io" cross-link.
+    - **In-browser verifier.** [`/verify`](https://fleet.ochk.io/verify) accepts
+      all six OC envelope kinds (delegation / action / revocation / pledge /
+      pledge-outcome / pledge-abandonment); paste the JSON, get a verdict.
+    - **CLI / SDK.** Any `@orangecheck/pledge-core@^1.0.0` consumer; see the
+      [SDK reference](/sdk/pledge-core).
+
+## API endpoints
+
+The full schemas live in the [OpenAPI spec](https://fleet.ochk.io/api/openapi);
+summary:
+
+| Method | Path                             | Auth       | What                                                                     |
+| ------ | -------------------------------- | ---------- | ------------------------------------------------------------------------ |
+| `POST` | `/api/pledges`                   | session    | Register a signed pledge envelope. Recomputes id, rejects tampered.      |
+| `GET`  | `/api/pledges?project_id=…`      | session    | List pledges for the project. Optional `status` filter.                  |
+| `GET`  | `/api/pledges?swearer_address=…` | **public** | Cross-fleet list of every pledge sworn by an address. No auth.           |
+| `GET`  | `/api/pledges/{id}`              | **public** | Fetch one pledge by envelope id. No auth — pledges are public artifacts. |
+
+V1 is pledge-only; outcome and abandonment envelopes are out of fleet
+persistence scope (resolve them against the public Nostr stream at verify time).
+V2 reconciles status against chain / Nostr / oracle state.
+
+## Webhook event
+
+Subscribe via `POST /api/webhooks/endpoints` with
+`events: ['pledge.registered', …]`. Payload:
+
+```json
+{
+    "id": "<64-hex envelope id>",
+    "project_id": "proj_…",
+    "kind": "pledge",
+    "envelope": {
+        /* full canonical PledgeEnvelope */
+    },
+    "swearer_address": "bc1q…",
+    "status": "pending"
+}
+```
+
+`status` reflects the lifecycle phase at insert time: `pending` (before
+`resolves_at`), `resolvable` (past `resolves_at`, V2 reconciler not yet landed),
+or `expired_unresolved` (past `expires_at`). V2 will emit `pledge.outcome` and
+`pledge.abandoned` events as the reconciler resolves them; the V1 webhook is a
+one-shot at registration.
+
+## Audit bundle inclusion
+
+The signed audit-bundle export at
+[`/api/audit/export`](https://fleet.ochk.io/api-explorer#/audit/get-audit-export)
+includes pledges in all three formats (JSON, NDJSON, CSV) alongside delegations
+/ actions / revocations. A compliance team rebuilds the project's
+agent-state-machine from the bundle, then projects pledges on top — same
+content-addressed envelopes the operator signed, byte-identical.
+
+Bundle replay order is preserved: delegations → revocations → actions → pledges.
+The manifest's `counts.pledges` field is authoritative for pledge-slice
+cardinality.
+
+## Verifying offline
+
+Every pledge detail page at `/reputation/p/<id>` includes a copy-paste Node
+recipe; the canonical version:
+
+```js
+// npm i @orangecheck/pledge-core
+import { verifyPledge } from '@orangecheck/pledge-core';
+
+const res = await fetch(`https://fleet.ochk.io/api/pledges/${id}`);
+const { pledge } = await res.json();
+
+const result = await verifyPledge({
+    envelope: pledge.envelope,
+    // wire your BIP-322 verifier here — bip322-js, btc-signer, etc.
+    skipSignatureVerification: true,
+});
+
+console.log(result.ok ? 'ok' : `FAIL: ${result.code}`);
+```
+
+`ok=true` proves: (1) declared id matches the canonical hash of inputs, (2) the
+BIP-322 signature is valid against the swearer's address (when the verifier
+callback is wired), (3) envelope is structurally well-formed. It does _not_
+prove the pledge has been kept — that's an outcome envelope, separately signed.
+
+## Activation
+
+Pledge persistence is gated behind a Postgres migration (`drizzle/0004_*`). On a
+fresh deploy or a deploy that hasn't pulled the latest migration, every pledge
+endpoint returns `503 schema_not_migrated` and the dashboard falls through to a
+"preview" banner. Run `yarn db:migrate` against the deploy's `DATABASE_URL` to
+flip it on. See
+[`STATUS.md`](https://github.com/orangecheck/oc-fleet-web/blob/main/STATUS.md)
+for the runbook.
+
+## What fleet does not do
+
+- **Slashing.** Fleet does not move sats. Bonded reputation is enforcement by
+  exposure: a broken pledge attaches a permanent record to the swearer's Bitcoin
+  address. The bond stays in the wallet.
+- **Custody.** Fleet does not hold any private keys. Every pledge is signed on
+  the operator's wallet; fleet receives an already-signed envelope.
+- **Aggregated scores.** Fleet does not compute a "reputation score." The
+  primitive is raw replayable history — anyone can compute their own aggregation
+  from the canonical pledge stream.

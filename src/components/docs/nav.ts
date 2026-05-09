@@ -465,6 +465,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Drop-in adapters for Anthropic / OpenAI / Vercel AI SDK / LangGraph / MCP.',
             },
             {
+                href: '/fleet/reputation',
+                label: 'Bonded reputation',
+                blurb: 'Compose / persist / surface OC Pledge envelopes — the bonded-delivery slice of fleet.',
+            },
+            {
                 href: '/fleet/webhooks',
                 label: 'Webhooks',
                 blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',

@@ -6,105 +6,99 @@ export const metadata = {
 
 # OC Me · Federation custody
 
-**OC the company is not your custodian.** When you sign up to me.ochk.io
-with email-OTP, the wallet attached to your account is held by a
-**Fedimint federation** — an M-of-N set of operationally-independent
-guardians that threshold-sign withdrawals together. OC integrates as a
-*client* of that federation, never as a guardian. OC has zero key
-shares; OC cannot reach the threshold; OC cannot move your funds.
+**OC the company is not your custodian.** When you sign up to me.ochk.io with
+email-OTP, the wallet attached to your account is held by a **Fedimint
+federation** — an M-of-N set of operationally-independent guardians that
+threshold-sign withdrawals together. OC integrates as a _client_ of that
+federation, never as a guardian. OC has zero key shares; OC cannot reach the
+threshold; OC cannot move your funds.
 
 This page is the public-facing version of the operator runbook at
 [`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md)
-in the `oc-me-web` repo. If you're an OC operator binding a federation,
-read the runbook. If you're a user, this page is enough.
+in the `oc-me-web` repo. If you're an OC operator binding a federation, read the
+runbook. If you're a user, this page is enough.
 
 ## What "federation custody" actually means
 
 A Fedimint federation is a small group of independent operators (the
-**guardians**) running coordinated software. The federation as a whole
-issues ecash notes — bearer-form Bitcoin claims that you hold in your
-browser. To withdraw on-chain or send via Lightning, the federation
-threshold-signs on your behalf.
+**guardians**) running coordinated software. The federation as a whole issues
+ecash notes — bearer-form Bitcoin claims that you hold in your browser. To
+withdraw on-chain or send via Lightning, the federation threshold-signs on your
+behalf.
 
-| If this party | tries to | the result is |
-|---|---|---|
-| OC | move user funds | impossible — OC holds zero key shares |
-| Fewer than M guardians | move user funds | impossible — threshold not met |
-| M+ colluding guardians | move user funds | possible (this is what M-of-N means) |
-| You | withdraw on-chain | works as long as the federation is up |
-| You | export your wallet to another Fedimint client | works — your mnemonic is yours |
+| If this party          | tries to                                      | the result is                         |
+| ---------------------- | --------------------------------------------- | ------------------------------------- |
+| OC                     | move user funds                               | impossible — OC holds zero key shares |
+| Fewer than M guardians | move user funds                               | impossible — threshold not met        |
+| M+ colluding guardians | move user funds                               | possible (this is what M-of-N means)  |
+| You                    | withdraw on-chain                             | works as long as the federation is up |
+| You                    | export your wallet to another Fedimint client | works — your mnemonic is yours        |
 
-The honesty of "federation custody is not OC custody" depends on **the
-specific federation OC introduces you to**. Specifically:
+The honesty of "federation custody is not OC custody" depends on **the specific
+federation OC introduces you to**. Specifically:
 
-1. **At least 4 guardians**, threshold strictly greater than half (so
-   3-of-4, 4-of-7, etc.). 2-of-3 is fragile to a single guardian
-   failure; we don't accept it for production.
+1. **At least 4 guardians**, threshold strictly greater than half (so 3-of-4,
+   4-of-7, etc.). 2-of-3 is fragile to a single guardian failure; we don't
+   accept it for production.
 2. **Guardians operated by distinct legal entities, in distinct hosting
-   environments, ideally in distinct legal jurisdictions.** A "4
-   guardians" federation where they all run on the same VPS at the same
-   provider is a single point of failure in costume.
-3. **A signed, content-addressed charter** that lists every guardian,
-   discloses their operators, and includes an exit clause for users.
+   environments, ideally in distinct legal jurisdictions.** A "4 guardians"
+   federation where they all run on the same VPS at the same provider is a
+   single point of failure in costume.
+3. **A signed, content-addressed charter** that lists every guardian, discloses
+   their operators, and includes an exit clause for users.
 4. **At least one Lightning gateway not operated by OC.**
 
 These are the same properties the operator runbook (§1) enforces via
-`scripts/provision-federation.ts`. If a candidate federation can't
-satisfy them, OC doesn't bind it.
+`scripts/provision-federation.ts`. If a candidate federation can't satisfy them,
+OC doesn't bind it.
 
 ## Where to find your federation's charter
 
-Once a federation is bound, the charter (with all of the above
-disclosed) is published in three places:
+Once a federation is bound, the charter (with all of the above disclosed) is
+published in three places:
 
 1. The federation's own site / status page.
-2. me.ochk.io's [`/custody`](https://me.ochk.io/custody) page,
-   including the SHA-256 hash of the charter so you can verify the copy
-   you read against the one OC bound.
-3. The operator runbook deploy log (so the bind operation is auditable
-   after the fact).
+2. me.ochk.io's [`/custody`](https://me.ochk.io/custody) page, including the
+   SHA-256 hash of the charter so you can verify the copy you read against the
+   one OC bound.
+3. The operator runbook deploy log (so the bind operation is auditable after the
+   fact).
 
-Hash mismatch between any of those three is a red flag. If the
-federation amends its charter without re-publishing the new hash on
-me.ochk.io, file an issue at
+Hash mismatch between any of those three is a red flag. If the federation amends
+its charter without re-publishing the new hash on me.ochk.io, file an issue at
 [github.com/orangecheck/oc-me-web/issues](https://github.com/orangecheck/oc-me-web/issues).
 
 ## Provisioning ceremony (what your browser does)
 
 When you sign up via email-OTP:
 
-1. me.ochk.io reads
-   `NEXT_PUBLIC_FEDIMINT_FEDERATION_INVITE` and renders the wallet
-   ceremony at [`/me/wallet`](https://me.ochk.io/me/wallet).
+1. me.ochk.io reads `NEXT_PUBLIC_FEDIMINT_FEDERATION_INVITE` and renders the
+   wallet ceremony at [`/me/wallet`](https://me.ochk.io/me/wallet).
 2. Your browser lazy-loads `@fedimint/core` (a WASM module) and
-   `@fedimint/transport-web`. Code arrives via the standard Vercel CDN
-   over HTTPS.
-3. The Fedimint client generates a fresh **mnemonic** entirely in
-   your browser. It never leaves your machine. OC the server never
-   sees it.
-4. You're shown the mnemonic words and asked to write them down. The
-   wallet is **not** considered ready until you confirm. This gate is
-   the difference between "wallet exists" and "wallet is recoverable."
-5. The client joins the federation using the public invite. From that
-   point, your federation balance is held by the guardians, redeemable
-   on-chain or via Lightning by you (with the federation's threshold
-   signature) at any time.
+   `@fedimint/transport-web`. Code arrives via the standard Vercel CDN over
+   HTTPS.
+3. The Fedimint client generates a fresh **mnemonic** entirely in your browser.
+   It never leaves your machine. OC the server never sees it.
+4. You're shown the mnemonic words and asked to write them down. The wallet is
+   **not** considered ready until you confirm. This gate is the difference
+   between "wallet exists" and "wallet is recoverable."
+5. The client joins the federation using the public invite. From that point,
+   your federation balance is held by the guardians, redeemable on-chain or via
+   Lightning by you (with the federation's threshold signature) at any time.
 
-You can re-read the source of the React provider that orchestrates
-this at
+You can re-read the source of the React provider that orchestrates this at
 [`src/lib/fedimint/provider.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/fedimint/provider.tsx).
 
 ## What if a guardian goes down?
 
-The federation continues to operate as long as at least `threshold` of
-the guardians are reachable. With a 3-of-4 federation, one guardian can
-be down indefinitely without affecting your ability to withdraw or send.
+The federation continues to operate as long as at least `threshold` of the
+guardians are reachable. With a 3-of-4 federation, one guardian can be down
+indefinitely without affecting your ability to withdraw or send.
 
-If `(N - threshold + 1)` guardians go down at once, the federation
-itself can't reach threshold and withdrawals pause until guardians are
-restored. This is the federation's responsibility to communicate; OC
-mirrors the federation's status page on
-[`/custody`](https://me.ochk.io/custody).
+If `(N - threshold + 1)` guardians go down at once, the federation itself can't
+reach threshold and withdrawals pause until guardians are restored. This is the
+federation's responsibility to communicate; OC mirrors the federation's status
+page on [`/custody`](https://me.ochk.io/custody).
 
 ## What if OC sunsets?
 
@@ -112,42 +106,41 @@ Per the charter's exit clause:
 
 - Your mnemonic is the only thing you need to recover the wallet in any
   Fedimint-compatible client. OC's UI is convenience, not custody.
-- On-chain withdrawal does not require OC's services to be online —
-  the federation's threshold-signing flow is independent of OC.
+- On-chain withdrawal does not require OC's services to be online — the
+  federation's threshold-signing flow is independent of OC.
 - You can graduate to a self-custody Bitcoin wallet from
   [`/me/graduate`](https://me.ochk.io/me/graduate) at any time.
-- If you'd rather pick a different federation, any Fedimint client can
-  join it; your sats migrate via standard Fedimint cross-federation
-  flow.
+- If you'd rather pick a different federation, any Fedimint client can join it;
+  your sats migrate via standard Fedimint cross-federation flow.
 
 ## Graduating to self-custody
 
 [`/me/graduate`](https://me.ochk.io/me/graduate) walks you through:
 
-1. Choose a destination — your own BIP-322-compatible Bitcoin wallet,
-   or a different Fedimint federation.
-2. Sweep the federation balance to your destination via on-chain
-   withdrawal (federation-signed) or via Lightning, depending on
-   amount and destination type.
-3. Your OC identity stays the same — what changes is the
-   `signing_method` claim on your `/api/auth/me` payload (from
-   `fedimint_threshold` to `bip322` or to a different federation's
-   `fedimint_threshold`). Sat-earning continues unchanged.
+1. Choose a destination — your own BIP-322-compatible Bitcoin wallet, or a
+   different Fedimint federation.
+2. Sweep the federation balance to your destination via on-chain withdrawal
+   (federation-signed) or via Lightning, depending on amount and destination
+   type.
+3. Your OC identity stays the same — what changes is the `signing_method` claim
+   on your `/api/auth/me` payload (from `fedimint_threshold` to `bip322` or to a
+   different federation's `fedimint_threshold`). Sat-earning continues
+   unchanged.
 
 ## Current state
 
-As of the latest deploy: **the Fedimint client is wired and the
-provisioning ceremony is implemented**. The production federation
-invite has not yet been bound — the federation operator decision is
-in active resolution per the criteria in
+As of the latest deploy: **the Fedimint client is wired and the provisioning
+ceremony is implemented**. The production federation invite has not yet been
+bound — the federation operator decision is in active resolution per the
+criteria in
 [`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md).
-Until it's bound, `/me/wallet` for `did:email:` users shows a
-"federation not yet configured" admin panel that links to this page
-and to [`/custody`](https://me.ochk.io/custody).
+Until it's bound, `/me/wallet` for `did:email:` users shows a "federation not
+yet configured" admin panel that links to this page and to
+[`/custody`](https://me.ochk.io/custody).
 
 We are not soft-pedaling this. The in-tree audit at
 [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
 walks the gap with file paths.
 
-If you want a wallet today, sign in via BIP-322 — that path works
-end-to-end and your wallet stays yours.
+If you want a wallet today, sign in via BIP-322 — that path works end-to-end and
+your wallet stays yours.

@@ -1,0 +1,59 @@
+name: CI
+
+# Pre-merge quality gate for oc-docs. Vercel handles production deploys
+# on push to main; this workflow runs the checks Vercel doesn't
+# (type-check, format, lint, build). Critical for the docs site since
+# Phase 3.5 auto-PRs from oc-packages release tags land MDX changes
+# here that should pass type-check + build before merging.
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    quality:
+        name: Code Quality
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'yarn'
+
+            - name: Install
+              run: yarn install --frozen-lockfile
+
+            - name: Type check
+              run: yarn type-check
+
+            - name: Format check
+              run: yarn format:check
+
+            - name: Lint
+              run: yarn lint
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        needs: quality
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'yarn'
+
+            - name: Install
+              run: yarn install --frozen-lockfile
+
+            - name: Build
+              run: yarn build

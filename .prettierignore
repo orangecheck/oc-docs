@@ -1,0 +1,13 @@
+# Auto-generated SDK reference. Owned by oc-packages/scripts/gen-docs.mjs;
+# regenerated on every release tag. TypeDoc's output isn't prettier-shaped
+# and we don't want format drift between regen and format-check. This
+# directory is ignored from the formatter to keep the gen-docs orchestrator's
+# output as the source of truth.
+src/pages/sdk/
+
+# Other auto-generated artifacts.
+.next/
+out/
+node_modules/
+dist/
+build/

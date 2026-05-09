@@ -10,34 +10,33 @@ export const metadata = {
 
 The me.ochk.io federation pool is operated by independent **guardians** — one
 keypair per operator, threshold-signing federation actions in concert with
-peers. OC the company is not a guardian; we recruit, vet, and pay guardians,
-but every signing key is operator-held and every commitment is operator-
-signed. The federation cannot tell whether a guardian is running on
-operator-provisioned hardware or OC-provisioned hardware; the trust property
-is in the signature, not the hostname.
+peers. OC the company is not a guardian; we recruit, vet, and pay guardians, but
+every signing key is operator-held and every commitment is operator- signed. The
+federation cannot tell whether a guardian is running on operator-provisioned
+hardware or OC-provisioned hardware; the trust property is in the signature, not
+the hostname.
 
 This page is the program overview. Two paths into it:
 
-- **[Apply via me.ochk.io](https://me.ochk.io/me/operator)** — sign in,
-  generate or import an operator key, fill the application form, sign +
-  submit in-browser. The whole lifecycle (key custody, application, charter
-  ratification, ceremonies, incident publishing) runs in the portal without
-  ever touching a CLI.
+- **[Apply via me.ochk.io](https://me.ochk.io/me/operator)** — sign in, generate
+  or import an operator key, fill the application form, sign + submit
+  in-browser. The whole lifecycle (key custody, application, charter
+  ratification, ceremonies, incident publishing) runs in the portal without ever
+  touching a CLI.
 - **[Apply via the kit](https://github.com/orangecheck/oc-guardian-kit)** —
   `oc-guardian init` on a server you control, fill the questionnaire, run
-  `oc-guardian apply prepare`, email `application.json` to apply@ochk.io.
-  Bypass parity preserved at every step; identical envelopes, identical
-  review queue.
+  `oc-guardian apply prepare`, email `application.json` to apply@ochk.io. Bypass
+  parity preserved at every step; identical envelopes, identical review queue.
 
 ## Lifecycle
 
-| Stage | What happens | Where |
-| --- | --- | --- |
-| **identity** | Generate (or import) an Ed25519 operator keypair. Browser stores it in IndexedDB; kit stores it in OS keychain. Backup is a 24-word BIP-39 mnemonic. | [me.ochk.io/me/operator](https://me.ochk.io/me/operator) |
-| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). Browser hashes the answers, signs a `program-apply` envelope, posts to `/api/operator/applications`. | Portal or kit |
-| **review** | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting. | Reviewer side |
-| **federation** | Pick a federation slot from the directory and ratify its charter. Charter ratification is a `charter-sign` envelope under your operator key. | [me.ochk.io/me/operator/federations](https://me.ochk.io/me/operator/federations) |
-| **operate** | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`). | Portal + binary |
+| Stage           | What happens                                                                                                                                                                                                     | Where                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **identity**    | Generate (or import) an Ed25519 operator keypair. Browser stores it in IndexedDB; kit stores it in OS keychain. Backup is a 24-word BIP-39 mnemonic.                                                             | [me.ochk.io/me/operator](https://me.ochk.io/me/operator)                         |
+| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). Browser hashes the answers, signs a `program-apply` envelope, posts to `/api/operator/applications`.                                 | Portal or kit                                                                    |
+| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                     | Reviewer side                                                                    |
+| **federation**  | Pick a federation slot from the directory and ratify its charter. Charter ratification is a `charter-sign` envelope under your operator key.                                                                     | [me.ochk.io/me/operator/federations](https://me.ochk.io/me/operator/federations) |
+| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`). | Portal + binary                                                                  |
 
 ## Two ways to run the guardian binary
 
@@ -45,18 +44,18 @@ The federation cannot distinguish between these. Pick whichever fits.
 
 ### Option A · bring your own hardware
 
-You own the host. Pull the cosign-verified Docker image, deploy the binary
-with your operator pubkey baked into the config, expose port 9000 to the
-federation peers. Full runbook: [/me/operator/runbook](/me/operator/runbook).
+You own the host. Pull the cosign-verified Docker image, deploy the binary with
+your operator pubkey baked into the config, expose port 9000 to the federation
+peers. Full runbook: [/me/operator/runbook](/me/operator/runbook).
 
 ### Option B · let OC provision for you
 
 Opt into hosted hardware on the dashboard. OC spins up a VPS at the chosen
-vendor + region, deploys the signed image, surfaces start/stop/upgrade
-controls in the portal. Your private key never touches the host —
-signing requests come from your browser (or your kit) to the binary's
-RPC port. If OC's infra is fully compromised tomorrow, the worst case is
-your guardian goes offline; your key + federation membership stay yours.
+vendor + region, deploys the signed image, surfaces start/stop/upgrade controls
+in the portal. Your private key never touches the host — signing requests come
+from your browser (or your kit) to the binary's RPC port. If OC's infra is fully
+compromised tomorrow, the worst case is your guardian goes offline; your key +
+federation membership stay yours.
 
 Pricing in sats, billed against your operator payouts. Decommission any time.
 
@@ -65,31 +64,29 @@ Pricing in sats, billed against your operator payouts. Decommission any time.
 These are non-negotiable. Anything that violates them is a bug.
 
 1. **Operator-held keys.** OC the company has zero credentials capable of
-   signing as you. Browser IDB or kit OS keychain are equivalent storage —
-   both are operator-controlled.
-2. **Bypass parity.** Every portal feature has a documented kit-only
-   equivalent at [/operator/bypass](https://me.ochk.io/operator/bypass).
-   A guardian operating purely via the kit is architecturally
-   indistinguishable from one operating with the portal.
-3. **Public commitments.** Charter ratifications, incidents, attestations
-   are operator-signed and publicly verifiable offline. OC cannot forge
-   a row in any of these timelines.
-4. **No custody.** Operator wallets, federation funds, and user balances
-   are held by the federation guardians collectively — never by OC the
-   company. OC at most participates as one guardian among several on
-   federations where it operates a node; on most federations OC is not a
-   guardian.
+   signing as you. Browser IDB or kit OS keychain are equivalent storage — both
+   are operator-controlled.
+2. **Bypass parity.** Every portal feature has a documented kit-only equivalent
+   at [/operator/bypass](https://me.ochk.io/operator/bypass). A guardian
+   operating purely via the kit is architecturally indistinguishable from one
+   operating with the portal.
+3. **Public commitments.** Charter ratifications, incidents, attestations are
+   operator-signed and publicly verifiable offline. OC cannot forge a row in any
+   of these timelines.
+4. **No custody.** Operator wallets, federation funds, and user balances are
+   held by the federation guardians collectively — never by OC the company. OC
+   at most participates as one guardian among several on federations where it
+   operates a node; on most federations OC is not a guardian.
 
 ## Sub-pages in this section
 
-- [Charter](/me/operator/charter) — the canonical text guardians ratify.
-  Hash + version live on each federation's record.
-- [Runbook](/me/operator/runbook) — how to actually run the guardian
-  binary on hardware you control. Bypass-parity reference for the portal's
-  RunbookCard.
-- [In-browser flow](/me/operator/in-browser) — the browser-key path that
-  lets the entire lifecycle happen without a CLI. Covers IDB persistence,
-  mnemonic backup, envelope canonicalization, federation-side equivalence.
+- [Charter](/me/operator/charter) — the canonical text guardians ratify. Hash +
+  version live on each federation's record.
+- [Runbook](/me/operator/runbook) — how to actually run the guardian binary on
+  hardware you control. Bypass-parity reference for the portal's RunbookCard.
+- [In-browser flow](/me/operator/in-browser) — the browser-key path that lets
+  the entire lifecycle happen without a CLI. Covers IDB persistence, mnemonic
+  backup, envelope canonicalization, federation-side equivalence.
 
 ## Where to ask
 

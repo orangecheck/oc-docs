@@ -7,7 +7,6 @@
  *
  * Idempotent. Marker is the literal "> **Full reference:" string.
  */
-
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,11 +59,7 @@ for (const { file, pkg } of TARGETS) {
         '',
     ];
 
-    const updated = [
-        ...lines.slice(0, h1Idx + 1),
-        ...banner,
-        ...lines.slice(h1Idx + 1),
-    ].join('\n');
+    const updated = [...lines.slice(0, h1Idx + 1), ...banner, ...lines.slice(h1Idx + 1)].join('\n');
 
     writeFileSync(path, updated);
     touched++;

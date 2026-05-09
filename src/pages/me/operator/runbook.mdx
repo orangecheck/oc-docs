@@ -8,59 +8,61 @@ export const metadata = {
 
 **Run the guardian binary on hardware you control.**
 
-The portal handles your operator-key custody and every state-changing
-envelope (apply, charter-sign, incident-publish, etc.). The guardian
-**binary** — the process that participates in DKG and threshold-signing
-with the rest of the federation — has to run on a host with a stable
-network address. This page is the runbook for that piece.
+The portal handles your operator-key custody and every state-changing envelope
+(apply, charter-sign, incident-publish, etc.). The guardian **binary** — the
+process that participates in DKG and threshold-signing with the rest of the
+federation — has to run on a host with a stable network address. This page is
+the runbook for that piece.
 
-If you'd rather not manage a host, the [hosted-hardware option](https://me.ochk.io/me/operator)
-on the dashboard lets OC provision a VPS for you and run the binary on its
-hardware (your private key still stays in your browser). Either path works;
-federations cannot tell which you used.
+If you'd rather not manage a host, the
+[hosted-hardware option](https://me.ochk.io/me/operator) on the dashboard lets
+OC provision a VPS for you and run the binary on its hardware (your private key
+still stays in your browser). Either path works; federations cannot tell which
+you used.
 
 ## Prerequisites
 
-- An operator key provisioned at [me.ochk.io/me/operator](https://me.ochk.io/me/operator)
-  (or via `oc-guardian init` on the kit). You'll need the **public** half
-  for the config bundle.
+- An operator key provisioned at
+  [me.ochk.io/me/operator](https://me.ochk.io/me/operator) (or via
+  `oc-guardian init` on the kit). You'll need the **public** half for the config
+  bundle.
 - An accepted application — your operator_id appears in the registry at
   [/api/operator/registry](https://me.ochk.io/api/operator/registry).
 - A federation membership — your operator key has signed at least one
   federation's charter at
   [/me/operator/ceremonies](https://me.ochk.io/me/operator/ceremonies).
 - A host. Linux, kernel ≥ 5.15, x86_64 or arm64. 4 GB RAM minimum (8 GB
-  recommended). 80 GB SSD. Reachable on a stable IP, ideally with a DNS
-  name. Ports 9000/tcp and 9001/tcp open to federation peers (the
-  federation directory tells you the peer list).
+  recommended). 80 GB SSD. Reachable on a stable IP, ideally with a DNS name.
+  Ports 9000/tcp and 9001/tcp open to federation peers (the federation directory
+  tells you the peer list).
 
 ## 01 · Config bundle
 
 Download your config bundle from
-[me.ochk.io/me/operator → runbook](https://me.ochk.io/me/operator). The
-portal generates a JSON file pre-filled with your operator pubkey + chosen
-federation. Or compose it by hand:
+[me.ochk.io/me/operator → runbook](https://me.ochk.io/me/operator). The portal
+generates a JSON file pre-filled with your operator pubkey + chosen federation.
+Or compose it by hand:
 
 ```json
 {
-  "operator_id": "op-<your-id>",
-  "operator_pubkey_hex": "<64 hex chars>",
-  "federation_slug": "oc-me-v1",
-  "attestation_post_url": "https://me.ochk.io/api/operator/attestation",
-  "log_level": "info"
+    "operator_id": "op-<your-id>",
+    "operator_pubkey_hex": "<64 hex chars>",
+    "federation_slug": "oc-me-v1",
+    "attestation_post_url": "https://me.ochk.io/api/operator/attestation",
+    "log_level": "info"
 }
 ```
 
-Copy this to the host (`scp oc-guardian.config user@host:/etc/oc-guardian/`)
-or stamp it into the host via your config-management system. **No private
-key in the bundle** — the binary fetches signing material on-demand from
-your browser (or kit) over a localhost RPC port.
+Copy this to the host (`scp oc-guardian.config user@host:/etc/oc-guardian/`) or
+stamp it into the host via your config-management system. **No private key in
+the bundle** — the binary fetches signing material on-demand from your browser
+(or kit) over a localhost RPC port.
 
 ## 02 · Pull the signed image
 
 The guardian binary is shipped as a multi-arch (linux/amd64, linux/arm64)
-distroless Docker image. Verify the cosign signature + SLSA-L3 build
-provenance before running:
+distroless Docker image. Verify the cosign signature + SLSA-L3 build provenance
+before running:
 
 ```bash
 docker pull ghcr.io/orangecheck/oc-guardian:latest
@@ -70,8 +72,8 @@ cosign verify ghcr.io/orangecheck/oc-guardian:latest \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com
 ```
 
-If verify fails, abort. The binary signing identity is the
-oc-guardian-kit GitHub Actions runner; anything else is a tampered image.
+If verify fails, abort. The binary signing identity is the oc-guardian-kit
+GitHub Actions runner; anything else is a tampered image.
 
 ## 03 · Run
 
@@ -86,18 +88,17 @@ docker run -d --name oc-guardian --restart unless-stopped \
   ghcr.io/orangecheck/oc-guardian:latest
 ```
 
-The container does **not** hold your private key. When the federation
-schedules a threshold-sign, the binary surfaces the request on its RPC
-port; your portal session (or `oc-guardian sign --serve`) presents the
-signature.
+The container does **not** hold your private key. When the federation schedules
+a threshold-sign, the binary surfaces the request on its RPC port; your portal
+session (or `oc-guardian sign --serve`) presents the signature.
 
 ## 04 · Confirm health
 
 The binary POSTs a signed health envelope to
 `https://me.ochk.io/api/operator/attestation` every 60 seconds. Within ~2
 minutes of first POST, the
-[/me/operator/attestation](https://me.ochk.io/me/operator/attestation)
-tab flips to green for your operator_id.
+[/me/operator/attestation](https://me.ochk.io/me/operator/attestation) tab flips
+to green for your operator_id.
 
 You can also probe locally:
 
@@ -108,8 +109,8 @@ curl -s http://<your-host>:9000/healthz
 
 ## 05 · Upgrades
 
-When a new signed image lands, the portal posts an info-severity incident
-to the federation. To upgrade:
+When a new signed image lands, the portal posts an info-severity incident to the
+federation. To upgrade:
 
 ```bash
 docker pull ghcr.io/orangecheck/oc-guardian:latest
@@ -122,23 +123,23 @@ docker rm oc-guardian
 # re-run step 03 (the new image)
 ```
 
-Brief threshold pause during the swap — federations tolerate up to 30s
-under §6.1 of the charter, but coordinate via the federation channel so
-multiple guardians don't upgrade simultaneously.
+Brief threshold pause during the swap — federations tolerate up to 30s under
+§6.1 of the charter, but coordinate via the federation channel so multiple
+guardians don't upgrade simultaneously.
 
 ## Troubleshooting
 
-| Symptom | Likely cause | Fix |
-| --- | --- | --- |
-| `attestation` tab stays grey | binary cannot reach `me.ochk.io` | check egress firewall |
-| `attestation` tab is red | PCR mismatch with pinned image | run cosign verify; re-pull the canonical tag |
-| federation peers cannot reach you | port 9000/9001 not open | check ingress firewall + DNS |
-| binary refuses to start, "config schema mismatch" | bundle out-of-date | redownload from the portal |
-| signing requests pile up at the binary | portal session not connected | open the portal's runbook tab; reconnect |
+| Symptom                                           | Likely cause                     | Fix                                          |
+| ------------------------------------------------- | -------------------------------- | -------------------------------------------- |
+| `attestation` tab stays grey                      | binary cannot reach `me.ochk.io` | check egress firewall                        |
+| `attestation` tab is red                          | PCR mismatch with pinned image   | run cosign verify; re-pull the canonical tag |
+| federation peers cannot reach you                 | port 9000/9001 not open          | check ingress firewall + DNS                 |
+| binary refuses to start, "config schema mismatch" | bundle out-of-date               | redownload from the portal                   |
+| signing requests pile up at the binary            | portal session not connected     | open the portal's runbook tab; reconnect     |
 
 ## Bypass note
 
-This entire flow has a kit-only equivalent. Replace the portal-issued
-config bundle with `oc-guardian config gen` and the upgrade flow with
+This entire flow has a kit-only equivalent. Replace the portal-issued config
+bundle with `oc-guardian config gen` and the upgrade flow with
 `oc-guardian upgrade`; everything else is identical. See
 [me.ochk.io/operator/bypass](https://me.ochk.io/operator/bypass).

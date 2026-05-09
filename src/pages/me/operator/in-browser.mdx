@@ -9,26 +9,25 @@ export const metadata = {
 **Operator-held keys, browser-resident.**
 
 The portal at [me.ochk.io/me/operator](https://me.ochk.io/me/operator) lets
-operators apply, ratify charters, publish incidents, and request hosted
-hardware without ever installing the kit. The architectural invariant —
-**signatures must be produced on operator-held key material the portal
-cannot reach** — is preserved by holding the key in the *browser's*
-IndexedDB and signing client-side; the portal only sees signed envelopes,
-never the private half.
+operators apply, ratify charters, publish incidents, and request hosted hardware
+without ever installing the kit. The architectural invariant — **signatures must
+be produced on operator-held key material the portal cannot reach** — is
+preserved by holding the key in the _browser's_ IndexedDB and signing
+client-side; the portal only sees signed envelopes, never the private half.
 
-This page is the technical reference for that path. It covers what the
-browser stores, how envelopes round-trip with the Rust kit, what happens
-on key loss, and why federations cannot distinguish a browser-signed
-guardian from a kit-signed one.
+This page is the technical reference for that path. It covers what the browser
+stores, how envelopes round-trip with the Rust kit, what happens on key loss,
+and why federations cannot distinguish a browser-signed guardian from a
+kit-signed one.
 
 ## Storage model
 
-| Element | Location | Persistence |
-| --- | --- | --- |
-| Ed25519 private key (32 bytes, hex) | IndexedDB (`oc-operator-key` DB) | Survives reload, tab close, browser restart. Cleared by browser data wipe / "delete site data". |
-| Ed25519 public key (32 bytes, hex) | IndexedDB · derivable from private | Same. |
-| `operator_id` (`op-<8 bytes hex of sha256(pubkey)>`) | IndexedDB · derivable | Same. Identical derivation in the kit (Rust): the portal and kit always agree on the operator_id for a given key. |
-| 24-word BIP-39 mnemonic | **Shown once at generate time, then dropped from memory.** Operator records it externally. | Recovery requires re-entering the mnemonic. We do not store it. |
+| Element                                              | Location                                                                                   | Persistence                                                                                                       |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Ed25519 private key (32 bytes, hex)                  | IndexedDB (`oc-operator-key` DB)                                                           | Survives reload, tab close, browser restart. Cleared by browser data wipe / "delete site data".                   |
+| Ed25519 public key (32 bytes, hex)                   | IndexedDB · derivable from private                                                         | Same.                                                                                                             |
+| `operator_id` (`op-<8 bytes hex of sha256(pubkey)>`) | IndexedDB · derivable                                                                      | Same. Identical derivation in the kit (Rust): the portal and kit always agree on the operator_id for a given key. |
+| 24-word BIP-39 mnemonic                              | **Shown once at generate time, then dropped from memory.** Operator records it externally. | Recovery requires re-entering the mnemonic. We do not store it.                                                   |
 
 The schema lives in
 [`oc-me-web/src/lib/operator/browser-key.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/operator/browser-key.ts).
@@ -38,20 +37,19 @@ The schema lives in
 Three entry points on the portal:
 
 1. **Generate new** — fresh Ed25519 keypair from `crypto.getRandomValues`,
-   wrapped in a 24-word BIP-39 mnemonic. The mnemonic is shown once;
-   you confirm you've recorded it before the panel closes.
-2. **Restore from mnemonic** — re-derive the same key on a different
-   browser / device by pasting the 24-word phrase. Same words → same
-   key → same `operator_id` → same federation memberships.
+   wrapped in a 24-word BIP-39 mnemonic. The mnemonic is shown once; you confirm
+   you've recorded it before the panel closes.
+2. **Restore from mnemonic** — re-derive the same key on a different browser /
+   device by pasting the 24-word phrase. Same words → same key → same
+   `operator_id` → same federation memberships.
 3. **Import from kit** — paste the 64-hex private key from
-   `oc-guardian export-private-key`. Useful if you provisioned via the
-   kit on a server first and want to drive the portal from the same
-   identity.
+   `oc-guardian export-private-key`. Useful if you provisioned via the kit on a
+   server first and want to drive the portal from the same identity.
 
-Refusing to overwrite is intentional. If a key already exists in this
-browser, generate / restore / import all error rather than clobbering it.
-You delete the existing key first if you really want a fresh start
-(losing any federation memberships bound to the old key in the process).
+Refusing to overwrite is intentional. If a key already exists in this browser,
+generate / restore / import all error rather than clobbering it. You delete the
+existing key first if you really want a fresh start (losing any federation
+memberships bound to the old key in the process).
 
 ## Envelope round-trip
 
@@ -60,11 +58,11 @@ Canonicalization is field-declaration order over the payload struct:
 
 ```ts
 const ordered = {
-    action,            // "program-apply" | "charter-sign" | "alert-publish" | …
-    params,            // action-specific record
-    nonce,             // 48-bit random
-    expires_at,        // unix seconds
-    federation,        // slug | null
+    action, // "program-apply" | "charter-sign" | "alert-publish" | …
+    params, // action-specific record
+    nonce, // 48-bit random
+    expires_at, // unix seconds
+    federation, // slug | null
 };
 const message = new TextEncoder().encode(JSON.stringify(ordered));
 const sig = ed25519.sign(message, privkey);
@@ -73,9 +71,8 @@ const sig = ed25519.sign(message, privkey);
 The Rust kit's `serde_json::to_vec(&ActionPayload)` produces byte-identical
 output. The server-side validator at
 [`oc-me-web/src/lib/operator/envelope.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/operator/envelope.ts)
-re-encodes the payload and verifies the Ed25519 signature against the
-embedded pubkey — same code path for portal-signed and kit-signed
-envelopes.
+re-encodes the payload and verifies the Ed25519 signature against the embedded
+pubkey — same code path for portal-signed and kit-signed envelopes.
 
 Round-trip tests at
 [`src/__tests__/lib/operator-browser-key.test.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/__tests__/lib/operator-browser-key.test.ts)
@@ -85,51 +82,49 @@ verify each envelope type:
 - `charter-sign` (ratify a federation charter)
 - `alert-publish` (publish an operator-signed incident)
 
-A future drift between the kit's Rust impl, the portal's TS validator, and
-the portal's TS signer would fail these tests immediately.
+A future drift between the kit's Rust impl, the portal's TS validator, and the
+portal's TS signer would fail these tests immediately.
 
 ## Key loss + recovery
 
-| Scenario | Recovery path |
-| --- | --- |
-| Cleared site data on this browser | Restore from mnemonic on the same or different browser. |
-| Browser uninstalled | Same — restore from mnemonic. |
-| Mnemonic lost, kit-imported key never written down | Reveal the raw private key from the portal (Reveal Private Key button) and back it up to a password manager. **Do this before you lose the device.** |
-| Both mnemonic and raw key lost | The operator_id is permanently stranded. Generate a new identity (loses any federation memberships) and re-apply. The kit cannot recover this either — there's no escrow. |
+| Scenario                                           | Recovery path                                                                                                                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cleared site data on this browser                  | Restore from mnemonic on the same or different browser.                                                                                                                   |
+| Browser uninstalled                                | Same — restore from mnemonic.                                                                                                                                             |
+| Mnemonic lost, kit-imported key never written down | Reveal the raw private key from the portal (Reveal Private Key button) and back it up to a password manager. **Do this before you lose the device.**                      |
+| Both mnemonic and raw key lost                     | The operator_id is permanently stranded. Generate a new identity (loses any federation memberships) and re-apply. The kit cannot recover this either — there's no escrow. |
 
-The mnemonic is the only durable backup we provide; treat it like seed
-words for a Bitcoin wallet. We deliberately do **not** offer
-"server-stored mnemonic" or "OC can recover" — that would defeat the
-operator-held-keys invariant.
+The mnemonic is the only durable backup we provide; treat it like seed words for
+a Bitcoin wallet. We deliberately do **not** offer "server-stored mnemonic" or
+"OC can recover" — that would defeat the operator-held-keys invariant.
 
 ## Why federations cannot distinguish
 
-A federation peer sees the binary participating in DKG / threshold-sign
-with correctly-signed envelopes. The signing material lives in the
-guardian binary's RPC client (be it your browser tab, a kit running on a
-server, or both proxied through the same operator key). Federation-side,
-the only observable property is that the envelope verifies under your
-pubkey.
+A federation peer sees the binary participating in DKG / threshold-sign with
+correctly-signed envelopes. The signing material lives in the guardian binary's
+RPC client (be it your browser tab, a kit running on a server, or both proxied
+through the same operator key). Federation-side, the only observable property is
+that the envelope verifies under your pubkey.
 
-Practically: you can apply via the portal, run the binary on a server,
-sign incidents from your phone via a different browser, and the federation
-just sees one operator. The constraint is that any browser / kit instance
-holding the private key is fully empowered as that operator — same as
-running multiple Bitcoin nodes with the same xpriv.
+Practically: you can apply via the portal, run the binary on a server, sign
+incidents from your phone via a different browser, and the federation just sees
+one operator. The constraint is that any browser / kit instance holding the
+private key is fully empowered as that operator — same as running multiple
+Bitcoin nodes with the same xpriv.
 
 ## Bypass parity
 
 The kit-only flow at [/operator/bypass](https://me.ochk.io/operator/bypass)
 covers every action without using the portal:
 
-| Action | Kit command | Portal equivalent |
-| --- | --- | --- |
-| generate identity | `oc-guardian init --hsm os-keychain` | "generate new" on /me/operator |
-| sign application | `oc-guardian apply prepare` | application form on /me/operator |
-| ratify charter | `oc-guardian charter sign` | "ratify charter" on /me/operator/federations |
-| publish incident | `oc-guardian incident publish` | compose form on /me/operator/incidents |
-| run guardian | `oc-guardian run` | docker recipe in runbook + hosted-hardware option |
+| Action            | Kit command                          | Portal equivalent                                 |
+| ----------------- | ------------------------------------ | ------------------------------------------------- |
+| generate identity | `oc-guardian init --hsm os-keychain` | "generate new" on /me/operator                    |
+| sign application  | `oc-guardian apply prepare`          | application form on /me/operator                  |
+| ratify charter    | `oc-guardian charter sign`           | "ratify charter" on /me/operator/federations      |
+| publish incident  | `oc-guardian incident publish`       | compose form on /me/operator/incidents            |
+| run guardian      | `oc-guardian run`                    | docker recipe in runbook + hosted-hardware option |
 
 Both paths produce byte-identical envelopes, indexed in the same KV store,
-visible on the same public timelines. Pick whichever fits your trust
-posture; mix them freely.
+visible on the same public timelines. Pick whichever fits your trust posture;
+mix them freely.

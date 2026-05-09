@@ -108,12 +108,12 @@ view.
 
 ## Errors and edge cases
 
-| Error                                               | Meaning                                                                               | Fix                                                                                                         |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Error                                               | Meaning                                                                               | Fix                                                                                                   |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                        | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
-| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`.                                             |
-| `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                         | Honor `Retry-After`; back off exponentially.                                                                |
-| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Run domain verification at `me.ochk.io/me/projects/<key>` (DNS TXT or meta tag), then retry.                |
+| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`.                                       |
+| `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                         | Honor `Retry-After`; back off exponentially.                                                          |
+| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Run domain verification at `me.ochk.io/me/projects/<key>` (DNS TXT or meta tag), then retry.          |
 
 ## Self-host considerations
 

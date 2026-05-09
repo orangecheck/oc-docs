@@ -6,9 +6,10 @@ export const metadata = {
 
 # `@orangecheck/me-client` · SDK reference
 
-> **Full reference:** [docs.ochk.io/sdk/me-client](/sdk/me-client) — auto-generated from the TypeScript source on every release.
-> The narrative below is the curated overview; the SDK reference page is the source of truth for every export, type, and signature.
-
+> **Full reference:** [docs.ochk.io/sdk/me-client](/sdk/me-client) —
+> auto-generated from the TypeScript source on every release. The narrative
+> below is the curated overview; the SDK reference page is the source of truth
+> for every export, type, and signature.
 
 **v0.7.0 · MIT.**
 
@@ -192,13 +193,14 @@ The user is prompted by me.ochk.io to consent before this resolves.
 Pre-flight your config against the same rules the server enforces — no network
 call, no round-trip. Per-project read/write is owner-gated and lives at
 `/api/me/projects/[id]` (or
-[me.ochk.io/me/projects/`<key>`](https://me.ochk.io/me/projects) in the UI);
-the SDK intentionally doesn't include a global `oc.config.update()`
-because configs are per-project, not per-account.
+[me.ochk.io/me/projects/`<key>`](https://me.ochk.io/me/projects) in the UI); the
+SDK intentionally doesn't include a global `oc.config.update()` because configs
+are per-project, not per-account.
 
 ```ts
-import { oc } from '@orangecheck/me-client';
 import type { IntegratorPriceConfig } from '@orangecheck/me-client';
+
+import { oc } from '@orangecheck/me-client';
 
 const cfg: IntegratorPriceConfig = {
     /* … */
@@ -207,8 +209,8 @@ const result = oc.config.validate(cfg);
 if (!result.ok) console.error(result.errors);
 ```
 
-| Function                  | Signature                                     | Note            |
-| ------------------------- | --------------------------------------------- | --------------- |
+| Function                  | Signature                                     | Note             |
+| ------------------------- | --------------------------------------------- | ---------------- |
 | `oc.config.validate(cfg)` | `(IntegratorPriceConfig) => ValidationResult` | No network call. |
 
 The same function is also exported as the top-level `validateIntegratorConfig`.
@@ -233,10 +235,10 @@ passed. Stale-on-error: a transient JWKS outage returns the previous cached
 entry rather than rejecting every webhook.
 
 > Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
-> [agent.ochk.io](https://agent.ochk.io) / [docs.ochk.io/agent](/agent), not
-> on me.ochk.io. me-client doesn't ship a delegation namespace; reach for
-> `@orangecheck/agent-client` if you need to issue or revoke agent
-> delegations from your integration.
+> [agent.ochk.io](https://agent.ochk.io) / [docs.ochk.io/agent](/agent), not on
+> me.ochk.io. me-client doesn't ship a delegation namespace; reach for
+> `@orangecheck/agent-client` if you need to issue or revoke agent delegations
+> from your integration.
 
 ## `oc.event.fire` · arbitrary billable subtypes
 
@@ -270,19 +272,18 @@ const verify = await oc.event.fire({
 ## `oc.scope.*` · privacy-preserving scope grants
 
 OC's privacy default: signing into your site reveals only an anonymous
-**per-integrator subject** (`sub`). The user's master identity (BIP-322
-address or email) stays private; you cannot correlate users across
-sites. To read additional fields (their email, attest tier, bitcoin
-address, display name) you must explicitly request a scope and the
-user must explicitly consent.
+**per-integrator subject** (`sub`). The user's master identity (BIP-322 address
+or email) stays private; you cannot correlate users across sites. To read
+additional fields (their email, attest tier, bitcoin address, display name) you
+must explicitly request a scope and the user must explicitly consent.
 
-Full design at [PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).
+Full design at
+[PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).
 
 ### `oc.scope.granted`
 
-Read what scopes the currently-signed-in user has already granted to
-your project. Returns the per-integrator `sub` plus any granted
-field values.
+Read what scopes the currently-signed-in user has already granted to your
+project. Returns the per-integrator `sub` plus any granted field values.
 
 ```ts
 import { oc } from '@orangecheck/me-client';
@@ -297,15 +298,15 @@ console.log(sub); // "sub_3K7xQ2mN1pYwB8tRvE…"
 
 // `scopes` is a partial map · only fields whose scope the user has
 // granted are present.
-console.log(scopes.email);       // "user@example.com" · or undefined
+console.log(scopes.email); // "user@example.com" · or undefined
 console.log(scopes.attest_tier); // "bonded" · or undefined
 ```
 
 ### `oc.scope.request`
 
-Redirect the user to me.ochk.io's consent prompt. After they decide,
-browser returns to `return_to`. Subsequent `oc.scope.granted()` calls
-reflect their decisions.
+Redirect the user to me.ochk.io's consent prompt. After they decide, browser
+returns to `return_to`. Subsequent `oc.scope.granted()` calls reflect their
+decisions.
 
 ```ts
 oc.scope.request(['email', 'attest_tier'], {
@@ -315,41 +316,41 @@ oc.scope.request(['email', 'attest_tier'], {
 // ↑ this navigates · the line after never runs
 ```
 
-The user picks **grant once** (1h expiry), **grant always** (until
-revoked), or **deny** per scope. Every grant is revocable any time
-on `me.ochk.io/me/identity`.
+The user picks **grant once** (1h expiry), **grant always** (until revoked), or
+**deny** per scope. Every grant is revocable any time on
+`me.ochk.io/me/identity`.
 
 ### Valid scopes
 
-| Scope             | Reveals                                                                 | Use case                                                       |
-| ----------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)                          | On-chain holdings verification, payment-channel co-signing     |
-| `email`           | Email address (email-OTP users only)                                    | Transactional email · receipts, password reset                 |
-| `attest_tier`     | Current `AttestTier` (`anonymous` / `bonded` / `kyc_light` / `kyc_strong`) | Sybil-resistance gating, regulated KYC flows                   |
-| `display_name`    | A user-chosen handle (separate from real identity)                      | Forum / social integrations where some name is needed          |
+| Scope             | Reveals                                                                    | Use case                                                   |
+| ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)                             | On-chain holdings verification, payment-channel co-signing |
+| `email`           | Email address (email-OTP users only)                                       | Transactional email · receipts, password reset             |
+| `attest_tier`     | Current `AttestTier` (`anonymous` / `bonded` / `kyc_light` / `kyc_strong`) | Sybil-resistance gating, regulated KYC flows               |
+| `display_name`    | A user-chosen handle (separate from real identity)                         | Forum / social integrations where some name is needed      |
 
 ### Migration from `user_address` (≤ 0.9.0)
 
 Pre-0.10.0 webhook payloads delivered the user's master address as
 `user_address`. From 0.10.0 onward, payloads use `sub` (per-integrator)
-+ optional `scopes` (granted fields). To migrate:
+
+- optional `scopes` (granted fields). To migrate:
 
 1. Update SDK to `^0.10.0`.
-2. Switch from `event.user_address` → `event.sub` for user records in
-   your database.
+2. Switch from `event.user_address` → `event.sub` for user records in your
+   database.
 3. If you actually need the user's email or address, call
    `oc.scope.request(['email'])` and read `event.scopes.email` /
    `oc.scope.granted().scopes.email`.
 
-The `user_address` field is retired from outgoing payloads in the
-matching me.ochk.io deploy. Existing rows in your database keyed on
-old `user_address` values stay valid; just expect new events to use
-`sub`.
+The `user_address` field is retired from outgoing payloads in the matching
+me.ochk.io deploy. Existing rows in your database keyed on old `user_address`
+values stay valid; just expect new events to use `sub`.
 
-| Function                               | Signature                                                              | Note                                                          |
-| -------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `oc.scope.granted(opts)`               | `(GrantedOptions) => Promise<GrantedResult>`                           | Read currently-granted scopes for the signed-in user.         |
-| `oc.scope.request(scopes, opts)`       | `(Scope[], RequestOptions) => never`                                   | Redirect to consent prompt · throws after navigation.         |
+| Function                         | Signature                                    | Note                                                  |
+| -------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| `oc.scope.granted(opts)`         | `(GrantedOptions) => Promise<GrantedResult>` | Read currently-granted scopes for the signed-in user. |
+| `oc.scope.request(scopes, opts)` | `(Scope[], RequestOptions) => never`         | Redirect to consent prompt · throws after navigation. |
 
 ## Types
 
@@ -371,14 +372,14 @@ directly from `@orangecheck/auth-client` for stable typed access.
 
 ## Constants and helpers
 
-| Export                                   | Signature                                           |
-| ---------------------------------------- | --------------------------------------------------- |
-| `PLATFORM_FEE_POLICY`                    | `{ pct: 0.2; min_floor_sats: 1; ratified: string }` |
-| `MIN_INTEGRATOR_PRICE_SATS`              | `5`                                                 |
-| `computeFees(cfg, payment_amount_sats?)` | `(IntegratorEventConfig, number?) => ComputedFees`  |
-| `validateIntegratorConfig(cfg)`          | `(IntegratorPriceConfig) => ValidationResult`       |
-| `setBearerToken(token)`                  | `(string \| null) => void` · cross-domain auth      |
-| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`             |
+| Export                                    | Signature                                           |
+| ----------------------------------------- | --------------------------------------------------- |
+| `PLATFORM_FEE_POLICY`                     | `{ pct: 0.2; min_floor_sats: 1; ratified: string }` |
+| `MIN_INTEGRATOR_PRICE_SATS`               | `5`                                                 |
+| `computeFees(cfg, payment_amount_sats?)`  | `(IntegratorEventConfig, number?) => ComputedFees`  |
+| `validateIntegratorConfig(cfg)`           | `(IntegratorPriceConfig) => ValidationResult`       |
+| `setBearerToken(token)`                   | `(string \| null) => void` · cross-domain auth      |
+| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`               |
 
 ## Where it lives
 

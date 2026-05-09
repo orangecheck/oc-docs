@@ -25,7 +25,8 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  # Node 22 — chevrotain (transitive dep) requires >=22
+                  node-version: '22'
                   cache: 'yarn'
 
             - name: Install
@@ -49,7 +50,8 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  # Node 22 — chevrotain (transitive dep) requires >=22
+                  node-version: '22'
                   cache: 'yarn'
 
             - name: Install

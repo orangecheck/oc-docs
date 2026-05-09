@@ -1,0 +1,78 @@
+export const metadata = {
+    title: 'SDK reference',
+    description:
+        "Auto-generated TypeScript API reference for every @orangecheck/* package. Source-of-truth for every export, type, and signature; regenerated from the TypeScript source on every release.",
+};
+
+# SDK reference — `@orangecheck/*`
+
+This section is the **auto-generated** TypeScript API reference for every package published from [`oc-packages`](https://github.com/orangecheck/oc-packages). Every export, every type, every signature, every JSDoc paragraph — pulled from the TypeScript source via [TypeDoc](https://typedoc.org/) on every release.
+
+The discipline:
+
+- **TSDoc comments in source code are the source of truth.** Anyone who wants to update a function's documentation edits the `.ts` file. The page here updates itself on the next release.
+- **Per-package READMEs are short.** Tagline + install + 30-second example + a link back here. Detailed API surface lives only here.
+- **Hand-written narrative lives elsewhere.** Quickstart pages, conceptual docs, "why this protocol" prose stays under each protocol's section ([OC Attest](/attest), [OC Pledge](/pledge), [OC Vote](/vote), etc.). This section is reference, not narrative.
+- **CI gates drift.** PRs in `oc-packages` that change the public TypeScript surface get a drift-check artifact uploaded; release tags auto-PR the regenerated tree to `oc-docs` (Phase 3.5, gated on `OC_DOCS_BOT_TOKEN`).
+
+## Currently published
+
+27 TypeScript packages have full API reference here. Use the sidebar to drill into a specific package, or browse the picker at [`/sdks`](/sdks) for the curated "which package to use for which job" overview.
+
+| Package | Reference |
+|---|---|
+| `@orangecheck/sdk` | [/sdk/sdk/README](/sdk/sdk/README) |
+| `@orangecheck/auth-core` | [/sdk/auth-core/README](/sdk/auth-core/README) |
+| `@orangecheck/auth-client` | [/sdk/auth-client/README](/sdk/auth-client/README) |
+| `@orangecheck/nostr-core` | [/sdk/nostr-core/README](/sdk/nostr-core/README) |
+| `@orangecheck/agent-core` | [/sdk/agent-core/README](/sdk/agent-core/README) |
+| `@orangecheck/agent-signer` | [/sdk/agent-signer/README](/sdk/agent-signer/README) |
+| `@orangecheck/agent-mcp` | [/sdk/agent-mcp/README](/sdk/agent-mcp/README) |
+| `@orangecheck/agent-anthropic` | [/sdk/agent-anthropic/README](/sdk/agent-anthropic/README) |
+| `@orangecheck/agent-openai` | [/sdk/agent-openai/README](/sdk/agent-openai/README) |
+| `@orangecheck/agent-langgraph` | [/sdk/agent-langgraph/README](/sdk/agent-langgraph/README) |
+| `@orangecheck/agent-vercel` | [/sdk/agent-vercel/README](/sdk/agent-vercel/README) |
+| `@orangecheck/lock-core` | [/sdk/lock-core/README](/sdk/lock-core/README) |
+| `@orangecheck/lock-crypto` | [/sdk/lock-crypto/README](/sdk/lock-crypto/README) |
+| `@orangecheck/lock-device` | [/sdk/lock-device/README](/sdk/lock-device/README) |
+| `@orangecheck/stamp-core` | [/sdk/stamp-core/README](/sdk/stamp-core/README) |
+| `@orangecheck/stamp-ots` | [/sdk/stamp-ots/README](/sdk/stamp-ots/README) |
+| `@orangecheck/vote-core` | [/sdk/vote-core/README](/sdk/vote-core/README) |
+| `@orangecheck/vote-react` | [/sdk/vote-react/README](/sdk/vote-react/README) |
+| `@orangecheck/pledge-core` | [/sdk/pledge-core/README](/sdk/pledge-core/README) |
+| `@orangecheck/me-client` | [/sdk/me-client/README](/sdk/me-client/README) |
+| `@orangecheck/gate` | [/sdk/gate/README](/sdk/gate/README) |
+| `@orangecheck/airdrop-gate` | [/sdk/airdrop-gate/README](/sdk/airdrop-gate/README) |
+| `@orangecheck/relay-filter` | [/sdk/relay-filter/README](/sdk/relay-filter/README) |
+| `@orangecheck/wallet-adapter` | [/sdk/wallet-adapter/README](/sdk/wallet-adapter/README) |
+| `@orangecheck/webhook-verify` | [/sdk/webhook-verify/README](/sdk/webhook-verify/README) |
+| `@orangecheck/react` | [/sdk/react/README](/sdk/react/README) |
+| `@orangecheck/ui` | [/sdk/ui/README](/sdk/ui/README) |
+
+CLIs (`@orangecheck/cli`, `@orangecheck/agent-cli`, `@orangecheck/stamp-cli`, `@orangecheck/vote-cli`) and the Python SDK (`orangecheck` on PyPI) are documented via their READMEs and the curated overviews under [`/sdks/*`](/sdks).
+
+## How a generated page is laid out
+
+Every page derives from a `.ts` source file. Each section contains:
+
+- **Function pages** show signature, parameters table, return type, type parameters, examples from the JSDoc.
+- **Interface pages** show every property, its type, its JSDoc description, and any inherited members.
+- **Type alias pages** show the resolved type plus JSDoc.
+- **Variable pages** show the constant's type and value (when it's a literal).
+- **Class pages** show the constructor, every method (with own page), and inherited members.
+
+All of this comes from the TypeScript source file at the GitHub permalink shown in the page's "Defined in" line. Permalinks point at `blob/main/...` so the link continues to resolve when source moves around.
+
+## Local generation
+
+Clone [`oc-packages`](https://github.com/orangecheck/oc-packages) and [`oc-docs`](https://github.com/orangecheck/oc-docs) as siblings, then:
+
+```bash
+cd oc-packages
+yarn install
+yarn docs:gen <pkg>     # regenerate one package
+yarn docs:gen:all       # regenerate every package
+yarn docs:check         # exit 1 if regenerated docs differ from committed oc-docs
+```
+
+The generator writes into `../oc-docs/src/pages/sdk/<pkg>/`.

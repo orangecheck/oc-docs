@@ -65,11 +65,52 @@ The shape varies slightly by event family. The shared fields are `id`,
 }
 ```
 
+**Outcome envelopes** (`pledge.outcome`):
+
+```json
+{
+    "id": "0123…64-hex outcome envelope id",
+    "project_id": "proj_…",
+    "kind": "pledge-outcome",
+    "pledge_id": "0123…64-hex parent pledge id",
+    "outcome": "kept",
+    "resolved_by": "deterministic",
+    "envelope": {
+        /* full canonical OutcomeEnvelope JSON */
+    }
+}
+```
+
+`outcome` is one of `kept` / `broken` / `expired_unresolved` / `disputed`.
+`resolved_by` is either the literal string `"deterministic"` (chain_state /
+nostr_event_exists / stamp_published / http_get_hash / dns_record /
+vote_resolves) or the BIP-322 address of the counterparty (counterparty_signs).
+Multiple outcomes can target the same `pledge_id` — the parent pledge
+transitions to `disputed` when the outcomes contradict.
+
+**Abandonment envelopes** (`pledge.abandoned`):
+
+```json
+{
+    "id": "0123…64-hex abandonment envelope id",
+    "project_id": "proj_…",
+    "kind": "pledge-abandonment",
+    "pledge_id": "0123…64-hex parent pledge id",
+    "envelope": {
+        /* full canonical AbandonmentEnvelope JSON */
+    }
+}
+```
+
+Per SPEC §5.2, only the original swearer can sign an abandonment (no agent
+abandonments in v0.1) and the action is irreversible — a second abandonment for
+the same pledge_id is silently deduplicated.
+
 `envelope` is in every case the byte-identical canonical envelope you'd get from
 `/api/audit/export` or from a Nostr relay subscribed to the project's kind.
 Verify offline with [`@orangecheck/agent-core`](/sdk/agent-core) (agent
-envelopes) or [`@orangecheck/pledge-core`](/sdk/pledge-core) (pledges) — no
-fleet-side trust.
+envelopes) or [`@orangecheck/pledge-core`](/sdk/pledge-core) (pledges, outcomes,
+abandonments) — no fleet-side trust.
 
 ## Headers
 

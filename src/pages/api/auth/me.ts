@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ok: true,
         account: {
             id: session.sub,
-            btc_address: session.addr,
+            did_oc: session.did_oc,
             display_name: session.name ?? null,
             nostr_npub: session.npub ?? null,
         },

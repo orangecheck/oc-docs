@@ -570,30 +570,6 @@ export const DOCS_NAV: DocsSection[] = [
             },
         ],
     },
-    {
-        slug: 'company',
-        label: 'Company',
-        blurb: 'Cross-product commitments + governance.',
-        items: [
-            {
-                href: '/charter',
-                label: 'Charter',
-                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, fleet, every protocol sibling).',
-            },
-        ],
-    },
-    {
-        slug: 'infrastructure',
-        label: 'Infrastructure',
-        blurb: 'The shared services every protocol runs on.',
-        items: [
-            {
-                href: '/infrastructure/relay',
-                label: 'relay.ochk.io',
-                blurb: "OC's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy.",
-            },
-        ],
-    },
     // The /sdk group: curated overview + per-package TypeDoc reference.
     // The per-@orangecheck-package items below are auto-generated from
     // oc-packages/scripts/gen-docs.mjs (TypeDoc → MDX). The Python and
@@ -769,8 +745,13 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'reference',
         label: 'Reference',
-        blurb: 'Glossary, FAQ, error codes, everything else.',
+        blurb: 'Charter, glossary, FAQ, error codes, infrastructure — the cross-cutting reference cluster.',
         items: [
+            {
+                href: '/charter',
+                label: 'Charter',
+                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, fleet, every protocol sibling).',
+            },
             {
                 href: '/reference/faq',
                 label: 'FAQ',
@@ -785,6 +766,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/reference/error-codes',
                 label: 'Status & error codes',
                 blurb: 'Every reason string `/api/check`, `/api/verify`, and the SDKs can return.',
+            },
+            {
+                href: '/infrastructure/relay',
+                label: 'relay.ochk.io',
+                blurb: "OC's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy.",
             },
         ],
     },

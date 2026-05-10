@@ -13,14 +13,20 @@ export const metadata = {
 
 ```ts
 const config: {
+  archetypes: readonly ArchetypeTemplate[];
+  fromTemplate: (useCase: IntegratorArchetype, identity: ProjectIdentity) => IntegratorPriceConfig;
+  getArchetype: (id: IntegratorArchetype) => ArchetypeTemplate;
   validate: (cfg: IntegratorPriceConfig) => ValidationResult;
 };
 ```
 
-Defined in: [me-client/src/config.ts:25](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L25)
+Defined in: [me-client/src/config.ts:49](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L49)
 
 ## Type Declaration
 
-| Name | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-validate">&lt;/a> `validate()` | (`cfg`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx)) => [`ValidationResult`](../interfaces/ValidationResult.mdx) | [me-client/src/config.ts:25](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L25) |
+| Name | Type | Default value | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-archetypes">&lt;/a> `archetypes` | readonly [`ArchetypeTemplate`](../interfaces/ArchetypeTemplate.mdx)[] | `ARCHETYPE_TEMPLATES` | All available archetypes · render in a picker. | [me-client/src/config.ts:56](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L56) |
+| &lt;a id="property-fromtemplate">&lt;/a> `fromTemplate()` | (`useCase`: [`IntegratorArchetype`](../type-aliases/IntegratorArchetype.mdx), `identity`: `ProjectIdentity`) => [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx) | - | Build a complete IntegratorPriceConfig from an archetype id + the project's identity fields. Every subtype gets an entry — the archetype's listed subtypes get the template's pricing; everything else gets `enabled: false` with conservative defaults so the config is type-complete and the integrator can flip-on later subtypes without re-deriving prices. Throws synchronously if `useCase` isn't a known archetype id. | [me-client/src/config.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L51) |
+| &lt;a id="property-getarchetype">&lt;/a> `getArchetype()` | (`id`: [`IntegratorArchetype`](../type-aliases/IntegratorArchetype.mdx)) => [`ArchetypeTemplate`](../interfaces/ArchetypeTemplate.mdx) | `getArchetypeTemplate` | Look up a template's metadata · for rendering "you picked X" state and offering one-click swaps in your own UI. Look up a template's metadata · used by config-editor UIs to render "you're on the X template · here's what it enables" copy. | [me-client/src/config.ts:54](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L54) |
+| &lt;a id="property-validate">&lt;/a> `validate()` | (`cfg`: [`IntegratorPriceConfig`](../interfaces/IntegratorPriceConfig.mdx)) => [`ValidationResult`](../interfaces/ValidationResult.mdx) | - | - | [me-client/src/config.ts:50](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/config.ts#L50) |

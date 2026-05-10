@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: parseTrustAttestationCount()",
+    description: "Auto-generated API reference for Function: parseTrustAttestationCount(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / parseTrustAttestationCount
+
+# Function: parseTrustAttestationCount()
+
+```ts
+function parseTrustAttestationCount(value: string): 
+  | TrustAttestationCount
+  | null;
+```
+
+Defined in: [me-client/src/scope.ts:84](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L84)
+
+Decode the `trust_attestation_count` scope's wire-format string into
+ a typed quad. Returns null if the input is malformed (defensive ·
+ the resolver always emits well-formed strings, but third-party
+ consumers may hand us anything).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `string` |
+
+## Returns
+
+  \| [`TrustAttestationCount`](../interfaces/TrustAttestationCount.mdx)
+  \| `null`

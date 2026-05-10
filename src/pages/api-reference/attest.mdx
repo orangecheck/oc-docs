@@ -52,6 +52,15 @@ behavior 1:1 — same conformance vectors run on both. A canonical message built
 in TS and a canonical message rebuilt server-side for the same inputs are
 byte-identical. If you observe drift, it's a bug.
 
+## Live spec — embedded
+
+import { EmbeddedOpenAPI } from '@/components/docs/EmbeddedOpenAPI';
+
+<EmbeddedOpenAPI
+    url="https://attest.ochk.io/api/openapi"
+    caption="attest.ochk.io · OC Attest"
+/>
+
 ## See also
 
 - Hand-written narrative: [OC Attest](/attest).

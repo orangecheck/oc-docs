@@ -84,6 +84,15 @@ signed by the operator's wallet. Replay order: **delegations → revocations →
 actions → pledges → outcomes → abandonments**. Counts cached in `audit_bundles`
 for the dashboard's bundle list.
 
+## Live spec — embedded
+
+import { EmbeddedOpenAPI } from '@/components/docs/EmbeddedOpenAPI';
+
+<EmbeddedOpenAPI
+    url="https://fleet.ochk.io/api/openapi"
+    caption="fleet.ochk.io · Fleet"
+/>
+
 ## See also
 
 - Operator-facing narrative: [Fleet](/fleet) +

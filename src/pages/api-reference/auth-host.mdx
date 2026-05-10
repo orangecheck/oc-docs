@@ -65,6 +65,15 @@ var at deploy time.
 Both produce the **same** session cookie shape; consumer code doesn't have to
 branch on which path the user took.
 
+## Live spec — embedded
+
+import { EmbeddedOpenAPI } from '@/components/docs/EmbeddedOpenAPI';
+
+<EmbeddedOpenAPI
+    url="https://ochk.io/api/openapi"
+    caption="ochk.io · auth host"
+/>
+
 ## See also
 
 - The full curated SDK map: [SDKs](/sdk).

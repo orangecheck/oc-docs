@@ -1,0 +1,26 @@
+export const metadata = {
+    title: "Interface: EventSubtypeMetadata",
+    description: "Auto-generated API reference for Interface: EventSubtypeMetadata. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / EventSubtypeMetadata
+
+# Interface: EventSubtypeMetadata
+
+Defined in: [me-client/src/subtypes.ts:29](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L29)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-class">&lt;/a> `class` | [`EventClass`](../type-aliases/EventClass.mdx) | - | [me-client/src/subtypes.ts:31](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L31) |
+| &lt;a id="property-common_use_cases">&lt;/a> `common_use_cases` | readonly `string`[] | Common use cases · lets integrators search their own product for matching flows. Two-three terms each, lowercase. | [me-client/src/subtypes.ts:43](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L43) |
+| &lt;a id="property-example">&lt;/a> `example` | `string` | A concrete example from a typical SaaS · helps integrators map an unfamiliar subtype name to a real flow they recognize. | [me-client/src/subtypes.ts:40](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L40) |
+| &lt;a id="property-fires_when">&lt;/a> `fires_when` | `string` | When this fires · imperative-mood plain English. The integrator reads this to know which event in their codebase should call `oc.event.fire()` with this subtype. | [me-client/src/subtypes.ts:37](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L37) |
+| &lt;a id="property-id">&lt;/a> `id` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | - | [me-client/src/subtypes.ts:30](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L30) |
+| &lt;a id="property-label">&lt;/a> `label` | `string` | Short label · matches SUBTYPE_LABELS on the server. | [me-client/src/subtypes.ts:33](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L33) |
+| &lt;a id="property-typical_price_hint">&lt;/a> `typical_price_hint` | `string` | What an integrator typically pays for this subtype, anchored at $1 ≈ 1052 sats. Returns null for percent-of-amount subtypes where the price scales with the underlying transaction. | [me-client/src/subtypes.ts:47](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/subtypes.ts#L47) |

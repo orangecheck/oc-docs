@@ -142,7 +142,7 @@ function Header() {
     if (status !== 'authenticated') return <a href={signInUrl}>sign in</a>;
     return (
         <div>
-            signed in as {account.address.slice(0, 8)}…
+            signed in as {account.didOc.slice(0, 8)}…
             <button onClick={() => signOut()}>sign out</button>
         </div>
     );

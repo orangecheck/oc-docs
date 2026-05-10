@@ -1,71 +1,138 @@
 export const metadata = {
-    title: 'SDK reference',
+    title: 'SDKs',
     description:
-        "Auto-generated TypeScript API reference for every @orangecheck/* package. Source-of-truth for every export, type, and signature; regenerated from the TypeScript source on every release.",
+        'Every published package in the OrangeCheck ecosystem — TypeScript, Python, CLIs — with which protocol it serves, which stack to pick, and a link to the full reference.',
 };
 
-# SDK reference — `@orangecheck/*`
+# SDKs
 
-This section is the **auto-generated** TypeScript API reference for every package published from [`oc-packages`](https://github.com/orangecheck/oc-packages). Every export, every type, every signature, every JSDoc paragraph — pulled from the TypeScript source via [TypeDoc](https://typedoc.org/) on every release.
+Every published package in the OrangeCheck ecosystem, with what it does, which
+protocol it serves, and a link to the full API reference. All packages are
+MIT-licensed and live in the
+[`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo (TypeScript)
+or [`oc-py`](https://github.com/orangecheck/oc-py) (Python).
 
-The discipline:
+> **The detailed per-export, per-type, per-signature reference under each
+> TypeScript package is auto-generated from the source via
+> [TypeDoc](https://typedoc.org/) on every release.** TSDoc comments in the
+> `.ts` source are the source of truth; per-package READMEs are short
+> taglines + install + a 30-second example. Hand-written narrative
+> (quickstart, "why this protocol") lives under each protocol's section
+> ([OC Attest](/attest), [OC Pledge](/pledge), etc.).
 
-- **TSDoc comments in source code are the source of truth.** Anyone who wants to update a function's documentation edits the `.ts` file. The page here updates itself on the next release.
-- **Per-package READMEs are short.** Tagline + install + 30-second example + a link back here. Detailed API surface lives only here.
-- **Hand-written narrative lives elsewhere.** Quickstart pages, conceptual docs, "why this protocol" prose stays under each protocol's section ([OC Attest](/attest), [OC Pledge](/pledge), [OC Vote](/vote), etc.). This section is reference, not narrative.
-- **CI gates drift.** PRs in `oc-packages` that change the public TypeScript surface get a drift-check artifact uploaded; release tags auto-PR the regenerated tree to `oc-docs` (Phase 3.5, gated on `OC_DOCS_BOT_TOKEN`).
+## Which to install
 
-## Currently published
+Match the job to the package; click through to the reference.
 
-27 TypeScript packages have full API reference here. Use the sidebar to drill into a specific package, or browse the picker at [`/sdks`](/sdks) for the curated "which package to use for which job" overview.
+| You're building…                   | Install                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------- |
+| Gate an HTTP route                 | [`@orangecheck/gate`](/sdk/gate/README)                                |
+| Sign-in-with-Bitcoin flow          | [`@orangecheck/sdk`](/sdk/sdk/README) · `issueChallenge` / `verifyChallenge` |
+| React app rendering badges         | [`@orangecheck/react`](/sdk/react/README)                              |
+| Browser wallet integration         | [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README)            |
+| Server-side TypeScript verifier    | [`@orangecheck/sdk`](/sdk/sdk/README)                                  |
+| Python / Django / FastAPI service  | [`orangecheck` (PyPI)](/sdk/python)                                    |
+| Scripts + one-shot checks          | [`@orangecheck/cli`](/sdk/cli)                                         |
+| Nostr relay filter                 | [`@orangecheck/relay-filter`](/sdk/relay-filter/README)                |
+| Airdrop list filter                | [`@orangecheck/airdrop-gate`](/sdk/airdrop-gate/README)                |
+| E2E-encrypted envelopes            | [`@orangecheck/lock-core`](/sdk/lock-core/README) + [`lock-device`](/sdk/lock-device/README) |
+| Timestamped signed statements      | [`@orangecheck/stamp-core`](/sdk/stamp-core/README) + [`stamp-ots`](/sdk/stamp-ots/README) |
+| Stake-weighted poll tally          | [`@orangecheck/vote-core`](/sdk/vote-core/README)                      |
+| Scoped, bonded delegated signing   | [`@orangecheck/agent-core`](/sdk/agent-core/README)                    |
+| Bonded commitments / future claims | [`@orangecheck/pledge-core`](/sdk/pledge-core/README)                  |
+| Verify HMAC webhook deliveries     | [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)            |
 
-| Package | Reference |
-|---|---|
-| `@orangecheck/sdk` | [/sdk/sdk/README](/sdk/sdk/README) |
-| `@orangecheck/auth-core` | [/sdk/auth-core/README](/sdk/auth-core/README) |
-| `@orangecheck/auth-client` | [/sdk/auth-client/README](/sdk/auth-client/README) |
-| `@orangecheck/nostr-core` | [/sdk/nostr-core/README](/sdk/nostr-core/README) |
-| `@orangecheck/agent-core` | [/sdk/agent-core/README](/sdk/agent-core/README) |
-| `@orangecheck/agent-signer` | [/sdk/agent-signer/README](/sdk/agent-signer/README) |
-| `@orangecheck/agent-mcp` | [/sdk/agent-mcp/README](/sdk/agent-mcp/README) |
-| `@orangecheck/agent-anthropic` | [/sdk/agent-anthropic/README](/sdk/agent-anthropic/README) |
-| `@orangecheck/agent-openai` | [/sdk/agent-openai/README](/sdk/agent-openai/README) |
-| `@orangecheck/agent-langgraph` | [/sdk/agent-langgraph/README](/sdk/agent-langgraph/README) |
-| `@orangecheck/agent-vercel` | [/sdk/agent-vercel/README](/sdk/agent-vercel/README) |
-| `@orangecheck/lock-core` | [/sdk/lock-core/README](/sdk/lock-core/README) |
-| `@orangecheck/lock-crypto` | [/sdk/lock-crypto/README](/sdk/lock-crypto/README) |
-| `@orangecheck/lock-device` | [/sdk/lock-device/README](/sdk/lock-device/README) |
-| `@orangecheck/stamp-core` | [/sdk/stamp-core/README](/sdk/stamp-core/README) |
-| `@orangecheck/stamp-ots` | [/sdk/stamp-ots/README](/sdk/stamp-ots/README) |
-| `@orangecheck/vote-core` | [/sdk/vote-core/README](/sdk/vote-core/README) |
-| `@orangecheck/vote-react` | [/sdk/vote-react/README](/sdk/vote-react/README) |
-| `@orangecheck/pledge-core` | [/sdk/pledge-core/README](/sdk/pledge-core/README) |
-| `@orangecheck/me-client` | [/sdk/me-client/README](/sdk/me-client/README) |
-| `@orangecheck/gate` | [/sdk/gate/README](/sdk/gate/README) |
-| `@orangecheck/airdrop-gate` | [/sdk/airdrop-gate/README](/sdk/airdrop-gate/README) |
-| `@orangecheck/relay-filter` | [/sdk/relay-filter/README](/sdk/relay-filter/README) |
-| `@orangecheck/wallet-adapter` | [/sdk/wallet-adapter/README](/sdk/wallet-adapter/README) |
-| `@orangecheck/webhook-verify` | [/sdk/webhook-verify/README](/sdk/webhook-verify/README) |
-| `@orangecheck/react` | [/sdk/react/README](/sdk/react/README) |
-| `@orangecheck/ui` | [/sdk/ui/README](/sdk/ui/README) |
+## Cross-cutting
 
-CLIs (`@orangecheck/cli`, `@orangecheck/agent-cli`, `@orangecheck/stamp-cli`, `@orangecheck/vote-cli`) and the Python SDK (`orangecheck` on PyPI) are documented via their READMEs and the curated overviews under [`/sdks/*`](/sdks).
+Serve every sibling protocol.
 
-## How a generated page is laid out
+| Package                                                           | Purpose                                                                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [`@orangecheck/sdk`](/sdk/sdk/README)                             | Core TypeScript SDK — `check()`, `verify()`, `createAttestation()`, `issueChallenge()`, scoring.       |
+| [`orangecheck` (Python)](/sdk/python)                             | Python SDK. Same surface as `@orangecheck/sdk`, same conformance vectors.                              |
+| [`@orangecheck/cli`](/sdk/cli)                                    | `oc` shell — check / verify / create / challenge / discover.                                           |
+| [`@orangecheck/gate`](/sdk/gate/README)                           | HTTP middleware for Express / Next / Fastify / Hono / Workers.                                         |
+| [`@orangecheck/react`](/sdk/react/README)                         | `<OcBadge>`, `<OcGate>`, `<OcChallengeButton>`.                                                        |
+| [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README)       | One `sign(message)` API across UniSat / Xverse / Leather / Alby.                                       |
+| [`@orangecheck/relay-filter`](/sdk/relay-filter/README)           | Sybil-filter policy for Nostr relays. Strfry plugin + framework-agnostic core.                         |
+| [`@orangecheck/airdrop-gate`](/sdk/airdrop-gate/README)           | Sybil-resistant allowlist filter — turn a candidate list into a filtered set.                          |
+| [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)       | HMAC verification helpers for webhook deliveries from fleet / me / attest.                             |
+| [`@orangecheck/auth-core`](/sdk/auth-core/README)                 | Ed25519 JWT verify + cookie helpers — consumer half of the ochk.io auth host.                          |
+| [`@orangecheck/auth-client`](/sdk/auth-client/README)             | React provider + hooks for cross-subdomain auth via the ochk.io host.                                  |
+| [`@orangecheck/nostr-core`](/sdk/nostr-core/README)               | Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).                                      |
+| [`@orangecheck/ui`](/sdk/ui/README)                               | Shared shadcn-style UI primitives across the family.                                                   |
 
-Every page derives from a `.ts` source file. Each section contains:
+## Per-protocol packages
 
-- **Function pages** show signature, parameters table, return type, type parameters, examples from the JSDoc.
-- **Interface pages** show every property, its type, its JSDoc description, and any inherited members.
-- **Type alias pages** show the resolved type plus JSDoc.
-- **Variable pages** show the constant's type and value (when it's a literal).
-- **Class pages** show the constructor, every method (with own page), and inherited members.
+### OC Lock
 
-All of this comes from the TypeScript source file at the GitHub permalink shown in the page's "Defined in" line. Permalinks point at `blob/main/...` so the link continues to resolve when source moves around.
+| Package                                                 | Purpose                                                                           |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README)   | X25519 / HKDF-SHA256 / AES-256-GCM primitives. Narrow surface, audited.           |
+| [`@orangecheck/lock-core`](/sdk/lock-core/README)       | Envelope format, RFC-8785 canonicalization, `seal()`, `unseal()`.                 |
+| [`@orangecheck/lock-device`](/sdk/lock-device/README)   | Device-key generation, BIP-322-bound binding statements, Nostr directory publish. |
 
-## Local generation
+### OC Stamp
 
-Clone [`oc-packages`](https://github.com/orangecheck/oc-packages) and [`oc-docs`](https://github.com/orangecheck/oc-docs) as siblings, then:
+| Package                                                 | Purpose                                                                                   |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [`@orangecheck/stamp-core`](/sdk/stamp-core/README)     | Canonical message, envelope format, `stamp()` + `verify()`, optional OC Attest reference. |
+| [`@orangecheck/stamp-ots`](/sdk/stamp-ots/README)       | OpenTimestamps calendar client, proof upgrade, pluggable anchor verifier.                 |
+
+### OC Vote
+
+| Package                                                 | Purpose                                                                                                                    |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/vote-core`](/sdk/vote-core/README)       | Reference implementation of oc-vote-protocol — `canonicalize`, `pollId`, `commit`, `voterWeight`, deterministic `tally()`. |
+| [`@orangecheck/vote-react`](/sdk/vote-react/README)     | React components for OC Vote — badge, poll, useTally.                                                                      |
+
+### OC Agent
+
+| Package                                                       | Purpose                                                                                            |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/agent-core`](/sdk/agent-core/README)           | Delegation envelope, scope grammar, `delegate()`, `act()`, `verifyAct()`, revocation lookup.       |
+| [`@orangecheck/agent-signer`](/sdk/agent-signer/README)       | Producer-side signer — wraps a wallet to emit agent-action envelopes.                              |
+| [`@orangecheck/agent-mcp`](/sdk/agent-mcp/README)             | Model Context Protocol bindings for agent envelopes.                                               |
+| [`@orangecheck/agent-anthropic`](/sdk/agent-anthropic/README) | Adapter for Anthropic SDK tool-use canonicalization.                                               |
+| [`@orangecheck/agent-openai`](/sdk/agent-openai/README)       | Adapter for OpenAI SDK tool-call canonicalization.                                                 |
+| [`@orangecheck/agent-langgraph`](/sdk/agent-langgraph/README) | Adapter for LangGraph tool-call canonicalization.                                                  |
+| [`@orangecheck/agent-vercel`](/sdk/agent-vercel/README)       | Adapter for Vercel AI SDK tool-call canonicalization.                                              |
+
+### OC Pledge
+
+| Package                                                 | Purpose                                                                                                                          |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/pledge-core`](/sdk/pledge-core/README)   | Pledge envelope, claim grammar, outcome canonicalization, `pledge()`, `attest()`, `dispute()`, deterministic state-machine eval. |
+
+### Commercial products
+
+| Package                                                 | Purpose                                                                       |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [`@orangecheck/me-client`](/sdk/me-client/README)       | me.ochk.io client SDK — auth, accounts, billable events.                      |
+
+## Semver
+
+Everything below 1.0 is pre-stable. Minor bumps CAN change exported types;
+patch bumps won't. Check the per-package README before upgrading; diff the
+changelog if something looks ambiguous.
+
+`@orangecheck/sdk`, `@orangecheck/agent-core`, `@orangecheck/pledge-core`,
+`@orangecheck/lock-core`, `@orangecheck/stamp-core`, `@orangecheck/vote-core`
+are at v1.0.0+ — wire-format-stable; type changes are semver-respecting.
+
+## Cross-implementation conformance
+
+The TypeScript SDK and the Python SDK ship vendored copies of the same
+canonical test vectors from the protocol repos. CI re-runs both suites on
+every push and fails on drift. This means: a canonical message built in TS
+and a canonical message built in Python for the same inputs are
+**byte-identical**. Ditto attestation IDs, poll IDs, stamp envelope IDs,
+pledge IDs. If you ever observe otherwise, it's a bug — please file it.
+
+## Local generation of the auto-gen reference
+
+Clone [`oc-packages`](https://github.com/orangecheck/oc-packages) and
+[`oc-docs`](https://github.com/orangecheck/oc-docs) as siblings, then:
 
 ```bash
 cd oc-packages
@@ -75,4 +142,6 @@ yarn docs:gen:all       # regenerate every package
 yarn docs:check         # exit 1 if regenerated docs differ from committed oc-docs
 ```
 
-The generator writes into `../oc-docs/src/pages/sdk/<pkg>/`.
+The generator writes into `../oc-docs/src/pages/sdk/<pkg>/`. CI gates
+drift via Phase 3.5: release tags auto-PR the regenerated tree to oc-docs
+(gated on `OC_DOCS_BOT_TOKEN`).

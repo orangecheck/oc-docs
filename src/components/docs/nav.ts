@@ -544,53 +544,6 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
-        slug: 'sdks',
-        label: 'SDKs',
-        blurb: 'Drop-in packages for every protocol.',
-        items: [
-            {
-                href: '/sdks',
-                label: 'Overview',
-                blurb: 'Map of every shipped package. Which stack to pick.',
-            },
-            {
-                href: '/sdks/javascript',
-                label: '@orangecheck/sdk',
-                blurb: 'TypeScript core — check, verify, createAttestation.',
-            },
-            {
-                href: '/sdks/python',
-                label: 'orangecheck (Python)',
-                blurb: 'Python SDK. Same surface, same conformance vectors.',
-            },
-            {
-                href: '/sdks/gate',
-                label: '@orangecheck/gate',
-                blurb: 'HTTP middleware for Express / Next / Fastify / Hono / Workers.',
-            },
-            {
-                href: '/sdks/react',
-                label: '@orangecheck/react',
-                blurb: '<OcBadge>, <OcGate>, <OcChallengeButton>.',
-            },
-            {
-                href: '/sdks/cli',
-                label: '@orangecheck/cli',
-                blurb: '`oc` shell for scripts and one-shot checks.',
-            },
-            {
-                href: '/sdks/wallet-adapter',
-                label: '@orangecheck/wallet-adapter',
-                blurb: 'Normalize UniSat / Xverse / Leather / Alby behind one sign API.',
-            },
-            {
-                href: '/sdks/error-codes',
-                label: 'Status & error codes',
-                blurb: 'Every reason string `/api/check` and the SDKs can return.',
-            },
-        ],
-    },
-    {
         slug: 'company',
         label: 'Company',
         blurb: 'Cross-product commitments + governance.',
@@ -614,18 +567,30 @@ export const DOCS_NAV: DocsSection[] = [
             },
         ],
     },
-    // AUTOGEN-SDK-START — contents managed by oc-packages/scripts/gen-docs.mjs.
-    // Do not edit manually; the docs:gen orchestrator overwrites this section on
-    // every release tag.
+    // The /sdk group: curated overview + per-package TypeDoc reference.
+    // The per-@orangecheck-package items below are auto-generated from
+    // oc-packages/scripts/gen-docs.mjs (TypeDoc → MDX). The Python and
+    // CLI entries are hand-written one-pagers (no TypeDoc input).
     {
         slug: 'sdk',
-        label: 'SDK reference',
-        blurb: 'Auto-generated TypeScript API reference for every @orangecheck/* package.',
+        label: 'SDKs',
+        blurb: 'Every shipped package — TypeScript, Python, CLIs — with the curated map + auto-generated reference.',
         items: [
             {
                 href: '/sdk',
                 label: 'Overview',
-                blurb: 'How the auto-generated reference is laid out, and how it stays in sync with the TS source.',
+                blurb: 'Curated which-package-for-which-job map, plus how the auto-gen reference is laid out.',
+            },
+            // ── languages without TypeDoc input ────────────────────────
+            {
+                href: '/sdk/python',
+                label: 'orangecheck (Python)',
+                blurb: 'Python SDK. Same surface as @orangecheck/sdk, same conformance vectors.',
+            },
+            {
+                href: '/sdk/cli',
+                label: '@orangecheck/cli',
+                blurb: '`oc` shell — check / verify / create / challenge / discover.',
             },
             // ── core ───────────────────────────────────────────────────
             {
@@ -788,6 +753,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/reference/glossary',
                 label: 'Glossary',
                 blurb: 'Every term used across the docs.',
+            },
+            {
+                href: '/reference/error-codes',
+                label: 'Status & error codes',
+                blurb: 'Every reason string `/api/check`, `/api/verify`, and the SDKs can return.',
             },
         ],
     },

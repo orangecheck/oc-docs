@@ -10,6 +10,55 @@ const nextConfig: NextConfig = {
     // transpile next's bare-specifier resolution fails (no exports map).
     transpilePackages: ['@orangecheck/ui'],
 
+    /**
+     * The handwritten `/sdks/*` group merged into the auto-gen `/sdk/*`
+     * tree on 2026-05-09. Permanent 308 redirects so external bookmarks +
+     * the existing /sdks/javascript / gate / cli / etc. URLs land at the
+     * canonical reference. Everything that wasn't covered by the autogen
+     * (Python SDK, error codes) moved to a sensible new home and gets its
+     * own redirect.
+     */
+    async redirects() {
+        return [
+            { source: '/sdks', destination: '/sdk', permanent: true },
+            {
+                source: '/sdks/javascript',
+                destination: '/sdk/sdk/README',
+                permanent: true,
+            },
+            {
+                source: '/sdks/gate',
+                destination: '/sdk/gate/README',
+                permanent: true,
+            },
+            {
+                source: '/sdks/react',
+                destination: '/sdk/react/README',
+                permanent: true,
+            },
+            {
+                source: '/sdks/wallet-adapter',
+                destination: '/sdk/wallet-adapter/README',
+                permanent: true,
+            },
+            {
+                source: '/sdks/cli',
+                destination: '/sdk/cli',
+                permanent: true,
+            },
+            {
+                source: '/sdks/python',
+                destination: '/sdk/python',
+                permanent: true,
+            },
+            {
+                source: '/sdks/error-codes',
+                destination: '/reference/error-codes',
+                permanent: true,
+            },
+        ];
+    },
+
     async headers() {
         return [
             {

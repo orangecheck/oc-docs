@@ -1,0 +1,63 @@
+export const metadata = {
+    title: 'API reference',
+    description:
+        'Machine-readable OpenAPI 3.1 specs for every OrangeCheck product / protocol surface that ships HTTP APIs. Generate clients with openapi-generator.',
+};
+
+# API reference
+
+Every product and protocol in the OrangeCheck family that ships an HTTP API
+exposes a machine-readable **OpenAPI 3.1** spec at `/api/openapi` on its own
+origin, plus an interactive **`/api-explorer`** page (Swagger UI). Same shape
+across the family — same auth scheme name (`cookieAuth` for session-bound
+endpoints), same error-response convention
+(`{ ok: false, reason: '...', detail: '...' }`), same `429 rate_limited`
+contract.
+
+## Currently shipped
+
+| Product       | Subdomain                                  | OpenAPI spec                                       | Interactive explorer                                 |
+| ------------- | ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
+| **Auth host** | [`ochk.io`](https://ochk.io)               | [/api/openapi](https://ochk.io/api/openapi)        | [/api-explorer](https://ochk.io/api-explorer)        |
+| **OC Attest** | [`attest.ochk.io`](https://attest.ochk.io) | [/api/openapi](https://attest.ochk.io/api/openapi) | [/api-explorer](https://attest.ochk.io/api-explorer) |
+| **Fleet**     | [`fleet.ochk.io`](https://fleet.ochk.io)   | [/api/openapi](https://fleet.ochk.io/api/openapi)  | [/api-explorer](https://fleet.ochk.io/api-explorer)  |
+
+The narrowed product pages (linked in the sidebar under this group) embed the
+same spec rendered inline + cross-link to the live explorer.
+
+## What about the other subdomains?
+
+- **`me.ochk.io`** — consumer commercial product. OpenAPI spec lands when the
+  cross-cutting integrator API stabilizes; the in-flight surface is documented
+  under [`/me`](/me).
+- **`pledge.ochk.io`**, **`stamp.ochk.io`**, **`vote.ochk.io`**,
+  **`agent.ochk.io`**, **`lock.ochk.io`** — protocol resolver sites; the
+  load-bearing crypto + canonicalization is in the SDKs, not in HTTP APIs. The
+  `/api/auth/me` endpoint each of them exposes is a delegated session check that
+  goes through the auth host (documented at
+  [/api-reference/auth-host](/api-reference/auth-host)).
+
+## Generating clients
+
+Each spec is canonical OpenAPI 3.1 — works with every standard generator.
+Example: a Python client for the Fleet API:
+
+```bash
+openapi-generator-cli generate \
+    -i https://fleet.ochk.io/api/openapi \
+    -g python \
+    -o ./fleet-client
+```
+
+Same recipe with `-g go`, `-g rust`, `-g typescript-fetch`, etc. The specs are
+public + CORS-permissive so you can hit them from anywhere; cached 5 minutes
+server-side so client-generation tools that hammer them don't poison the
+response.
+
+## Trust model
+
+These OpenAPI specs are **documentation**, not protocol artifacts. The canonical
+contracts are still the TypeScript handler source + `@orangecheck/*` SDK
+conformance vectors. If a spec ever drifts from the implementation, **the
+implementation wins** — file an issue on `oc-fleet-web` / `oc-www` /
+`oc-attest-web` and the spec gets corrected on the next deploy.

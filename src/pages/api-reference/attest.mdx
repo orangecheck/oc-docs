@@ -1,0 +1,59 @@
+export const metadata = {
+    title: 'API · attest.ochk.io · OC Attest',
+    description:
+        'Public verification API for OC Attest — check / verify / discover / publish-attestation / stats. Full OpenAPI 3.1 spec; interactive explorer at attest.ochk.io/api-explorer.',
+};
+
+# attest.ochk.io · OC Attest API
+
+The server-side verification + discovery surface for OC Attest, the **identity**
+verb of the OrangeCheck family. An attestation says "this Bitcoin address
+controls ≥ X sats unspent for ≥ Y days." The load-bearing primitive is
+`/api/check` — one call, one pass/fail.
+
+> **Live spec & interactive explorer.**
+> [`https://attest.ochk.io/api/openapi`](https://attest.ochk.io/api/openapi)
+>
+> - [`https://attest.ochk.io/api-explorer`](https://attest.ochk.io/api-explorer).
+
+## Surface map
+
+| Tag        | Endpoints                  | Purpose                                                                              |
+| ---------- | -------------------------- | ------------------------------------------------------------------------------------ |
+| `check`    | `/api/check`               | One-call sybil-gate. `?addr=…&min_sats=…&min_days=…` → `{ ok, score, sats, days }`.  |
+| `verify`   | `/api/verify`              | Full envelope verification — recompute id, verify BIP-322, assert bond meets policy. |
+| `discover` | `/api/discover`            | List attestations matching a subject across the family Nostr relay set.              |
+| `publish`  | `/api/publish-attestation` | Server-side broadcaster. Client builds + signs locally; server fans out to relays.   |
+| `stats`    | `/api/stats`               | Network-wide aggregate. Heavy-cached (10 min).                                       |
+
+## Auth posture
+
+**Every endpoint is public.** No auth, no API keys. Rate-limited per-IP (token
+bucket — `429 rate_limited` with `Retry-After` on overflow).
+
+The session-bound endpoint (`/api/auth/me`) on `attest.ochk.io` is delegated to
+the family auth host via `oc_session` cookie verification — it's documented
+under [the auth host's API](/api-reference/auth-host), not here.
+
+## When to use which
+
+| You want…                                                       | Use                                                                                                                           |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| One-call "does this address pass?" gate                         | `/api/check` (or [`@orangecheck/sdk`](/sdk/sdk/README)'s `check()` for in-process)                                            |
+| Full verification of an envelope a client built                 | `/api/verify` (or [`@orangecheck/sdk`](/sdk/sdk/README)'s `verify()` for in-process)                                          |
+| Browse / list every attestation a subject has                   | `/api/discover`                                                                                                               |
+| Publish a freshly-signed envelope to the family Nostr relay set | `/api/publish-attestation` (or publish directly via [`@orangecheck/nostr-core`](/sdk/nostr-core/README) if you want the keys) |
+| Network-wide stats for a `/status` page                         | `/api/stats`                                                                                                                  |
+
+## Conformance
+
+The HTTP API mirrors the TypeScript [`@orangecheck/sdk`](/sdk/sdk/README)
+behavior 1:1 — same conformance vectors run on both. A canonical message built
+in TS and a canonical message rebuilt server-side for the same inputs are
+byte-identical. If you observe drift, it's a bug.
+
+## See also
+
+- Hand-written narrative: [OC Attest](/attest).
+- TypeScript SDK reference: [`@orangecheck/sdk`](/sdk/sdk/README).
+- Source: [`oc-attest-web`](https://github.com/orangecheck/oc-attest-web).

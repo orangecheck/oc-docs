@@ -1,0 +1,72 @@
+export const metadata = {
+    title: 'API · ochk.io · auth host',
+    description:
+        'Public API surface for ochk.io — the OrangeCheck family auth host. Sign-in (BIP-322 + email-OTP), JWKS, signed-challenge primitive, account ops, contact form. Full OpenAPI 3.1 spec; interactive explorer at ochk.io/api-explorer.',
+};
+
+# ochk.io · auth host API
+
+The OrangeCheck family auth host. Issues Ed25519-signed `oc_session` cookies
+(`Domain=.ochk.io`) that every consumer subsite verifies locally via
+[`@orangecheck/auth-core`](/sdk/auth-core/README) +
+[`@orangecheck/auth-client`](/sdk/auth-client/README) — no DB on consumers, no
+per-request fetch to the auth host.
+
+> **Live spec & interactive explorer.** The canonical contracts are at
+> [`https://ochk.io/api/openapi`](https://ochk.io/api/openapi) (OpenAPI 3.1
+> JSON, CORS-permissive, cached 5 min) and
+> [`https://ochk.io/api-explorer`](https://ochk.io/api-explorer) (Swagger UI
+> with "Try it out" enabled). Generate clients with
+> `openapi-generator-cli generate -i https://ochk.io/api/openapi -g <lang>`.
+
+## Surface map
+
+| Tag         | Endpoints                                                 | Purpose                                                                              |
+| ----------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/account` | Session lifecycle. JWT verification key, current session, sign-in/out, account edit. |
+| `challenge` | `/api/challenge` (GET + POST)                             | BIP-322 signed-challenge primitive — issue + verify, the building block.             |
+| `email-otp` | `/api/auth/email-otp/start`, `/verify`                    | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                           |
+| `public`    | `/api/family-stats`                                       | Cross-subdomain family-wide stats. No auth.                                          |
+| `forms`     | `/api/contact`                                            | Contact-form relay via Resend. Same-origin only.                                     |
+
+## Auth scheme
+
+`cookieAuth` — the `oc_session` cookie issued by `/api/auth/signin` (or
+`/api/auth/email-otp/verify`). Cookie attributes:
+
+- `Domain=.ochk.io` (cross-subdomain)
+- `HttpOnly` (no JS access)
+- `Secure` (TLS only)
+- `SameSite=Lax`
+
+Consumer sites verify locally — no fetch to the auth host on every request. The
+Ed25519 public JWK lives at [`/api/auth/jwks`](https://ochk.io/api/auth/jwks)
+and `/.well-known/jwks.json`; consumers cache it as the `OC_AUTH_PUBLIC_JWK` env
+var at deploy time.
+
+## Two sign-in primitives
+
+**BIP-322 (canonical):**
+
+1. `GET /api/challenge?addr=...&audience=...&purpose=login` →
+   `{ message, nonce, expiresAt }`
+2. User signs `message` with their Bitcoin wallet via
+   [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README) or directly.
+3. `POST /api/auth/signin` with `{ address, message, signature, nonce }` → 200 +
+   `oc_session` cookie set.
+
+**Email-OTP (lower-friction):**
+
+1. `POST /api/auth/email-otp/start` with `{ email }` → server emails 6-digit
+   code
+2. `POST /api/auth/email-otp/verify` with `{ email, code }` → 200 + `oc_session`
+   cookie set.
+
+Both produce the **same** session cookie shape; consumer code doesn't have to
+branch on which path the user took.
+
+## See also
+
+- The full curated SDK map: [SDKs](/sdk).
+- Family-wide trust model: [Charter](/charter).
+- Source: [`oc-www`](https://github.com/orangecheck/oc-www).

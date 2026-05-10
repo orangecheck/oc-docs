@@ -544,6 +544,33 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'api-reference',
+        label: 'API reference',
+        blurb: 'Machine-readable OpenAPI 3.1 specs + interactive explorers, one per product / protocol surface that ships HTTP APIs.',
+        items: [
+            {
+                href: '/api-reference',
+                label: 'Overview',
+                blurb: 'Map of every OpenAPI spec in the family. How to generate clients with openapi-generator.',
+            },
+            {
+                href: '/api-reference/auth-host',
+                label: 'ochk.io · auth host',
+                blurb: 'Family auth host — sign-in (BIP-322 + email-OTP), JWKS, challenge primitive, account ops, contact form.',
+            },
+            {
+                href: '/api-reference/attest',
+                label: 'attest.ochk.io · OC Attest',
+                blurb: 'Verification API — check / verify / discover / publish-attestation / stats.',
+            },
+            {
+                href: '/api-reference/fleet',
+                label: 'fleet.ochk.io · Fleet',
+                blurb: 'Managed agent + pledge infrastructure — delegations, actions, revocations, pledges (V1) + outcomes / abandonments (V2), audit, webhooks.',
+            },
+        ],
+    },
+    {
         slug: 'company',
         label: 'Company',
         blurb: 'Cross-product commitments + governance.',

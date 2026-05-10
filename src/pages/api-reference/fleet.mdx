@@ -1,0 +1,94 @@
+export const metadata = {
+    title: 'API · fleet.ochk.io · Fleet',
+    description:
+        'Fleet API surface — managed agent + pledge infrastructure. Delegations, actions, revocations, sub-delegations, pledges (V1), outcomes + abandonments (V2), audit bundles, webhooks. Full OpenAPI 3.1 spec.',
+};
+
+# fleet.ochk.io · Fleet API
+
+The managed-infrastructure API for OrangeCheck Fleet. Delegations,
+sub-delegations, actions, revocations, pledges (V1), outcomes + abandonments
+(V2), audit-bundle export, webhook endpoints. Cookie auth via the
+[family auth host](/api-reference/auth-host) `oc_session` cookie plus optional
+bearer-token auth (per-project API tokens).
+
+> **Live spec & interactive explorer.**
+> [`https://fleet.ochk.io/api/openapi`](https://fleet.ochk.io/api/openapi)
+>
+> - [`https://fleet.ochk.io/api-explorer`](https://fleet.ochk.io/api-explorer).
+
+## Surface map
+
+| Tag              | Endpoints (selected)                                                                                         | Purpose                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `projects`       | `/api/projects`, `/api/projects/{id}`, `/api/projects/{id}/transfer`                                         | Tenant primitives. Create / update / archive / transfer ownership.                 |
+| `members`        | `/api/projects/{id}/members`, `/api/projects/{id}/invites`                                                   | Team — invite / role-change / remove.                                              |
+| `delegations`    | `/api/delegations`, `/api/delegations/{id}`, `/api/delegations/federation`                                   | OC Agent — register a kind-30083 delegation envelope. Single-address + federation. |
+| `subdelegations` | `/api/subdelegations`, `/api/subdelegations/{id}`                                                            | OC Agent v1.1 sub-delegation chain.                                                |
+| `actions`        | `/api/actions`                                                                                               | OC Agent — register a kind-30084 action envelope.                                  |
+| `revocations`    | `/api/revocations`                                                                                           | OC Agent — register a kind-30085 revocation envelope.                              |
+| `pledges` (V1)   | `/api/pledges`, `/api/pledges/{id}`                                                                          | OC Pledge — register a pledge envelope. Public read by id or swearer.              |
+| `pledges` (V2)   | `/api/pledges/{id}/outcome`, `/api/pledges/{id}/abandon`, `/api/pledge-outcomes`, `/api/pledge-abandonments` | V2 lifecycle — outcomes (kept/broken/disputed/expired_unresolved) + abandonments.  |
+| `audit`          | `/api/audit/export?format=ndjson\|json\|csv`, `/api/audit/bundles`                                           | Signed bundle export. All envelope kinds + V2 lifecycle. Cardinality cache.        |
+| `webhooks`       | `/api/webhooks/endpoints`, `/api/webhooks/deliveries`                                                        | Subscribe an endpoint, debug deliveries.                                           |
+| `tokens`         | `/api/tokens`                                                                                                | Per-project API tokens for bearer auth.                                            |
+| `admin-log`      | `/api/admin/log`                                                                                             | Admin event log.                                                                   |
+| `billing`        | `/api/billing`, `/api/billing/portal`                                                                        | Lightning + Stripe billing.                                                        |
+
+## Auth schemes
+
+`cookieAuth` — the `oc_session` cookie issued by the
+[family auth host](/api-reference/auth-host). Cross-subdomain
+(`Domain=.ochk.io`); no fleet-side login.
+
+`bearerAuth` — per-project API tokens (created at
+`/settings § 03 · api tokens`). Tokens are prefixed `tok_…`, stored as
+`sha256(secret)` server-side. Use `Authorization: Bearer tok_…` for non-browser
+clients (CI, scripts, server-side SDKs). Bearer takes precedence over the cookie
+when both are present.
+
+## V1 vs V2 (bonded reputation)
+
+**V1** ships pledge persistence + composer (`/api/pledges`,
+`/reputation/compose`). A pledge sits in `pending` until something resolves it.
+
+**V2** ships the lifecycle — outcomes resolve a pledge to `kept` / `broken` /
+`disputed` / `expired_unresolved`; abandonments permanently retract. The
+composer flows live at `/reputation/p/<id>/outcome` and
+`/reputation/p/<id>/abandon`. Webhook events `pledge.outcome` and
+`pledge.abandoned` fire on each. The reconciler cron auto-emits deterministic
+`expired_unresolved` outcomes for pledges that pass `expires_at` without
+resolution.
+
+See the full lifecycle docs: [Bonded reputation](/fleet/reputation).
+
+## Webhook events
+
+Subscribe via `POST /api/webhooks/endpoints`. Family-shipped events:
+
+```
+delegation.registered     subdelegation.registered    action.registered
+revocation.registered     pledge.registered           pledge.outcome
+pledge.abandoned          test.ping
+```
+
+Each delivery is HMAC-SHA256-signed; the receiver verifies with
+[`@orangecheck/webhook-verify`](/sdk/webhook-verify/README). The full delivery
+contract is documented at [Webhooks](/fleet/webhooks).
+
+## Audit bundle
+
+`GET /api/audit/export?project_id=…&format=ndjson|json|csv` returns a signed
+bundle of every envelope the project has registered, byte-identical to what was
+signed by the operator's wallet. Replay order: **delegations → revocations →
+actions → pledges → outcomes → abandonments**. Counts cached in `audit_bundles`
+for the dashboard's bundle list.
+
+## See also
+
+- Operator-facing narrative: [Fleet](/fleet) +
+  [Bonded reputation](/fleet/reputation) + [Webhooks](/fleet/webhooks).
+- TypeScript SDKs the API mirrors:
+  [`@orangecheck/agent-core`](/sdk/agent-core/README),
+  [`@orangecheck/pledge-core`](/sdk/pledge-core/README).
+- Source: [`oc-fleet-web`](https://github.com/orangecheck/oc-fleet-web).

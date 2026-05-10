@@ -68,6 +68,8 @@ operators who want one place to see the loop.
 The full schemas live in the [OpenAPI spec](https://fleet.ochk.io/api/openapi);
 summary:
 
+### Pledges (V1)
+
 | Method | Path                             | Auth       | What                                                                     |
 | ------ | -------------------------------- | ---------- | ------------------------------------------------------------------------ |
 | `POST` | `/api/pledges`                   | session    | Register a signed pledge envelope. Recomputes id, rejects tampered.      |
@@ -75,46 +77,81 @@ summary:
 | `GET`  | `/api/pledges?swearer_address=…` | **public** | Cross-fleet list of every pledge sworn by an address. No auth.           |
 | `GET`  | `/api/pledges/{id}`              | **public** | Fetch one pledge by envelope id. No auth — pledges are public artifacts. |
 
-V1 is pledge-only; outcome and abandonment envelopes are out of fleet
-persistence scope (resolve them against the public Nostr stream at verify time).
-V2 reconciles status against chain / Nostr / oracle state.
+### Outcomes (V2)
 
-## Webhook event
+Outcome envelopes resolve a pledge to `kept` / `broken` / `expired_unresolved` /
+`disputed`. Deterministic mechanisms (chain_state, nostr_event_exists,
+stamp_published, http_get_hash, dns_record, vote_resolves) emit unsigned
+outcomes (`envelope.sig=null`); the counterparty_signs mechanism requires a real
+BIP-322 from the counterparty's address. The session caller can also publish an
+outcome under their own address (e.g. swearer signing `broken` to acknowledge a
+missed commitment). Disagreement is allowed — multiple outcomes stack on the
+parent pledge and the state machine surfaces them as `disputed` until the
+dispute window ends.
 
-Subscribe via `POST /api/webhooks/endpoints` with
-`events: ['pledge.registered', …]`. Payload:
+| Method | Path                                     | Auth       | What                                                                                               |
+| ------ | ---------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| `POST` | `/api/pledges/{id}/outcome`              | session    | Register a signed outcome envelope. Recomputes id, enforces sig rules + resolved_by authorization. |
+| `GET`  | `/api/pledges/{id}/outcome`              | **public** | Every outcome envelope targeting this pledge_id. Multiple rows possible.                           |
+| `GET`  | `/api/pledge-outcomes?project_id=…`      | session    | Cross-pledge outcome list for a project. Used by the audit timeline.                               |
+| `GET`  | `/api/pledge-outcomes?swearer_address=…` | **public** | Every outcome where the parent pledge's swearer matches.                                           |
+
+### Abandonments (V2)
+
+Per SPEC §5.2, **only the original swearer can abandon a pledge** (no agent
+abandonments in v0.1) and the action is permanent. A second abandonment on the
+same pledge is a silent no-op.
+
+| Method | Path                                         | Auth       | What                                                                           |
+| ------ | -------------------------------------------- | ---------- | ------------------------------------------------------------------------------ |
+| `POST` | `/api/pledges/{id}/abandon`                  | session    | Register a swearer-signed abandonment. Server enforces sig.pubkey === swearer. |
+| `GET`  | `/api/pledges/{id}/abandon`                  | **public** | Fetch abandonment if present (404 otherwise).                                  |
+| `GET`  | `/api/pledge-abandonments?project_id=…`      | session    | Project-scoped abandonments list.                                              |
+| `GET`  | `/api/pledge-abandonments?swearer_address=…` | **public** | Public per-swearer abandonments list.                                          |
+
+## Webhook events
+
+Subscribe via `POST /api/webhooks/endpoints` with the events you care about.
+Three pledge-family events fire today:
+
+| Event               | When                                                                                                                                         |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pledge.registered` | A pledge envelope was accepted by `/api/pledges`. Payload: `id, project_id, kind, envelope, swearer_address, status`.                        |
+| `pledge.outcome`    | An outcome envelope was accepted by `/api/pledges/{id}/outcome`. Payload: `id, project_id, kind, pledge_id, outcome, resolved_by, envelope`. |
+| `pledge.abandoned`  | An abandonment envelope was accepted by `/api/pledges/{id}/abandon`. Payload: `id, project_id, kind, pledge_id, envelope`.                   |
+
+Sample `pledge.outcome` payload:
 
 ```json
 {
-    "id": "<64-hex envelope id>",
+    "id": "<64-hex outcome envelope id>",
     "project_id": "proj_…",
-    "kind": "pledge",
+    "kind": "pledge-outcome",
+    "pledge_id": "<64-hex parent pledge id>",
+    "outcome": "kept",
+    "resolved_by": "deterministic",
     "envelope": {
-        /* full canonical PledgeEnvelope */
-    },
-    "swearer_address": "bc1q…",
-    "status": "pending"
+        /* full canonical OutcomeEnvelope */
+    }
 }
 ```
-
-`status` reflects the lifecycle phase at insert time: `pending` (before
-`resolves_at`), `resolvable` (past `resolves_at`, V2 reconciler not yet landed),
-or `expired_unresolved` (past `expires_at`). V2 will emit `pledge.outcome` and
-`pledge.abandoned` events as the reconciler resolves them; the V1 webhook is a
-one-shot at registration.
 
 ## Audit bundle inclusion
 
 The signed audit-bundle export at
 [`/api/audit/export`](https://fleet.ochk.io/api-explorer#/audit/get-audit-export)
-includes pledges in all three formats (JSON, NDJSON, CSV) alongside delegations
-/ actions / revocations. A compliance team rebuilds the project's
-agent-state-machine from the bundle, then projects pledges on top — same
-content-addressed envelopes the operator signed, byte-identical.
+includes the full V2 lifecycle in all three formats (JSON, NDJSON, CSV)
+alongside delegations / actions / revocations. A compliance team rebuilds the
+project's agent-state-machine from the bundle, then projects pledges on top,
+then resolves their lifecycle by applying outcomes + abandonments — all from the
+same content-addressed envelopes the operator signed, byte-identical to what's
+on the public Nostr relay set.
 
-Bundle replay order is preserved: delegations → revocations → actions → pledges.
-The manifest's `counts.pledges` field is authoritative for pledge-slice
-cardinality.
+Bundle replay order: **delegations → revocations → actions → pledges → outcomes
+→ abandonments**. Manifest counts: `delegations`, `revocations`, `actions`,
+`pledges`, `outcomes`, `abandonments`. The `audit_bundles` bookkeeping table
+tracks all six counts so the dashboard's bundle list summarizes without
+re-loading the tarball.
 
 ## Verifying offline
 

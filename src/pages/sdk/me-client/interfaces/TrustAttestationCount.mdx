@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Interface: TrustAttestationCount",
+    description: "Auto-generated API reference for Interface: TrustAttestationCount. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / TrustAttestationCount
+
+# Interface: TrustAttestationCount
+
+Defined in: [me-client/src/scope.ts:73](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L73)
+
+Decoded shape of the `trust_attestation_count` scope value. The wire
+ format is a comma-separated quad: total,good,distinct_good_issuers,caution.
+ Block-status counts are intentionally omitted from the disclosure
+ surface — block flags belong to the pseudonymous-issuer side, not
+ the subject's public score.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-caution">&lt;/a> `caution` | `number` | [me-client/src/scope.ts:77](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L77) |
+| &lt;a id="property-distinct_good_issuers">&lt;/a> `distinct_good_issuers` | `number` | [me-client/src/scope.ts:76](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L76) |
+| &lt;a id="property-good">&lt;/a> `good` | `number` | [me-client/src/scope.ts:75](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L75) |
+| &lt;a id="property-total">&lt;/a> `total` | `number` | [me-client/src/scope.ts:74](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L74) |

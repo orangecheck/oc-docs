@@ -4,6 +4,7 @@ import { OcLogoDropdown } from '@orangecheck/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { SITE_CONFIG } from '@/lib/site.config';
 import { cn } from '@/lib/utils/utils';
 
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
@@ -31,7 +32,11 @@ export function LayoutHeader() {
     return (
         <header className="bg-background/90 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-40 w-full border-b backdrop-blur">
             <div className="container flex h-12 items-center justify-between gap-4">
-                <OcLogoDropdown current="docs" homeHref="/">
+                <OcLogoDropdown
+                    current={SITE_CONFIG.slug}
+                    homeHref="/"
+                    siteState={SITE_CONFIG.state}
+                >
                     <LogoMark size={20} />
                     <span className="font-display text-base font-bold tracking-tight">
                         oc&middot;<span className="text-primary">docs</span>

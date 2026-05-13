@@ -3,12 +3,24 @@ import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
 import rehypeSlug from 'rehype-slug';
 
+// Surface the running build in the OcAccountMenu BuildFooter.
+// VERCEL_GIT_COMMIT_SHA is populated automatically on every Vercel deploy;
+// `dev` is the safe sentinel for local builds.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pkg = require('./package.json') as { version: string };
+const BUILD_SHA = (process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7);
+
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
     // @orangecheck/ui ships an ESM bundle with `import 'next/link'`; without
     // transpile next's bare-specifier resolution fails (no exports map).
     transpilePackages: ['@orangecheck/ui'],
+
+    env: {
+        NEXT_PUBLIC_APP_VERSION: pkg.version,
+        NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
+    },
 
     /**
      * The handwritten `/sdks/*` group merged into the auto-gen `/sdk/*`

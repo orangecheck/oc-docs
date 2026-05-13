@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "packageManager": "yarn@1.22.22",
-    "description": "docs.ochk.io — unified documentation for the OrangeCheck ecosystem (OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent).",
+    "description": "docs.ochk.io \u2014 unified documentation for the OrangeCheck ecosystem (OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent).",
     "scripts": {
         "dev": "rm -rf .next && next dev",
         "build": "next build",
@@ -20,7 +20,7 @@
         "@next/mdx": "15.5.15",
         "@orangecheck/auth-client": "^1.0.0",
         "@orangecheck/auth-core": "^1.1.0",
-        "@orangecheck/ui": "^0.1.1",
+        "@orangecheck/ui": "^0.4.0",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-separator": "^1.1.7",
         "@radix-ui/react-slot": "^1.2.3",

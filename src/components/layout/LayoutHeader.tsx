@@ -1,6 +1,6 @@
 'use client';
 
-import { EcosystemSwitcher } from '@orangecheck/ui';
+import { OcLogoDropdown } from '@orangecheck/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -31,15 +31,12 @@ export function LayoutHeader() {
     return (
         <header className="bg-background/90 supports-[backdrop-filter]:bg-background/70 sticky top-0 z-40 w-full border-b backdrop-blur">
             <div className="container flex h-12 items-center justify-between gap-4">
-                <Link
-                    href="/"
-                    className="group flex items-center gap-2 transition-opacity hover:opacity-80"
-                >
+                <OcLogoDropdown current="docs" homeHref="/">
                     <LogoMark size={20} />
                     <span className="font-display text-base font-bold tracking-tight">
                         oc&middot;<span className="text-primary">docs</span>
                     </span>
-                </Link>
+                </OcLogoDropdown>
 
                 <nav className="hidden items-center gap-1 md:flex">
                     {PROTOCOLS.map((p) => {
@@ -62,9 +59,6 @@ export function LayoutHeader() {
                 </nav>
 
                 <div className="flex items-center gap-1">
-                    <div className="hidden md:block">
-                        <EcosystemSwitcher current="docs" />
-                    </div>
                     <div className="hidden md:flex">
                         <HeaderAccount />
                     </div>

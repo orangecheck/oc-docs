@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · SDK reference',
     description:
-        '@orangecheck/me-client v0.7.0 SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). useOcSession, oc.session, oc.payment, oc.event, oc.webhook, oc.config — plus every type the SDK exports.',
+        '@orangecheck/me-client v0.7.0 SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). useOcSession, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
 };
 
 # `@orangecheck/me-client` · SDK reference
@@ -239,6 +239,57 @@ entry rather than rejecting every webhook.
 > me.ochk.io. me-client doesn't ship a delegation namespace; reach for
 > `@orangecheck/agent-client` if you need to issue or revoke agent delegations
 > from your integration.
+
+## `oc.identity.verifyActivityAttestation` · cross-integrator sybil-resistance gate
+
+Verify a signed activity attestation bundle the user forwarded to you. The
+bundle wraps six cross-integrator activity values (event_count,
+human_event_count, lifetime_sats, distinct_integrator_count, oldest_event_at,
+active_days) plus a 24h expiry, signed with the me.ochk.io envelope key — the
+same key that signs every billable event, rebind, and trust attestation.
+
+```ts
+import { oc } from '@orangecheck/me-client';
+
+const result = await oc.identity.verifyActivityAttestation(bundle);
+if (!result.ok) return res.status(401).send(result.reason);
+
+const a = result.attestation!;
+if (a.lifetime_sats < 10_000) return res.status(403).send('low signal');
+if (a.distinct_integrator_count < 3) return res.status(403).send('low breadth');
+if (Date.parse(a.oldest_event_at!) > Date.now() - 90 * 86_400_000) {
+    return res.status(403).send('too new');
+}
+// passed all four axes (depth × breadth × duration × habituality)
+```
+
+Runs five checks: bundle shape, canonical-bytes hash matches the content-
+addressed `id`, JWK with matching `kid` present in the envelope JWKS, ed25519
+signature, and `now < expires_at`. Every check surfaces as a typed row in
+`result.checks` for logging.
+
+Auto-fetches and caches `me.ochk.io/.well-known/oc-envelope-jwks.json` for 1h
+when no `jwk` is passed. The envelope JWKS is **distinct** from the auth-host
+JWKS that signs webhook deliveries — same Ed25519 curve, different URL, cached
+separately. Pass `{ jwk }` to skip the network fetch for edge runtimes or
+air-gapped deployments.
+
+Why this is the right primitive for sybil-resistance gating: the values are
+**costly to fake** (sats accrue from real integrator outflow, distinct count
+requires onboarding through N separate integrators, oldest_event_at can't be
+back-dated, active_days requires habitual presence over time) and **trivial
+to verify** (one function call, one signature check, identical posture on Node
+20+, Vercel Edge, browser).
+
+The verifier displaces the adjacent category of spend integrators currently
+pay for separately — fraud detection, anti-spam, account-takeover monitoring
+— with a single primitive that ships as a side effect of using OC for auth.
+
+> Same five checks run in-browser at
+> [me.ochk.io/verify-activity](https://me.ochk.io/verify-activity) for any
+> third party who receives a forwarded attestation but doesn't want to write
+> the verifier themselves. The SDK and the browser page produce identical
+> verdicts on the same input.
 
 ## `oc.event.fire` · arbitrary billable subtypes
 

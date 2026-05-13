@@ -277,19 +277,19 @@ air-gapped deployments.
 Why this is the right primitive for sybil-resistance gating: the values are
 **costly to fake** (sats accrue from real integrator outflow, distinct count
 requires onboarding through N separate integrators, oldest_event_at can't be
-back-dated, active_days requires habitual presence over time) and **trivial
-to verify** (one function call, one signature check, identical posture on Node
-20+, Vercel Edge, browser).
+back-dated, active_days requires habitual presence over time) and **trivial to
+verify** (one function call, one signature check, identical posture on Node 20+,
+Vercel Edge, browser).
 
-The verifier displaces the adjacent category of spend integrators currently
-pay for separately — fraud detection, anti-spam, account-takeover monitoring
-— with a single primitive that ships as a side effect of using OC for auth.
+The verifier displaces the adjacent category of spend integrators currently pay
+for separately — fraud detection, anti-spam, account-takeover monitoring — with
+a single primitive that ships as a side effect of using OC for auth.
 
 > Same five checks run in-browser at
-> [me.ochk.io/verify-activity](https://me.ochk.io/verify-activity) for any
-> third party who receives a forwarded attestation but doesn't want to write
-> the verifier themselves. The SDK and the browser page produce identical
-> verdicts on the same input.
+> [me.ochk.io/verify-activity](https://me.ochk.io/verify-activity) for any third
+> party who receives a forwarded attestation but doesn't want to write the
+> verifier themselves. The SDK and the browser page produce identical verdicts
+> on the same input.
 
 ## `oc.event.fire` · arbitrary billable subtypes
 

@@ -10,9 +10,9 @@ export const metadata = {
 
 This is the published charter for the Fedimint federation that backs
 [`me.ochk.io`](https://me.ochk.io) email-OTP wallets. Every guardian operator
-signs the SHA-256 of this document's canonical bytes (the [Canonical
-bytes](#canonical-bytes) section below) using their hardware-backed Ed25519
-operator key. The signature appears on
+signs the SHA-256 of this document's canonical bytes (the
+[Canonical bytes](#canonical-bytes) section below) using their hardware-backed
+Ed25519 operator key. The signature appears on
 [me.ochk.io/me/operator/ceremonies](https://me.ochk.io/me/operator/ceremonies)
 and the per-federation deep-view at
 [me.ochk.io/federations/oc-me-v1](https://me.ochk.io/federations/oc-me-v1).
@@ -40,18 +40,19 @@ minority can defraud users.
 OrangeCheck (the company) holds zero key shares and is not a guardian. OC is a
 **client** of this federation, never an operator of it. Users provision a
 federation-held Bitcoin wallet on their first `/me/wallet` visit; the mnemonic
-stays in the user's browser (IndexedDB) and is never transmitted to OC or to
-the federation.
+stays in the user's browser (IndexedDB) and is never transmitted to OC or to the
+federation.
 
 ## 3. Guardian operator disclosure
 
-Per [FEDERATION-DEPLOYMENT.md §1A](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md#1a-cryptographic-control-model-what-13-actually-means)
+Per
+[FEDERATION-DEPLOYMENT.md §1A](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md#1a-cryptographic-control-model-what-13-actually-means)
 the load-bearing operational-independence invariant is **operator-key
 diversity** — each seat is controlled by a distinct hardware-backed Ed25519
 operator key, held by a distinct legal entity, ideally in a distinct legal
 jurisdiction. Vendor diversity is not a §1.3 conformance test (Fedimint
-threshold-signing prevents any single vendor from moving funds regardless of
-who hosts the daemons).
+threshold-signing prevents any single vendor from moving funds regardless of who
+hosts the daemons).
 
 Each guardian operator publishes:
 
@@ -60,19 +61,18 @@ Each guardian operator publishes:
 - a public security-disclosure contact
 - any conflicts of interest
 
-These disclosures appear on
-[me.ochk.io/operators](https://me.ochk.io/operators) (the marketplace) and on
-the per-federation deep-view.
+These disclosures appear on [me.ochk.io/operators](https://me.ochk.io/operators)
+(the marketplace) and on the per-federation deep-view.
 
 ## 4. OrangeCheck's role
 
-OrangeCheck the company is a **client** of this federation, not a guardian.
-OC holds zero key shares and cannot reach the threshold by itself, alone or
-with any subset of guardians the company has not formally accepted into the
-operator program. The company never asks operators to sign envelopes on its
-behalf, and the operator portal (`me.ochk.io/me/operator`) is incapable of
-producing operator signatures — every state-changing action requires the
-operator's hardware-key signature, which the portal cannot forge.
+OrangeCheck the company is a **client** of this federation, not a guardian. OC
+holds zero key shares and cannot reach the threshold by itself, alone or with
+any subset of guardians the company has not formally accepted into the operator
+program. The company never asks operators to sign envelopes on its behalf, and
+the operator portal (`me.ochk.io/me/operator`) is incapable of producing
+operator signatures — every state-changing action requires the operator's
+hardware-key signature, which the portal cannot forge.
 
 ## 5. Lightning gateway disclosure
 
@@ -87,14 +87,14 @@ deep-view.
 **If OrangeCheck sunsets, or this charter is breached, every user can:**
 
 - **(a)** sweep their balance to a self-custody Bitcoin wallet via on-chain
-  withdrawal. The withdrawal is threshold-signed by the federation's
-  guardians (not by OrangeCheck) and does not require OC's services to be
-  online. The user's saved mnemonic from `/me/wallet` is sufficient.
+  withdrawal. The withdrawal is threshold-signed by the federation's guardians
+  (not by OrangeCheck) and does not require OC's services to be online. The
+  user's saved mnemonic from `/me/wallet` is sufficient.
 - **(b)** export their wallet state from the Fedimint client in their browser
-  and import it into any Fedimint-compatible client (mutiny, fedimint-cli,
-  Fedi mobile, etc.).
-- **(c)** graduate to a different federation via the standard
-  Fedimint cross-federation flow (sweep → re-peg).
+  and import it into any Fedimint-compatible client (mutiny, fedimint-cli, Fedi
+  mobile, etc.).
+- **(c)** graduate to a different federation via the standard Fedimint
+  cross-federation flow (sweep → re-peg).
 
 OC publishing a sunset notice does not change any of the above. The federation
 continues operating as long as 3 of 4 guardians remain online.
@@ -103,22 +103,22 @@ continues operating as long as 3 of 4 guardians remain online.
 
 Users with complaints about the federation's operation contact
 [`abuse@ochk.io`](mailto:abuse@ochk.io) (the company's published abuse address)
-and the guardian operator listed for their issue (jurisdictional /
-operational disputes route to the specific guardian). OrangeCheck reviews
-abuse reports and, where appropriate, requests the guardian operator address
-them. Disputes the operator and OC cannot resolve escalate to the federation's
-charter-amendment process (§8) or to legal counsel.
+and the guardian operator listed for their issue (jurisdictional / operational
+disputes route to the specific guardian). OrangeCheck reviews abuse reports and,
+where appropriate, requests the guardian operator address them. Disputes the
+operator and OC cannot resolve escalate to the federation's charter-amendment
+process (§8) or to legal counsel.
 
 ## 8. Charter amendment process
 
-This charter is amended by a 4-of-5 quorum of guardian operators signing the
-new version with their hardware-backed operator keys. The new SHA-256 hash
-replaces the prior version at this URL and on the federation registry. Users
-are notified via:
+This charter is amended by a 4-of-5 quorum of guardian operators signing the new
+version with their hardware-backed operator keys. The new SHA-256 hash replaces
+the prior version at this URL and on the federation registry. Users are notified
+via:
 
 - the [me.ochk.io/changelog](https://me.ochk.io/changelog) entry
-- per-user [me.ochk.io/me/notifications](https://me.ochk.io/me/notifications)
-  if they have a wallet provisioned against this federation
+- per-user [me.ochk.io/me/notifications](https://me.ochk.io/me/notifications) if
+  they have a wallet provisioned against this federation
 - the operator [incidents feed](https://me.ochk.io/me/operator/incidents)
 
 Amendments that materially change the federation's operational posture
@@ -127,9 +127,9 @@ amendment to publish at least 14 days before activation.
 
 ## Canonical bytes
 
-The SHA-256 of the following canonical bytes is the federation's charter
-hash. Operators sign this hash with their hardware-backed Ed25519 key; the
-signature is the ratification.
+The SHA-256 of the following canonical bytes is the federation's charter hash.
+Operators sign this hash with their hardware-backed Ed25519 key; the signature
+is the ratification.
 
 ```
 # OC-Me Federation Charter v1.0.0 · canonical bytes
@@ -152,10 +152,10 @@ amendment_quorum: 4-of-5 operators
 amendment_notice_days: 14
 ```
 
-The canonical bytes are the EXACT UTF-8 bytes of the block between the
-fenced code blocks above. Newlines are LF (`\n`). The block starts with
-`# OC-Me Federation Charter v1.0.0 · canonical bytes\n` and ends with the
-last commitment line followed by a single trailing `\n`.
+The canonical bytes are the EXACT UTF-8 bytes of the block between the fenced
+code blocks above. Newlines are LF (`\n`). The block starts with
+`# OC-Me Federation Charter v1.0.0 · canonical bytes\n` and ends with the last
+commitment line followed by a single trailing `\n`.
 
 A consumer verifying offline:
 
@@ -163,8 +163,8 @@ A consumer verifying offline:
 2. Computes `sha256(file)`.
 3. Compares the hex against the hash published at
    [me.ochk.io/api/operator/charter?federation=oc-me-v1](https://me.ochk.io/api/operator/charter?federation=oc-me-v1).
-4. Verifies each operator's `sig_hex` (returned in the same JSON) against
-   their `operator_pubkey` and the hash using Ed25519.
+4. Verifies each operator's `sig_hex` (returned in the same JSON) against their
+   `operator_pubkey` and the hash using Ed25519.
 
 The kit ships this verification as `oc-guardian charter fetch oc-me-v1` (see
 [`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
@@ -172,8 +172,8 @@ The kit ships this verification as `oc-guardian charter fetch oc-me-v1` (see
 
 ## Related
 
-- [Company-wide OrangeCheck charter](/charter) — the eight commitments
-  this federation operates under.
+- [Company-wide OrangeCheck charter](/charter) — the eight commitments this
+  federation operates under.
 - [FEDERATION-DEPLOYMENT.md](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md)
   — the §1A cryptographic-control model.
 - [oc-guardian-kit](https://github.com/orangecheck/oc-guardian-kit) — the

@@ -46,7 +46,7 @@ envelope id; sign it; the envelope is POSTed to `/api/delegations`. Fleet:
 
 - recomputes the id from canonical inputs and rejects on mismatch (tamper
   defense)
-- requires `principal === session.addr` (forgery defense)
+- requires `principal === session.did_oc` (forgery defense)
 - persists the row, fans out to Nostr kind 30083, submits to OC Stamp
 - triggers any subscribed webhook with `event_type: 'delegation.registered'`
 

@@ -86,7 +86,7 @@ export default withOcAuth(async (req, res) => {
         ok: true,
         account: {
             id: req.ocSession.sub,
-            btc_address: req.ocSession.addr,
+            did_oc: req.ocSession.did_oc,
             display_name: req.ocSession.name ?? null,
             nostr_npub: req.ocSession.npub ?? null,
         },

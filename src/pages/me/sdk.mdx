@@ -51,7 +51,7 @@ export default withOcAuth(async (req, res) => {
         ok: true,
         account: {
             id: req.ocSession.sub,
-            btc_address: req.ocSession.addr,
+            did_oc: req.ocSession.did_oc,
             display_name: req.ocSession.name ?? null,
             nostr_npub: req.ocSession.npub ?? null,
         },
@@ -70,7 +70,7 @@ app.use(ocAuthExpress());
 
 app.get('/api/profile', (req, res) => {
     if (!req.ocSession) return res.status(401).json({ error: 'sign in' });
-    res.json({ address: req.ocSession.addr });
+    res.json({ address: req.ocSession.did_oc });
 });
 ```
 
@@ -86,7 +86,7 @@ app.use('*', ocAuthHono());
 app.get('/api/me', (c) => {
     const session = c.get('ocSession');
     if (!session) return c.json({ ok: false }, 401);
-    return c.json({ address: session.addr });
+    return c.json({ address: session.did_oc });
 });
 ```
 

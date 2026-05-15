@@ -1,0 +1,107 @@
+export const metadata = {
+    title: 'OC Vault · Security',
+    description:
+        'An honest read of what OC Vault protects, what it exposes by design, the no-backdoor recovery tradeoff, and how the breach check preserves privacy with k-anonymity.',
+};
+
+# OC Vault · Security
+
+OC Vault's security claim is unusually narrow and unusually strong: **OC cannot
+read your data, because the architecture gives it nothing to read.** This page
+is the honest version of that claim — what is protected, what is exposed by
+design, what is a user decision, and the one tradeoff you are explicitly opting
+into.
+
+Implementers and researchers should also read the protocol's
+[`SECURITY.md`](https://github.com/orangecheck/oc-lock-protocol/blob/main/SECURITY.md).
+
+## One-glance threat model
+
+| Adversary                                 | What they learn                                                             | What they cannot                                         | Mitigation                                               |
+| ----------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| **OC / vault.ochk.io database access**    | That an identity has _N_ encrypted blobs, each with a random id + timestamp | Entry names, types, tags, payloads — anything readable   | Baked in — the double-encrypted blob (see below)         |
+| **Network observer**                      | You speak HTTPS to vault.ochk.io                                            | Content (TLS) and metadata (double encryption)           | —                                                        |
+| **Possessor of a share URL**              | Share ciphertext                                                            | The entry — the AES key lives in the URL fragment only   | Send the link over a channel only the recipient has      |
+| **Stolen unlocked browser**               | Full decrypted vault                                                        | —                                                        | Auto-lock; OS disk encryption; lock before stepping away |
+| **Stolen locked / signed-out browser**    | Ciphertext at rest in IndexedDB                                             | Plaintext — the session cookie is required to re-open    | Auto-lock; sign out on shared machines                   |
+| **Compromised wallet extension**          | Can complete a sign-in as you                                               | Cannot exfiltrate the vault key (never leaves IndexedDB) | Hardware wallet; manual signature paste                  |
+| **Lost wallet, no export, no cloud sync** | —                                                                           | —                                                        | **None — the entries are gone. This is by design.**      |
+
+## What is sealed
+
+- **Every entry payload** — AES-256-GCM under the per-browser vault key, with a
+  fresh 12-byte nonce per write.
+- **All entry metadata in the cloud** — entry name, type, tags and timestamps
+  are wrapped a second time before upload. OC's blob store sees only a random
+  16-byte envelope id and an `updated_at` value. See
+  [Protocol → double-encrypted blob](/vault/protocol#cloud-sync-the-double-encrypted-blob).
+- **The vault key itself** — 32 random bytes that never leave the device. OC has
+  no copy and the protocol provides no path to obtain one.
+
+## What is exposed by design
+
+Honesty matters more than a clean table:
+
+- **Local metadata, locally.** In your own browser's IndexedDB, entry `name`,
+  `type` and `tags` are stored in clear so the dashboard can search and filter
+  them instantly. They are sealed before they ever leave the device — but a
+  process with read access to _your_ browser profile sees them.
+- **Payment status.** OC necessarily knows whether an identity has paid for
+  cloud sync, when, and which tier. That is billing, not vault content.
+- **Blob count and timing.** With cloud sync on, OC can see _that_ you have some
+  number of encrypted blobs and _when_ each last changed. It cannot see what any
+  of them are.
+- **Your Bitcoin address.** It is your identifier with the auth host. Using an
+  address with no on-chain history avoids linking the vault to a balance.
+
+## The recovery tradeoff — read this twice
+
+There is **no master-password reset and no recovery backdoor**, because there is
+no account and no key escrow. If you lose access to the wallet that signs you in
+_and_ you have neither a portable export nor active cloud sync, your entries are
+permanently unrecoverable. OC cannot help — OC has nothing to help with.
+
+This is the cost of the core guarantee. A vendor that can recover your data for
+you can also be compelled, or breached, into surrendering it. OC Vault chose the
+other side of that trade. Mitigate it deliberately:
+
+- **Export regularly.** `settings → portable export` produces a file that
+  [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) can open forever.
+- **Turn on cloud sync** so a second device holds the entries.
+- **Witnessed Recovery** (a paid SKU) lets a chosen party hold a timelocked
+  recovery shard — without ever holding key access.
+
+## Breach checking · k-anonymity
+
+The optional breach scan on the
+[vault health](https://vault.ochk.io/vault/health) page checks passwords against
+the Have I Been Pwned corpus **without telling HIBP which password — or which
+user — is being checked**:
+
+1. The password is SHA-1 hashed locally. (SHA-1 is used purely as a lookup key
+   into HIBP's index — it protects nothing.)
+2. Only the **first five hex characters** of that hash are sent.
+3. HIBP returns every breached-hash suffix sharing that prefix — hundreds of
+   them — and the match is found locally.
+4. The request carries `Add-Padding`, so the response size leaks nothing either.
+
+This is the same mechanism 1Password's Watchtower and Bitwarden's reports use.
+The scan never runs unless you explicitly click it. The rest of the health audit
+— reused and weak detection — is entirely offline.
+
+## Operational hardening you control
+
+- **Auto-lock** — set an idle timeout in settings; on expiry the tab reloads,
+  clearing every decrypted value from memory.
+- **Clipboard auto-clear** — a copied secret is wiped from the OS clipboard
+  after a configurable delay (default 30 s).
+- **Conceal previews** — keep TOTP codes and entry previews masked until
+  explicitly revealed, to defeat shoulder-surfing.
+- **Lock before you walk away** — press `l`, or use the lock button in settings,
+  on any shared machine.
+
+## Reporting
+
+Security issues in the vault client or the underlying protocol go to the
+OrangeCheck disclosure process — see
+[`oc-lock-protocol/SECURITY.md`](https://github.com/orangecheck/oc-lock-protocol/blob/main/SECURITY.md).

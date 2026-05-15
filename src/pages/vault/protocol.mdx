@@ -1,0 +1,144 @@
+export const metadata = {
+    title: 'OC Vault · Protocol',
+    description:
+        'How OC Vault maps onto OC Lock Flow 4: the vault key, the per-entry AES-256-GCM envelope, the double-encrypted cloud blob that keeps the server blind to metadata, and the portable export format.',
+};
+
+# OC Vault · Protocol
+
+OC Vault is the consumer productization of [OC Lock](/lock/) **Flow 4** — the
+self-vault pattern. This page describes how vault entries are sealed, how cloud
+sync stays metadata-blind, and what the portable export actually contains. For
+the normative envelope rules see the
+[`oc-lock-protocol`](https://github.com/orangecheck/oc-lock-protocol) spec.
+
+## Why Flow 4 is shaped differently from Flows 1–3
+
+OC Lock's Flows 1–3 (device-to-device, group, time-locked) seal each message as
+a full BIP-322-signed `.lock` envelope. That requires a wallet sign-prompt per
+seal — fine for a one-off file drop, wrong for password-manager UX where a user
+adds fifty entries in a sitting.
+
+Flow 4 keeps the Lock **primitives** (X25519, HKDF-SHA256, AES-256-GCM, RFC 8785
+canonicalization) but defers envelope construction to _export_ time. Day-to-day
+writes are sealed under a symmetric **vault key**; a full signed `.lock`
+envelope is produced only when the user explicitly chooses to share or back up
+an entry.
+
+## The vault key
+
+On first load the browser generates a **vault key**: 32 cryptographically-random
+bytes, persisted in IndexedDB.
+
+- It is the AES-256-GCM key-encryption key for every entry.
+- It never leaves the device. OC never receives it, and the protocol has no
+  mechanism by which it could.
+- Its `sha256[:8]` fingerprint is surfaced in settings so a user can verify
+  device parity.
+
+Lose the vault key with no export and no cloud sync, and the entries are
+unrecoverable — by construction. There is no escrow.
+
+## The entry envelope
+
+Each entry is a small JSON record. The secret payload is encrypted; a thin layer
+of metadata is left in clear so the local UI can index it.
+
+```json
+{
+    "id": "9f2c…", // 16 random bytes, hex
+    "type": "password",
+    "name": "github · primary", // plaintext — local index only
+    "nonce": "b64url(12-byte nonce)",
+    "ciphertext": "b64url(AES-256-GCM(JSON(fields)))",
+    "created_at": "2026-05-15T…Z",
+    "updated_at": "2026-05-15T…Z",
+    "favorite": false,
+    "tags": ["work"],
+    "deleted_at": null // set ⇒ tombstoned (in trash)
+}
+```
+
+The `fields` object inside the ciphertext is type-specific — for a `password`
+entry it holds `username`, `password`, `url`, an optional `totp` secret,
+`notes`, a `passwordHistory` array of superseded values, and any user-defined
+`custom` fields. A fresh 12-byte nonce is drawn per encryption, so re-saving an
+unchanged entry still produces fresh ciphertext.
+
+> **Local-only metadata.** `name`, `type`, `tags`, `favorite` and the timestamps
+> are _not_ encrypted in the local IndexedDB record — they index the dashboard.
+> They are, however, sealed before they ever reach the server. See below.
+
+## Cloud sync · the double-encrypted blob
+
+Cloud sync (a paid tier) mirrors encrypted entries to an OC-hosted blob store so
+they reach every device signed in with the same Bitcoin identity. To keep OC
+blind even to entry _metadata_, the entire entry record is wrapped a **second**
+time before transit:
+
+```text
+VaultEntry JSON  (id + type + name + nonce + ciphertext + dates + tags)
+        │
+        ▼  AES-256-GCM(  ·  , vault_key, fresh blob_nonce)     ← outer wrap
+        │
+        ▼
+{ "v": 1, "blob_nonce": "b64url(…)", "blob_ct": "b64url(…)" }  ← what is uploaded
+```
+
+The server therefore stores, per entry, only:
+
+- a random 16-byte **envelope id**, and
+- an `updated_at` timestamp.
+
+It cannot read the entry name, the type, the tag list, or even the inner
+ciphertext's length-class. Both layers use the same vault key with independent
+nonces; that is safe — AES-GCM is IND-CPA secure under fresh nonces.
+
+Reconciliation is last-write-wins on `updated_at`. Deletes are **soft**: a
+deleted entry keeps its row with `deleted_at` set and a bumped `updated_at`, so
+the tombstone propagates like any other change — a delete on one device reaches
+the others. A purge from the trash is the only hard delete.
+
+## The portable export
+
+"Zero lock-in" is a protocol property, not a marketing line. Export produces a
+single JSON snapshot:
+
+```json
+{
+    "format": "oc-vault-export",
+    "version": 1,
+    "exported_at": "2026-05-15T…Z",
+    "identity": "bc1q…",
+    "entries": [
+        /* VaultEntry records, ciphertext intact */
+    ]
+}
+```
+
+The `entries` carry the same per-entry ciphertext as IndexedDB. Anyone holding
+the vault key can decrypt them with
+[`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) directly — the
+AES-256-GCM, b64url and JSON conventions are all documented and stable. If
+vault.ochk.io shut down tomorrow, this file would still open.
+
+## One-time share links
+
+Sharing a single entry does not reuse the vault key. The share flow:
+
+1. draws a fresh 32-byte AES key and 12-byte nonce,
+2. encrypts the chosen entry's fields under that key,
+3. uploads only the ciphertext to `/api/share`, and
+4. hands the user a URL whose **fragment** (`#…`) carries the AES key.
+
+Because URL fragments are never sent to a server, vault.ochk.io sees ciphertext
+only. The row is retrieve-once: it self-destructs on first successful read or at
+TTL expiry (1 h / 24 h / 7 d).
+
+## SDK surface
+
+| Package                                               | Role                                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------ |
+| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives. |
+| [`@orangecheck/lock-core`](/sdk/lock-core/README)     | The `.lock` envelope shapes used by signed single-entry export.    |
+| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — the basis for multi-device sync.   |

@@ -4,7 +4,7 @@
  * Top-level reading order:
  *   1. Getting started · Ecosystem (shared)              — landing + plumbing
  *   2. Protocols · Attest / Lock / Stamp / Vote / Agent / Pledge — six siblings
- *   3. Commercial products · Fleet / Me                — managed offerings
+ *   3. Commercial products · Fleet / Me / Vault         — managed offerings
  *   4. SDKs                                              — ship-ready packages
  *   5. Company · Charter                                 — cross-product commitments
  *   6. Reference · FAQ / Glossary                        — everything else
@@ -540,6 +540,33 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/me/operator/in-browser',
                 label: 'In-browser flow',
                 blurb: 'How the portal runs the entire operator lifecycle without a CLI. Storage, round-trip, recovery.',
+            },
+        ],
+    },
+    {
+        slug: 'vault',
+        label: 'OC Vault',
+        blurb: 'Consumer commercial product · Bitcoin-bound encrypted secrets vault. Your wallet is your master password.',
+        items: [
+            {
+                href: '/vault',
+                label: 'Overview',
+                blurb: 'What vault.ochk.io is — OC Lock Flow 4 productized. Entry types, tooling, pricing.',
+            },
+            {
+                href: '/vault/quickstart',
+                label: 'Quickstart',
+                blurb: 'Sign in with Bitcoin, add an entry, audit passwords, turn on cloud sync, export a backup.',
+            },
+            {
+                href: '/vault/protocol',
+                label: 'Protocol',
+                blurb: 'Flow 4, the entry envelope, the double-encrypted cloud blob, the portable export format.',
+            },
+            {
+                href: '/vault/security',
+                label: 'Security',
+                blurb: 'Threat model, what is sealed vs exposed, the no-backdoor recovery tradeoff, k-anonymity breach checks.',
             },
         ],
     },

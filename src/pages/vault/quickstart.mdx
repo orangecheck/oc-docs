@@ -1,0 +1,96 @@
+export const metadata = {
+    title: 'OC Vault · Quickstart',
+    description:
+        'Five steps from cold to a working encrypted vault: sign in with Bitcoin, add an entry, audit your passwords, optionally turn on Lightning-paid cloud sync, and export a portable backup.',
+};
+
+# OC Vault · Quickstart
+
+**Five steps from cold to a working vault.** No OC account to create — your
+Bitcoin identity _is_ the account. Nothing here is destructive, and the free
+tier needs no payment.
+
+## 01 · sign in with Bitcoin
+
+Open [vault.ochk.io](https://vault.ochk.io) and click **sign in**. Vault uses
+the OrangeCheck family auth host at `ochk.io`:
+
+- **Bitcoin wallet** — a single BIP-322 challenge. UniSat, Xverse, Leather, OKX,
+  Phantom, Sparrow, or a manual paste-and-sign fallback.
+- **Email-OTP** — for users without a wallet, a federation-custodied identity is
+  provisioned silently.
+
+There is no password to choose and none to forget. The session is a short-lived
+signed cookie scoped to `.ochk.io`; vault.ochk.io verifies it locally and stores
+nothing about you server-side beyond payment status.
+
+## 02 · the vault key is generated for you
+
+On first load your browser generates a **vault key** — 32 random bytes held in
+IndexedDB. This is the AES-256-GCM key that seals every entry. It never leaves
+the device and OC never sees it.
+
+You don't manage this key directly. Its fingerprint (`sha256[:8]`) is shown on
+the settings page so you can confirm two devices are _not_ yet sharing one —
+that is what cloud sync is for.
+
+## 03 · add your first entry
+
+Click **new entry** (or press `n`). Pick a type — password, TOTP, API key, card,
+identity, note, key-value, or file — give it a name, fill the fields,
+**create**.
+
+A few things worth knowing on day one:
+
+- **Generate a password** — the editor has an inline generator with a live
+  strength meter. Switch it to **passphrase** mode for a diceware-style secret.
+  Press `g` anywhere for the standalone generator.
+- **Tag it** — type a tag and press Enter. Tags are the flexible alternative to
+  folders; filter by them on the dashboard.
+- **Star it** — favorites pin to the top of the list.
+- **Custom fields** — add arbitrary extra fields; mark any of them secret.
+
+Press `?` on the dashboard for the full keyboard-shortcut list.
+
+## 04 · audit your passwords
+
+Open **vault health** (press `h`). The audit runs entirely in your browser and
+flags:
+
+- **reused** — the same password protecting more than one entry
+- **weak** — low estimated entropy
+- **insecure URL** — a login that points at plain `http://`
+
+Click **run breach scan** to additionally check each password against the Have I
+Been Pwned corpus. The check is privacy-preserving: the password is hashed
+locally and only the first five hex characters of that hash are sent. See
+[Security](/vault/security#breach-checking-k-anonymity).
+
+## 05 · (optional) turn on cloud sync
+
+The free tier is local-only and complete. To sync encrypted entries across
+devices, pay once via Lightning:
+
+- **vault Cloud Lifetime** — 210,000 sats, one-time
+- **vault Cloud Annual** — 21,000 sats / year
+
+Click **pay with lightning** on the dashboard. A BTCPay invoice opens; the
+moment it settles, the dashboard flips sync on automatically. What syncs is
+**double-encrypted ciphertext** — OC's storage layer sees only a random envelope
+id and a timestamp. See
+[Protocol](/vault/protocol#cloud-sync-the-double-encrypted-blob).
+
+## Always: export a backup
+
+From **settings → portable export**, download every entry as a single JSON file.
+That file is the same ciphertext that lives in your browser. Anyone who later
+recovers your vault key can decrypt it with
+[`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) from npm — no
+vault.ochk.io required. Do this before you wipe a device.
+
+## Migrating in
+
+Already using another manager? **settings → import from CSV** parses exports
+from 1Password, Bitwarden, LastPass, and Chrome (plus a generic fallback).
+Parsing happens entirely in your browser — the CSV file never reaches a server.
+`otpauth://` URIs are split out into separate TOTP entries automatically.

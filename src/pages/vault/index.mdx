@@ -1,0 +1,100 @@
+export const metadata = {
+    title: 'OC Vault · vault.ochk.io',
+    description:
+        'Commercial encrypted-secrets vault from OrangeCheck. Your Bitcoin wallet is your master password — passwords, TOTP codes, API keys, cards, identities and small files sealed client-side as ciphertext. No OC account, no recovery backdoor, zero lock-in.',
+};
+
+# OC Vault
+
+**Bitcoin-bound encrypted secrets storage. Your wallet is your master
+password.** [vault.ochk.io](https://vault.ochk.io) is a commercial sub-product
+of OrangeCheck, parallel to [fleet.ochk.io](/fleet/) and [me.ochk.io](/me/). It
+is the consumer-facing productization of [OC Lock](/lock/) **Flow 4** — the
+self-vault ("password manager") pattern: one identity, many encrypted entries,
+all sealed under a key only the user's browser holds.
+
+The pitch is one sentence: **a password manager that physically cannot read your
+data.** OC holds ciphertext and nothing else. Even with full database access
+there is no entry name, no type, no payload to read.
+
+## Three structural differences from a conventional password manager
+
+|                                               |                                                                                                                                                                                                 |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No OC account**                             | Your Bitcoin wallet derives your device key locally. There is no master password to reset, because there is no account to attach a reset to. OC never sees the wallet and holds no backdoor.    |
+| **Cryptographic contract = product contract** | The promise "only your wallet can decrypt" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                             |
+| **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears. |
+
+## What you can store
+
+Nine entry types, each a self-contained AES-256-GCM blob:
+
+- **password** — username, password, URL, an optional one-time-password (TOTP)
+  field, notes
+- **totp** — a standalone authenticator entry; the 6-digit RFC 6238 code rotates
+  live in the list
+- **api-key** — service, key, URL, notes — for `OPENAI_API_KEY`-shaped secrets
+- **card** — cardholder, number, expiry, CVV, PIN, billing ZIP; the list shows
+  only the last four digits
+- **identity** — name, email, phone, company, address — the form-filler block
+- **note** — free-form encrypted text
+- **kv** — a single key/value pair, for recovery-code walls and miscellany
+- **file** — up to ~1 MB of binary payload
+- **seed-phrase** — provided for BIP-39 passphrases and non-Bitcoin recovery
+  phrases **only**. Not for Bitcoin seeds — those belong on metal, offline. The
+  editor shows a warning when this type is selected.
+
+Every type also carries free-form **tags**, a **favorite** flag, and arbitrary
+**custom fields**.
+
+## Built-in security tooling
+
+- **Vault health audit** — flags reused, weak, and insecure-URL passwords
+  entirely offline. An opt-in breach scan checks each password against Have I
+  Been Pwned using k-anonymity: only the first five hex characters of a SHA-1
+  hash leave the device. See [Security](/vault/security).
+- **Generator** — cryptographically-random passwords and diceware-style
+  passphrases, with a live entropy readout.
+- **Auto-lock** — configurable idle timeout that clears all decrypted state.
+- **Clipboard auto-clear** — a copied secret is wiped from the clipboard after a
+  configurable delay.
+- **Trash** — deletes are soft; entries can be restored, and the tombstone
+  propagates through cloud sync.
+- **Password history** — superseded password values are retained per entry.
+- **One-time share links** — send any entry via a URL whose fragment carries the
+  decryption key; the server stores only ciphertext and the row self-destructs
+  on first retrieval.
+
+## Pricing
+
+vault.ochk.io is paid in **sats over Lightning — no fiat, no cards**.
+
+| SKU                      | Price                               | For                                                                             |
+| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------- |
+| **Free**                 | 0 sats                              | Local + self-supplied sync. Full feature parity minus the OC-hosted blob store. |
+| **vault Cloud Annual**   | 21,000 sats / year                  | "Try it" buyers                                                                 |
+| **vault Cloud Lifetime** | 210,000 sats one-time               | The brand-defining SKU                                                          |
+| **Family Circle**        | 50,000 sats lifetime / 5 identities | Couples, families                                                               |
+| **Witnessed Recovery**   | 21,000 sats / year per slot         | Anyone with no spare devices                                                    |
+
+The free tier is genuine: local storage and a portable export work with no
+payment. Paid tiers add the OC-hosted, ciphertext-only cloud blob store so
+encrypted entries sync across every device that signs in with the same Bitcoin
+identity.
+
+## Sub-pages in this section
+
+- [Quickstart](/vault/quickstart) — open a vault, add your first entry, turn on
+  sync
+- [Protocol](/vault/protocol) — Flow 4, the entry envelope, double-encrypted
+  sync, the export format
+- [Security](/vault/security) — threat model, what is sealed, what is exposed,
+  the recovery tradeoff
+
+## Where things live
+
+- **Product** — [vault.ochk.io](https://vault.ochk.io)
+- **Protocol** — [OC Lock](/lock/) · the `.lock` envelope and BIP-322 binding
+- **SDK** — [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README),
+  [`lock-core`](/sdk/lock-core/README), [`lock-device`](/sdk/lock-device/README)
+- **Auth** — the family [auth host](/api-reference/auth-host) at `ochk.io`

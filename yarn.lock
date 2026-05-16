@@ -627,10 +627,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/ui@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.8.2.tgz#0dfe3b7f6940b874b16adca2fc217c8bc83e0ed4"
-  integrity sha512-3YiYFhpq9Q0E3qVQtAuwS5bQ0LPEjCHc7mUwwmxX8YMq2Vx0wCGuXB7PfL4mzK2qyQetnxadRxgx2YT59Y5d8Q==
+"@orangecheck/ui@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.10.0.tgz#9a4e75d7b9f4b1338ff427bc67e0452316e81802"
+  integrity sha512-4o7NOk+r9gRWvCQZCL6pJJ4+uDGydIxEUaA7x0R87PJ4rPPKiPcgaBGpjCg+Bjxw0QvcLsT6nxpnWtZWKU4ylg==
 
 "@radix-ui/primitive@1.1.3":
   version "1.1.3"

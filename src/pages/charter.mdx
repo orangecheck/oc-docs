@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck Charter',
     description:
-        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — me.ochk.io, fleet.ochk.io, and every protocol sibling.',
+        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — me.ochk.io, fleet.ochk.io, vault.ochk.io, and every protocol sibling.',
 };
 
 # Charter
@@ -14,10 +14,10 @@ publicly. The full text is committed to git so the diff is auditable; this page
 is the canonical published version.
 
 The charter binds the **whole company**. Every product that ships under the
-OrangeCheck name — `me.ochk.io`, `fleet.ochk.io`, and every sibling protocol
-site (`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) — operates under
-these eight commitments. There is one charter, in one place, on docs.ochk.io.
-Product subdomains link here.
+OrangeCheck name — `me.ochk.io`, `fleet.ochk.io`, `vault.ochk.io`, and every
+sibling protocol site (`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) —
+operates under these eight commitments. There is one charter, in one place, on
+docs.ochk.io. Product subdomains link here.
 
 ## The eight commitments
 
@@ -96,6 +96,14 @@ review window, and a versioned re-ratification.
   ever. Commitments **02** (no custody, period), **05** (audit verifies without
   us), **06** (authority infrastructure positioning), and **08** (one seat, not
   the chair) bind this product specifically.
+- **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
+  secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
+  name, type, or payload is ever readable server-side, and there is no recovery
+  backdoor by construction. Commitments **02** (no custody — the vault key never
+  leaves the user's device, OC cannot decrypt), **03/04** (`oc-lock-protocol` is
+  open and free forever), **05** (every entry exports as a portable artifact any
+  holder of the key can decrypt offline via `@orangecheck/lock-crypto`), and
+  **07** (paid in sats over Lightning, no fiat) bind this product specifically.
 - **Protocol siblings** — every `oc-*-protocol` spec repo + the matching
   `*.ochk.io` reference site. Commitments **03** (open spec), **04** (free
   forever), and **05** (offline-verifiable) bind these specifically.

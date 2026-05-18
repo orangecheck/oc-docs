@@ -615,10 +615,12 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.0.0.tgz#ee41802b3835a9a9089827e1f2641131ba9f4614"
-  integrity sha512-ZBKns8CqNwJRJF88VSiOHfwa/I2m7mmGBHkJGv9XK/g380+MaztvuQWkIwJVSM7j/weHWShWvBI94Pnw1keGyg==
+"@orangecheck/auth-client@^2.12.0":
+  version "2.12.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.12.0.tgz#7f27673572568d1dba4eb5a3ab8a7568bc599728"
+  integrity sha512-gzvJ7kfOxC1NWM+FCNi8mpEIMursMPs9Q7B/6LqYBEVeyPNtZmHRB3lMo2vfyFmDultx6bgc9YQF18ozgtUkEA==
+  dependencies:
+    "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/auth-core@^2.0.0":
   version "2.0.0"
@@ -627,10 +629,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/ui@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.10.1.tgz#44957dc720485932d410c1727e1c8b3df14dc338"
-  integrity sha512-/EUFdZhzvnJSGP2DFc7PabFwyLnIzdckMelKDJps7i2Q8H4HQx4j7Exvaq39NI9PkyGuvfPA636539H/eahCMQ==
+"@orangecheck/ui@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.11.0.tgz#a3ef06811f8821252dbb281a4dc2fb4b8d91f5e8"
+  integrity sha512-5tJQ5BZZaT2X81FCll66s43L4gXhWXiOIkOShjrNHIlHgqkzmwOwU3poX8OityPGNUWidaXHcOJsDYSilGfhog==
 
 "@radix-ui/primitive@1.1.3":
   version "1.1.3"
@@ -809,6 +811,11 @@
   dependencies:
     fflate "^0.7.3"
     string.prototype.codepointat "^0.2.1"
+
+"@simplewebauthn/browser@^13.3.0":
+  version "13.3.0"
+  resolved "https://registry.npmjs.org/@simplewebauthn/browser/-/browser-13.3.0.tgz#e12153e71f4a8f4f8f17f94ca9c5161115306239"
+  integrity sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==
 
 "@swagger-api/apidom-ast@^1.11.0":
   version "1.11.0"

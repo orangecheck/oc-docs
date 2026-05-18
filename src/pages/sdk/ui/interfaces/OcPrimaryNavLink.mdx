@@ -1,0 +1,54 @@
+export const metadata = {
+    title: "Interface: OcPrimaryNavLink",
+    description: "Auto-generated API reference for Interface: OcPrimaryNavLink. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/ui**](../README.mdx)
+
+***
+
+[@orangecheck/ui](../README.mdx) / OcPrimaryNavLink
+
+# Interface: OcPrimaryNavLink
+
+Defined in: [primary-nav.tsx:39](https://github.com/orangecheck/oc-packages/blob/main/ui/src/primary-nav.tsx#L39)
+
+`<OcPrimaryNav>` — the centered link row in every family site's
+`<LayoutHeader>`. Replaces the per-site bespoke `<nav>` blocks.
+
+**Design goals:**
+
+  - Visible at every viewport width — no `hidden md:flex` cutoff.
+    Three short links (`dashboard · docs · spec`) fit on a 320px
+    phone in compact mono uppercase. Hamburger drawer stays
+    reserved for tertiary content (about / contact / etc.).
+
+  - Active-link affordance is identical to the prior bespoke pattern
+    (primary-coloured text + 1px underline accent), so visitors who
+    learned the old nav keep their muscle memory.
+
+  - Horizontal-scroll fallback. If a site adds a fourth link or runs
+    a very long label, the row scrolls instead of wrapping or
+    overflowing — `overflow-x-auto` + `whitespace-nowrap` + a thin
+    gradient mask via `mask-image` so the truncation reads as
+    intentional.
+
+**Usage:**
+
+  &lt;OcPrimaryNav
+      activePath=&#123;router.pathname&#125;
+      links=&#123;[
+          &#123; href: '/dashboard', label: 'dashboard' &#125;,
+          &#123; href: 'https://docs.ochk.io/attest', label: 'docs', external: true &#125;,
+          &#123; href: 'https://github.com/orangecheck/oc-attest-protocol/blob/main/SPEC.md', label: 'spec', external: true &#125;,
+      ]&#125;
+  />
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-external">&lt;/a> `external?` | `boolean` | When true, opens in a new tab and skips the `isActive` check. | [primary-nav.tsx:45](https://github.com/orangecheck/oc-packages/blob/main/ui/src/primary-nav.tsx#L45) |
+| &lt;a id="property-href">&lt;/a> `href` | `string` | Same-origin path or absolute URL. | [primary-nav.tsx:41](https://github.com/orangecheck/oc-packages/blob/main/ui/src/primary-nav.tsx#L41) |
+| &lt;a id="property-label">&lt;/a> `label` | `string` | Visible label · lowercase preferred (the chip styling applies tracking + uppercase). | [primary-nav.tsx:43](https://github.com/orangecheck/oc-packages/blob/main/ui/src/primary-nav.tsx#L43) |
+| &lt;a id="property-matchexact">&lt;/a> `matchExact?` | `boolean` | Optional override for the active-match. By default the link is active when `activePath === href` or `activePath.startsWith(href + '/')`. | [primary-nav.tsx:48](https://github.com/orangecheck/oc-packages/blob/main/ui/src/primary-nav.tsx#L48) |

@@ -1,168 +1,76 @@
 export const metadata = {
     title: 'OrangeCheck Connect',
     description:
-        'Layer an OrangeCheck identity on top of your existing login. Your users get a Bitcoin-backed did:oc no matter how they sign in — and you keep your own auth.',
+        'Keep your existing login. Drop in one server-side call and your users get a Bitcoin-backed OrangeCheck identity — no matter how they signed in.',
 };
 
 # OrangeCheck Connect
 
-**Add OrangeCheck to your existing login.** Keep Google, Auth0, Clerk,
-email/password, magic links — whatever you already run. After your user
-authenticates, your backend makes **one HTTPS call** and that user gets a
-Bitcoin-backed OrangeCheck identity (`did:oc`).
+**Add OrangeCheck to your existing login.** Keep Auth0, Clerk, NextAuth, Google,
+email/password — whatever you already run. It works exactly as it does today.
+Drop in one server-side call so that when your user signs in, an OrangeCheck
+identity (`did:oc`) is created for them at the same time.
 
-There is no new SDK to learn. A Connect integration is a single server-to-server
-`POST`.
-
-## Two ways to integrate
-
-| Pathway                      | You do                                                                              | Who owns the login UX |
-| ---------------------------- | ----------------------------------------------------------------------------------- | --------------------- |
-| **OC-as-login**              | Mount [`@orangecheck/auth-client`](/sdk/auth-client) — OrangeCheck _is_ your login. | OrangeCheck           |
-| **OC Connect** _(this page)_ | Keep your own login; call `/api/connect/provision` after it.                        | You                   |
+There is no new SDK. A Connect integration is one HTTPS `POST`.
 
 ## How it works
 
 1. Register a Connect app at
    [me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect) —
-   you get a `client_id`.
-2. Your user signs in however they already do.
-3. Your backend calls `POST https://ochk.io/api/connect/provision` with proof of
-   who the user is.
-4. OrangeCheck returns a `did:oc`. Store it against your user record.
+   you get an **API key**.
+2. Your user signs in however they already do. Nothing changes.
+3. Right after, your backend calls `POST https://ochk.io/api/connect/provision`
+   with your API key and your own id for that user.
+4. OrangeCheck returns a `did:oc`. Store it on your user record.
 
-The provisioned account is **federation-custodied** — exactly like an email-OTP
-signup. The user can later graduate to self-custody. OrangeCheck never holds a
-Bitcoin key it cannot account for.
-
-## Two trust tiers
-
-Connect accepts a user identity by one of two means. Configure either or both on
-your Connect app.
-
-### Tier 1 — verified OIDC token
-
-You forward a real OIDC ID token (Google today; Apple / Microsoft / GitHub
-next). OrangeCheck verifies it itself against the provider's JWKS — signature,
-issuer, expiry, **audience binding**, and `email_verified`. OrangeCheck trusts
-the _provider_, so the email is genuinely verified and the user resolves to
-their **canonical `did:oc`** — the same identity they have everywhere in the
-OrangeCheck family.
-
-Register your own Google OAuth client id(s) on the Connect app so OrangeCheck
-can bind the token's `aud`.
+## The whole integration
 
 ```ts
-// Your backend, after the user signs in with Google.
+// Anywhere after your own login succeeds — Auth0, Clerk, Google, your own SSO,
+// it does not matter. Run this from your backend.
 const res = await fetch('https://ochk.io/api/connect/provision', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        client_id: process.env.OC_CONNECT_CLIENT_ID,
-        tier: 'oidc',
-        provider: 'google',
-        id_token: googleIdToken, // the ID token from your Google sign-in
-        external_user_id: user.id, // optional — see "merge-on-verify" below
-    }),
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OCHK_CONNECT_KEY}`,
+    },
+    body: JSON.stringify({ user_id: yourUser.id }),
 });
-const result = await res.json();
-// → { ok: true, did_oc: 'did:oc:…', assurance: 'L1', is_new, upgrade_available: false }
+const { did_oc, is_new } = await res.json();
+// store did_oc on your user record — that is the whole integration.
 ```
 
-Pass your own `external_user_id` and Connect does **merge-on-verify**: if that
-user had a prior Tier-2 (`L0`) account, it is folded into this verified
-canonical account and the response carries `merged: true`. That is how an `L0`
-user reaches their one canonical `did:oc` — store whatever `did_oc` the response
-returns.
+`OCHK_CONNECT_KEY` is the API key from the console. `user_id` is your own stable
+id for the user. That is everything — no token to forward, no provider to name,
+no keypair, no redirect.
 
-### Tier 2 — signed assertion
-
-For any login flow that is _not_ a verifiable OIDC provider — email/password,
-magic links, your own SSO — you sign a small claims object with an Ed25519 key.
-OrangeCheck trusts _you_ for the fact of authentication.
-
-Generate the key in the Connect console: it is created in your browser, you save
-the private half, and only the public half reaches OrangeCheck.
-
-Sign the **exact bytes** of the JSON you send — there is nothing to
-canonicalize:
-
-```ts
-import { createPrivateKey, sign } from 'node:crypto';
-
-// Load the base64 private key you saved from the console. A raw 32-byte
-// Ed25519 key becomes a Node key object with this PKCS#8 prefix.
-const PKCS8_PREFIX = Buffer.from('302e020100300506032b657004220420', 'hex');
-const privateKey = createPrivateKey({
-    key: Buffer.concat([
-        PKCS8_PREFIX,
-        Buffer.from(process.env.OC_CONNECT_KEY, 'base64'),
-    ]),
-    format: 'der',
-    type: 'pkcs8',
-});
-
-const claims = {
-    external_user_id: user.id, // your own stable user id
-    email: user.email, // optional — treated as UNVERIFIED
-    issued_at: Math.floor(Date.now() / 1000),
-    nonce: crypto.randomUUID(), // single-use
-};
-const claimsBytes = Buffer.from(JSON.stringify(claims), 'utf8');
-const signature = sign(null, claimsBytes, privateKey);
-
-const res = await fetch('https://ochk.io/api/connect/provision', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        client_id: process.env.OC_CONNECT_CLIENT_ID,
-        tier: 'assertion',
-        claims_b64: claimsBytes.toString('base64url'),
-        signature: signature.toString('base64url'),
-    }),
-});
-const result = await res.json();
-// → { ok: true, did_oc: 'did:oc:…', assurance: 'L0', is_new, upgrade_available: true }
-```
+The call is **idempotent**: run it on every login if you like — the same user
+always resolves to the same `did:oc` (`is_new` tells you whether this call
+created it).
 
 ## What you get back
 
 ```json
-{
-    "ok": true,
-    "did_oc": "did:oc:…",
-    "assurance": "L1",
-    "is_new": true,
-    "upgrade_available": false
-}
+{ "ok": true, "did_oc": "did:oc:…", "is_new": true }
 ```
 
-Store `did_oc` against your user record — that is the whole integration. You now
-know "my user ↔ this OrangeCheck identity" and can show it, let them graduate to
-self-custody, or call other OrangeCheck APIs on their behalf.
-
-## Assurance — and why Tier 2 is L0
-
-Every result carries an `assurance` level:
-
-| Level  | Meaning                                                                                                              |
-| ------ | -------------------------------------------------------------------------------------------------------------------- |
-| **L1** | A verified identifier — Tier 1 (OrangeCheck checked the provider itself). Resolves to the user's canonical `did:oc`. |
-| **L0** | Integrator-asserted — Tier 2. OrangeCheck verified the _fact_ you authenticated them, but nothing about the email.   |
-
-A Tier-2 (`L0`) result is an **integrator-scoped** identity: it is keyed to your
-app and **cannot** touch a higher-assurance account. This is deliberate — it
-means a Connect integration can never assert its way into someone's existing
-OrangeCheck identity. `upgrade_available: true` flags that the user can still
-reach their canonical `did:oc`: when that same user later authenticates via Tier
-1 and you pass their `external_user_id`, Connect folds the `L0` account into the
-verified canonical account (merge-on-verify, above).
+The provisioned account is **federation-custodied** — OrangeCheck never holds a
+Bitcoin key it cannot account for, and the user can later graduate to
+self-custody. You now know "my user ↔ this OrangeCheck identity" and can show
+it, or call other OrangeCheck APIs on their behalf.
 
 ## Notes
 
-- `/api/connect/provision` is **server-to-server** — call it from your backend,
-  never the browser. The ID token / assertion is the proof.
-- Both tiers are **single-use**: a replayed token or assertion is rejected. Use
-  a fresh `nonce` per assertion.
-- Manage your apps — audiences, keys, suspend — any time at
-  [me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect).
+- **Server-to-server only.** Call `/api/connect/provision` from your backend —
+  never the browser. The API key must stay secret.
+- **The key is shown once.** Save it when you register the app. Lost it? Hit
+  _regenerate key_ in the console — the old key stops working immediately.
+- **Optional `email`.** You may also pass the user's email
+  (`{ user_id, email }`). It is recorded as a hint so the same person can be
+  unified to one identity across integrators later. The base call does not need
+  it, and it is never treated as a verified identity.
+- An integrator can only ever create and manage **its own** users' OrangeCheck
+  accounts — a Connect key can never reach into anyone else's identity.
+
+Register your first app at
+[me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect).

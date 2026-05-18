@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Variable: DISPLAYIDENTITYKINDS",
+    description: "Auto-generated API reference for Variable: DISPLAYIDENTITYKINDS. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / DISPLAY\_IDENTITY\_KINDS
+
+# Variable: DISPLAY\_IDENTITY\_KINDS
+
+```ts
+const DISPLAY_IDENTITY_KINDS: readonly ["did", "btc", "email", "nostr"];
+```
+
+Defined in: [index.ts:37](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L37)
+
+The kinds of identity a user can surface as their account-badge
+label. `did` is the canonical `did:oc` identifier (always available
+and the ultimate fallback); the other three are linked identities
+the user may or may not have.

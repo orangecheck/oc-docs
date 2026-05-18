@@ -629,10 +629,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/ui@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.12.0.tgz#a9e04af4c30fa2472e4203abe4b5c3c747d8eeba"
-  integrity sha512-tjUUpzFk7+MH5lXm/+p/uQVtrGzNAVwRUT89orTH4DQMQCTrhxCnHcRuhKBNaS7zbKhMK6A0Yh1aOy4V8ah/jg==
+"@orangecheck/ui@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.13.0.tgz#0d1daee6a0cc1068dc210440e3c9dee37ae393e6"
+  integrity sha512-HtzNIiJIELRnBhDBUoQoWkxn4U7hxBHUCzcD3dtgQCknNwi2nwcMokvVZEL8CyMNZmFeEXNaPIltHfvd8ttCdg==
 
 "@orangecheck/wallet-adapter@^0.4.0":
   version "0.4.0"

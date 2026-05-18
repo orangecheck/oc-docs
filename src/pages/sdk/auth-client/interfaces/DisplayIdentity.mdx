@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Interface: DisplayIdentity",
+    description: "Auto-generated API reference for Interface: DisplayIdentity. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / DisplayIdentity
+
+# Interface: DisplayIdentity
+
+Defined in: [types.ts:21](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L21)
+
+The identity a user has chosen to show in their account badge — the
+collapsed label every family site renders instead of the raw
+`did:oc`. Carried as a JWT claim by the auth host, so the choice is
+consistent across every `.ochk.io` subdomain with no round-trip.
+
+`kind` is which identity; `value` is the full, renderable value (the
+`did:oc`, the Bitcoin address, the email, or the npub). Integrators
+rendering their own chip read `useOcSession().account.displayIdentity`
+— it is always populated (it defaults to the `did`).
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"email"` \| `"btc"` \| `"did"` \| `"nostr"` | [types.ts:22](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L22) |
+| &lt;a id="property-value">&lt;/a> `value` | `string` | [types.ts:23](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L23) |

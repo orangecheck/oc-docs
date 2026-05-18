@@ -11,15 +11,16 @@ export const metadata = {
 
 # Interface: OcSessionState
 
-Defined in: [src/types.ts:31](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L31)
+Defined in: [types.ts:104](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L104)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-account">&lt;/a> `account` | [`OcAccount`](OcAccount.mdx) \| `null` | - | [src/types.ts:33](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L33) |
-| &lt;a id="property-error">&lt;/a> `error` | `Error` \| `null` | `null` while loading; an `Error` instance when `status === 'error'`. | [src/types.ts:35](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L35) |
-| &lt;a id="property-refresh">&lt;/a> `refresh` | () => `Promise`\&lt;`void`\> | Re-fetch the session. Useful after sign-in/sign-out happens elsewhere. | [src/types.ts:37](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L37) |
-| &lt;a id="property-signinurl">&lt;/a> `signInUrl` | `string` | URL to navigate to for sign-in on the auth host. | [src/types.ts:41](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L41) |
-| &lt;a id="property-signout">&lt;/a> `signOut` | () => `Promise`\&lt;`void`\> | Trigger a sign-out. Resolves once the cookie has been cleared. | [src/types.ts:39](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L39) |
-| &lt;a id="property-status">&lt;/a> `status` | [`OcSessionStatus`](../type-aliases/OcSessionStatus.mdx) | - | [src/types.ts:32](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L32) |
+| &lt;a id="property-account">&lt;/a> `account` | [`OcAccount`](OcAccount.mdx) \| `null` | - | [types.ts:106](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L106) |
+| &lt;a id="property-error">&lt;/a> `error` | `Error` \| `null` | `null` while loading; an `Error` instance when `status === 'error'`. | [types.ts:108](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L108) |
+| &lt;a id="property-refresh">&lt;/a> `refresh` | () => `Promise`\&lt;`void`\> | Re-fetch the session. Useful after sign-in/sign-out happens elsewhere. | [types.ts:110](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L110) |
+| &lt;a id="property-setdisplayidentity">&lt;/a> `setDisplayIdentity` | (`kind`: `"email"` \| `"btc"` \| `"did"` \| `"nostr"`) => `Promise`\&lt;`void`\> | Promote a linked identity to be the account-badge label across every `.ochk.io` site. PATCHes the auth host, which re-mints the session cookie with the new `display_identity` claim, then `refresh()`es this session. Rejects if the chosen kind is not a verified identity on the account (`btc` / `email` / `nostr` must actually be linked; `did` is always valid). | [types.ts:121](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L121) |
+| &lt;a id="property-signinurl">&lt;/a> `signInUrl` | `string` | URL to navigate to for sign-in on the auth host. | [types.ts:123](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L123) |
+| &lt;a id="property-signout">&lt;/a> `signOut` | () => `Promise`\&lt;`void`\> | Trigger a sign-out. Resolves once the cookie has been cleared. | [types.ts:112](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L112) |
+| &lt;a id="property-status">&lt;/a> `status` | [`OcSessionStatus`](../type-aliases/OcSessionStatus.mdx) | - | [types.ts:105](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L105) |

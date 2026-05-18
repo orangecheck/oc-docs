@@ -12,18 +12,18 @@ export const metadata = {
 # Function: OcSignInButton()
 
 ```ts
-function OcSignInButton(__namedParameters: OcSignInButtonProps): 
-  | ReactElement<any, string | JSXElementConstructor<any>>
-  | null;
+function OcSignInButton(__namedParameters: OcSignInButtonProps): any;
 ```
 
-Defined in: [src/components.tsx:330](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/components.tsx#L330)
+Defined in: [components.tsx:349](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/components.tsx#L349)
 
-Drop-in sign-in button. Renders an anchor that deep-links to the auth
-host's sign-in page with the current URL as `?return_to=…`.
+Drop-in sign-in button. Renders an anchor that points at either:
 
-When the user is already authenticated it renders nothing — wrap it in
-a conditional or use `<OcAccountPill>` as the signed-in affordance.
+  - the consumer's local `/signin` page (when `signInUrl` prop is set
+    — recommended; works with `<OcSignIn />`), or
+  - the auth host's `/signin?return_to=…` (default fallback)
+
+When the user is already authenticated it renders nothing.
 
 ## Parameters
 
@@ -33,5 +33,4 @@ a conditional or use `<OcAccountPill>` as the signed-in affordance.
 
 ## Returns
 
-  \| `ReactElement`\&lt;`any`, `string` \| `JSXElementConstructor`\&lt;`any`\>\>
-  \| `null`
+`any`

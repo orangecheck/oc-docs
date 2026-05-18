@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: redirectToSudo()",
+    description: "Auto-generated API reference for Function: redirectToSudo(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / redirectToSudo
+
+# Function: redirectToSudo()
+
+```ts
+function redirectToSudo(args?: RedirectToSudoArgs): void;
+```
+
+Defined in: [sudo.tsx:49](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/sudo.tsx#L49)
+
+Redirect the current browser to the auth host's `/sudo` page,
+preserving `return_to` and `purpose` query parameters. The auth
+host runs the ceremony and bounces back on success.
+
+Throws on SSR — call this only inside a click handler or effect
+after a `'sudo_required'` response.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | [`RedirectToSudoArgs`](../interfaces/RedirectToSudoArgs.mdx) |
+
+## Returns
+
+`void`

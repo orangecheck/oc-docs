@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: RedirectToSudoArgs",
+    description: "Auto-generated API reference for Interface: RedirectToSudoArgs. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / RedirectToSudoArgs
+
+# Interface: RedirectToSudoArgs
+
+Defined in: [sudo.tsx:24](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/sudo.tsx#L24)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-config">&lt;/a> `config?` | [`OcAuthConfig`](OcAuthConfig.mdx) | Optional auth-client config override · same shape as `<OcSessionProvider config={…} />`. Defaults to `authOrigin: 'https://ochk.io'`. | [sudo.tsx:38](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/sudo.tsx#L38) |
+| &lt;a id="property-purpose">&lt;/a> `purpose?` | `string` | Free-form tag echoed in the /sudo page UI — e.g. `"register a hardware key"`. The user sees "To &lt;purpose>, confirm with the one-time code…" so the prompt is framed by the action that triggered it. Not security-relevant. | [sudo.tsx:34](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/sudo.tsx#L34) |
+| &lt;a id="property-returnto">&lt;/a> `returnTo?` | `string` | Where to send the browser after the user finishes the sudo ceremony. Defaults to `window.location.href` at call-time. Must be a family origin (`*.ochk.io`) or a relative path; the /sudo page coerces unsafe values to /dashboard. | [sudo.tsx:29](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/sudo.tsx#L29) |

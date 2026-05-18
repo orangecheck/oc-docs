@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · SDK reference',
     description:
-        '@orangecheck/me-client v0.7.0 SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). useOcSession, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
+        '@orangecheck/me-client SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
 };
 
 # `@orangecheck/me-client` · SDK reference
@@ -11,12 +11,16 @@ export const metadata = {
 > below is the curated overview; the SDK reference page is the source of truth
 > for every export, type, and signature.
 
-**v0.7.0 · MIT.**
+**MIT.** Version-pinned reference: see
+[docs.ochk.io/sdk/me-client](/sdk/me-client), auto-generated per release.
 
 This is the canonical TypeScript SDK for integrating me.ochk.io. Three entry
 points, three audiences:
 
-- **`@orangecheck/me-client`** — React surface (provider + hook + button).
+- **`@orangecheck/me-client`** — React + JS surface: the `OcSignInButton`
+  component plus the `oc.*` namespaces (session, payment, event, webhook,
+  config, identity). The `<OcSessionProvider>` + `useOcSession()` React bindings
+  ship in the companion package `@orangecheck/auth-client` — install both.
 - **`@orangecheck/me-client/server`** — server-side verification. `withOcAuth`
   (Next.js Pages), `ocAuthExpress`, `ocAuthHono`, `getOcSession(headers)`,
   `verifyOcToken(token)`. **No env vars, no JWK handling, no
@@ -32,10 +36,13 @@ points, three audiences:
 yarn add @orangecheck/me-client @orangecheck/auth-client
 ```
 
-`@orangecheck/auth-client` is the React provider + hook. `me-client` re-exports
-it from the main entry point, so most React code only needs to import from
-`me-client`. Server-side code reaches for `@orangecheck/me-client/server` and
-never touches React.
+`@orangecheck/auth-client` carries the React provider + hook
+(`<OcSessionProvider>`, `useOcSession()`); `@orangecheck/me-client` carries the
+data SDK (`oc.*` namespaces), the server adapters, the `/popup` helper, and the
+`OcSignInButton` component. They are **separate packages** — `me-client` does
+not re-export the provider or hook, so React code imports the provider/hook from
+`auth-client` and everything else from `me-client`. Install both. Server-side
+code reaches for `@orangecheck/me-client/server` and never touches React.
 
 ## server-side verification (zero JWK handling)
 
@@ -117,12 +124,17 @@ button.addEventListener('click', async () => {
 
 ## React surface
 
+The provider and hook below are exported by **`@orangecheck/auth-client`**, the
+companion package — `me-client` carries the `oc.*` data namespaces and the
+`OcSignInButton`, `auth-client` carries the cross-subdomain session bindings.
+Install both.
+
 ### `<OcSessionProvider>`
 
 Wrap your app once at the root. Default `authOrigin` is `https://ochk.io`.
 
 ```tsx
-import { OcSessionProvider } from '@orangecheck/me-client';
+import { OcSessionProvider } from '@orangecheck/auth-client';
 
 <OcSessionProvider>{/* … */}</OcSessionProvider>;
 ```
@@ -134,7 +146,7 @@ Returns `{ status, account, signInUrl, signOut, refresh, error }`. Status is
 authenticated.
 
 ```tsx
-import { useOcSession } from '@orangecheck/me-client';
+import { useOcSession } from '@orangecheck/auth-client';
 
 function Header() {
     const { status, account, signInUrl, signOut } = useOcSession();

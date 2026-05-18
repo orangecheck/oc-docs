@@ -38,24 +38,30 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 
 ## Public endpoints
 
-| Method | Path                                   | Purpose                                                                            |
-| ------ | -------------------------------------- | ---------------------------------------------------------------------------------- |
-| `GET`  | `/api/health`                          | liveness probe                                                                     |
-| `GET`  | `/api/health/deep`                     | dependency probe                                                                   |
-| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event                                       |
-| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                                                   |
-| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                                                   |
-| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                                                    |
-| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                                              |
-| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                                              |
-| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)                                         |
-| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success)                            |
-| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)                                   |
-| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                                                     |
-| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                                            |
-| `POST` | `/api/integrator/event`                | fire a billable event under a project_key (live mode requires domain verification) |
+| Method | Path                                   | Purpose                                                 |
+| ------ | -------------------------------------- | ------------------------------------------------------- |
+| `GET`  | `/api/health`                          | liveness probe                                          |
+| `GET`  | `/api/health/deep`                     | dependency probe                                        |
+| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event            |
+| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
+| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                        |
+| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
+| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
+| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                   |
+| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
+| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
+| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)        |
+| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                          |
+| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
 ## Authenticated endpoints (oc_session required)
+
+> Integrator-facing endpoints (`/api/integrator/event`,
+> `/api/integrator/event/batch`, `/api/payment/authorize`) additionally accept
+> an `Authorization: Bearer <token>` header — a cross-domain integrator's
+> backend is on a different eTLD+1 and never receives the `Domain=.ochk.io`
+> `oc_session` cookie, so it forwards the popup-issued JWT instead. The
+> remaining endpoints in this section require the cookie.
 
 | Method | Path                     | Purpose                                                          |
 | ------ | ------------------------ | ---------------------------------------------------------------- |
@@ -81,6 +87,18 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 | Method | Path                     | Purpose                                                     |
 | ------ | ------------------------ | ----------------------------------------------------------- |
 | `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · Class B billable |
+
+## Authenticated · integrator event ingestion
+
+The authenticated user is the cashback recipient; `project_key` (in the body)
+identifies the billing project. Cookie **or** `Authorization: Bearer` — see the
+note above. Production callers should sign the request with the project signing
+secret (`X-OC-Signature`); advisory in the v1 rollout.
+
+| Method | Path                          | Purpose                                                                            |
+| ------ | ----------------------------- | ---------------------------------------------------------------------------------- |
+| `POST` | `/api/integrator/event`       | fire a billable event under a project_key (live mode requires domain verification) |
+| `POST` | `/api/integrator/event/batch` | fire 1–100 billable events in one call · per-event idempotency keys                |
 
 ## Authenticated · integrator project lifecycle
 

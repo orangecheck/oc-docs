@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Interface: OcSignInProps",
+    description: "Auto-generated API reference for Interface: OcSignInProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / OcSignInProps
+
+# Interface: OcSignInProps
+
+Defined in: [signin.tsx:42](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L42)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-audience">&lt;/a> `audience` | `string` | Consumer-site audience URL passed as `expectedAudience` on the BIP-322 challenge. e.g. `'https://vault.ochk.io'`. Required — the challenge nonce is bound to this audience. | [signin.tsx:48](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L48) |
+| &lt;a id="property-authorigin">&lt;/a> `authOrigin?` | `string` | Override the auth host. Defaults to `'https://ochk.io'`. For preview / dev / staging only. | [signin.tsx:82](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L82) |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | className for the outer container. | [signin.tsx:106](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L106) |
+| &lt;a id="property-initialpath">&lt;/a> `initialPath?` | `"wallet"` \| `"email"` | Initial visible tab on mobile. Defaults to `'wallet'`. On desktop both paths render side-by-side and this is ignored. | [signin.tsx:87](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L87) |
+| &lt;a id="property-linkprompt">&lt;/a> `linkPrompt?` | `boolean` | Whether to show the "also link my other identity" checkbox on the sign-in form. **On by default.** The checkbox is optional and unchecked by default; it is shown on both the wallet and email paths. If the user ticks it, the complementary identity's link ceremony (BIP-322 for a wallet, OTP for an email) runs inline immediately after a successful sign-in — before `onSuccess` / `returnTo`, so it composes with custom routing — because the sign-in just proved one credential and the link ceremony proves the second. Pass `linkPrompt={false}` to omit the checkbox. | [signin.tsx:104](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L104) |
+| &lt;a id="property-onsuccess">&lt;/a> `onSuccess?` | (`account`: [`OcAccount`](OcAccount.mdx), `token?`: `string`) => `void` | Override the default hard-navigation behavior. When provided, called with the account and the session JWT. The component will NOT navigate — the caller is responsible. Use for custom post-signin routing — e.g. /popup/signin postMessages `{ account, token }` to its opener so a cross-domain integrator (different eTLD+1 from .ochk.io, which the HttpOnly cookie can't reach) can verify the session via JWKS. | [signin.tsx:64](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L64) |
+| &lt;a id="property-paths">&lt;/a> `paths?` | \&#123; `email?`: `boolean`; `wallet?`: `boolean`; \&#125; | Disable one of the two paths. Default is both enabled. Useful for B2B-only sites that don't want to expose email-OTP. | [signin.tsx:92](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L92) |
+| `paths.email?` | `boolean` | - | [signin.tsx:92](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L92) |
+| `paths.wallet?` | `boolean` | - | [signin.tsx:92](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L92) |
+| &lt;a id="property-resolvereturnto">&lt;/a> `resolveReturnTo?` | (`account`: [`OcAccount`](OcAccount.mdx)) => `string` \| `Promise`\&lt;`string`\> | Async post-success routing. When provided (and `onSuccess` is not), the component awaits `resolveReturnTo(account)` and hard-navigates to the result instead of the static `returnTo`. This is the seam that lets a site keep persona-aware routing without forking the ceremony — e.g. me.ochk.io resolves `/api/me/intent` and routes to `/me/developer` | `/me/operator` | `/me`. The returned value is open-redirect-checked exactly like `returnTo` (same-origin paths only); on a resolver throw the component falls back to the static `returnTo`. | [signin.tsx:77](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L77) |
+| &lt;a id="property-returnto">&lt;/a> `returnTo?` | `string` | Where to navigate after success. Defaults to `'/'`. Open-redirect-safe: same-origin paths only (must start with `/`, NOT `//`). Absolute URLs are ignored. | [signin.tsx:54](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L54) |

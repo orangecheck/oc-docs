@@ -1,0 +1,48 @@
+export const metadata = {
+    title: "Function: useStepUpAuth()",
+    description: "Auto-generated API reference for Function: useStepUpAuth(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / useStepUpAuth
+
+# Function: useStepUpAuth()
+
+```ts
+function useStepUpAuth(opts?: UseHostOptions): UseStepUpAuthReturn;
+```
+
+Defined in: [webauthn.tsx:321](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L321)
+
+Prove possession of a registered hardware key before a sensitive
+action. On success the auth host sets a fresh oc_session cookie
+carrying `step_up_at = <unix-now>`; the provider re-fetches the
+session so `verifyStepUpClaim(payload, …)` flips to true immediately.
+
+Throws via `error` (not via `throw`) when:
+  - the user has no credentials registered (`no_credentials_registered`)
+  - the user cancels the platform prompt (`cancelled`)
+  - the assertion fails verification on the host (`verify_failed`,
+    `cloned_authenticator`, `credential_outside_allowlist`, …)
+
+Caller pattern:
+
+  const &#123; stepUp &#125; = useStepUpAuth();
+  const &#123; refresh &#125; = useOcSession();
+  const r = await stepUp(&#123; purpose: 'spend_over_1m' &#125;);
+  if (!r) return; // user cancelled or step-up failed
+  await refresh(); // pick up the new step_up_at
+  // …proceed with the sensitive action
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts?` | `UseHostOptions` |
+
+## Returns
+
+[`UseStepUpAuthReturn`](../interfaces/UseStepUpAuthReturn.mdx)

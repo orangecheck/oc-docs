@@ -11,13 +11,13 @@ export const metadata = {
 
 # Interface: OcAuthConfig
 
-Defined in: [src/types.ts:44](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L44)
+Defined in: [types.ts:126](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L126)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-authorigin">&lt;/a> `authOrigin?` | `string` | Origin of the auth host — the subdomain that runs the sign-in UI, issues session cookies, and exposes `/api/auth/me` + `/api/auth/logout`. Defaults to `https://ochk.io`. Override in preview/dev. | [src/types.ts:51](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L51) |
-| &lt;a id="property-logoutpath">&lt;/a> `logoutPath?` | `string` | Path on the auth host to hit to clear the session cookie. Defaults to `/api/auth/logout`. Called with `credentials: 'include'` so the `.ochk.io` cookie is sent along. | [src/types.ts:75](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L75) |
-| &lt;a id="property-mepath">&lt;/a> `mePath?` | `string` | Local path (same origin as the current app) that exposes the crypto-verified session. If your app ships one at `/api/auth/me`, leave as default. Returns 200 `{ account }` or 401. | [src/types.ts:69](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L69) |
-| &lt;a id="property-signinpath">&lt;/a> `signInPath?` | `string` | Path on the auth host that accepts `?return_to=<url>` and drives the sign-in flow. The page offers two paths in-place: - email + OTP (default — federation-custodied wallet provisioned for the user; identity is `did:email:<sha256(email)>`) - BIP-322 wallet sign (paste address → in-page wallet sign; identity is the Bitcoin address itself) Defaults to `/signin`. | [src/types.ts:63](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L63) |
+| &lt;a id="property-authorigin">&lt;/a> `authOrigin?` | `string` | Origin of the auth host — the subdomain that runs the sign-in UI, issues session cookies, and exposes `/api/auth/me` + `/api/auth/logout`. Defaults to `https://ochk.io`. Override in preview/dev. | [types.ts:133](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L133) |
+| &lt;a id="property-logoutpath">&lt;/a> `logoutPath?` | `string` | Path on the auth host to hit to clear the session cookie. Defaults to `/api/auth/logout`. Called with `credentials: 'include'` so the `.ochk.io` cookie is sent along. | [types.ts:157](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L157) |
+| &lt;a id="property-mepath">&lt;/a> `mePath?` | `string` | Local path (same origin as the current app) that exposes the crypto-verified session. If your app ships one at `/api/auth/me`, leave as default. Returns 200 `{ account }` or 401. | [types.ts:151](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L151) |
+| &lt;a id="property-signinpath">&lt;/a> `signInPath?` | `string` | Path on the auth host that accepts `?return_to=<url>` and drives the sign-in flow. The page offers two paths in-place: - email + OTP (default — federation-custodied wallet provisioned for the user; identity is `did:email:<sha256(email)>`) - BIP-322 wallet sign (paste address → in-page wallet sign; identity is the Bitcoin address itself) Defaults to `/signin`. | [types.ts:145](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L145) |

@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: fetchOcLinkedIdentities()",
+    description: "Auto-generated API reference for Function: fetchOcLinkedIdentities(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / fetchOcLinkedIdentities
+
+# Function: fetchOcLinkedIdentities()
+
+```ts
+function fetchOcLinkedIdentities(opts?: {
+  authOrigin?: string;
+}): Promise<OcLinkedIdentity[]>;
+```
+
+Defined in: [linked-identities.tsx:70](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/linked-identities.tsx#L70)
+
+Fetch the signed-in user's linked identities from the auth host —
+the same data `<OcLinkedIdentities>` renders, exposed as a plain
+function for surfaces that need the list without the full
+management UI (notably `<OcAccountMenu>`'s badge-identity promote
+list). Returns `[]` when anonymous; throws on network / server
+error so the caller can show a deferred state.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts?` | \&#123; `authOrigin?`: `string`; \&#125; |
+| `opts.authOrigin?` | `string` |
+
+## Returns
+
+`Promise`\&lt;[`OcLinkedIdentity`](../interfaces/OcLinkedIdentity.mdx)[]\>

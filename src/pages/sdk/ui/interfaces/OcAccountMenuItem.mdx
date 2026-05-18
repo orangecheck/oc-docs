@@ -1,0 +1,50 @@
+export const metadata = {
+    title: "Interface: OcAccountMenuItem",
+    description: "Auto-generated API reference for Interface: OcAccountMenuItem. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/ui**](../README.mdx)
+
+***
+
+[@orangecheck/ui](../README.mdx) / OcAccountMenuItem
+
+# Interface: OcAccountMenuItem
+
+Defined in: [account-menu.tsx:41](https://github.com/orangecheck/oc-packages/blob/main/ui/src/account-menu.tsx#L41)
+
+`<OcAccountMenu>` — the canonical top-right account affordance for
+every family site. Replaces the older inline-styled `OcAccountChip`
+from `@orangecheck/auth-client` with a Tailwind-styled, fully
+configurable, cross-site-aware dropdown.
+
+Three explicit visual states:
+
+  1. **Pre-hydration / loading** — neutral `sign in` placeholder so
+     the header never goes blank on first paint.
+  2. **Anonymous / error** — primary-styled `sign in` CTA pointing
+     at the site's local `/signin` (or whatever `signInUrl` you
+     pass).
+  3. **Authenticated** — pill with a primary-tinted signal dot and
+     shortened did_oc (or display name if set); click → popover
+     with the full did_oc as a one-click copy-to-clipboard row,
+     optional site-specific menu items, family dashboard link,
+     sign-out, and an optional BuildFooter showing site name +
+     version + commit sha → GitHub.
+
+Cross-site recognition: the component re-fetches the session on
+`visibilitychange` and `focus` events, so when a user signs in at a
+sibling site (ochk.io, attest.ochk.io, etc.) and tabs back, the
+chip flips from "sign in" to "signed in" without a hard reload.
+
+The component reads `useOcSession()` from `@orangecheck/auth-client`,
+so the consuming app must mount `<OcSessionProvider>` somewhere in
+its tree (already standard in every consumer's `_app.tsx`).
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-external">&lt;/a> `external?` | `boolean` | When `true`, opens in a new tab and renders a ↗ glyph after the label. Use for cross-domain links (e.g. `https://ochk.io/dashboard`). | [account-menu.tsx:50](https://github.com/orangecheck/oc-packages/blob/main/ui/src/account-menu.tsx#L50) |
+| &lt;a id="property-href">&lt;/a> `href` | `string` | Same-origin path or absolute URL. | [account-menu.tsx:43](https://github.com/orangecheck/oc-packages/blob/main/ui/src/account-menu.tsx#L43) |
+| &lt;a id="property-label">&lt;/a> `label` | `string` | Visible label. | [account-menu.tsx:45](https://github.com/orangecheck/oc-packages/blob/main/ui/src/account-menu.tsx#L45) |

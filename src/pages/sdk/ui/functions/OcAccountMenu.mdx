@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: OcAccountMenu()",
+    description: "Auto-generated API reference for Function: OcAccountMenu(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/ui**](../README.mdx)
+
+***
+
+[@orangecheck/ui](../README.mdx) / OcAccountMenu
+
+# Function: OcAccountMenu()
+
+```ts
+function OcAccountMenu(props: OcAccountMenuProps): any;
+```
+
+Defined in: [account-menu.tsx:271](https://github.com/orangecheck/oc-packages/blob/main/ui/src/account-menu.tsx#L271)
+
+Connected variant — pulls the session from `useOcSession()`. This is
+what every consumer site with `<OcSessionProvider>` mounted should
+use. For sites running a parallel auth context (e.g. oc-www's local
+`useAuth`), use `<OcAccountMenuView>` below and pass a session prop
+directly.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `props` | [`OcAccountMenuProps`](../interfaces/OcAccountMenuProps.mdx) |
+
+## Returns
+
+`any`

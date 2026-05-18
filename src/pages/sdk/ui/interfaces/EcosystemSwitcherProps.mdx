@@ -11,11 +11,12 @@ export const metadata = {
 
 # Interface: EcosystemSwitcherProps
 
-Defined in: [ecosystem-switcher.tsx:103](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L103)
+Defined in: [ecosystem-switcher.tsx:134](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L134)
 
 ## Properties
 
-| Property | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-classname">&lt;/a> `className?` | `string` | [ecosystem-switcher.tsx:105](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L105) |
-| &lt;a id="property-current">&lt;/a> `current` | [`EcosystemSlug`](../type-aliases/EcosystemSlug.mdx) | [ecosystem-switcher.tsx:104](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L104) |
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [ecosystem-switcher.tsx:136](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L136) |
+| &lt;a id="property-current">&lt;/a> `current` | [`EcosystemSlug`](../type-aliases/EcosystemSlug.mdx) | - | [ecosystem-switcher.tsx:135](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L135) |
+| &lt;a id="property-showownerentries">&lt;/a> `showOwnerEntries?` | `boolean` | When true, append the owner-only entries (currently `oc·analytics`) to the family-switcher dropdown. Consumers pass this from their session: `useOcSession().account?.isOwner`. Defaults to false so non-owners never see owner-only links. Not a security boundary — analytics.ochk.io re-checks the live OWNER_OC_ADDRESSES env on every request. This prop only decides whether the UX hint is visible. | [ecosystem-switcher.tsx:147](https://github.com/orangecheck/oc-packages/blob/main/ui/src/ecosystem-switcher.tsx#L147) |

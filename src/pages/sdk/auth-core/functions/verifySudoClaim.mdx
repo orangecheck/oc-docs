@@ -1,0 +1,47 @@
+export const metadata = {
+    title: "Function: verifySudoClaim()",
+    description: "Auto-generated API reference for Function: verifySudoClaim(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / verifySudoClaim
+
+# Function: verifySudoClaim()
+
+```ts
+function verifySudoClaim(payload: SessionPayload, opts: {
+  max_age_secs: number;
+}): boolean;
+```
+
+Defined in: [index.ts:216](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L216)
+
+Returns true when the JWT carries a fresh `sudo_at` claim — i.e. the
+user successfully re-authenticated inline (email-OTP or BIP-322
+challenge) within the supplied freshness window. Independent of
+`step_up_at` · sudo is "you proved your primary identity again,"
+step-up is "you tapped your hardware key."
+
+Returns false for tokens that lack the claim, that carry a stale
+value, that carry a future-dated value (clock skew or malicious
+mint), or where the freshness window is non-positive.
+
+Use this to gate auth-graph-mutating operations on the auth host —
+adding a second hardware key, linking a new identity, generating
+recovery codes, changing recovery method. Default window is 5
+minutes; tighten per-operation as needed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | [`SessionPayload`](../interfaces/SessionPayload.mdx) |
+| `opts` | \&#123; `max_age_secs`: `number`; \&#125; |
+| `opts.max_age_secs` | `number` |
+
+## Returns
+
+`boolean`

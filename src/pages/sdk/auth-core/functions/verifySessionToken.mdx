@@ -15,7 +15,7 @@ export const metadata = {
 function verifySessionToken(token: string, cfg: VerifyConfig): Promise<SessionPayload | null>;
 ```
 
-Defined in: [src/index.ts:177](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L177)
+Defined in: [index.ts:360](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L360)
 
 Crypto-only JWT verify. Returns the payload on success, `null` on
 any failure (bad signature, expired, wrong issuer, malformed).

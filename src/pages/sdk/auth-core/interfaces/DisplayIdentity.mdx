@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Interface: DisplayIdentity",
+    description: "Auto-generated API reference for Interface: DisplayIdentity. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / DisplayIdentity
+
+# Interface: DisplayIdentity
+
+Defined in: [index.ts:51](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L51)
+
+The identity a user has chosen to display in their account badge —
+carried as a JWT claim so every `.ochk.io` subdomain (and any
+integrator reading the session) renders the same label with no
+network round-trip, exactly like `name` / `npub`.
+
+`kind` is which identity; `value` is the full, renderable value (the
+`did:oc`, the Bitcoin address, the email, or the npub). Only the
+*promoted* identity's value is carried — never the whole identity
+set — so an unrelated email never enters the token.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"did"` \| `"btc"` \| `"email"` \| `"nostr"` | [index.ts:52](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L52) |
+| &lt;a id="property-value">&lt;/a> `value` | `string` | [index.ts:53](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L53) |

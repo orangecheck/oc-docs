@@ -62,11 +62,18 @@ const res = await fetch('https://ochk.io/api/connect/provision', {
         tier: 'oidc',
         provider: 'google',
         id_token: googleIdToken, // the ID token from your Google sign-in
+        external_user_id: user.id, // optional — see "merge-on-verify" below
     }),
 });
 const result = await res.json();
 // → { ok: true, did_oc: 'did:oc:…', assurance: 'L1', is_new, upgrade_available: false }
 ```
+
+Pass your own `external_user_id` and Connect does **merge-on-verify**: if that
+user had a prior Tier-2 (`L0`) account, it is folded into this verified
+canonical account and the response carries `merged: true`. That is how an `L0`
+user reaches their one canonical `did:oc` — store whatever `did_oc` the response
+returns.
 
 ### Tier 2 — signed assertion
 
@@ -146,9 +153,10 @@ Every result carries an `assurance` level:
 A Tier-2 (`L0`) result is an **integrator-scoped** identity: it is keyed to your
 app and **cannot** touch a higher-assurance account. This is deliberate — it
 means a Connect integration can never assert its way into someone's existing
-OrangeCheck identity. An `L0` user reaches their canonical `did:oc` later, by
-verifying a shared identity (an email one-time code, or a Bitcoin signature);
-`upgrade_available: true` flags that.
+OrangeCheck identity. `upgrade_available: true` flags that the user can still
+reach their canonical `did:oc`: when that same user later authenticates via Tier
+1 and you pass their `external_user_id`, Connect folds the `L0` account into the
+verified canonical account (merge-on-verify, above).
 
 ## Notes
 

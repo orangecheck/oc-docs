@@ -63,6 +63,18 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'connect',
+        label: 'Connect',
+        blurb: 'Add OrangeCheck to your existing login.',
+        items: [
+            {
+                href: '/connect',
+                label: 'Overview',
+                blurb: 'Layer a Bitcoin-backed did:oc on top of Google, Auth0, email/password — any login.',
+            },
+        ],
+    },
+    {
         slug: 'ecosystem',
         label: 'Ecosystem (shared)',
         blurb: 'The plumbing every protocol inherits.',

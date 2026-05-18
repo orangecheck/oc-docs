@@ -615,24 +615,24 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.12.0":
-  version "2.12.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.12.0.tgz#7f27673572568d1dba4eb5a3ab8a7568bc599728"
-  integrity sha512-gzvJ7kfOxC1NWM+FCNi8mpEIMursMPs9Q7B/6LqYBEVeyPNtZmHRB3lMo2vfyFmDultx6bgc9YQF18ozgtUkEA==
+"@orangecheck/auth-client@^2.13.0":
+  version "2.13.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.13.0.tgz#4ff3fcf6ed188d43bcc6c7df1871741c3aa8959a"
+  integrity sha512-b7Upi6u7OlSBZBYi/f7IpLQrDv44tQduE29PNdTlaLPxzTscjl+P0UlAB9vJyRtNub3mxnSiFQt1af1AhGy75A==
   dependencies:
     "@simplewebauthn/browser" "^13.3.0"
 
-"@orangecheck/auth-core@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-2.0.0.tgz#a277c186719898fa05ae74c0be53b4626b0c1814"
-  integrity sha512-8lJoHrtk8nZh4PjNO+GSD6K6VZuSPEv3gEOo1VqQC15P/8Oqewwuqz3BCx/FNzqWOgTWOJKh2UaCahvJCUNLaA==
+"@orangecheck/auth-core@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-2.4.0.tgz#3b74dc073f3405573c0a358030b7778cc4187ca9"
+  integrity sha512-lch0p9zT2TmH/Vd5JfHtkt4NZNBykcWhUC49pSSd39QTWqV5ljed8PzHq+zDp4K3AbiqASPWVYfq2jzy7EeSow==
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/ui@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.11.0.tgz#a3ef06811f8821252dbb281a4dc2fb4b8d91f5e8"
-  integrity sha512-5tJQ5BZZaT2X81FCll66s43L4gXhWXiOIkOShjrNHIlHgqkzmwOwU3poX8OityPGNUWidaXHcOJsDYSilGfhog==
+"@orangecheck/ui@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.12.0.tgz#a9e04af4c30fa2472e4203abe4b5c3c747d8eeba"
+  integrity sha512-tjUUpzFk7+MH5lXm/+p/uQVtrGzNAVwRUT89orTH4DQMQCTrhxCnHcRuhKBNaS7zbKhMK6A0Yh1aOy4V8ah/jg==
 
 "@orangecheck/wallet-adapter@^0.4.0":
   version "0.4.0"

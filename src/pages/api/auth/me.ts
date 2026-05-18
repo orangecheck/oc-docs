@@ -36,6 +36,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             did_oc: session.did_oc,
             display_name: session.name ?? null,
             nostr_npub: session.npub ?? null,
+            // Promoted account-badge identity, echoed from the JWT claim.
+            display_identity: session.display_identity ?? null,
         },
     });
 }

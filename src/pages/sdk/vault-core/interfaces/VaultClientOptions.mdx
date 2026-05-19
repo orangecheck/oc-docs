@@ -1,0 +1,24 @@
+export const metadata = {
+    title: "Interface: VaultClientOptions",
+    description: "Auto-generated API reference for Interface: VaultClientOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / VaultClientOptions
+
+# Interface: VaultClientOptions
+
+Defined in: [vault-core/src/sync.ts:48](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L48)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-baseurl">&lt;/a> `baseUrl?` | `string` | API origin. Default `https://vault.ochk.io`. | [vault-core/src/sync.ts:50](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L50) |
+| &lt;a id="property-credentials">&lt;/a> `credentials?` | `RequestCredentials` | Cookie mode — browser callers using the `oc_session` cookie pass `'include'`. | [vault-core/src/sync.ts:56](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L56) |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Injectable `fetch`, for testing or non-standard runtimes. | [vault-core/src/sync.ts:58](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L58) |
+| &lt;a id="property-headers">&lt;/a> `headers?` | `Record`\&lt;`string`, `string`\> | Extra request headers. | [vault-core/src/sync.ts:54](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L54) |
+| &lt;a id="property-token">&lt;/a> `token?` | `string` | An `ocvt_…` access token — sent as `Authorization: Bearer`. | [vault-core/src/sync.ts:52](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L52) |

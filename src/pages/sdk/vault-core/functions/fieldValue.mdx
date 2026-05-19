@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: fieldValue()",
+    description: "Auto-generated API reference for Function: fieldValue(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / fieldValue
+
+# Function: fieldValue()
+
+```ts
+function fieldValue(fields: VaultEntryFields, name: string): string | undefined;
+```
+
+Defined in: [vault-core/src/fields.ts:121](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L121)
+
+Resolve a field of decrypted entry fields by name — case-insensitively,
+and including a match against a `custom[]` field's `label`. Returns
+`undefined` when there is no such field or its value is not a string.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fields` | [`VaultEntryFields`](../type-aliases/VaultEntryFields.mdx) |
+| `name` | `string` |
+
+## Returns
+
+`string` \| `undefined`

@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: parseExport()",
+    description: "Auto-generated API reference for Function: parseExport(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / parseExport
+
+# Function: parseExport()
+
+```ts
+function parseExport(input: unknown): VaultExport;
+```
+
+Defined in: [vault-core/src/export.ts:51](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L51)
+
+Parse + validate an `oc-vault-export` file (a JSON string or an already
+parsed object). Throws on a wrong format / version or a malformed entry.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `unknown` |
+
+## Returns
+
+[`VaultExport`](../interfaces/VaultExport.mdx)

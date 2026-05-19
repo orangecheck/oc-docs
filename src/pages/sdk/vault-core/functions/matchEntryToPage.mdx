@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: matchEntryToPage()",
+    description: "Auto-generated API reference for Function: matchEntryToPage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / matchEntryToPage
+
+# Function: matchEntryToPage()
+
+```ts
+function matchEntryToPage(entryUrl: string, pageUrl: string): OriginMatch;
+```
+
+Defined in: [vault-core/src/origin.ts:64](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/origin.ts#L64)
+
+How an entry's stored URL relates to a page URL.
+ - 'exact'       — same scheme + host + port; offer first.
+ - 'registrable' — same eTLD+1 (e.g. www. vs bare); offer, ranked lower.
+ - 'none'        — do not offer this entry for this page.
+
+An `https` entry never matches an `http` page: a downgrade is a no.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entryUrl` | `string` |
+| `pageUrl` | `string` |
+
+## Returns
+
+[`OriginMatch`](../type-aliases/OriginMatch.mdx)

@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: VaultExport",
+    description: "Auto-generated API reference for Interface: VaultExport. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / VaultExport
+
+# Interface: VaultExport
+
+Defined in: [vault-core/src/export.ts:16](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L16)
+
+The shape of an `oc-vault-export` v1 file.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-entries">&lt;/a> `entries` | [`VaultEntry`](VaultEntry.mdx)[] | Entries with their nonce + ciphertext intact — still sealed under `K`. | [vault-core/src/export.ts:24](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L24) |
+| &lt;a id="property-entry_count">&lt;/a> `entry_count` | `number` | - | [vault-core/src/export.ts:22](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L22) |
+| &lt;a id="property-exported_at">&lt;/a> `exported_at` | `string` | - | [vault-core/src/export.ts:19](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L19) |
+| &lt;a id="property-format">&lt;/a> `format` | `"oc-vault-export"` | - | [vault-core/src/export.ts:17](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L17) |
+| &lt;a id="property-identity">&lt;/a> `identity` | `string` \| `null` | Plaintext sender address from the session; may be null. | [vault-core/src/export.ts:21](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L21) |
+| &lt;a id="property-version">&lt;/a> `version` | `1` | - | [vault-core/src/export.ts:18](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/export.ts#L18) |

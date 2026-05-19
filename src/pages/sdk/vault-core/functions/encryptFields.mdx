@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: encryptFields()",
+    description: "Auto-generated API reference for Function: encryptFields(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / encryptFields
+
+# Function: encryptFields()
+
+```ts
+function encryptFields(fields: VaultEntryFields, key: Uint8Array): {
+  ciphertext: string;
+  nonce: string;
+};
+```
+
+Defined in: [vault-core/src/crypto.ts:177](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L177)
+
+Encrypt an entry's inner fields under the vault key.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fields` | [`VaultEntryFields`](../type-aliases/VaultEntryFields.mdx) |
+| `key` | `Uint8Array` |
+
+## Returns
+
+```ts
+{
+  ciphertext: string;
+  nonce: string;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `ciphertext` | `string` | [vault-core/src/crypto.ts:180](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L180) |
+| `nonce` | `string` | [vault-core/src/crypto.ts:180](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L180) |

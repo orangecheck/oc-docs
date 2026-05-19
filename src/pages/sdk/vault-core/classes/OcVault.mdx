@@ -1,0 +1,185 @@
+export const metadata = {
+    title: "Class: OcVault",
+    description: "Auto-generated API reference for Class: OcVault. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / OcVault
+
+# Class: OcVault
+
+Defined in: [vault-core/src/vault.ts:32](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L32)
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-entries">&lt;/a> `entries` | `readonly` | [`DecryptedEntry`](../interfaces/DecryptedEntry.mdx)[] | Every live (non-trashed) decrypted entry. | [vault-core/src/vault.ts:37](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L37) |
+| &lt;a id="property-identity">&lt;/a> `identity` | `readonly` | `string` \| `null` | The OrangeCheck identity this vault belongs to, when known. | [vault-core/src/vault.ts:39](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L39) |
+| &lt;a id="property-key">&lt;/a> `key` | `readonly` | `Uint8Array` | The unwrapped 32-byte vault key. In-memory only. | [vault-core/src/vault.ts:35](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L35) |
+
+## Methods
+
+### find()
+
+```ts
+find(item: string): DecryptedEntry | null;
+```
+
+Defined in: [vault-core/src/vault.ts:105](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L105)
+
+Find one decrypted entry by its id or its name (case-insensitive).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `item` | `string` |
+
+#### Returns
+
+[`DecryptedEntry`](../interfaces/DecryptedEntry.mdx) \| `null`
+
+***
+
+### list()
+
+```ts
+list(): VaultEntrySummary[];
+```
+
+Defined in: [vault-core/src/vault.ts:100](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L100)
+
+Metadata summaries for every entry — no secret values.
+
+#### Returns
+
+[`VaultEntrySummary`](../interfaces/VaultEntrySummary.mdx)[]
+
+***
+
+### resolve()
+
+```ts
+resolve(ref: string | SecretRef): string;
+```
+
+Defined in: [vault-core/src/vault.ts:115](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L115)
+
+Resolve one `ocv://` reference to its value.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ref` | `string` \| [`SecretRef`](../interfaces/SecretRef.mdx) |
+
+#### Returns
+
+`string`
+
+***
+
+### resolveAll()
+
+```ts
+resolveAll(refs: Record<string, string>): Record<string, string>;
+```
+
+Defined in: [vault-core/src/vault.ts:129](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L129)
+
+Resolve a map of `{ name: ocv://reference }` to `{ name: value }` —
+the shape an `.env`-style file or a CI matrix uses.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `refs` | `Record`\&lt;`string`, `string`\> |
+
+#### Returns
+
+`Record`\&lt;`string`, `string`\>
+
+***
+
+### fromEntries()
+
+```ts
+static fromEntries(entries: VaultEntry[], key: Uint8Array): OcVault;
+```
+
+Defined in: [vault-core/src/vault.ts:77](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L77)
+
+Open from entries and a raw key you already hold (e.g. the extension).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entries` | [`VaultEntry`](../interfaces/VaultEntry.mdx)[] |
+| `key` | `Uint8Array` |
+
+#### Returns
+
+`OcVault`
+
+***
+
+### fromExport()
+
+```ts
+static fromExport(
+   exportFile: string | VaultExport, 
+   escrow: WrappedKey, 
+   passphrase: string): OcVault;
+```
+
+Defined in: [vault-core/src/vault.ts:63](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L63)
+
+Open from a portable export file — fully offline, no network. The
+export holds ciphertext only, so the escrowed `WrappedKey` and the
+passphrase are still required to derive the key.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `exportFile` | `string` \| [`VaultExport`](../interfaces/VaultExport.mdx) |
+| `escrow` | [`WrappedKey`](../interfaces/WrappedKey.mdx) |
+| `passphrase` | `string` |
+
+#### Returns
+
+`OcVault`
+
+***
+
+### open()
+
+```ts
+static open(opts: {
+  client: VaultClient;
+  passphrase: string;
+}): Promise<OcVault>;
+```
+
+Defined in: [vault-core/src/vault.ts:46](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L46)
+
+Open a live vault over a `VaultClient`: fetch the escrow, unwrap the
+key with the passphrase, pull every blob, decrypt.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | \&#123; `client`: [`VaultClient`](VaultClient.mdx); `passphrase`: `string`; \&#125; |
+| `opts.client` | [`VaultClient`](VaultClient.mdx) |
+| `opts.passphrase` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`OcVault`\>

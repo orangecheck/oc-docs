@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: unwrapVaultKey()",
+    description: "Auto-generated API reference for Function: unwrapVaultKey(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / unwrapVaultKey
+
+# Function: unwrapVaultKey()
+
+```ts
+function unwrapVaultKey(w: WrappedKey, passphrase: string): Uint8Array;
+```
+
+Defined in: [vault-core/src/crypto.ts:111](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L111)
+
+Unwrap the vault key from its escrowed `WrappedKey` using the passphrase.
+scrypt-derives the wrap key, then AES-256-GCM-decrypts. Throws
+`WrongPassphrase` on any failure — never returns a bogus key.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `w` | [`WrappedKey`](../interfaces/WrappedKey.mdx) |
+| `passphrase` | `string` |
+
+## Returns
+
+`Uint8Array`

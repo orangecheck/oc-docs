@@ -1,0 +1,151 @@
+export const metadata = {
+    title: 'OC Vault · Developer platform',
+    description:
+        'The oc-vault CLI, the @orangecheck/vault-core SDK, ocv:// secret references, access tokens, and the GitHub Action — programmatic, zero-knowledge access to your encrypted vault.',
+};
+
+# OC Vault · Developer platform
+
+Reach your vault from a script, an app, or a CI job — without a browser, and
+without surrendering zero-knowledge. The developer platform is one CLI, one SDK,
+one `ocv://` reference syntax, and a GitHub Action.
+
+## The model — why a leaked token is not a leaked vault
+
+OC Vault is zero-knowledge: `vault.ochk.io` stores only ciphertext, and the
+vault key is derived from your passphrase. A developer surface has to let a
+headless process read secrets without breaking that, so oc-vault **splits the
+credential in two**:
+
+- **An access token** authorizes _transport_ — it lets a caller fetch your
+  encrypted blobs. It carries **no key material**. A leaked token yields only
+  ciphertext, exactly what the server already holds.
+- **The passphrase** derives the vault key and performs _decryption_,
+  client-side. It is never sent anywhere.
+
+This is stricter than the service-account model elsewhere in the industry, where
+the token itself embeds the keys. Here, no single credential both authenticates
+and decrypts.
+
+## Mint an access token
+
+Sign in at [vault.ochk.io](https://vault.ochk.io), open
+**[/vault/developer](https://vault.ochk.io/vault/developer)**, and mint a token.
+Choose a scope:
+
+- **read** — fetch blobs and escrow. Enough for the CLI, the SDK's read path,
+  and CI.
+- **read-write** — also create, update, and delete entries.
+
+The secret (`ocvt_…`) is shown once. Store it like a password; revoke it any
+time from the same page.
+
+## `ocv://` secret references
+
+A reference is the only secret-shaped string that belongs in a committed file.
+The plaintext is produced only at run time.
+
+```
+ocv://<vault>/<item>/<field>[?attr=otp]
+```
+
+- **vault** — `personal` (your own vault). Team vaults are on the roadmap.
+- **item** — an entry's name (case-insensitive) or its 32-hex id.
+- **field** — a field name; omit it for the entry type's primary field
+  (`password` for a login, `key` for an api-key, `secret` for a totp).
+- **?attr=otp** — emit a live TOTP code instead of the stored seed.
+
+```
+ocv://personal/Stripe/key
+ocv://personal/GitHub/username
+ocv://personal/GitHub/login?attr=otp
+```
+
+## The `oc-vault` CLI
+
+```bash
+npm install -g @orangecheck/vault-cli
+
+oc-vault login --token "ocvt_…"      # caches ciphertext locally, once
+```
+
+`login` fetches your escrow and ciphertext blobs and caches them — nothing
+plaintext is written. Every other command runs against that cache; the
+passphrase (from `$OCV_PASSPHRASE` or a hidden prompt) unwraps the key in memory
+only.
+
+```bash
+oc-vault read ocv://personal/Stripe/key       # print one secret
+oc-vault run --env-file .env.ocv -- ./server  # secrets in the child's env
+oc-vault export --env-file .env.ocv           # emit KEY=value
+oc-vault inject -i config.tpl -o config.out   # fill a template
+oc-vault item list                            # browse entries
+oc-vault whoami
+```
+
+| Command                       | What it does                                                 |
+| ----------------------------- | ------------------------------------------------------------ |
+| `login` / `sync`              | Authenticate and cache the encrypted vault.                  |
+| `read <ref>`                  | Resolve one `ocv://` reference.                              |
+| `run [--env-file f] -- <cmd>` | Run a command with references resolved into its environment. |
+| `export [--env-file f]`       | Emit `KEY=value`, or load a CI job (`--github`).             |
+| `inject -i <tpl> [-o <out>]`  | Fill `ocv://` references in a template.                      |
+| `item list` / `item get`      | Browse entries; secrets masked unless `--reveal`.            |
+| `whoami`                      | Show the cached identity.                                    |
+
+## The SDK — `@orangecheck/vault-core`
+
+The crypto, entry model, `ocv://` resolver, and a transport-agnostic API client.
+The CLI and the Action are thin shells over it.
+
+```ts
+import { OcVault, VaultClient } from '@orangecheck/vault-core';
+
+const vault = await OcVault.open({
+    client: new VaultClient({ token: process.env.OCV_TOKEN }),
+    passphrase: process.env.OCV_PASSPHRASE,
+});
+
+vault.resolve('ocv://personal/Stripe/key'); // the value
+vault.list(); // metadata only — no secrets
+```
+
+Offline, from a portable export — no network at all:
+
+```ts
+const vault = OcVault.fromExport(exportJson, escrow, passphrase);
+```
+
+The vault key is derived in-process and never transmitted. Full API reference:
+[`/sdk/vault-core`](/sdk/vault-core).
+
+## GitHub Actions
+
+The `load-vault-secrets` Action resolves `ocv://` references into a job. Put the
+references in the step's `env:`; the resolved values are loaded for every later
+step and masked in the logs.
+
+```yaml
+steps:
+    - uses: orangecheck/oc-load-vault-secrets-action@v1
+      with:
+          token: ${{ secrets.OCV_TOKEN }}
+          passphrase: ${{ secrets.OCV_PASSPHRASE }}
+      env:
+          DATABASE_URL: ocv://personal/prod-postgres/url
+          STRIPE_KEY: ocv://personal/Stripe/key
+
+    - run: ./deploy.sh # DATABASE_URL and STRIPE_KEY are set
+```
+
+Store the token (mint it **read-only** for CI) and the passphrase as repository
+secrets. Decryption happens on the runner — the token carries no key material,
+and the passphrase never leaves the runner.
+
+## Packages
+
+| Package                                                                            | Role                                          |
+| ---------------------------------------------------------------------------------- | --------------------------------------------- |
+| [`@orangecheck/vault-core`](https://www.npmjs.com/package/@orangecheck/vault-core) | Crypto, model, `ocv://` resolver, API client. |
+| [`@orangecheck/vault-cli`](https://www.npmjs.com/package/@orangecheck/vault-cli)   | The `oc-vault` command.                       |
+| `orangecheck/oc-load-vault-secrets-action`                                         | The GitHub Action.                            |

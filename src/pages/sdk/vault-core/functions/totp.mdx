@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: totp()",
+    description: "Auto-generated API reference for Function: totp(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / totp
+
+# Function: totp()
+
+```ts
+function totp(secret: string, opts?: TotpOptions): string;
+```
+
+Defined in: [vault-core/src/totp.ts:53](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/totp.ts#L53)
+
+Generate the current TOTP code for a base32 `secret`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `secret` | `string` |
+| `opts` | [`TotpOptions`](../interfaces/TotpOptions.mdx) |
+
+## Returns
+
+`string`

@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: decryptFields()",
+    description: "Auto-generated API reference for Function: decryptFields(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / decryptFields
+
+# Function: decryptFields()
+
+```ts
+function decryptFields(entry: Pick<VaultEntry, "nonce" | "ciphertext">, key: Uint8Array): VaultEntryFields;
+```
+
+Defined in: [vault-core/src/crypto.ts:145](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L145)
+
+Decrypt an entry's inner fields. Call lazily — never cache the result.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entry` | `Pick`\&lt;[`VaultEntry`](../interfaces/VaultEntry.mdx), `"nonce"` \| `"ciphertext"`\> |
+| `key` | `Uint8Array` |
+
+## Returns
+
+[`VaultEntryFields`](../type-aliases/VaultEntryFields.mdx)

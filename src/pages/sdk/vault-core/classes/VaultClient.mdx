@@ -1,0 +1,176 @@
+export const metadata = {
+    title: "Class: VaultClient",
+    description: "Auto-generated API reference for Class: VaultClient. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / VaultClient
+
+# Class: VaultClient
+
+Defined in: [vault-core/src/sync.ts:62](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L62)
+
+A thin, transport-agnostic client for the vault.ochk.io ciphertext API.
+
+## Constructors
+
+### Constructor
+
+```ts
+new VaultClient(opts?: VaultClientOptions): VaultClient;
+```
+
+Defined in: [vault-core/src/sync.ts:69](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L69)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`VaultClientOptions`](../interfaces/VaultClientOptions.mdx) |
+
+#### Returns
+
+`VaultClient`
+
+## Methods
+
+### deleteBlob()
+
+```ts
+deleteBlob(envelopeId: string): Promise<void>;
+```
+
+Defined in: [vault-core/src/sync.ts:182](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L182)
+
+Hard-delete one blob.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `envelopeId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\>
+
+***
+
+### fetchBlob()
+
+```ts
+fetchBlob(envelopeId: string): Promise<string | null>;
+```
+
+Defined in: [vault-core/src/sync.ts:135](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L135)
+
+One blob's packed ciphertext, or null when it is gone.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `envelopeId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`string` \| `null`\>
+
+***
+
+### fetchBlobs()
+
+```ts
+fetchBlobs(refs: BlobRef[], concurrency?: number): Promise<FetchedBlob[]>;
+```
+
+Defined in: [vault-core/src/sync.ts:151](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L151)
+
+Fetch many blobs with bounded concurrency — fast, but not a thundering
+herd against the rate limiter. A blob that fails transiently is
+omitted; the next sync re-fetches it.
+
+#### Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `refs` | [`BlobRef`](../interfaces/BlobRef.mdx)[] | `undefined` |
+| `concurrency` | `number` | `8` |
+
+#### Returns
+
+`Promise`\&lt;[`FetchedBlob`](../interfaces/FetchedBlob.mdx)[]\>
+
+***
+
+### fetchEscrow()
+
+```ts
+fetchEscrow(): Promise<WrappedKey | null>;
+```
+
+Defined in: [vault-core/src/sync.ts:109](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L109)
+
+The escrowed, passphrase-wrapped vault key, or null when no vault exists.
+
+#### Returns
+
+`Promise`\&lt;[`WrappedKey`](../interfaces/WrappedKey.mdx) \| `null`\>
+
+***
+
+### fetchIdentity()
+
+```ts
+fetchIdentity(): Promise<string | null>;
+```
+
+Defined in: [vault-core/src/sync.ts:117](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L117)
+
+The signed-in OrangeCheck identity (`did:oc:…`), or null.
+
+#### Returns
+
+`Promise`\&lt;`string` \| `null`\>
+
+***
+
+### listBlobs()
+
+```ts
+listBlobs(): Promise<BlobRef[]>;
+```
+
+Defined in: [vault-core/src/sync.ts:129](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L129)
+
+The change manifest — envelope ids + timestamps, no ciphertext.
+
+#### Returns
+
+`Promise`\&lt;[`BlobRef`](../interfaces/BlobRef.mdx)[]\>
+
+***
+
+### putBlob()
+
+```ts
+putBlob(envelopeId: string, ciphertext: string): Promise<void>;
+```
+
+Defined in: [vault-core/src/sync.ts:174](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L174)
+
+Upsert one blob's packed ciphertext.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `envelopeId` | `string` |
+| `ciphertext` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\>

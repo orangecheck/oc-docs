@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Variable: PRIMARYFIELD",
+    description: "Auto-generated API reference for Variable: PRIMARYFIELD. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / PRIMARY\_FIELD
+
+# Variable: PRIMARY\_FIELD
+
+```ts
+const PRIMARY_FIELD: Record<VaultEntryType, string>;
+```
+
+Defined in: [vault-core/src/fields.ts:104](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L104)
+
+The "primary" field of each entry type — the one a secret reference
+resolves to when no field component is given (`ocv://personal/Stripe`
+→ the api-key's `key`).

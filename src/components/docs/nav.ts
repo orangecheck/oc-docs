@@ -585,6 +585,11 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'Security',
                 blurb: 'Threat model, what is sealed vs exposed, the no-backdoor recovery tradeoff, k-anonymity breach checks.',
             },
+            {
+                href: '/vault/developer',
+                label: 'Developer platform',
+                blurb: 'The oc-vault CLI, the vault-core SDK, ocv:// references, access tokens, and the GitHub Action.',
+            },
         ],
     },
     {
@@ -711,6 +716,12 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/sdk/lock-device/README',
                 label: '@orangecheck/lock-device',
                 blurb: 'Device-key management for OC Lock recipients.',
+            },
+            // ── vault (oc-vault) ───────────────────────────────────────
+            {
+                href: '/sdk/vault-core/README',
+                label: '@orangecheck/vault-core',
+                blurb: 'OC Vault crypto, entry model, ocv:// secret-reference resolver, API client.',
             },
             // ── stamp (oc-stamp-protocol) ──────────────────────────────
             {

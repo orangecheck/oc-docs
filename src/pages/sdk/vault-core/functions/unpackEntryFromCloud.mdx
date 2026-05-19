@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: unpackEntryFromCloud()",
+    description: "Auto-generated API reference for Function: unpackEntryFromCloud(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / unpackEntryFromCloud
+
+# Function: unpackEntryFromCloud()
+
+```ts
+function unpackEntryFromCloud(payload: string, key: Uint8Array): VaultEntry;
+```
+
+Defined in: [vault-core/src/crypto.ts:137](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L137)
+
+Unpack a cloud blob — the outer AES-GCM layer that keeps the server
+blind to entry names and types — back to a `VaultEntry`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | `string` |
+| `key` | `Uint8Array` |
+
+## Returns
+
+[`VaultEntry`](../interfaces/VaultEntry.mdx)

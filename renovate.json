@@ -1,0 +1,25 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits"],
+    "labels": ["renovate"],
+    "prConcurrentLimit": 5,
+    "prHourlyLimit": 10,
+    "packageRules": [
+        {
+            "description": "Auto-merge @orangecheck/* patch + minor — bundle all family bumps into one PR — after a 1-day stability window.",
+            "matchPackageNames": ["/^@orangecheck//"],
+            "matchUpdateTypes": ["patch", "minor"],
+            "groupName": "@orangecheck/* (family)",
+            "automerge": true,
+            "automergeType": "branch",
+            "minimumReleaseAge": "1 day"
+        },
+        {
+            "description": "Human-review @orangecheck/* major bumps — these change wire shape.",
+            "matchPackageNames": ["/^@orangecheck//"],
+            "matchUpdateTypes": ["major"],
+            "automerge": false,
+            "labels": ["renovate", "major-bump"]
+        }
+    ]
+}

@@ -1,17 +1,18 @@
 export const metadata = {
     title: 'OC Vault · vault.ochk.io',
     description:
-        'Commercial encrypted-secrets vault from OrangeCheck. Your Bitcoin wallet is your master password — passwords, TOTP codes, API keys, cards, identities and small files sealed client-side as ciphertext. No OC account, no recovery backdoor, zero lock-in.',
+        'Commercial encrypted-secrets vault from OrangeCheck. Passwords, TOTP codes, API keys, cards, identities, env-var bundles, and small files sealed client-side as ciphertext. Browser extension, CLI, and SDK on top. No recovery backdoor, zero lock-in.',
 };
 
 # OC Vault
 
-**Bitcoin-bound encrypted secrets storage. Your wallet is your master
-password.** [vault.ochk.io](https://vault.ochk.io) is a commercial sub-product
-of OrangeCheck, parallel to [fleet.ochk.io](/fleet/) and [me.ochk.io](/me/). It
-is the consumer-facing productization of [OC Lock](/lock/) **Flow 4** — the
-self-vault ("password manager") pattern: one identity, many encrypted entries,
-all sealed under a key only the user's browser holds.
+**Encrypted secrets storage, sealed by a key OrangeCheck never sees.**
+[vault.ochk.io](https://vault.ochk.io) is a commercial sub-product of
+OrangeCheck, parallel to [fleet.ochk.io](/fleet/) and [me.ochk.io](/me/). It is
+the consumer-facing productization of [OC Lock](/lock/) **Flow 4** — the
+self-vault ("password manager") pattern: one OC identity, many encrypted
+entries, all sealed under a key only your browser, your extension, or your CLI
+holds.
 
 The pitch is one sentence: **a password manager that physically cannot read your
 data.** OC holds ciphertext and nothing else. Even with full database access
@@ -19,21 +20,24 @@ there is no entry name, no type, no payload to read.
 
 ## Three structural differences from a conventional password manager
 
-|                                               |                                                                                                                                                                                                 |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No OC account**                             | Your Bitcoin wallet derives your device key locally. There is no master password to reset, because there is no account to attach a reset to. OC never sees the wallet and holds no backdoor.    |
-| **Cryptographic contract = product contract** | The promise "only your wallet can decrypt" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                             |
-| **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears. |
+|                                               |                                                                                                                                                                                                                                                                               |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No OC account**                             | Your OrangeCheck identity (Bitcoin wallet via BIP-322, or a federation-custodied identity via email-OTP) is the account. There is no master password to reset, because there is no account to attach a reset to. OC never sees a wallet key and holds no decryption backdoor. |
+| **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                           |
+| **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/vault-core`](/sdk/vault-core/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears.                                                                                 |
 
 ## What you can store
 
-Nine entry types, each a self-contained AES-256-GCM blob:
+Ten entry types, each a self-contained AES-256-GCM blob:
 
 - **password** — username, password, URL, an optional one-time-password (TOTP)
   field, notes
 - **totp** — a standalone authenticator entry; the 6-digit RFC 6238 code rotates
   live in the list
 - **api-key** — service, key, URL, notes — for `OPENAI_API_KEY`-shaped secrets
+- **env** — a bundle of `KEY=value` environment variables, addressable by key
+  from the CLI as `ocv://personal/<bundle>/<KEY>`. The natural shape for `.env`
+  files and CI config
 - **card** — cardholder, number, expiry, CVV, PIN, billing ZIP; the list shows
   only the last four digits
 - **identity** — name, email, phone, company, address — the form-filler block
@@ -44,8 +48,8 @@ Nine entry types, each a self-contained AES-256-GCM blob:
   phrases **only**. Not for Bitcoin seeds — those belong on metal, offline. The
   editor shows a warning when this type is selected.
 
-Every type also carries free-form **tags**, a **favorite** flag, and arbitrary
-**custom fields**.
+Every type also carries free-form **tags**, a **favorite** flag, **folders**,
+and arbitrary **custom fields**.
 
 ## Built-in security tooling
 
@@ -64,6 +68,26 @@ Every type also carries free-form **tags**, a **favorite** flag, and arbitrary
 - **One-time share links** — send any entry via a URL whose fragment carries the
   decryption key; the server stores only ciphertext and the row self-destructs
   on first retrieval.
+
+## Reach it from anywhere — extension, CLI, SDK
+
+The same encrypted vault, three surfaces:
+
+- **[Browser extension](/vault/extension)** — Manifest V3, Chromium and Firefox.
+  Autofill, capture, your full vault one toolbar click away. The vault key never
+  leaves the extension.
+- **[`oc-vault` CLI](/vault/developer)** — `oc-vault read ocv://…`, `run`,
+  `inject`, `export`, `item list/get`. Zero-knowledge: the passphrase unwraps
+  the key in memory and is never stored.
+- **[`@orangecheck/vault-core`](/sdk/vault-core/README) SDK** — the crypto, the
+  entry model, the `ocv://` resolver, and a transport-agnostic API client. Build
+  your own integration on top.
+- **[GitHub Action](/vault/developer#github-actions)** — resolve `ocv://`
+  references into a CI job's environment, masked in logs.
+
+Headless access uses an **access token** that authorizes transport only — it
+carries no key material, so a leaked token yields only ciphertext. The
+passphrase still does the decrypting, in-process.
 
 ## Pricing
 
@@ -86,6 +110,10 @@ identity.
 
 - [Quickstart](/vault/quickstart) — open a vault, add your first entry, turn on
   sync
+- [Browser extension](/vault/extension) — autofill in Chromium / Firefox, your
+  full vault one toolbar click away
+- [Developer platform](/vault/developer) — the `oc-vault` CLI, `ocv://` secret
+  references, access tokens, the GitHub Action
 - [Protocol](/vault/protocol) — Flow 4, the entry envelope, double-encrypted
   sync, the export format
 - [Security](/vault/security) — threat model, what is sealed, what is exposed,
@@ -94,7 +122,10 @@ identity.
 ## Where things live
 
 - **Product** — [vault.ochk.io](https://vault.ochk.io)
+- **Browser extension** — see [/vault/extension](/vault/extension)
 - **Protocol** — [OC Lock](/lock/) · the `.lock` envelope and BIP-322 binding
-- **SDK** — [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README),
-  [`lock-core`](/sdk/lock-core/README), [`lock-device`](/sdk/lock-device/README)
+- **SDK** — [`@orangecheck/vault-core`](/sdk/vault-core/README) (the vault
+  crypto + model + resolver), `@orangecheck/vault-cli` (the `oc-vault` command),
+  and lower-level [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README)
+  primitives
 - **Auth** — the family [auth host](/api-reference/auth-host) at `ochk.io`

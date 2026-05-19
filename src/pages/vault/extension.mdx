@@ -1,0 +1,78 @@
+export const metadata = {
+    title: 'OC Vault · Browser extension',
+    description:
+        'The OC Vault browser extension — autofill for any site, save new logins as you create them, your full vault one toolbar click away. Manifest V3, zero-knowledge: the vault key never leaves the extension.',
+};
+
+# OC Vault · Browser extension
+
+A Manifest V3 extension for Chromium browsers (Chrome, Brave, Edge, Arc,
+Vivaldi). Autofills logins, captures new ones, and gives you the full vault one
+toolbar click away — all against the same end-to-end-encrypted
+[vault.ochk.io](https://vault.ochk.io) you already use.
+
+**Zero-knowledge by construction.** The service worker is the only component
+that holds the vault key. The popup shows metadata; the content script (the part
+adjacent to a hostile page) gets a single field's value at fill time and nothing
+else. The vault key never touches disk and never reaches the page. See
+[Security](/vault/security).
+
+## What it does
+
+- **Autofill.** Focus a login field on a site you have credentials for — the
+  suggestion list drops down automatically (or stays in reserve behind the small
+  OC mark, your call). Picking a row fills the form. The match uses the same
+  registrable-domain rule as oc-vault itself; an HTTPS-saved login is never
+  offered on an HTTP page.
+- **Capture.** Submit a login and the extension offers to save it — or update an
+  existing entry if the password changed. Unchanged passwords are not
+  re-prompted.
+- **Your vault in the popup.** Search, copy, reveal — the same actions the web
+  app has. The popup syncs automatically; there is no manual refresh button.
+- **TOTP codes** — copy a live 6-digit RFC 6238 code with one click.
+
+## Settings worth knowing
+
+- **Auto-lock** — clear the key from memory after N idle minutes; pick
+  **forever** on the unlock screen if you'd rather it stay open.
+- **Offer autofill on login fields** — master switch for the on-field mark and
+  dropdown.
+- **Open the autofill menu on field focus** — turn off if you keep your
+  browser's built-in password manager, so the two never both pop at once.
+- **Offer to save new logins** — capture toggle.
+- **Clear clipboard after copy** — N-second auto-clear.
+
+## A note on the browser's built-in password manager
+
+Browsers ship their own autofill, and there's no extension API to suppress it —
+that's why every serious password manager (1Password, Bitwarden, Dashlane)
+guides you to turn the browser's manager off. OC Vault does the same: the popup
+shows a one-time card on first open with a button that opens your browser's
+settings. Once disabled, only OC Vault offers to fill.
+
+## Install
+
+The extension is in publish prep — once it's on the Chrome Web Store and Edge
+Add-ons, the install link will go here.
+
+Until then you can run it from source:
+
+```bash
+git clone https://github.com/orangecheck/oc-vault-extension
+cd oc-vault-extension
+npm install
+npm run build
+```
+
+Then in Chrome (or any Chromium browser): **chrome://extensions** → enable
+**Developer mode** → **Load unpacked** → pick `.output/chrome-mv3`.
+
+`npm run build:firefox` produces a Firefox/WebExtensions build under
+`.output/firefox-mv2`.
+
+## Pairing with the CLI
+
+The extension and the [`oc-vault` CLI](/vault/developer) sit on the same vault;
+an entry created in either is immediately available to the other on the next
+sync. Use the extension for day-to-day filling, the CLI for CI and scripted
+access.

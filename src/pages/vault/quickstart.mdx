@@ -36,9 +36,9 @@ that is what cloud sync is for.
 
 ## 03 · add your first entry
 
-Click **new entry** (or press `n`). Pick a type — password, TOTP, API key, card,
-identity, note, key-value, or file — give it a name, fill the fields,
-**create**.
+Click **new entry** (or press `n`). Pick a type — password, TOTP, API key,
+**env** (a `.env`-shaped bundle of `KEY=value` vars), card, identity, note,
+key-value, or file — give it a name, fill the fields, **create**.
 
 A few things worth knowing on day one:
 
@@ -94,3 +94,18 @@ Already using another manager? **settings → import from CSV** parses exports
 from 1Password, Bitwarden, LastPass, and Chrome (plus a generic fallback).
 Parsing happens entirely in your browser — the CSV file never reaches a server.
 `otpauth://` URIs are split out into separate TOTP entries automatically.
+
+## Use it everywhere
+
+The same vault is available from three surfaces:
+
+- **The browser** — install the [OC Vault extension](/vault/extension) for
+  autofill, login capture, and one-click access to your vault from the toolbar.
+- **The shell** — `npm install -g @orangecheck/vault-cli` gives you the
+  [`oc-vault` command](/vault/developer): `read`, `run`, `inject`, `export`,
+  `item list/get`. Resolves `ocv://personal/<item>/<field>` references from
+  `.env` files, templates, and CI jobs.
+- **Your code / CI** — the [`@orangecheck/vault-core`](/sdk/vault-core/README)
+  SDK and the [GitHub Action](/vault/developer#github-actions) build on the same
+  primitives. Headless access uses an **access token** that authorizes transport
+  only; the passphrase still does the decrypting, in-process.

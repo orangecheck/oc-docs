@@ -576,6 +576,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Sign in with Bitcoin, add an entry, audit passwords, turn on cloud sync, export a backup.',
             },
             {
+                href: '/vault/extension',
+                label: 'Browser extension',
+                blurb: 'Manifest V3 extension — autofill, capture, your full vault one toolbar click away.',
+            },
+            {
                 href: '/vault/protocol',
                 label: 'Protocol',
                 blurb: 'Flow 4, the entry envelope, the double-encrypted cloud blob, the portable export format.',

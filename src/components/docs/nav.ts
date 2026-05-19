@@ -63,13 +63,18 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
-        slug: 'connect',
-        label: 'Connect',
-        blurb: 'Add OrangeCheck to your existing login.',
+        slug: 'integration',
+        label: 'Integration',
+        blurb: 'Bring OrangeCheck identity into your app.',
         items: [
             {
-                href: '/connect',
+                href: '/integration',
                 label: 'Overview',
+                blurb: 'The two integration pathways — which one is yours.',
+            },
+            {
+                href: '/connect',
+                label: 'OrangeCheck Connect',
                 blurb: 'Layer a Bitcoin-backed did:oc on top of Google, Auth0, email/password — any login.',
             },
         ],

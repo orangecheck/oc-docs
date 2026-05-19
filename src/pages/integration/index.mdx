@@ -1,0 +1,60 @@
+export const metadata = {
+    title: 'Integrating with OrangeCheck',
+    description:
+        'Two ways to bring OrangeCheck identity into your product — let OrangeCheck be your sign-in, or layer it onto the login you already run.',
+};
+
+# Integrating with OrangeCheck
+
+You want your users to have an OrangeCheck identity — a Bitcoin-backed `did:oc`.
+There are **two integration pathways**, and which one is yours comes down to a
+single question: **do you already have a login?**
+
+## Which path is mine?
+
+| If you…                                                                                                     | Pathway                             | What you add                                 |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------- |
+| are building auth from scratch, or are happy for OrangeCheck to _be_ your login                             | **1 · OrangeCheck as your sign-in** | the `@orangecheck/auth-client` React package |
+| already run your own login — Google, Auth0, Clerk, NextAuth, email/password, anything — and want to keep it | **2 · OrangeCheck Connect**         | one server-side HTTPS call                   |
+
+Both end at the same place: your users hold a `did:oc`. They differ only in who
+owns the sign-in screen.
+
+## Pathway 1 — OrangeCheck as your sign-in
+
+OrangeCheck _is_ your auth. Mount
+[`@orangecheck/auth-client`](/sdk/auth-client/README): `<OcSessionProvider>`
+near your app root, `<OcSignIn>` on your sign-in page, and `useOcSession()`
+anywhere you need the signed-in identity.
+
+Your users sign in with a **Bitcoin wallet (BIP-322)**, an **email one-time
+code**, or **Google / GitHub** — every path is handled by the OrangeCheck auth
+host, and you receive a cross-subdomain `oc_session`. No passwords, no auth
+backend to run, no OAuth apps of your own to register.
+
+→ [`@orangecheck/auth-client` reference](/sdk/auth-client/README) ·
+[auth host API](/api-reference/auth-host)
+
+## Pathway 2 — OrangeCheck Connect
+
+You keep the login you already run — it does not change at all. After your user
+authenticates, by _any_ means, your **backend** makes one server-side call to
+`POST https://ochk.io/api/connect/provision` with your Connect API key, and that
+user is given a Bitcoin-backed `did:oc`. No new SDK; no change to how anyone
+signs in; nobody sees a second login screen.
+
+→ [OrangeCheck Connect guide](/connect)
+
+## What you get, either way
+
+A **`did:oc`** — an opaque, Bitcoin-backed OrangeCheck identity. It is
+federation-custodied by default, with a path for the user to graduate to full
+self-custody, and it is recognized across every `.ochk.io` family product. How
+your users authenticated is your concern; the `did:oc` is the durable identity
+underneath.
+
+## Not covered here
+
+The **me.ochk.io** product SDK — billable events, paying users in sats — is a
+separate, product-specific integration. See the [me.ochk.io docs](/me). This
+page is about identity integration only.

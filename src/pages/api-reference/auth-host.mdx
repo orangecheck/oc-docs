@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'API · ochk.io · auth host',
     description:
-        'Public API surface for ochk.io — the OrangeCheck family auth host. Sign-in (BIP-322 + email-OTP), JWKS, signed-challenge primitive, account ops, contact form. Full OpenAPI 3.1 spec; interactive explorer at ochk.io/api-explorer.',
+        'Public API surface for ochk.io — the OrangeCheck family auth host. Sign-in (BIP-322, email-OTP, Google/GitHub OAuth), OrangeCheck Connect provisioning, JWKS, signed-challenge primitive, account ops, contact form.',
 };
 
 # ochk.io · auth host API
@@ -21,13 +21,15 @@ per-request fetch to the auth host.
 
 ## Surface map
 
-| Tag         | Endpoints                                                 | Purpose                                                                              |
-| ----------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/account` | Session lifecycle. JWT verification key, current session, sign-in/out, account edit. |
-| `challenge` | `/api/challenge` (GET + POST)                             | BIP-322 signed-challenge primitive — issue + verify, the building block.             |
-| `email-otp` | `/api/auth/email-otp/start`, `/verify`                    | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                           |
-| `public`    | `/api/family-stats`                                       | Cross-subdomain family-wide stats. No auth.                                          |
-| `forms`     | `/api/contact`                                            | Contact-form relay via Resend. Same-origin only.                                     |
+| Tag         | Endpoints                                                        | Purpose                                                                                                                 |
+| ----------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/account`        | Session lifecycle. JWT verification key, current session, sign-in/out, account edit.                                    |
+| `challenge` | `/api/challenge` (GET + POST)                                    | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                |
+| `email-otp` | `/api/auth/email-otp/start`, `/verify`                           | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                              |
+| `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers` | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers. |
+| `connect`   | `/api/connect/provision`, `/api/connect/apps`                    | OrangeCheck Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).              |
+| `public`    | `/api/family-stats`                                              | Cross-subdomain family-wide stats. No auth.                                                                             |
+| `forms`     | `/api/contact`                                                   | Contact-form relay via Resend. Same-origin only.                                                                        |
 
 ## Auth scheme
 
@@ -44,7 +46,10 @@ Ed25519 public JWK lives at [`/api/auth/jwks`](https://ochk.io/api/auth/jwks)
 and `/.well-known/jwks.json`; consumers cache it as the `OC_AUTH_PUBLIC_JWK` env
 var at deploy time.
 
-## Two sign-in primitives
+## Sign-in primitives
+
+Three paths, one outcome — each lands the **same** `oc_session` cookie, so
+consumer code never branches on how the user signed in.
 
 **BIP-322 (canonical):**
 
@@ -62,8 +67,18 @@ var at deploy time.
 2. `POST /api/auth/email-otp/verify` with `{ email, code }` → 200 + `oc_session`
    cookie set.
 
-Both produce the **same** session cookie shape; consumer code doesn't have to
-branch on which path the user took.
+**OAuth providers (Google / GitHub):**
+
+1. `GET /api/auth/<provider>/start` → redirect to the provider's consent screen.
+2. The provider redirects back to `/api/auth/<provider>/callback`; the auth host
+   verifies the result and sets the `oc_session` cookie.
+3. `GET /api/auth/providers` lists which providers are configured — this is what
+   [`<OcSignIn>`](/sdk/auth-client/README) reads to render its provider buttons.
+
+A provider sign-in mints the same federation-custodied account that email-OTP
+does.
+For layering OrangeCheck onto an integrator's _own_ OAuth instead, see
+[OrangeCheck Connect](/connect).
 
 ## Live spec — embedded
 
@@ -73,6 +88,11 @@ import { EmbeddedOpenAPI } from '@/components/docs/EmbeddedOpenAPI';
     url="https://ochk.io/api/openapi"
     caption="ochk.io · auth host"
 />
+
+> The OAuth-provider (`/api/auth/<provider>/*`) and Connect (`/api/connect/*`)
+> endpoints are newer than the embedded OpenAPI document — their contracts are
+> documented under [Integration](/integration) and
+> [OrangeCheck Connect](/connect) until the spec catches up.
 
 ## See also
 

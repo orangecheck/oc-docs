@@ -22,6 +22,10 @@ export default function Document() {
     return (
         <Html lang="en">
             <Head>
+                {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
+                    (dist/docs/favicon/*). Regenerate via the kit then
+                    `cp ../oc-media-kit/dist/docs/favicon/* public/favicons/`. */}
+                <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
                 <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico" />
                 <link
                     rel="icon"

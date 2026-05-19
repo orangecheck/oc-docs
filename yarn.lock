@@ -615,10 +615,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.14.0":
-  version "2.14.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.14.0.tgz#2d2d76c52a68fa6bbe8f23ef9f69da167d58bad0"
-  integrity sha512-miEUqg2EZi7RlyKQGHHfHRRRGK3C17ImpcBOIdB3xoddfbfTFA8izdGEPQNqFcFrEiKy0DcReY2v0bVJ5iZL8g==
+"@orangecheck/auth-client@^2.14.1":
+  version "2.14.1"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.14.1.tgz#bf08c616cb6d8623303f49e391518259015e38c3"
+  integrity sha512-p9unuZg+NVJn9DP6tQVB4qXbrW2KtUZUqDPjRHKEDMznwCGwxllQTzEDyG9i0pHtYZj/d6VCgYfzytIFntLmTA==
   dependencies:
     "@simplewebauthn/browser" "^13.3.0"
 

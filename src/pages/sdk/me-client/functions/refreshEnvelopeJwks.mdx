@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: refreshEnvelopeJwks()",
+    description: "Auto-generated API reference for Function: refreshEnvelopeJwks(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / refreshEnvelopeJwks
+
+# Function: refreshEnvelopeJwks()
+
+```ts
+function refreshEnvelopeJwks(issuer?: string): Promise<void>;
+```
+
+Defined in: [me-client/src/identity.ts:354](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L354)
+
+Force-refresh the envelope-JWKS cache · useful after a key rotation
+ if you don't want to wait for the TTL to expire.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `issuer` | `string` | `DEFAULT_ISSUER` |
+
+## Returns
+
+`Promise`\&lt;`void`\>

@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: verifyActivityAttestation()",
+    description: "Auto-generated API reference for Function: verifyActivityAttestation(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / verifyActivityAttestation
+
+# Function: verifyActivityAttestation()
+
+```ts
+function verifyActivityAttestation(bundle: ActivityAttestationBundle, options?: VerifyActivityOptions): Promise<ActivityVerifyResult>;
+```
+
+Defined in: [me-client/src/identity.ts:216](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L216)
+
+Verify a signed activity attestation bundle. Returns a typed
+ActivityVerifyResult with per-check detail · never throws (network
++ parse failures surface as ok=false rows in the checks array, so
+the caller can log them without try/catch).
+
+Five checks, in order: bundle shape, canonical-bytes hash matches
+id, JWK with matching kid present, ed25519 signature, freshness.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `bundle` | [`ActivityAttestationBundle`](../interfaces/ActivityAttestationBundle.mdx) |
+| `options` | [`VerifyActivityOptions`](../interfaces/VerifyActivityOptions.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`ActivityVerifyResult`](../interfaces/ActivityVerifyResult.mdx)\>

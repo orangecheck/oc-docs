@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Interface: OcAccountSummary",
+    description: "Auto-generated API reference for Interface: OcAccountSummary. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / OcAccountSummary
+
+# Interface: OcAccountSummary
+
+Defined in: [types.ts:115](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L115)
+
+Multi-account roster · summary of another account this browser has
+signed into and can switch to without re-authenticating. Surfaced by
+`<OcAccountMenu>` in the `§ accounts` section. Returned by the auth
+host's `/api/auth/me` as `roster: [...]` (an empty array on single-
+account or pre-multi-account sessions).
+
+Sessions for peer accounts stay alive in the auth host's DB for the
+normal 30-day window; once expired, the peer falls out of the roster
+and the user must re-authenticate to bring it back in.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-didoc">&lt;/a> `didOc` | `string` | - | [types.ts:116](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L116) |
+| &lt;a id="property-displayidentity">&lt;/a> `displayIdentity` | [`DisplayIdentity`](DisplayIdentity.mdx) | - | [types.ts:119](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L119) |
+| &lt;a id="property-displayname">&lt;/a> `displayName` | `string` \| `null` | - | [types.ts:117](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L117) |
+| &lt;a id="property-lastseenat">&lt;/a> `lastSeenAt` | `string` \| `null` | ISO timestamp of the last verified request on this account's session row, or null if never touched. | [types.ts:122](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L122) |
+| &lt;a id="property-primarybtc">&lt;/a> `primaryBtc` | `string` \| `null` | - | [types.ts:118](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L118) |

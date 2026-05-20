@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: WebhookHeaders",
+    description: "Auto-generated API reference for Interface: WebhookHeaders. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / WebhookHeaders
+
+# Interface: WebhookHeaders
+
+Defined in: [me-client/src/types.ts:277](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L277)
+
+HTTP headers OC sends with every webhook delivery. Capture these in
+the receive handler · `OC-Signature` is what verifies the body.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-oc-class">&lt;/a> `OC-Class` | [`EventClass`](../type-aliases/EventClass.mdx) | Class · matches payload.class. | [me-client/src/types.ts:291](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L291) |
+| &lt;a id="property-oc-delivery-attempt">&lt;/a> `OC-Delivery-Attempt` | `string` | 1-indexed delivery attempt count. >1 means the prior attempt did not return a 2xx within the timeout · idempotency key on payload.id is critical. | [me-client/src/types.ts:295](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L295) |
+| &lt;a id="property-oc-envelope-id">&lt;/a> `OC-Envelope-Id` | `string` | Envelope id · matches payload.id; useful for idempotent receive handlers that dedupe on this header without parsing the body. | [me-client/src/types.ts:286](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L286) |
+| &lt;a id="property-oc-key-id">&lt;/a> `OC-Key-Id` | `string` | Stable kid of the signing key · resolves against ochk.io/.well-known/jwks.json. | [me-client/src/types.ts:282](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L282) |
+| &lt;a id="property-oc-signature">&lt;/a> `OC-Signature` | `string` | Ed25519 signature over the raw response body, hex-encoded. | [me-client/src/types.ts:279](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L279) |
+| &lt;a id="property-oc-subtype">&lt;/a> `OC-Subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | Subtype · matches payload.subtype; lets routers branch on the header before parsing. | [me-client/src/types.ts:289](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L289) |

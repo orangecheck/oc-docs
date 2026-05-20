@@ -11,21 +11,26 @@ export const metadata = {
 
 # Interface: BillableEvent
 
-Defined in: [me-client/src/types.ts:190](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L190)
+Defined in: [me-client/src/types.ts:200](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L200)
+
+## Extended by
+
+- [`WebhookPayload`](WebhookPayload.mdx)
 
 ## Properties
 
-| Property | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-class">&lt;/a> `class` | [`EventClass`](../type-aliases/EventClass.mdx) | [me-client/src/types.ts:193](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L193) |
-| &lt;a id="property-gross_fee_sats">&lt;/a> `gross_fee_sats` | `number` | [me-client/src/types.ts:196](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L196) |
-| &lt;a id="property-id">&lt;/a> `id` | `string` | [me-client/src/types.ts:191](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L191) |
-| &lt;a id="property-occurred_at">&lt;/a> `occurred_at` | `string` | [me-client/src/types.ts:192](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L192) |
-| &lt;a id="property-platform_fee_sats">&lt;/a> `platform_fee_sats` | `number` | [me-client/src/types.ts:197](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L197) |
-| &lt;a id="property-site">&lt;/a> `site` | \&#123; `display_name`: `string`; `domain`: `string`; \&#125; | [me-client/src/types.ts:195](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L195) |
-| `site.display_name` | `string` | [me-client/src/types.ts:195](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L195) |
-| `site.domain` | `string` | [me-client/src/types.ts:195](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L195) |
-| &lt;a id="property-site_rebate_sats">&lt;/a> `site_rebate_sats` | `number` | [me-client/src/types.ts:199](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L199) |
-| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | [me-client/src/types.ts:194](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L194) |
-| &lt;a id="property-user_earned_sats">&lt;/a> `user_earned_sats` | `number` | [me-client/src/types.ts:198](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L198) |
-| &lt;a id="property-verify_url">&lt;/a> `verify_url` | `string` | [me-client/src/types.ts:200](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L200) |
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-class">&lt;/a> `class` | [`EventClass`](../type-aliases/EventClass.mdx) | - | [me-client/src/types.ts:203](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L203) |
+| &lt;a id="property-gross_fee_sats">&lt;/a> `gross_fee_sats` | `number` | - | [me-client/src/types.ts:206](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L206) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [me-client/src/types.ts:201](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L201) |
+| &lt;a id="property-is_agent">&lt;/a> `is_agent?` | `boolean` | Per OCHK-V3-PLAN §7 phase-1 · true when the event was fired by an oc-agent delegation rather than a human session. The integrator's IntegratorEventConfig.agent block may price these differently or refuse them. Optional · canonical encoder branches to v=3 only when present, so legacy human-fired events keep their v=2 hash + signature. | [me-client/src/types.ts:217](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L217) |
+| &lt;a id="property-occurred_at">&lt;/a> `occurred_at` | `string` | - | [me-client/src/types.ts:202](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L202) |
+| &lt;a id="property-platform_fee_sats">&lt;/a> `platform_fee_sats` | `number` | - | [me-client/src/types.ts:207](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L207) |
+| &lt;a id="property-site">&lt;/a> `site` | \&#123; `display_name`: `string`; `domain`: `string`; \&#125; | - | [me-client/src/types.ts:205](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L205) |
+| `site.display_name` | `string` | - | [me-client/src/types.ts:205](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L205) |
+| `site.domain` | `string` | - | [me-client/src/types.ts:205](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L205) |
+| &lt;a id="property-site_rebate_sats">&lt;/a> `site_rebate_sats` | `number` | - | [me-client/src/types.ts:209](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L209) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | - | [me-client/src/types.ts:204](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L204) |
+| &lt;a id="property-user_earned_sats">&lt;/a> `user_earned_sats` | `number` | - | [me-client/src/types.ts:208](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L208) |
+| &lt;a id="property-verify_url">&lt;/a> `verify_url` | `string` | - | [me-client/src/types.ts:210](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L210) |

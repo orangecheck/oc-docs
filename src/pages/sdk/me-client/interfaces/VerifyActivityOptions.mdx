@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: VerifyActivityOptions",
+    description: "Auto-generated API reference for Interface: VerifyActivityOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / VerifyActivityOptions
+
+# Interface: VerifyActivityOptions
+
+Defined in: [me-client/src/identity.ts:71](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L71)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Override the me.ochk.io issuer (defaults to https://me.ochk.io). Useful for staging / self-hosted dev. | [me-client/src/identity.ts:74](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L74) |
+| &lt;a id="property-jwk">&lt;/a> `jwk?` | `OcEnvelopePublicJwk` | Pass a JWK directly to skip the network fetch · convenient when embedding the public key in your service for air-gapped or edge-runtime deployments. | [me-client/src/identity.ts:78](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L78) |
+| &lt;a id="property-jwkscachettlms">&lt;/a> `jwksCacheTtlMs?` | `number` | JWKS cache TTL in ms. Defaults to 1h. Stale-on-error falls back to the previous cached value. | [me-client/src/identity.ts:81](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L81) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Optional · override "now" for deterministic tests. | [me-client/src/identity.ts:83](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/identity.ts#L83) |

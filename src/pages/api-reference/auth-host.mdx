@@ -21,15 +21,15 @@ per-request fetch to the auth host.
 
 ## Surface map
 
-| Tag         | Endpoints                                                        | Purpose                                                                                                                 |
-| ----------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/account`        | Session lifecycle. JWT verification key, current session, sign-in/out, account edit.                                    |
-| `challenge` | `/api/challenge` (GET + POST)                                    | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                |
-| `email-otp` | `/api/auth/email-otp/start`, `/verify`                           | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                              |
-| `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers` | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers. |
-| `connect`   | `/api/connect/provision`, `/api/connect/apps`                    | OrangeCheck Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).              |
-| `public`    | `/api/family-stats`                                              | Cross-subdomain family-wide stats. No auth.                                                                             |
-| `forms`     | `/api/contact`                                                   | Contact-form relay via Resend. Same-origin only.                                                                        |
+| Tag         | Endpoints                                                            | Purpose                                                                                                                 |
+| ----------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/switch`, `/account` | Session lifecycle. JWT verification key, current session, sign-in/out, multi-account switch, account edit.              |
+| `challenge` | `/api/challenge` (GET + POST)                                        | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                |
+| `email-otp` | `/api/auth/email-otp/start`, `/verify`                               | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                              |
+| `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers`     | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers. |
+| `connect`   | `/api/connect/provision`, `/api/connect/apps`                        | OrangeCheck Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).              |
+| `public`    | `/api/family-stats`                                                  | Cross-subdomain family-wide stats. No auth.                                                                             |
+| `forms`     | `/api/contact`                                                       | Contact-form relay via Resend. Same-origin only.                                                                        |
 
 ## Auth scheme
 
@@ -78,6 +78,16 @@ consumer code never branches on how the user signed in.
 A provider sign-in mints the same federation-custodied account that email-OTP
 does. For layering OrangeCheck onto an integrator's _own_ OAuth instead, see
 [OrangeCheck Connect](/connect).
+
+## Multi-account sign-in
+
+Hold multiple OrangeCheck accounts in one browser and switch between them
+without re-authenticating — same pattern as Google or GitHub. Three endpoints
+touch this: `POST /api/auth/signin?add=1` (and the email-OTP equivalent) brings
+a new account into the browser's roster; `POST /api/auth/switch` flips the
+active session; `POST /api/auth/logout?scope=current` signs out of just the
+current account while keeping the rest of the roster alive. Full narrative at
+[Multi-account](/reference/multi-account).
 
 ## Live spec — embedded
 

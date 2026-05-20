@@ -828,6 +828,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Every reason string `/api/check`, `/api/verify`, and the SDKs can return.',
             },
             {
+                href: '/reference/multi-account',
+                label: 'Multi-account sign-in',
+                blurb: 'Hold multiple OrangeCheck accounts in one browser and switch between them without re-auth. Roster model, wire surface, every family site gets it for free.',
+            },
+            {
                 href: '/infrastructure/relay',
                 label: 'relay.ochk.io',
                 blurb: "OC's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy.",

@@ -1,0 +1,222 @@
+export const metadata = {
+    title: 'Multi-account sign-in',
+    description:
+        'Hold multiple OrangeCheck accounts in one browser and switch between them without re-authenticating. How rosters work, what the surface looks like, what every family site gets for free.',
+};
+
+# Multi-account sign-in
+
+A single browser can hold N OrangeCheck accounts simultaneously and flip which
+one is "active" without re-authenticating. Same pattern as Google or GitHub
+multi-account: one click in the header dropdown, the badge swaps, every
+subsequent request rides the new account's session.
+
+This page is the narrative reference. The wire-level surface is at
+[/api-reference/auth-host](/api-reference/auth-host); the React-level surface is
+at [`@orangecheck/auth-client`](/sdk/auth-client/README).
+
+## What "multi-account" actually means
+
+Three things — only the first is new:
+
+1. **N distinct `did:oc` accounts addressable in one browser.** You sign in as
+   account A, then "add another account" and sign in as B; both sessions stay
+   alive. The header dropdown shows A as active and B as a switch target. Click
+   B → cookie flips → every `.ochk.io` subsite (stamp, vault, vote, …) now sees
+   B as the active account on its next request.
+2. _Not_ "merge several identities into one account." That's the existing
+   **linked identities** model — one `did:oc` carrying many email/btc/nostr
+   identifiers. Multi-account is the opposite: keeping distinct `did:oc`s
+   deliberately separate.
+3. _Not_ "share one session across users." Each account in the roster is fully
+   isolated; switching is a session swap, not a delegation.
+
+## How the roster lives
+
+A **roster** is a per-browser group of session rows on the auth host sharing one
+`roster_id` UUID. The roster ID lives **server-side** — never in the JWT, never
+in a second cookie. Consumer subsites can't see it (privacy: stamp.ochk.io
+doesn't learn that you also have a vault account); they see only the active
+account's JWT claims.
+
+```
+browser cookie:
+  oc_session = <JWT for account A>    Domain=.ochk.io   HttpOnly
+
+ochk.io database:
+  sessions ────────────────────────────────────────
+  ├ token_hash=<A's>  account=A  roster_id=R  expires=…
+  ├ token_hash=<B's>  account=B  roster_id=R  expires=…
+  └ token_hash=<C's>  account=C  roster_id=R  expires=…
+```
+
+The cookie only ever carries the JWT for the currently-active account. The other
+accounts in the roster are just **session rows** — proof that the user
+previously authenticated as those accounts in this browser. Switching mints a
+fresh JWT for the target and sets the cookie; old rows stay alive (so switching
+back doesn't require re-auth) until their natural 30-day expiry.
+
+## The wire surface
+
+Three endpoints on `ochk.io`, all family-CORS, browser-only:
+
+### `GET /api/auth/me`
+
+Existing endpoint. Now returns an extra `roster: [...]` array of switch targets
+— every roster member that is **not** the active account.
+
+```json
+{
+    "ok": true,
+    "account": {
+        "did_oc": "did:oc:abc123…",
+        "display_name": null,
+        "primary_btc": "bc1q…",
+        "display_identity": { "kind": "btc", "value": "bc1q…" }
+        // …other fields unchanged…
+    },
+    "roster": [
+        {
+            "did_oc": "did:oc:def456…",
+            "display_name": "work",
+            "primary_btc": null,
+            "display_identity": { "kind": "email", "value": "me@example.com" },
+            "last_seen_at": "2026-05-18T22:14:08Z"
+        }
+    ]
+}
+```
+
+Pre-multi-account hosts emit no `roster` field. Clients treat absence-or-empty
+identically — graceful single-account fallback.
+
+### `POST /api/auth/switch`
+
+New endpoint. Body `{ did_oc: "did:oc:…" }`. Verifies the target is in the
+caller's roster (a non-expired session row exists in this browser for that
+account), mints a fresh JWT for the target, sets the cookie.
+
+```bash
+curl -X POST https://ochk.io/api/auth/switch \
+     -H 'Content-Type: application/json' \
+     -d '{"did_oc":"did:oc:def456…"}' \
+     --cookie 'oc_session=…'
+# → 200 { ok: true, account: { did_oc: "did:oc:def456…", … } }
+```
+
+Failure cases:
+
+- `401 not_authenticated` — no valid current session.
+- `403 not_in_roster` — target did_oc isn't a previously-authenticated account
+  in this browser. The client must use the add-account flow to bring it into the
+  roster first.
+- `404 unknown_did_oc` — no account exists for that did_oc.
+- `409 no_roster` — current session predates multi-account (legacy
+  single-session cookie). Client falls back to a normal sign-in.
+
+### `POST /api/auth/signin?add=1` and `POST /api/auth/email-otp/verify?add=1`
+
+Same endpoints as before — the new `add=1` query param (or `add: true` body
+field) tells the host to **preserve** the caller's existing `roster_id` instead
+of minting a fresh one. The previous account's session row stays alive; the new
+account joins the roster.
+
+Without `add=1`, sign-in still behaves as it always has — a fresh roster is
+minted and the new session is its only member.
+
+### `POST /api/auth/logout?scope=current|all`
+
+The existing logout endpoint, now scope-aware:
+
+- `scope=all` (default · back-compat) — revoke every session in the roster,
+  clear cookies. Matches the historical "sign out" behavior.
+- `scope=current` — revoke just the current account's sessions. If there's
+  another reachable account in the roster, mint a fresh session for it and leave
+  the user signed in to that account. If the roster becomes empty, clear
+  cookies.
+
+## The React surface
+
+[`useOcSession()`](/sdk/auth-client/functions/useOcSession) returns three new
+fields on top of the existing shape:
+
+```ts
+import { useOcSession } from '@orangecheck/auth-client';
+
+function Header() {
+    const { account, roster, switchAccount, addAccountUrl, signOut } = useOcSession();
+
+    return (
+        <nav>
+            <span>signed in as {account?.didOc}</span>
+            {roster.map((peer) => (
+                <button key={peer.didOc} onClick={() => switchAccount(peer.didOc)}>
+                    switch to {peer.displayName ?? peer.didOc}
+                </button>
+            ))}
+            <a href={addAccountUrl()}>add another account</a>
+            <button onClick={() => signOut({ scope: 'current' })}>leave this account</button>
+            <button onClick={() => signOut()}>sign out of everything</button>
+        </nav>
+    );
+}
+```
+
+Most family sites never write this code themselves — the canonical
+[`<OcAccountMenu>`](/sdk/ui/README) from `@orangecheck/ui` already mounts the
+`§ accounts` section in the header popover, with switch rows, the
+add-another-account entry point, and per-row "leave this account" all wired up.
+Every `.ochk.io` family site (stamp, vault, vote, agent, lock, attest, pledge,
+fleet, me, …) gets it on the next `@orangecheck/ui` bump.
+
+For sites that mount [`<OcSignIn>`](/sdk/auth-client/functions/OcSignIn)
+directly at `/signin`, the `add` prop controls add-mode rendering — the
+component reads `?add=1` from the URL automatically, so the canonical "add
+another account" entry point at `https://ochk.io/signin?add=1` just works.
+
+## Security trade-offs
+
+Multi-account is a **UX feature, not a security upgrade.** The trade- offs are
+the same as every other multi-account system (Google, GitHub, Slack, …):
+
+- A stolen `oc_session` cookie gives an attacker access to every account in the
+  roster via `POST /api/auth/switch` — not just the currently-active account.
+  This is the cost of "switch without re-auth"; it's an explicit acceptance, not
+  an oversight.
+- **Step-up freshness claims are per-account.** The `step_up_at` and `sudo_at`
+  JWT claims live on each session's JWT independently; switching mints a fresh
+  JWT for the target with whatever freshness that account's prior session had.
+  Sensitive operations (revoking a hardware key, linking a new identity,
+  changing a recovery address) still require their own re-authentication.
+- **The roster ID is server-side only.** Consumer subdomains never see it; they
+  only see the active account's JWT claims. Stamp.ochk.io can't learn that you
+  also have an account on vault.ochk.io.
+
+## Edge cases worth knowing
+
+- **Switching to an account whose session expired.** After 30 days a session row
+  expires; if you try to switch to that account, the host returns
+  `403 not_in_roster`. The client should fall back to a normal sign-in for that
+  account; once that completes (with `?add=1` to preserve the roster), the
+  account is back in the switch list.
+- **Sign-out cascade on `scope=current` when only one account remains.**
+  Identical to a normal full sign-out — cookies cleared, status flips to
+  anonymous.
+- **Linked-identity merge interactions.** If you sign in as account A and then
+  sign in (with `?add=1`) using a BIP-322 address that was previously linked to
+  account B, the existing dual-proof transfer flow merges the addresses — and
+  the resulting session lands on the surviving canonical account. The roster
+  reflects post-merge state on the next `/api/auth/me`.
+- **The same account in the roster twice.** Cannot happen — `/api/auth/switch`
+  refuses no-op switches (target == active), and a second sign-in to an
+  already-rostered account is a successful re-auth, not a duplicate entry. The
+  roster always contains distinct `did_oc`s.
+
+## See also
+
+- [auth-host API reference](/api-reference/auth-host) · wire-level contracts for
+  every endpoint mentioned above.
+- [`@orangecheck/auth-client`](/sdk/auth-client/README) · React SDK
+  auto-generated reference (`useOcSession`, `OcSignIn`, types).
+- [`@orangecheck/ui`](/sdk/ui/README) · the family-wide `<OcAccountMenu>` that
+  ships the rendered surface.

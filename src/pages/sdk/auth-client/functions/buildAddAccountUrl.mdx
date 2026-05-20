@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: buildAddAccountUrl()",
+    description: "Auto-generated API reference for Function: buildAddAccountUrl(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / buildAddAccountUrl
+
+# Function: buildAddAccountUrl()
+
+```ts
+function buildAddAccountUrl(cfg: Required<OcAuthConfig>, returnTo?: string): string;
+```
+
+Defined in: [types.ts:246](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L246)
+
+Multi-account · build the URL for the "add another account" entry
+point. Same as [buildSignInUrl](buildSignInUrl.mdx) but appends `?add=1` so the
+sign-in page knows to preserve the current roster (the new account
+is appended; the previously-active account stays signed in too and
+remains switch-target reachable).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `cfg` | `Required`\&lt;[`OcAuthConfig`](../interfaces/OcAuthConfig.mdx)\> |
+| `returnTo?` | `string` |
+
+## Returns
+
+`string`

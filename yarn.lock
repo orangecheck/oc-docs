@@ -590,10 +590,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.16.0":
-  version "2.16.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.16.0.tgz#e7de50dfaec2c6ac754d550ee2ded5b91c3c2013"
-  integrity sha512-m1D+BhkJyIvChzWAR2p26ZFWSThzmf/0wlbRF/oBReCxoTOjI7COnIUJA7gEXHvlqQOEcV6/LMuPhifwWgCHZQ==
+"@orangecheck/auth-client@^2.17.2":
+  version "2.17.2"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.17.2.tgz#1b1bf6675d3c4d275d2abebafefb780588b02797"
+  integrity sha512-14frnkxLr6NKWTLLA2S/UzVEgMo7w4ZrOPnkhN/3mutqlW8scvEVFpSV4XM+Yr865+gZUScCVT3Ukrc2Eifklw==
   dependencies:
     "@simplewebauthn/browser" "^13.3.0"
 
@@ -604,10 +604,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/ui@^0.14.0":
-  version "0.14.0"
-  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.14.0.tgz#1d17f4af29fda9f126ed19e157ca76d67b3620a9"
-  integrity sha512-fI2VAj0gl3Ueel5FGd/KBSlR9t6Penzn/Su2ugmq2d1dmyjdHrMTz1YnnQ1iPs0VW49S5Uqs2lijKwhGq8KQNA==
+"@orangecheck/ui@^0.15.2":
+  version "0.15.2"
+  resolved "https://registry.npmjs.org/@orangecheck/ui/-/ui-0.15.2.tgz#33d65dee0907a0d683fc65cea8e796c5044bbba3"
+  integrity sha512-HmhfqZnlCi9/w/IljB3+GuTyPCqfg5fQunCNqwVkSZUie47OXkUJyCYU5+xtVO2R+fK50fEKMgZ9qxB9YCcqEg==
 
 "@orangecheck/wallet-adapter@^0.4.0":
   version "0.4.0"
@@ -2897,14 +2897,7 @@ doctrine@^2.1.0:
   dependencies:
     esutils "^2.0.2"
 
-dompurify@^3.3.1:
-  version "3.4.5"
-  resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.5.tgz#bedc7d30a6007ae9a8937b952be6adb76a28e871"
-  integrity sha512-OrwIBKsdNSVEeubdJ1HBv/wNENRM9ytAVCv7YXt//A3vPdVMNuACRqK9mXCGCBW2ln7BT/A4X0jXHo2Gu89miA==
-  optionalDependencies:
-    "@types/trusted-types" "^2.0.7"
-
-dompurify@^3.4.0:
+dompurify@^3.3.1, dompurify@^3.4.0:
   version "3.4.5"
   resolved "https://registry.yarnpkg.com/dompurify/-/dompurify-3.4.5.tgz#bedc7d30a6007ae9a8937b952be6adb76a28e871"
   integrity sha512-OrwIBKsdNSVEeubdJ1HBv/wNENRM9ytAVCv7YXt//A3vPdVMNuACRqK9mXCGCBW2ln7BT/A4X0jXHo2Gu89miA==

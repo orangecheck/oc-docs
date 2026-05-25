@@ -13,9 +13,10 @@ const BUILD_SHA = (process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7);
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
-    // @orangecheck/ui ships an ESM bundle with `import 'next/link'`; without
-    // transpile next's bare-specifier resolution fails (no exports map).
-    transpilePackages: ['@orangecheck/ui'],
+    // @orangecheck/ui + @orangecheck/design ship ESM bundles with `import
+    // 'next/link'`; without transpile next's bare-specifier resolution fails
+    // (no exports map) and SSR throws `Cannot find module next/link`.
+    transpilePackages: ['@orangecheck/ui', '@orangecheck/design'],
 
     env: {
         NEXT_PUBLIC_APP_VERSION: pkg.version,

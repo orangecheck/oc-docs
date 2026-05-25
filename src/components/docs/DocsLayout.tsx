@@ -4,8 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/Button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/Sheet';
+import { Button, Sheet, SheetContent, SheetTrigger } from '@orangecheck/design';
 
 import { DocsBreadcrumb } from './DocsBreadcrumb';
 import { DocsNav } from './DocsNav';

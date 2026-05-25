@@ -1,11 +1,27 @@
 import type { MDXComponents } from 'mdx/types';
 
+import dynamic from 'next/dynamic';
 import NextLink from 'next/link';
 import React, { isValidElement } from 'react';
 
 import { cn } from '@/lib/utils/utils';
 
-import { Mermaid } from '@/components/docs/Mermaid';
+// Mermaid renders its SVG client-side (dynamic `import('mermaid')` + DOM
+// injection), so server-rendering it produces output that never matches the
+// client — a React #418 hydration mismatch on any page with a diagram (the
+// homepage). Loading it ssr:false keeps it out of SSR/hydration entirely; it
+// mounts on the client after a stable placeholder, so there is nothing to
+// mismatch. The placeholder mirrors the pre-render <pre> so there's no jump.
+const Mermaid = dynamic(() => import('@/components/docs/Mermaid').then((m) => m.Mermaid), {
+    ssr: false,
+    loading: () => (
+        <figure className="my-6 overflow-x-auto rounded-lg border bg-zinc-950/40 p-4">
+            <pre className="text-muted-foreground overflow-x-auto font-mono text-xs">
+                rendering diagram…
+            </pre>
+        </figure>
+    ),
+});
 
 // MDX content is constrained by DocsLayout's center column; no wrapper.
 const MDXWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;

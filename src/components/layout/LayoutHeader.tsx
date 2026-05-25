@@ -1,5 +1,6 @@
 'use client';
 
+import { OcAppearanceMenu } from '@orangecheck/design';
 import { OcLogoDropdown } from '@orangecheck/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -9,7 +10,6 @@ import { cn } from '@/lib/utils/utils';
 
 import { HeaderAccount } from '@/components/layout/HeaderAccount';
 import { LogoMark } from '@/components/layout/LogoMark';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const PROTOCOLS = [
     { href: '/attest', label: 'Attest' },
@@ -68,7 +68,7 @@ export function LayoutHeader() {
                         <HeaderAccount />
                     </div>
                     <div className="hidden md:block">
-                        <ThemeToggle />
+                        <OcAppearanceMenu />
                     </div>
                 </div>
             </div>

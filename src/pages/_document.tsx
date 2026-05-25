@@ -1,3 +1,4 @@
+import { getOcThemeInitScript } from '@orangecheck/design';
 import { Head, Html, Main, NextScript } from 'next/document';
 
 // Plausible analytics — privacy-first, no cookies, GDPR-clean. Every
@@ -75,6 +76,9 @@ export default function Document() {
                 )}
             </Head>
             <body>
+                {/* No-flash skin + mode init from @orangecheck/design — applies
+                    the saved oc_skin / oc_theme before first paint. */}
+                <script dangerouslySetInnerHTML={{ __html: getOcThemeInitScript() }} />
                 <Main />
                 <NextScript />
             </body>

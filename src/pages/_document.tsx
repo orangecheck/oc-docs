@@ -25,7 +25,10 @@ const ANALYTICS_ENABLED =
 
 export default function Document() {
     return (
-        <Html lang="en">
+        // suppressHydrationWarning: getOcThemeInitScript() + next-themes set the
+        // skin/mode class + data-oc-theme on <html> before React hydrates, which
+        // is an intentional client/server attribute divergence.
+        <Html lang="en" suppressHydrationWarning>
             <Head>
                 {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
                     (dist/docs/favicon/*). Regenerate via the kit then

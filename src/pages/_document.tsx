@@ -9,12 +9,16 @@ import { Head, Html, Main, NextScript } from 'next/document';
 // to report somewhere else (e.g. a separate property).
 const DOMAIN_RE = /^[a-z0-9][a-z0-9.-]{0,253}$/i;
 const SAFE_URL_RE = /^https:\/\/[a-z0-9.-]+(:\d+)?(\/[\w./+%@~,!$&'()*-]*)?$/i;
+// First-party proxy paths (rewritten to plausible.io in next.config) are
+// what keep the script off ad-blocker blocklists.
+const SAFE_PATH_RE = /^\/[\w./-]*$/;
 const RAW_PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'ochk.io';
-const RAW_PLAUSIBLE_SRC =
-    process.env.NEXT_PUBLIC_PLAUSIBLE_SRC ??
-    'https://plausible.io/js/script.hash.outbound-links.pageview-props.tagged-events.js';
+const RAW_PLAUSIBLE_SRC = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC ?? '/oc-insights.js';
+const RAW_PLAUSIBLE_API = process.env.NEXT_PUBLIC_PLAUSIBLE_API ?? '/oc-insights/event';
 const PLAUSIBLE_DOMAIN = DOMAIN_RE.test(RAW_PLAUSIBLE_DOMAIN) ? RAW_PLAUSIBLE_DOMAIN : '';
-const PLAUSIBLE_SRC = SAFE_URL_RE.test(RAW_PLAUSIBLE_SRC) ? RAW_PLAUSIBLE_SRC : '';
+const isSafeRef = (v: string) => SAFE_URL_RE.test(v) || SAFE_PATH_RE.test(v);
+const PLAUSIBLE_SRC = isSafeRef(RAW_PLAUSIBLE_SRC) ? RAW_PLAUSIBLE_SRC : '';
+const PLAUSIBLE_API = isSafeRef(RAW_PLAUSIBLE_API) ? RAW_PLAUSIBLE_API : '';
 const ANALYTICS_ENABLED =
     process.env.NODE_ENV === 'production' && Boolean(PLAUSIBLE_DOMAIN) && Boolean(PLAUSIBLE_SRC);
 
@@ -60,6 +64,7 @@ export default function Document() {
                                     var script = document.createElement('script');
                                     script.defer = true;
                                     script.dataset.domain = ${JSON.stringify(PLAUSIBLE_DOMAIN)};
+                                    if (${JSON.stringify(PLAUSIBLE_API)}) script.dataset.api = ${JSON.stringify(PLAUSIBLE_API)};
                                     script.src = ${JSON.stringify(PLAUSIBLE_SRC)};
                                     script.onerror = function() {};
                                     document.head.appendChild(script);

@@ -71,6 +71,21 @@ const nextConfig: NextConfig = {
         ];
     },
 
+    async rewrites() {
+        return [
+            // Plausible proxied first-party (paths mirror the
+            // NEXT_PUBLIC_PLAUSIBLE_SRC / _API defaults in _document.tsx).
+            // Loading same-origin keeps the script + events off ad-blocker
+            // blocklists, which is what threw ERR_BLOCKED_BY_CLIENT.
+            {
+                source: '/oc-insights.js',
+                destination:
+                    'https://plausible.io/js/script.hash.outbound-links.pageview-props.tagged-events.js',
+            },
+            { source: '/oc-insights/event', destination: 'https://plausible.io/api/event' },
+        ];
+    },
+
     async headers() {
         return [
             {

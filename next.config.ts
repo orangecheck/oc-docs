@@ -9,6 +9,7 @@ import rehypeSlug from 'rehype-slug';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pkg = require('./package.json') as { version: string };
 const BUILD_SHA = (process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7);
+const isDev = process.env.NODE_ENV !== 'production';
 
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -107,11 +108,18 @@ const nextConfig: NextConfig = {
                         key: 'Content-Security-Policy',
                         value: [
                             "default-src 'self'",
-                            "script-src 'self' 'unsafe-inline'",
+                            // Next dev (react-refresh / HMR) evaluates code via
+                            // eval and talks to the dev server over a websocket;
+                            // production stays strict (no 'unsafe-eval', no ws:).
+                            isDev
+                                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+                                : "script-src 'self' 'unsafe-inline'",
                             "style-src 'self' 'unsafe-inline'",
                             "img-src 'self' data: https:",
                             "font-src 'self' data:",
-                            "connect-src 'self' https://ochk.io https://attest.ochk.io https://fleet.ochk.io",
+                            isDev
+                                ? "connect-src 'self' ws: https://ochk.io https://attest.ochk.io https://fleet.ochk.io"
+                                : "connect-src 'self' https://ochk.io https://attest.ochk.io https://fleet.ochk.io",
                             "frame-ancestors 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",
@@ -124,7 +132,14 @@ const nextConfig: NextConfig = {
 };
 
 const withMDX = createMDX({
+    // Compile MDX to read its component mapping from the nearest
+    // <MDXProvider> (mounted in _app via useMDXComponents). Without this the
+    // mapping is applied inconsistently between SSR (raw <h1>/<p>/<table>) and
+    // the client (styled components), which React flags as a hydration
+    // mismatch (#418) on any MDX *page* — e.g. the homepage index.mdx. With it,
+    // server and client both render the styled components.
     options: {
+        providerImportSource: '@mdx-js/react',
         remarkPlugins: [['remark-gfm']],
         // rehype-slug bakes `id="…"` onto every heading at build time so
         // anchor links (DocsToc + direct deep links like /foo#bar) work

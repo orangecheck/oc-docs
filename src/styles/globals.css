@@ -2,7 +2,6 @@
 
 /* Scan the published packages so utilities used inside their components emit
    even when no local file references them. */
-@source '../../node_modules/@orangecheck/ui';
 @source '../../node_modules/@orangecheck/design';
 @import 'tw-animate-css';
 

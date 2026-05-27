@@ -1,6 +1,6 @@
 'use client';
 
-import { OcAccountMenu } from '@orangecheck/ui';
+import { OcAccountMenu } from '@orangecheck/design';
 
 import { SITE_CONFIG } from '@/lib/site.config';
 

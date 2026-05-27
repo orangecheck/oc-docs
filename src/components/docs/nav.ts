@@ -795,7 +795,7 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/sdk/ui/README',
-                label: '@orangecheck/ui',
+                label: '@orangecheck/design',
                 blurb: 'Shared shadcn-style UI primitives across the family.',
             },
         ],

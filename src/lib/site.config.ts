@@ -1,4 +1,4 @@
-import type { EcosystemSlug, OcAccountMenuItem, SiteState } from '@orangecheck/ui';
+import type { EcosystemSlug, OcAccountMenuItem, SiteState } from '@orangecheck/design';
 
 /**
  * Single source of truth for this site's identity. Read by the header

@@ -1,7 +1,6 @@
 'use client';
 
-import { OcAppearanceMenu } from '@orangecheck/design';
-import { OcLogoDropdown } from '@orangecheck/ui';
+import { OcAppearanceMenu, OcLogoDropdown } from '@orangecheck/design';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 

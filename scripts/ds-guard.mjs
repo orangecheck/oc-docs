@@ -19,7 +19,10 @@ try {
     if (out) {
         console.error(
             '✗ design-system drift: `@orangecheck/ui` imported in:\n' +
-                out.split('\n').map((f) => '    ' + f).join('\n') +
+                out
+                    .split('\n')
+                    .map((f) => '    ' + f)
+                    .join('\n') +
                 '\n  → import composites/chrome from `@orangecheck/design` (see CLAUDE.md).'
         );
         bad = true;
@@ -27,7 +30,10 @@ try {
 } catch {}
 
 try {
-    if (existsSync('package.json') && /"@orangecheck\/ui"\s*:/.test(readFileSync('package.json', 'utf8'))) {
+    if (
+        existsSync('package.json') &&
+        /"@orangecheck\/ui"\s*:/.test(readFileSync('package.json', 'utf8'))
+    ) {
         console.error(
             '✗ design-system drift: `@orangecheck/ui` is a dependency in package.json.\n' +
                 '  → it is folded into `@orangecheck/design`; remove the dep.'

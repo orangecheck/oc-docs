@@ -97,7 +97,7 @@ session (or `oc-guardian sign --serve`) presents the signature.
 The binary POSTs a signed health envelope to
 `https://me.ochk.io/api/operator/attestation` every 60 seconds. Within ~2
 minutes of first POST, the
-[/me/operator/attestation](https://me.ochk.io/me/operator/attestation) tab flips
+[/me/operator/guardians](https://me.ochk.io/me/operator/guardians) tab flips
 to green for your operator_id.
 
 You can also probe locally:
@@ -142,4 +142,4 @@ guardians don't upgrade simultaneously.
 This entire flow has a kit-only equivalent. Replace the portal-issued config
 bundle with `oc-guardian config gen` and the upgrade flow with
 `oc-guardian upgrade`; everything else is identical. See
-[me.ochk.io/operator/bypass](https://me.ochk.io/operator/bypass).
+[github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md).

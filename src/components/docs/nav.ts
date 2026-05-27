@@ -540,8 +540,8 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/me/operator',
-                label: 'Operator program',
-                blurb: 'Apply, get accepted, run a guardian. Lifecycle in-browser; bypass parity via the kit.',
+                label: 'Operator',
+                blurb: 'Provision + run a federation: seats → charter → DKG → live. Lifecycle in-browser; bypass parity via the kit.',
             },
             {
                 href: '/me/operator/charter',

@@ -1,0 +1,195 @@
+export const metadata = {
+    title: 'OC Vault · Teams',
+    description:
+        'How OC Vault team vaults work: the team key, invite-URL fragments, escrow under your personal vault key, roles, seat limits, advisory edit-locks, the 8-second liveness poll, and how the collaborative-freshness signal differs from personal cloud sync.',
+};
+
+# OC Vault · Teams
+
+A **team vault** is a second, parallel vault you share with a small group — the
+family across three devices, a two-person company sharing infrastructure
+secrets, a band sharing a Stripe account, a household sharing streaming logins.
+Same encrypted-secrets model as the personal vault, but sealed under a separate
+**team key** that several Bitcoin identities can hold.
+
+Team vaults are part of **Family Circle** — 200,000 sats / 365 days, up to 10
+seats included. See [Pricing](/vault/#pricing). Extra seats above 10 are 40,000
+sats / 365 days / seat. You can own one team; you can be a member of as many
+teams as people invite you to.
+
+## The structural invariants
+
+The same "OC cannot read your data" claim applies, with one extra wrinkle: the
+team key is shared, so the people on the membership list can read what the team
+has. Everyone _outside_ the membership list — including OC — sees ciphertext
+only.
+
+| Property               | Personal vault                                | Team vault                                                                                 |
+| ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Key                    | 32 random bytes per identity                  | 32 random bytes per team                                                                   |
+| Where the key lives    | your browser's IndexedDB                      | every member's browser IndexedDB, escrowed under their personal vault key                  |
+| How a new device joins | Witnessed Recovery, encrypted backup, or sync | invite URL whose **fragment** carries the team key (the fragment never leaves the browser) |
+| Server sees            | random envelope id + ciphertext               | random envelope id + ciphertext + the team id                                              |
+| Cryptographic backstop | only the vault key decrypts                   | only the team key decrypts                                                                 |
+
+## How a team is formed and joined
+
+1. **You create the team.** Your browser draws a fresh 32-byte team key and
+   stores it in IndexedDB under a per-team metadata record. The key never leaves
+   the device.
+2. **You invite a teammate.** vault.ochk.io issues an invite token (a
+   one-time-use, expiring credential — no key material) and hands you an invite
+   URL whose **fragment** carries the team key:
+   `https://vault.ochk.io/vault/team/join#<invite-token>.<b64url-team-key>`. URL
+   fragments are never sent to a server, the same primitive
+   [one-time share links](/vault/protocol#one-time-share-links) use.
+3. **They open the link.** Their browser extracts the team key from the
+   fragment, signs the invite-claim challenge with their wallet, and joins. The
+   token is consumed; the team key now lives in their IndexedDB.
+4. **They get a team-key escrow for free.** As soon as your browser holds a team
+   key, it wraps that key under your **personal** vault key and stores it on the
+   server. If you clean-install vault.ochk.io tomorrow, the team key is
+   recoverable from escrow the moment you unlock your personal vault. The escrow
+   blob is opaque to OC; only your personal vault key opens it.
+
+> **Send the invite link over a channel only the recipient has.** A leaked link
+> is a leaked team key. Treat it like a password share — Signal, an in-person
+> AirDrop, or a chat platform you both trust.
+
+## Roles
+
+Every member carries one of four roles. Roles are advisory at the read layer
+(anyone with the team key can decrypt) and enforced at the write layer by the
+server's role checks.
+
+| Role       | Read | Write | Invite / manage seats | Set roles / kick | Transfer ownership | Delete the team |
+| ---------- | ---- | ----- | --------------------- | ---------------- | ------------------ | --------------- |
+| **owner**  | ✓    | ✓     | ✓                     | ✓                | ✓                  | ✓               |
+| **admin**  | ✓    | ✓     | ✓                     | ✓                | —                  | —               |
+| **member** | ✓    | ✓     | —                     | —                | —                  | —               |
+| **viewer** | ✓    | —     | —                     | —                | —                  | —               |
+
+Owner is unique per team. Admin is for trusted co-managers (your other half, a
+sysadmin); member is the everyday seat; viewer is read-only — useful for a
+household where one parent shouldn't accidentally rotate the WiFi password.
+
+## Seats
+
+Family Circle includes **10 seats** out of the box. Beyond that you can buy
+additional seats à la carte: **40,000 sats / 365 days / seat**. The purchased
+extra seats sit alongside the included 10 with a single expiry — let the extras
+lapse, the team contracts back to the included 10. You can never drop below the
+floor of 10 while Family Circle is active.
+
+## What syncs, and when
+
+The same `packEntryForCloud` envelope as personal sync, only with the team key:
+
+```text
+TeamEntry JSON  (id + type + name + nonce + ciphertext + dates + tags)
+        │
+        ▼  AES-256-GCM(  ·  , team_key, fresh blob_nonce)     ← outer wrap
+        │
+        ▼
+{ "v": 1, "blob_nonce": "b64url(…)", "blob_ct": "b64url(…)" }  ← what is uploaded
+```
+
+The server stores opaque blobs keyed by random envelope id. It cannot read entry
+names, types, tags, or payloads — only that the team has _N_ entries of unknown
+content. See
+[Protocol → Team vaults](/vault/protocol#team-vaults-a-different-sync-signal)
+for the full envelope rules.
+
+### The liveness signal
+
+Personal cloud sync answers _"are my local edits backed up yet?"_. Team vaults
+answer a different question: _"how fresh is what I'm looking at relative to my
+teammates' writes?"_. The team page reflects that with two client-side
+mechanisms:
+
+- **An 8-second background poll** while the tab is visible. The tick refreshes
+  the entry list, the folder list, and the advisory edit-locks.
+- **A liveness tile** in the dashboard's stat row showing the time of the last
+  successful refresh, with a subtle "refreshing…" affordance while a tick is in
+  flight. The last-refresh time is persisted in IndexedDB so it survives
+  reloads.
+
+A **manual refresh button** sits in the team-page header for when you explicitly
+want to pull right now (a teammate said in chat "I just added the GitHub token,
+look") rather than wait up to 8 seconds for the next tick.
+
+### Advisory edit-locks
+
+When you open an existing team entry in the editor, the browser claims an
+**advisory lock** on the server — a ~30 second lease, heartbeated every 30
+seconds while the editor is open. Teammates see a "being edited by
+&lt;short-id&gt;" badge on that row and the editor refuses to open for them
+until the lock expires or you close yours. The lock is advisory, not
+cryptographic: a misbehaving client could bypass it, but the honest UX is the
+one that matters here — preventing two people from clobbering one another in the
+normal case.
+
+### The compare-and-swap write path
+
+Team writes carry the server's last-known `updated_at` for that entry; the
+server rejects the write if it has moved on. The client surfaces the conflict
+and re-fetches, the same shape as a successful collaborative-edit flow in a
+CRDT-free system. Out-of-order writes are rejected, not silently applied —
+that's the discipline that keeps teammates from overwriting one another's edits
+even with the advisory lock bypassed.
+
+## Trash
+
+Deletes are soft for teams too. A deleted team entry keeps its row with
+`deleted_at` set so the tombstone propagates to every member's browser. The team
+trash is reachable by owner / admin (the same role gate as management actions);
+restoring brings the entry back for everyone. Permanent purge from the team
+trash is the only hard delete and runs the same compare-and-swap as a normal
+write.
+
+## Folders
+
+Team folders are server-backed and shared. Rename a folder on your browser and
+your teammates see the rename within ~8 seconds without a reload. The folder
+list is delivered alongside entries on each poll tick — best-effort: a transient
+folder-fetch failure never disrupts the entry list.
+
+## Leaving · ownership transfer · deletion
+
+- **Leave a team.** Available to every role _except_ owner. Your seat releases,
+  your local copy of the team key is dropped, the server forgets your
+  membership. Already-decrypted entries in your browser's IndexedDB are cleared.
+- **Transfer ownership.** Owners can promote an existing admin to owner; the
+  previous owner becomes an admin. Useful if the team's original payer is
+  rotating out.
+- **Delete the team.** Owner-only, irreversible — every blob on the server is
+  purged. Members' local IndexedDB still holds whatever cached entries they last
+  saw, until they clear browser data.
+
+## What OC sees, and what it doesn't
+
+| OC sees                                                                                                      | OC does **not** see                                          |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Which OC identities are members of which teams                                                               | The team key, ever                                           |
+| How many encrypted blobs each team has, when each was last updated, the rough byte-size                      | Entry names, types, tags, payloads, the team's "shape"       |
+| Who is the owner of each team and the role assignment of each member (the server enforces role-gated writes) | Whose browsers actually decrypt entries (no usage telemetry) |
+| Email addresses members opted to publish so teammates can see them in management                             | Email addresses members did not opt to publish               |
+| Lightning-payment receipts for Family Circle billing                                                         | Anything correlating a payment to specific entry contents    |
+
+The auditable claim is the cryptographic one: **the team key is not on our
+server, in any form, ever**. Everything else falls out of that.
+
+## Where things live
+
+- **Product** — [vault.ochk.io](https://vault.ochk.io) · `Teams` rail entry
+- **Pricing** — [/vault/#pricing](/vault/#pricing) (Family Circle row)
+- **Protocol** —
+  [/vault/protocol#team-vaults-a-different-sync-signal](/vault/protocol#team-vaults-a-different-sync-signal)
+- **SDK** — same primitives as personal vault:
+  [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) for AES-GCM / X25519 /
+  HKDF, [`@orangecheck/vault-core`](/sdk/vault-core/README) for the entry model.
+  The team-share extension to the entry envelope is the team key in both
+  encryption layers — there is no new primitive.
+- **CLI** — `oc-vault` currently addresses `personal/` only. Team-vault CLI is
+  on the roadmap; the cryptographic primitives are in place, the command-surface
+  design is what's missing.

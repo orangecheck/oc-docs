@@ -69,6 +69,22 @@ and arbitrary **custom fields**.
   decryption key; the server stores only ciphertext and the row self-destructs
   on first retrieval.
 
+## Team vaults · share with people you trust
+
+The **Family Circle** tier opens a parallel vault you _share_ with up to 10
+identities. Each team is sealed under its own 32-byte **team key**; you hand
+that key to a new member through an **invite URL whose fragment carries the
+key** (fragments never leave the browser, so OC never sees the key). Roles —
+owner, admin, member, viewer — gate writes and management. See
+[Teams](/vault/teams).
+
+The collaborative signal is different from personal sync. Personal asks _"are my
+local edits backed up yet?"_ — team asks _"how fresh is what I'm looking at
+relative to my teammates' writes?"_. The team vault polls every 8 seconds while
+the tab is visible and surfaces a **liveness** tile in the dashboard
+(last-refresh time, "refreshing…" mid-tick) plus a manual refresh button.
+Advisory edit-locks keep two members from clobbering one another mid-edit.
+
 ## Reach it from anywhere — extension, CLI, SDK
 
 The same encrypted vault, three surfaces:
@@ -91,25 +107,31 @@ passphrase still does the decrypting, in-process.
 
 ## Pricing
 
-vault.ochk.io is paid in **sats over Lightning — no fiat, no cards**.
+vault.ochk.io is paid in **sats over Lightning — no fiat, no cards, no
+auto-renew, no lifetime SKU**. Cloud sync is a running service (storage,
+bandwidth, a Lightning node), so you pay for the time you use it and stop paying
+when you stop. The free tier is forever.
 
-| SKU                      | Price                               | For                                                                             |
-| ------------------------ | ----------------------------------- | ------------------------------------------------------------------------------- |
-| **Free**                 | 0 sats                              | Local + self-supplied sync. Full feature parity minus the OC-hosted blob store. |
-| **vault Cloud Annual**   | 21,000 sats / year                  | "Try it" buyers                                                                 |
-| **vault Cloud Lifetime** | 210,000 sats one-time               | The brand-defining SKU                                                          |
-| **Family Circle**        | 50,000 sats lifetime / 5 identities | Couples, families                                                               |
-| **Witnessed Recovery**   | 21,000 sats / year per slot         | Anyone with no spare devices                                                    |
+| SKU                    | Price                         | For                                                                             |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------------------------- |
+| **Free**               | 0 sats                        | Local + portable export. Full feature parity minus the OC-hosted blob store.    |
+| **Monthly**            | 7,000 sats / 30 days          | "Try it" buyers                                                                 |
+| **Annual**             | 70,000 sats / 365 days        | Steady-state cloud sync (two months cheaper than monthly)                       |
+| **Family Circle**      | 200,000 sats / 365 days       | Personal cloud sync + one shared team vault, up to 10 seats included            |
+| **Extra team seat**    | 40,000 sats / 365 days · seat | Family Circle teams beyond the included 10 seats                                |
+| **Witnessed Recovery** | 70,000 sats / 365 days · slot | Recovery without cloud sync — a quorum of trusted witnesses can rewrap your key |
 
 The free tier is genuine: local storage and a portable export work with no
 payment. Paid tiers add the OC-hosted, ciphertext-only cloud blob store so
 encrypted entries sync across every device that signs in with the same Bitcoin
-identity.
+identity. Family Circle also unlocks team vaults — see [Teams](/vault/teams).
 
 ## Sub-pages in this section
 
 - [Quickstart](/vault/quickstart) — open a vault, add your first entry, turn on
   sync
+- [Teams](/vault/teams) — Family Circle team vaults, invite-fragment key
+  sharing, roles, the 8-second collaborative liveness model
 - [Browser extension](/vault/extension) — autofill in Chromium / Firefox, your
   full vault one toolbar click away
 - [Developer platform](/vault/developer) — the `oc-vault` CLI, `ocv://` secret

@@ -49,7 +49,9 @@ The plaintext is produced only at run time.
 ocv://<vault>/<item>/<field>[?attr=otp]
 ```
 
-- **vault** — `personal` (your own vault). Team vaults are on the roadmap.
+- **vault** — `personal` (your own vault). CLI access to
+  [team vaults](/vault/teams) is on the roadmap — the cryptographic primitives
+  are in place, only the command surface is missing.
 - **item** — an entry's name (case-insensitive) or its 32-hex id.
 - **field** — a field name; omit it for the entry type's primary field
   (`password` for a login, `key` for an api-key, `secret` for a totp).

@@ -23,7 +23,8 @@ export default function App({ Component, pageProps }: AppProps) {
             disableTransitionOnChange
         >
             <OcThemeBridge />
-            <OcThemeProvider>
+            {/* docs is reading-heavy — keep the ambient aurora faint behind long prose */}
+            <OcThemeProvider aurora={{ intensity: 0.5 }}>
                 <Seo />
                 <OcSessionProvider>
                     <MDXProvider components={components}>

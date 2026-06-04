@@ -38,6 +38,9 @@ SaaS so a typical customer ships in an afternoon instead of a quarter.
 - [Integrations](/fleet/integrations) — drop-in adapters for Anthropic Tool Use,
   OpenAI function calling, Vercel AI SDK, LangGraph, and MCP. Three lines of
   config and your tool calls flow into fleet.
+- [Bond verification](/fleet/bond) — `GET /api/bond` re-resolves a bond against
+  live bitcoin UTXO state. The load-bearing leg: a counterparty can weigh an
+  agent's skin-in-the-game without trusting fleet.
 - [API reference](/fleet/api) — OpenAPI 3.1 spec, Bearer-auth examples, error
   codes.
 - [Webhooks](/fleet/webhooks) — receive signed POSTs on every event your

@@ -487,6 +487,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Compose / persist / surface OC Pledge envelopes — the bonded-delivery slice of fleet.',
             },
             {
+                href: '/fleet/bond',
+                label: 'Bond verification',
+                blurb: 'GET /api/bond — re-resolve a bond against live bitcoin UTXO state. The load-bearing leg.',
+            },
+            {
                 href: '/fleet/webhooks',
                 label: 'Webhooks',
                 blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',

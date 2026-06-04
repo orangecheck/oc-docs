@@ -492,6 +492,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'GET /api/bond — re-resolve a bond against live bitcoin UTXO state. The load-bearing leg.',
             },
             {
+                href: '/fleet/compliance',
+                label: 'Compliance crosswalk',
+                blurb: 'Fleet artifacts mapped to EU AI Act / SOC 2 / NIST AI RMF — with honest rails. The procurement exit.',
+            },
+            {
                 href: '/fleet/webhooks',
                 label: 'Webhooks',
                 blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',

@@ -497,6 +497,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Fleet artifacts mapped to EU AI Act / SOC 2 / NIST AI RMF — with honest rails. The procurement exit.',
             },
             {
+                href: '/fleet/interop',
+                label: 'Interop credential',
+                blurb: 'How an OC delegation+bond rides into x402 / AP2 / A2A / ERC-8004 as a portable, offline-verifiable credential. Design intent.',
+            },
+            {
                 href: '/fleet/webhooks',
                 label: 'Webhooks',
                 blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',

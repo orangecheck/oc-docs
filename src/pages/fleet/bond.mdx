@@ -1,0 +1,132 @@
+export const metadata = {
+    title: 'Fleet bond verification',
+    description:
+        'GET /api/bond re-resolves an OC bond against live bitcoin UTXO state — sats_bonded, days_unspent, the §8 verdict, and the named trust anchors. The load-bearing bitcoin leg of fleet, documented as a contract you can verify without trusting fleet.',
+};
+
+# Bond verification
+
+A bond is the part of fleet that bitcoin makes real. An OC Pledge — and,
+optionally, an OC Agent delegation — references an **OrangeCheck attestation**
+that binds a bitcoin address to an unspent UTXO. The trust weight is
+`sats_bonded × days_unspent`: sats you cannot cheaply fake, age you cannot
+backdate, on a UTXO you have not spent. Swap bitcoin for an ordinary keypair and
+the bond becomes an unverifiable assertion — which is exactly why it is the one
+thing the settlement and authorization rails around fleet do not offer.
+
+The rule that keeps this honest: **a bond is only ever re-resolved against live
+chain state, never read from stored metadata.** fleet does not ask you to trust
+its database. It hands you a figure it just recomputed from the chain, names the
+endpoints it read, and invites you to reproduce it yourself.
+
+## What the gate checks (SPEC §8)
+
+`verifyBond` in [`@orangecheck/pledge-core`](/sdk/pledge-core) is the canonical
+gate. Given a pledge and the verifier's clock `now`, it resolves the bond's
+attestation against live UTXO state and applies five checks:
+
+| Code                       | Meaning                                                    |
+| -------------------------- | ---------------------------------------------------------- |
+| `E_BOND_NOT_FOUND`         | The attestation could not be discovered on the relays.     |
+| `E_BOND_ADDRESS_MISMATCH`  | The attestation bonds an address other than the swearer's. |
+| `E_BOND_SPENT`             | The bonded UTXO has been spent at or before `now`.         |
+| `E_BOND_INSUFFICIENT_SATS` | Live `sats_bonded` is below the pledge's `min_sats`.       |
+| `E_BOND_INSUFFICIENT_DAYS` | Live `days_unspent` is below the pledge's `min_days`.      |
+
+The result depends on chain state **at `now`**, not at the moment the pledge was
+sworn. A bond that was valid when sworn and is spent today fails today. That is
+the point — a counterparty checking an agent before relying on it gets the
+current truth, not a historical snapshot.
+
+## The endpoint
+
+```
+GET https://fleet.ochk.io/api/bond?attestation_id=<64-hex>
+```
+
+Public, no auth, no project gate — a counterparty must be able to verify a bond
+without a fleet account. It trusts no stored fleet row: every call hits the
+chain and the relays.
+
+Add a swearer and thresholds to get the full §8 verdict:
+
+```
+GET /api/bond?attestation_id=<64-hex>&swearer=<bc1…>&min_sats=<n>&min_days=<n>
+```
+
+### Response
+
+```jsonc
+{
+    "ok": true,
+    // present only when swearer + min_sats + min_days are supplied:
+    "verdict": { "ok": true, "sats_bonded": 1000000, "days_unspent": 212 },
+    "resolution": {
+        "found": true,
+        "signature_valid": true,
+        "address": "bc1q…",
+        "sats_bonded": 1000000, // live, computed via SPEC §5.4 oldest-first greedy
+        "days_unspent": 212, // live, from the youngest UTXO in the bonded set
+        "spent": false,
+        "reasons": [],
+        "checked_at": "2026-06-04T06:36:56.328Z", // freshness stamp
+        "sources": {
+            // named trust anchors (invariant #8)
+            "chain": "https://mempool.space/api",
+            "relays": [
+                "wss://relay.nostr.band",
+                "wss://nos.lol",
+                "…",
+                "wss://relay.ochk.io",
+            ],
+        },
+    },
+}
+```
+
+A failed verdict carries a code:
+
+```jsonc
+{ "ok": true, "verdict": { "ok": false, "code": "E_BOND_SPENT", "message": "…" }, "resolution": { … } }
+```
+
+If the chain or relays are unreachable, `resolution.found` is `false` with a
+`resolution_failed` reason. fleet **never** fakes a pass: an unverifiable bond
+is reported as unverifiable, not as valid.
+
+```bash
+curl -s 'https://fleet.ochk.io/api/bond?attestation_id=<id>&swearer=bc1q…&min_sats=1000000&min_days=180' | jq .verdict
+```
+
+## How the figures are computed
+
+`sats_bonded` and `days_unspent` come from the OC Attest verification algorithm
+(SPEC §5.4), shared with [`@orangecheck/sdk`](/sdk/sdk):
+
+1. Discover the attestation on the relay set by its content-addressed id and
+   re-verify its BIP-322 signature.
+2. Fetch the confirmed UTXOs for the attested address from Esplora.
+3. Select bonded UTXOs **oldest-first** until they cover the attested `bond:`
+   amount; `sats_bonded` is exactly that amount (surplus is ignored),
+   `days_unspent` is the age of the youngest UTXO in the bonded set.
+
+## Honest limitations (v0)
+
+- **`verifyBond` proves unspent-at-check-time only.** It cannot prevent the
+  swearer from spending the UTXO a block later. The mitigation is continuous
+  re-resolution plus a published re-attestation cadence — not a custodial lock.
+  A covenant or timelock construction would drift toward custody and break the
+  no-custody invariant, so fleet does not use one.
+- **Breach is reputational, never financial.** Funds never move. A spent bond or
+  a broken pledge attaches a permanent, public, address-keyed record — it does
+  not let fleet, or anyone, seize sats. fleet holds no keys and runs no payout
+  wallet.
+
+## Verify it yourself
+
+Everything above is reproducible without fleet. Fetch the attestation from any
+relay, re-derive its id as `sha256(canonical_message)`, re-check the BIP-322
+signature against the address, query the address's UTXOs against your own
+bitcoin node or Esplora instance, and apply the §5.4 rule. The
+[`@orangecheck/sdk`](/sdk/sdk) `check()` function does exactly this in one call.
+fleet runs the managed copy; the chain is the source of truth.

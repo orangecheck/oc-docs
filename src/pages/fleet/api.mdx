@@ -62,7 +62,7 @@ returns 401; a malformed Bearer falls through to anonymous.
 | **API tokens**      | `GET/POST /api/tokens`, `PATCH/DELETE /api/tokens/{id}`                                                                                                                                    |
 | **Webhooks**        | `GET/POST /api/webhooks/endpoints`, `GET/PATCH/DELETE /api/webhooks/endpoints/{id}`, `GET /api/webhooks/deliveries`, `POST /api/webhooks/deliveries/{id}/retry`                            |
 | **Admin log**       | `GET /api/admin/log?project_id=&limit=&before=&event_type=` — append-only audit trail of privilege-changing operations (rename / archive, member CRUD, token CRUD, webhook endpoint CRUD). |
-| **Billing**         | `POST /api/billing/portal` (Stripe Customer Portal redirect), `POST /api/checkout/{stripe,lightning}`                                                                                      |
+| **Billing**         | `POST /api/checkout/lightning` (BTCPay-hosted Lightning invoice; sats only — there is no fiat/card rail)                                                                                   |
 | **Public**          | `GET /api/health`, `GET /api/health/deep`, `GET /api/openapi`, `GET /api/auth/me`, `POST /api/auth/logout`                                                                                 |
 
 ## Error envelope
@@ -102,6 +102,31 @@ HTTP/1.1 429 Too Many Requests
 ```
 
 Apply jitter + exponential backoff in your retries.
+
+## Tier limits
+
+Rate limiting is per-IP and abuse-focused; **tier limits** are per-project and
+plan-based. They're enforced server-side (not just displayed), so over-limit
+writes are rejected with a `402` and a `billing`-class reason — upgrade lifts
+the ceiling.
+
+| Limit                  | Community (free) | Pro / Enterprise      | Over-limit reason     |
+| ---------------------- | ---------------- | --------------------- | --------------------- |
+| Concurrent agents      | 3                | unlimited             | `tier_agent_limit`    |
+| Signed actions / cycle | 5,000 / month    | 500k (Pro) · 1M (Ent) | `tier_action_limit`   |
+| Webhook delivery       | —                | included              | `tier_feature_locked` |
+| Audit-bundle export    | watermarked      | unwatermarked         | _(content unchanged)_ |
+
+```
+HTTP/1.1 402 Payment Required
+{ "ok": false, "reason": "tier_agent_limit",
+  "detail": "the community tier allows 3 concurrent agents — revoke one or upgrade to add more" }
+```
+
+The watermark is metadata in the bundle wrapper only — the envelopes inside are
+content-addressed and BIP-322-signed, so a community export verifies offline
+exactly as a Pro export does. Only live-authority agents (active / paused) count
+against the agent cap; revoked and expired delegations don't.
 
 ## Same-origin enforcement
 

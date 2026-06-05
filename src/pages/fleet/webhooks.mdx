@@ -9,10 +9,14 @@ export const metadata = {
 # Fleet webhooks
 
 Subscribe an HTTPS endpoint at `/settings § 04 · webhook endpoints` and fleet
-will POST a signed delivery on every event your endpoint subscribes to. Same
-wire format as Stripe / GitHub / BTCPay — the
+will POST a signed delivery on every event your endpoint subscribes to. The
+HMAC-SHA256 signature scheme is the same familiar shape as GitHub / BTCPay — the
 [`@orangecheck/webhook-verify`](https://www.npmjs.com/package/@orangecheck/webhook-verify)
 package is a drop-in receiver for any Node / Edge / Workers runtime.
+
+> Webhook delivery is a **Pro** feature. Registering an endpoint on a free
+> (community) project returns `402 tier_feature_locked` — see
+> [tier limits](/fleet/api#tier-limits).
 
 ## Event catalog
 

@@ -26,7 +26,7 @@ SaaS so a typical customer ships in an afternoon instead of a quarter.
 | **Is**    | A turnkey **operator dashboard** for OC Agent envelopes. Sign in with your Bitcoin address, register delegations, watch action receipts stream in, audit-export at any time.                     |
 | **Is**    | A **managed publisher**. We sign Nostr events for you (kind 30083 / 30084 / 30085 / 30086), submit OTS commitments to the calendar set, and re-publish on relay flake.                           |
 | **Is**    | A **webhook delivery layer**. Subscribe an HTTPS endpoint; we POST HMAC-signed events on every accepted envelope, retry with exponential backoff, surface delivery health.                       |
-| **Is**    | A **billing surface**. Lightning rail (BTCPay) is primary; Stripe is the USD parity rail. No token, no custody.                                                                                  |
+| **Is**    | A **billing surface**. Billed in sats over Lightning (BTCPay) — no fiat rail, no card on file. USD figures are a reference for finance teams, never a payment method. No token, no custody.      |
 | **Isn't** | A _new protocol_. Every envelope fleet persists is identical to one a customer could publish themselves directly via `@orangecheck/agent-cli`.                                                   |
 | **Isn't** | A _signer_. Fleet never holds principal keys. Every delegation is BIP-322-signed in the customer's wallet (UniSat, Xverse, Leather, OKX, Phantom, or paste-in).                                  |
 | **Isn't** | A _trust anchor_. Verifiers don't trust fleet — they trust the signatures on the envelopes fleet publishes. Drop the bundle into [@orangecheck/agent-core](/sdks/javascript) and verify offline. |

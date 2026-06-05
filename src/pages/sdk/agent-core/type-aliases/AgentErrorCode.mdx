@@ -38,7 +38,12 @@ type AgentErrorCode =
   | "E_SCOPES_BOTH_PROVIDED"
   | "E_SCOPES_NEITHER_PROVIDED"
   | "E_SCOPES_UNREADABLE"
-  | "E_BAD_LOCK_ENVELOPE";
+  | "E_BAD_LOCK_ENVELOPE"
+  | "E_BAD_FEDERATION_DESCRIPTOR"
+  | "E_THRESHOLD_MISMATCH"
+  | "E_THRESHOLD_NOT_MET"
+  | "E_UNKNOWN_GUARDIAN"
+  | "E_DUPLICATE_GUARDIAN";
 ```
 
 Defined in: [agent-core/src/types.ts:231](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L231)

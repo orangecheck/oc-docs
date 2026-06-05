@@ -25,6 +25,12 @@ export const metadata = {
 - [DelegationCanonicalInput](interfaces/DelegationCanonicalInput.mdx)
 - [DelegationEnvelope](interfaces/DelegationEnvelope.mdx)
 - [DelegationRevocationRef](interfaces/DelegationRevocationRef.mdx)
+- [FederationDelegationEnvelope](interfaces/FederationDelegationEnvelope.mdx)
+- [FederationDescriptor](interfaces/FederationDescriptor.mdx)
+- [FederationGuardian](interfaces/FederationGuardian.mdx)
+- [FederationPrincipal](interfaces/FederationPrincipal.mdx)
+- [FederationRevocationEnvelope](interfaces/FederationRevocationEnvelope.mdx)
+- [FederationSignature](interfaces/FederationSignature.mdx)
 - [RevocationCanonicalInput](interfaces/RevocationCanonicalInput.mdx)
 - [RevocationEnvelope](interfaces/RevocationEnvelope.mdx)
 - [Scope](interfaces/Scope.mdx)
@@ -42,6 +48,9 @@ export const metadata = {
 - [VerifyBase](interfaces/VerifyBase.mdx)
 - [VerifyDelegationInput](interfaces/VerifyDelegationInput.mdx)
 - [VerifyErr](interfaces/VerifyErr.mdx)
+- [VerifyFederationBase](interfaces/VerifyFederationBase.mdx)
+- [VerifyFederationDelegationInput](interfaces/VerifyFederationDelegationInput.mdx)
+- [VerifyFederationRevocationInput](interfaces/VerifyFederationRevocationInput.mdx)
 - [VerifyOk](interfaces/VerifyOk.mdx)
 - [VerifyRevocationInput](interfaces/VerifyRevocationInput.mdx)
 - [VerifySubdelegationInput](interfaces/VerifySubdelegationInput.mdx)
@@ -51,6 +60,7 @@ export const metadata = {
 - [AgentErrorCode](type-aliases/AgentErrorCode.mdx)
 - [ChainLink](type-aliases/ChainLink.mdx)
 - [EnvelopeKind](type-aliases/EnvelopeKind.mdx)
+- [FederationVerifyResult](type-aliases/FederationVerifyResult.mdx)
 - [RevocationHolder](type-aliases/RevocationHolder.mdx)
 - [ScopeOp](type-aliases/ScopeOp.mdx)
 - [VerifyActionResult](type-aliases/VerifyActionResult.mdx)
@@ -60,6 +70,7 @@ export const metadata = {
 
 ## Variables
 
+- [canonicalize](variables/canonicalize.mdx)
 - [DEFAULT\_MAX\_CHAIN\_DEPTH](variables/DEFAULT_MAX_CHAIN_DEPTH.mdx)
 - [ENVELOPE\_VERSION](variables/ENVELOPE_VERSION.mdx)
 - [REGISTERED\_SCOPES](variables/REGISTERED_SCOPES.mdx)
@@ -70,7 +81,6 @@ export const metadata = {
 - [actionCanonicalMessage](functions/actionCanonicalMessage.mdx)
 - [canonicalActionBytes](functions/canonicalActionBytes.mdx)
 - [canonicalDelegationBytes](functions/canonicalDelegationBytes.mdx)
-- [canonicalize](functions/canonicalize.mdx)
 - [canonicalizeAction](functions/canonicalizeAction.mdx)
 - [canonicalizeDelegation](functions/canonicalizeDelegation.mdx)
 - [canonicalizeRevocation](functions/canonicalizeRevocation.mdx)
@@ -80,14 +90,15 @@ export const metadata = {
 - [canonicalRevocationBytes](functions/canonicalRevocationBytes.mdx)
 - [computeActionId](functions/computeActionId.mdx)
 - [computeDelegationId](functions/computeDelegationId.mdx)
+- [computeFederationDescriptorId](functions/computeFederationDescriptorId.mdx)
 - [computeRevocationId](functions/computeRevocationId.mdx)
 - [computeSubdelegationId](functions/computeSubdelegationId.mdx)
 - [decodeScopesPayload](functions/decodeScopesPayload.mdx)
 - [delegationCanonicalBytes](functions/delegationCanonicalBytes.mdx)
 - [delegationCanonicalMessage](functions/delegationCanonicalMessage.mdx)
 - [encodeScopesPayload](functions/encodeScopesPayload.mdx)
+- [federationDescriptorCanonicalMessage](functions/federationDescriptorCanonicalMessage.mdx)
 - [hasPrivateScopes](functions/hasPrivateScopes.mdx)
-- [hexEncode](functions/hexEncode.mdx)
 - [isSubScope](functions/isSubScope.mdx)
 - [parseAndCanonicalizeScopes](functions/parseAndCanonicalizeScopes.mdx)
 - [parseScope](functions/parseScope.mdx)
@@ -101,5 +112,13 @@ export const metadata = {
 - [validateScope](functions/validateScope.mdx)
 - [verifyAction](functions/verifyAction.mdx)
 - [verifyDelegation](functions/verifyDelegation.mdx)
+- [verifyFederationDelegation](functions/verifyFederationDelegation.mdx)
+- [verifyFederationRevocation](functions/verifyFederationRevocation.mdx)
 - [verifyRevocation](functions/verifyRevocation.mdx)
 - [verifySubdelegation](functions/verifySubdelegation.mdx)
+
+## References
+
+### hexEncode
+
+Renames and re-exports [canonicalize](variables/canonicalize.mdx)

@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: VerifyFederationDelegationInput",
+    description: "Auto-generated API reference for Interface: VerifyFederationDelegationInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / VerifyFederationDelegationInput
+
+# Interface: VerifyFederationDelegationInput
+
+Defined in: [agent-core/src/federation.ts:222](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L222)
+
+## Extends
+
+- [`VerifyFederationBase`](VerifyFederationBase.mdx)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`FederationDelegationEnvelope`](FederationDelegationEnvelope.mdx) | - | - | [agent-core/src/federation.ts:223](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L223) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | - | - | [agent-core/src/federation.ts:224](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L224) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyFederationBase`](VerifyFederationBase.mdx).[`skipSignatureVerification`](VerifyFederationBase.mdx#property-skipsignatureverification) | [agent-core/src/federation.ts:97](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L97) |
+| &lt;a id="property-skiptemporalcheck">&lt;/a> `skipTemporalCheck?` | `boolean` | - | - | [agent-core/src/federation.ts:225](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L225) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | Injected BIP-322 verifier. Required unless `skipSignatureVerification`. | [`VerifyFederationBase`](VerifyFederationBase.mdx).[`verifyBip322`](VerifyFederationBase.mdx#property-verifybip322) | [agent-core/src/federation.ts:96](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L96) |

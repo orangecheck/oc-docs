@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: federationDescriptorCanonicalMessage()",
+    description: "Auto-generated API reference for Function: federationDescriptorCanonicalMessage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / federationDescriptorCanonicalMessage
+
+# Function: federationDescriptorCanonicalMessage()
+
+```ts
+function federationDescriptorCanonicalMessage(descriptor: FederationDescriptor): string;
+```
+
+Defined in: [agent-core/src/federation.ts:109](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L109)
+
+The canonical, line-oriented descriptor message. Guardians are emitted in
+lexicographic byte order of their address (NOT the JSON array order); the
+`name` label is excluded — it is JSON-only metadata. No trailing LF.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `descriptor` | [`FederationDescriptor`](../interfaces/FederationDescriptor.mdx) |
+
+## Returns
+
+`string`

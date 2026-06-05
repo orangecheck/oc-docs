@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Function: computeFederationDescriptorId()",
+    description: "Auto-generated API reference for Function: computeFederationDescriptorId(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / computeFederationDescriptorId
+
+# Function: computeFederationDescriptorId()
+
+```ts
+function computeFederationDescriptorId(descriptor: FederationDescriptor): string;
+```
+
+Defined in: [agent-core/src/federation.ts:121](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/federation.ts#L121)
+
+descriptor_id := H(canonical_descriptor_bytes). 64 lowercase hex.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `descriptor` | [`FederationDescriptor`](../interfaces/FederationDescriptor.mdx) |
+
+## Returns
+
+`string`

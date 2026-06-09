@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Interface: SystemWebhookPayload",
+    description: "Auto-generated API reference for Interface: SystemWebhookPayload. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / SystemWebhookPayload
+
+# Interface: SystemWebhookPayload
+
+Defined in: [me-client/src/types.ts:382](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L382)
+
+Non-billable SYSTEM webhook deliveries — project-level operational
+signals (escrow.low, escrow.depleted, escrow.recovered, drop.closed).
+Same signing + headers as billable deliveries; receivers subscribe
+via the same `subscribed` list ('*' or the explicit subtype string).
+Carries no user identity. Discriminate on `kind` first, then
+`subtype`:
+
+  const payload = JSON.parse(body) as WebhookPayload | SystemWebhookPayload;
+  if (payload.kind === 'oc-system-event' && payload.subtype === 'drop.closed') &#123; … &#125;
+
+## Extended by
+
+- [`DropClosedWebhookPayload`](DropClosedWebhookPayload.mdx)
+
+## Indexable
+
+```ts
+[extra: string]: unknown
+```
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"oc-system-event"` | [me-client/src/types.ts:383](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L383) |
+| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | [me-client/src/types.ts:385](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L385) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | `string` | [me-client/src/types.ts:384](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L384) |

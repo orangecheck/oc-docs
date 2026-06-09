@@ -12,10 +12,15 @@ export const metadata = {
 # Variable: MIN\_INTEGRATOR\_PRICE\_SATS
 
 ```ts
-const MIN_INTEGRATOR_PRICE_SATS: 5 = 5;
+const MIN_INTEGRATOR_PRICE_SATS: 1 = 1;
 ```
 
-Defined in: [me-client/src/types.ts:31](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L31)
+Defined in: [me-client/src/types.ts:36](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L36)
 
-Anti-spam price floor. No integrator can configure a per-event price
- below this.
+Per-event price floor. 1 sat — the natural atomic Bitcoin unit.
+ Integrators choose their own per-event prices above this; OC does
+ not impose sybil-resistance opinions on integrators (that's their
+ call, from their own threat model). The 1-sat floor is purely
+ mechanical — fees can't be fractional sats. Mirrors the canonical
+ value at oc-me-web/src/lib/events/types.ts (a previous SDK release
+ drifted to 5 while the platform ratified 1).

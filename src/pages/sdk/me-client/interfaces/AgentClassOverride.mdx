@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Interface: AgentClassOverride",
+    description: "Auto-generated API reference for Interface: AgentClassOverride. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / AgentClassOverride
+
+# Interface: AgentClassOverride
+
+Defined in: [me-client/src/types.ts:90](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L90)
+
+Optional per-class pricing overrides · per OCHK-V3-PLAN §7 phase-1.
+ Agents acting under a scoped oc-agent delegation may bill
+ differently than humans firing the same subtype. When `agent` is
+ unset on a subtype, agent traffic bills at the human rate. `refuse:
+ true` makes the subtype human-only — the endpoint returns 422
+ agent_refused for is_agent=true requests.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-refuse">&lt;/a> `refuse?` | `boolean` | When true, agent traffic is refused for this subtype. | [me-client/src/types.ts:96](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L96) |
+| &lt;a id="property-site_pays">&lt;/a> `site_pays?` | [`SiteFeeShape`](../type-aliases/SiteFeeShape.mdx) | Override site_pays for agent-fired events. | [me-client/src/types.ts:92](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L92) |
+| &lt;a id="property-user_share_pct">&lt;/a> `user_share_pct?` | `number` | Override user_share_pct. Same default-fallback as site_pays. | [me-client/src/types.ts:94](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L94) |

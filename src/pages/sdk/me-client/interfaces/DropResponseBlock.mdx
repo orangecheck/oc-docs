@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Interface: DropResponseBlock",
+    description: "Auto-generated API reference for Interface: DropResponseBlock. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README.mdx)
+
+***
+
+[@orangecheck/me-client](../README.mdx) / DropResponseBlock
+
+# Interface: DropResponseBlock
+
+Defined in: [me-client/src/types.ts:310](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L310)
+
+Drop-period context on event-ingest responses (single route:
+ top-level `drop`; batch route: per-result `drop`). `state` flips
+ from 'open' to 'closing' once the scheduled boundary passes and the
+ window awaits its sweep (~15 min) — render "processing", never a
+ negative countdown.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-close_height_target">&lt;/a> `close_height_target` | `number` \| `null` | [me-client/src/types.ts:315](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L315) |
+| &lt;a id="property-closes_at_target">&lt;/a> `closes_at_target` | `string` | [me-client/src/types.ts:314](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L314) |
+| &lt;a id="property-label">&lt;/a> `label` | `string` | [me-client/src/types.ts:312](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L312) |
+| &lt;a id="property-state">&lt;/a> `state` | `"open"` \| `"closing"` | [me-client/src/types.ts:313](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L313) |
+| &lt;a id="property-window_id">&lt;/a> `window_id` | `string` | [me-client/src/types.ts:311](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L311) |

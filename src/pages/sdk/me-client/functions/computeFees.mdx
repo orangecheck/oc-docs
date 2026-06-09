@@ -12,21 +12,35 @@ export const metadata = {
 # Function: computeFees()
 
 ```ts
-function computeFees(cfg: IntegratorEventConfig, payment_amount_sats?: number): ComputedFees;
+function computeFees(
+   cfg: IntegratorEventConfig, 
+   payment_amount_sats?: number, 
+   opts?: {
+  is_agent?: boolean;
+}): ComputedFees;
 ```
 
-Defined in: [me-client/src/types.ts:120](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L120)
+Defined in: [me-client/src/types.ts:156](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L156)
 
 Compute the four-way fee split for an event given an integrator's
  config and (for percent_of_amount events) the underlying payment
- amount.
+ amount. MIRRORS oc-me-web/src/lib/events/types.ts computeFees()
+ EXACTLY — the SDK-side replay (oc.event.verify) re-runs this against
+ envelopes the server billed, so any drift is a false "divergence".
 
- Invariants (verified by tests in oc-me-web/src/lib/events/types.test.ts):
-   1. gross_fee_sats >= MIN_INTEGRATOR_PRICE_SATS
-   2. platform_fee_sats >= PLATFORM_FEE_POLICY.min_floor_sats
-   3. user_share_pct is clamped to [0, 0.8]
-   4. site_rebate_sats >= 0
-   5. gross == platform + user + rebate (exact, modulo rounding into rebate)
+ Invariants:
+   1. gross_fee_sats >= MIN_INTEGRATOR_PRICE_SATS (1-sat atomic floor)
+   2. platform_fee_sats = min(gross, max(min_floor, round(gross × pct)))
+      — bounded above by gross so a 1-sat event can't owe more
+      platform fee than it grossed
+   3. user_earned_sats = min(gross − platform, round(gross × share)),
+      share clamped to [0, 0.8]
+   4. site_rebate_sats = gross − platform − user (exact remainder)
+   5. gross == platform + user + rebate exactly
+
+ When `opts.is_agent` is true AND the config has an `agent` override,
+ the agent's site_pays / user_share_pct apply. `agent.refuse: true`
+ throws 'agent_refused' (the server maps it to 422).
 
 ## Parameters
 
@@ -34,6 +48,8 @@ Compute the four-way fee split for an event given an integrator's
 | ------ | ------ |
 | `cfg` | [`IntegratorEventConfig`](../interfaces/IntegratorEventConfig.mdx) |
 | `payment_amount_sats?` | `number` |
+| `opts?` | \&#123; `is_agent?`: `boolean`; \&#125; |
+| `opts.is_agent?` | `boolean` |
 
 ## Returns
 

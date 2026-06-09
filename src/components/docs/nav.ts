@@ -544,6 +544,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Reception in Node + Rust, raw-body warning, retry semantics.',
             },
             {
+                href: '/me/drops',
+                label: 'Drop periods',
+                blurb: 'Batch payouts into scheduled windows — vesting, block boundaries, signed manifests, proofs.',
+            },
+            {
                 href: '/me/api',
                 label: 'HTTP API',
                 blurb: 'Every me.ochk.io endpoint · auth, rate limits, response shapes.',

@@ -1,0 +1,133 @@
+export const metadata = {
+    title: 'OC Me · Drop periods',
+    description:
+        'Batch your payouts into scheduled drops: integrator-defined payout windows with block-denominated boundaries, unconditional vesting, signed Merkle manifests, and per-recipient inclusion proofs.',
+};
+
+# OC Me · Drop periods
+
+**You don't have to pay out continuously.** A drop schedule groups event
+subtypes into recurring payout windows: covered events bill exactly as before —
+your escrow debits per event, the platform fee and your rebate are unchanged —
+but the **user-share matures** inside the open window and **vests as one batch
+at the boundary**. That batch is the drop.
+
+Three things make this safe enough for earners to accept:
+
+1. **No clawback, ever.** Vesting is unconditional. Maturing sats are already
+   earned and escrow-backed; a drop only defers _when_ they become takeable,
+   never _whether_.
+2. **Boundaries only move earlier.** Once a window opens, its boundary is
+   immutable upward. "Drop now", disabling, or deleting a schedule vests the
+   open window immediately; nothing can extend it. Cadence and subtype edits
+   apply from the _next_ window.
+3. **A published ceiling.** No schedule may hold earnings longer than
+   `MAX_DROP_WINDOW_DAYS` (92), published in `ABUSE_LIMITS` and surfaced on
+   me.ochk.io/trust.
+
+## Cadences · rule of three
+
+| Cadence   | Boundary                             | Use                               |
+| --------- | ------------------------------------ | --------------------------------- |
+| `weekly`  | a fixed weekday + hour, UTC          | "the Friday drop"                 |
+| `monthly` | a fixed day (1–28) + hour, UTC       | payroll-shaped payouts            |
+| `manual`  | when you say (auto-closes ≤ 92 days) | campaign drops, "drop when I say" |
+
+Configure schedules on your project's **drops** tab
+(me.ochk.io/me/projects/&lt;key&gt;/drops) or read them publicly:
+
+```ts
+const r = await fetch(
+    'https://me.ochk.io/api/integrator/config?project_key=pk_live_yourco'
+).then((x) => x.json());
+// r.drops → [{ schedule_id, label, subtypes, cadence }]
+```
+
+A subtype belongs to at most one active schedule. Subtypes you don't cover keep
+continuous (instant-vest) payout.
+
+## The boundary is a Bitcoin block
+
+At window open, the cadence compiles to a **target close height** from the
+observed chain tip (mempool.space, blockstream.info fallback — the source is
+named in the manifest). The user-share vests when the tip reaches that height.
+If no tip is observable, the window degrades honestly to its wallclock boundary
+— and regardless of everything else, a published **24h safety valve** past the
+scheduled boundary vests unconditionally, so neither an OC outage nor a
+chain-tip-source outage can freeze earners' money.
+
+## What your code sees
+
+Event-ingest responses carry a `drop` block when the subtype is covered
+(top-level on `/api/integrator/event`, per-result on `/event/batch`):
+
+```ts
+import type { DropResponseBlock } from '@orangecheck/me-client';
+
+// {
+//   window_id: 'w_…',
+//   label: 'friday drop',
+//   state: 'open' | 'closing',   // 'closing' = boundary passed, sweep pending (~15 min)
+//   closes_at_target: '2026-06-12T18:00:00.000Z',
+//   close_height_target: 901008  // null when no tip was observable at open
+// }
+```
+
+The event's signed canonical bytes (schema `v=4`) commit to
+`{ window_id, close_height_target }` — window membership is cryptographic, not a
+mutable database claim.
+
+When a window closes, subscribed webhooks receive a `drop.closed` system event:
+
+```ts
+import type { DropClosedWebhookPayload } from '@orangecheck/me-client';
+
+// kind: 'oc-system-event', subtype: 'drop.closed',
+// window_id, schedule_id, label, manifest_id, verify_url,
+// sealed_at, sealed_height, event_count, recipient_count,
+// gross_fee_sats, user_share_sats
+```
+
+Subscribe with `'*'` or the explicit `'drop.closed'` string, same as the escrow
+alerts.
+
+## The manifest · what anyone can verify
+
+Every closed window publishes a signed, content-addressed `oc-me-drop` manifest
+(OTS-anchored, republished to Nostr kind 30087):
+
+- the **id is the sha256** of the canonical bytes; the Ed25519 signature
+  verifies against me.ochk.io's published envelope JWKS;
+- `events_root` is a Merkle root over the member events' canonical digests — any
+  member event opens against it with a log-size proof;
+- `recipients_root` is a Merkle root over per-window-salted `(address, sats)`
+  leaves — each recipient can prove their line without the cohort being
+  enumerable;
+- the sealed block height and its source are named.
+
+Render + live-verify at `me.ochk.io/verify/<manifest_id>`; raw canonical bytes
+at `me.ochk.io/api/envelope/<manifest_id>` (add `?format=wrapped` for a
+self-contained record). Signed-in earners fetch their inclusion proof from
+`GET /api/me/drops/proof?window_id=…`.
+
+Named trust, stated plainly: the _completeness_ of the member set is OC's
+assembly from its event store — inclusion is provable, omission is not. That is
+the same trust boundary every envelope store in the product carries, and it's
+written on the verify page rather than hidden.
+
+## What earners see
+
+The wallet splits **available now** vs **maturing**, lists each upcoming drop
+with its vest time (block + ~wallclock), and names you — the site — as the
+schedule-setter. Vested sats settle through the normal path: the weekly
+distribution to their bound destination, or manual cash-out. Plan copy
+accordingly: a drop is "when earnings unlock", not "when sats hit their wallet".
+
+## Why you'd use it
+
+- **Legible payouts** — a hundred dust-level session events become one weekly
+  line the earner actually notices.
+- **The drop moment** — a synchronized, announceable payout your product can
+  build ritual around.
+- **Budget cadence** — your escrow still debits per event, but earner- facing
+  payout activity happens on a schedule you publish.

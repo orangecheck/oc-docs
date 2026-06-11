@@ -1,0 +1,176 @@
+export const metadata = {
+    title: 'Transport & durable inbox · OC Chat',
+    description:
+        'How an OC Chat message travels: the NIP-59 gift-wrap, the v2 encrypted wrap that hides the social graph from relays, the opaque per-conversation durable-inbox queue routing, and NIP-42 relay AUTH for institutional metadata hardening.',
+};
+
+# Transport & durable inbox
+
+OC Chat messages travel as gift-wrapped Nostr events that relays cannot read.
+This page covers the wire format, the v2 wrap encryption that closes the
+social-graph leak, the durable store-and-forward inbox, and the NIP-42
+relay-AUTH hardening.
+
+## Gift-wrap transport
+
+The canonical chat envelope travels as the **inner blob of a Nostr kind-1059
+gift-wrap** (NIP-59), signed by an **ephemeral, discarded Schnorr key**, with
+`created_at` rounded to the minute and the recipient inbox pubkey in the `p`
+tag. The recipient's chat inbox pubkey is `HKDF(device_sk)` — so **publishing a
+device record IS creating an inbox**; there is no second ceremony.
+
+## The v2 encrypted wrap (NORMATIVE, `ct = "oc-chat/v2"`)
+
+The wrap `content` MUST be **encrypted** to the recipient inbox key, not merely
+encoded. The chat envelope's own plaintext fields (`from.address`,
+`recipients[*].address`/`device_id`/`device_pk`, full-precision `created_at`)
+plus the sender's stable device pubkey would otherwise hand every relay — and
+the durable-inbox operator — the full **who-talks-to-whom graph**. The
+construction:
+
+```
+shared   = x( ECDH(eph_sk, lift_x(inbox_pk)) )          # x-coordinate only — negation-safe for BIP-340 x-only keys
+key      = HKDF-SHA256(ikm=shared, salt="oc-chat/v2", info=eph_pk_hex || inbox_pk_hex, L=32)
+content  = base64url( nonce(12) || AES-256-GCM(key, nonce, payload_json) )
+```
+
+`eph_sk` is the **same** ephemeral key that signs the outer event, so
+`event.pubkey` is the ECDH counterpart the recipient uses; binding `key` to the
+`(eph_pk, inbox_pk)` pair stops cross-wrap key reuse. A conforming publisher
+MUST emit `oc-chat/v2`; a recipient SHOULD also accept the legacy plain-base64
+`oc-chat/v1` for messages already in flight, and MUST treat a v2 wrap that fails
+the AEAD as not addressed to it.
+
+What a relay sees after the v2 wrap:
+
+| Visible to the relay | Closed by the v2 wrap                                     |
+| -------------------- | --------------------------------------------------------- |
+| an ephemeral pubkey  | the sender's identity (fresh throwaway key every message) |
+| the inbox `p` tag    | the recipient's Bitcoin address + device set              |
+| a minute timestamp   | the full-precision send time                              |
+| ciphertext           | the body, the conversation, every envelope field          |
+
+The residual disclosure is the inbox `p` tag and the timing — narrowed further
+by [relay AUTH](#relay-auth-nip-42) and, on the durable inbox, **eliminated** by
+opaque queue routing.
+
+## Durable inbox
+
+The gift-wrap rendezvous is **best-effort**: a relay MAY garbage-collect an
+event before an offline recipient connects, so an offline recipient + a swept
+relay event = a lost message. A conforming deployment therefore SHOULD provide a
+**store-and-forward inbox** — an operator-run queue retaining the _opaque_
+gift-wrap inner blob until the recipient drains it.
+
+> **This is the free-tier floor, not a paid feature.** A paid tier extends only
+> the retention horizon, multi-device fan-out, and history depth. Durability of
+> basic delivery is never the paywall.
+
+The operator MUST be unable to (a) **read** any message — it holds ciphertext
+only, never a key — or (b) **link** two conversations of one recipient, or link
+a queue to a Bitcoin identity. Routing every conversation to the single
+published inbox pubkey would let an operator that _retains_ enumerate a
+recipient's whole correspondence. Durable routing therefore uses an **opaque
+per-conversation queue id** derived from a recipient secret.
+
+### Queue derivation
+
+```
+queue_seed   = HKDF-SHA256(ikm = device_sk, salt = "", info = "oc-lock-chat/inbox-queue-seed/v1", L = 32)
+queue_id(c)  = base64url( HMAC-SHA256(key = queue_seed, msg = utf8(conversation_id)) )   // 43 chars, unpadded
+```
+
+- `queue_seed` is a **per-device secret** — never published, never leaving the
+  device unencrypted.
+- `queue_id(c)` is unguessable without `queue_seed`, and two conversations on
+  the same device produce **unrelated** ids — so the operator sees **N
+  independent queues, not one recipient** (test vector `vc06`).
+- A device recomputes `queue_id` for any conversation from `queue_seed` +
+  `conversation_id`, holding **no stored queue↔conversation map**.
+
+### Bootstrap (first contact)
+
+A sender reaching a recipient for the first time cannot yet compute
+`queue_id(c)` (it derives from a secret the sender lacks). The first inbound
+message of a new conversation goes to the recipient's **bootstrap queue**,
+derivable by anyone holding the recipient's device record:
+
+```
+bootstrap_id = base64url( SHA-256( utf8("oc-lock-chat/inbox-bootstrap/v1:" || inbox_pubkey_hex) ) )
+```
+
+The bootstrap queue carries the same recipient-linkability the relay `p` tag
+does and MUST be disclosed as such; it is used **only** until a per-conversation
+queue is established.
+
+### Handshake — migrating off bootstrap
+
+Each party advertises **its own** receiving `queue_id` inside the encrypted
+payload (the
+[`recv_queue` field](/chat/threading#recv_queue-the-durable-inbox-handshake)). A
+party that has learned its peer's `recv_queue` MUST deposit subsequent messages
+there and SHOULD stop using the bootstrap queue. Because `recv_queue` travels
+inside the AEAD-sealed payload, the operator never learns the bootstrap ↔
+per-conversation mapping.
+
+### Operator obligations (NORMATIVE)
+
+A store-and-forward inbox operator MUST:
+
+1. Store the gift-wrap inner blob **byte-for-byte** — preserving the envelope
+   `id`, `sig`, ciphertext GCM tag, and unknown fields. A re-wrap fan-out is a
+   detached `recipients[]` merge and MUST NOT recompute the signed `id`.
+2. Route **solely** on the opaque `queue_id` / `bootstrap_id` — never require,
+   store, or index a Bitcoin address, device pubkey, or plaintext thread
+   metadata.
+3. Hold **no** key material of any party.
+4. Treat the queue as **availability, not authority**: a draining recipient
+   re-verifies authenticity from the artifact alone (BIP-322 device-record
+   binding + `chat_envelope_id`), exactly as for a relay-delivered message.
+
+The operator endpoint is a **named trust anchor for availability** and MUST be
+surfaced plainly. The Ed25519 substitution test passes by inheritance: the queue
+is an ordinary mailbox asserting no Bitcoin claim of its own — the authority of
+every message it holds derives from the BIP-322-rooted device record.
+
+## Relay AUTH (NIP-42)
+
+The transport leaves one disclosed residue: the inbox pubkey in the kind-1059
+`p` tag, plus the bare fact of a connection, are visible to any observer of an
+open relay. [NIP-42](https://nips.nostr.com/42) lets a relay demand an
+**authenticated** connection before it serves or accepts events, so an
+_unauthenticated_ observer never sees the `p` tag. Pairing an `auth-required`
+relay with the v2 wrap is the **institutional privacy posture**.
+
+**Handshake.** On an `auth-required` relay the server sends
+`["AUTH", <challenge>]`; the client replies
+`["AUTH", <signed kind-22242 event>]` carrying `["relay", <url>]` +
+`["challenge", <challenge>]` tags, a recent `created_at`, empty `content`, and a
+Schnorr signature. A client MUST complete this before publishing/subscribing on
+such a relay, and MUST re-attempt a request the relay rejected with
+`auth-required:` after completing AUTH (`E_RELAY_AUTH_REQUIRED`).
+
+**Which key signs.** The kind-22242 event is **not** the gift-wrap and MUST NOT
+be signed by an identity key or tied to any one message's ephemeral wrap key.
+The default is a **fresh, per-connection ephemeral key** discarded with the
+socket — the relay learns one random pubkey linking to no identity and no
+message: pure access-gating. A relay that **allow-lists** specific members MAY
+require a designated stable credential key, named per relay (`auth_key`).
+
+> **Ed25519 verdict:** relay AUTH is **not** Bitcoin-load-bearing — it works
+> with any Schnorr keypair and carries no Bitcoin claim (the default key is
+> deliberately random). It is a metadata-privacy hardening that _rides on_ the
+> identity already proven by the device record. An `auth-required` relay still
+> sees the metadata of clients it **admits** — so it is a **named trust anchor**
+> (its URL surfaced in relay settings), and a client MUST NOT present AUTH as
+> making a relay trustless. The shared family relay
+> [relay.ochk.io](/infrastructure/relay) is open by default; AUTH is an opt-in
+> posture for self-hosted / institutional relays.
+
+## Next
+
+- [Threading & attachments](/chat/threading) — what rides inside the encrypted
+  payload.
+- [Channels](/chat/channels) — where source-intake pairs AUTH with public posts.
+- [Security posture](/chat/security) — S6, S9, S10 (the transport's named
+  residues).

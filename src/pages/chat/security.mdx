@@ -1,0 +1,132 @@
+export const metadata = {
+    title: 'Security posture · OC Chat',
+    description:
+        'OC Chat’s threat model and every named non-protection: no per-message forward secrecy, the beacon-trust seal, the postage replay ceiling, the directory deanonymization surface, the public-channel boundary, and the custody/money boundary. What OC Chat proves and what it explicitly does not.',
+};
+
+# Security posture
+
+OC Chat is a mode of [OC Lock](/lock/security) and **inherits OC Lock's security
+model** — read it first. This page covers only what OC Chat adds or changes. The
+family discipline is to **name every non-protection**, in writing, on the
+surface where it matters. This page is that list.
+
+## Threat model
+
+The adversary may: control and observe relays; run a malicious relay; seize a
+device; observe all network traffic as a passive global observer; operate or
+collude with a seal beacon; and compel the service operator (state actor). We
+assume Bitcoin's security holds, BIP-322 verification is correct, the user's
+runtime is not compromised, and randomness is strong.
+
+## What OC Chat proves (inherited + new)
+
+- **Confidentiality & authenticity** of every message — X25519 + AES-256-GCM to
+  device keys; the per-device key authenticates sends; the BIP-322 device-record
+  binding is offline-verifiable.
+- **Sender-metadata hiding from relays** — NIP-59 gift-wrap with an ephemeral,
+  discarded Schnorr key and minute-rounded `created_at`, under the
+  [v2 encrypted wrap](/chat/transport#the-v2-encrypted-wrap-normative-ct--oc-chatv2).
+- **Tamper-evident threading** — `parent_id` is the content-addressed `id` of
+  the parent, so a thread is a per-sender hash-chain.
+- **Re-wrap integrity** — chat-kind `id`/AAD
+  [exclude `recipients[]`](/chat/envelope), so a beacon/relay re-wrap cannot
+  forge content or break the signature (vector `vc04`).
+- **Offline payment proof** — a Lightning preimage,
+  `SHA-256(preimage) == payment_hash`, verifiable by anyone with no service.
+
+## What OC Chat does NOT solve
+
+### The core 1:1 product
+
+| #       | Non-protection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S1**  | **Device seizure decrypts history — no per-message forward secrecy.** Extracting `device_sk` decrypts every past message wrapped to it. Mitigation is coarse (~90-day rotation). **The single most dangerous gap for journalists protecting sources** — disclosed in bold on any surface targeting them, who are told to use Signal for forward-secrecy-critical work.                                                                                                                                                        |
+| **S8**  | **Multi-device portability cliff.** A device added _after_ a message was sent was never in `recipients[]` and cannot decrypt it without a backfill. "Multi-device history" is bounded to messages sent after the device existed. Disclose the bound.                                                                                                                                                                                                                                                                          |
+| **S9**  | **Envelope plaintext metadata.** On the wire this is **closed** by the v2 wrap — a relay/inbox operator sees only AEAD ciphertext. The residual exposure is anyone holding a raw envelope _out_ of its wrap (an exported artifact, a queued blob decrypted by its rightful recipient and re-shared). Group chat would still leak the social graph to every member in cleartext — designed-around, not solved, which is why groups wait for MLS.                                                                               |
+| **S10** | **Ordering / freshness / delivery.** `created_at` is untrusted; `parent_id` gives per-thread tamper-evidence but **not** a transport-layer anti-reorder/anti-replay guarantee — a relay can withhold, delay, or reorder _delivery_. An offline recipient + a GC'd relay event = a lost message **unless a [store-and-forward queue](/chat/transport#durable-inbox) retains it** (why the durable inbox is the free-tier floor). An operator that withholds a queued blob is detectable as a `parent_id` gap (`E_THREAD_GAP`). |
+| **S12** | **Account-loss = history-loss; no recovery without the Bitcoin key.** No account means a lost key loses history and contacts. Social-recovery (N-of-M) is roadmapped, never pretended trivial.                                                                                                                                                                                                                                                                                                                                |
+| **S13** | **Post-quantum.** X25519, secp256k1, and BLS12-381 are classically secure only. Long-range seals carry quantum risk over their lifetime.                                                                                                                                                                                                                                                                                                                                                                                      |
+| **S19** | **Acceptance is private; no "your request was opened" receipt.** Acceptance of a filtered/pending request is a client-local, revocable allowlist; clients MUST NOT emit an open/acceptance receipt (a read-receipt-style leak). The only acceptance signal a sender gets is an actual **reply**. The allowlist is never published, carried on the wire, or co-indexed with the directory.                                                                                                                                     |
+
+### The seal (`seal-til-block`)
+
+| #       | Non-protection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S2**  | **Beacon colludes to release early.** A colluding beacon threshold can decrypt the body **before** `unlock_block` — strictly weaker than `speak-now`, where no third party ever holds key material. The "relays learn nothing" claim is TRUE for `speak-now` and FALSE for `seal-til-block`. The UI MUST label a sealed message "readable early by `{named quorum}`."                                                                                                                                                       |
+| **S3**  | **Beacon disappears — permanent brick.** If the named beacon is sunset, every ciphertext sealed to it is permanently unrecoverable (the drand `fastnet` sunset is the precedent). The compose flow MUST force acknowledgement of brick risk; a durability SLA + key-resharing-on-disband are open items that MUST be resolved before any multi-year seal UI ships.                                                                                                                                                          |
+| **S4**  | **Redundant double-seal doubles the early-release surface.** `redundant_beacon` halves brick risk (S3) but means EITHER committee can independently decrypt early (S2). Opt-in, with the asymmetry disclosed.                                                                                                                                                                                                                                                                                                               |
+| **S5**  | **Seal-existence metadata leak.** The `seal` block (`unlock_block`, `beacon_id`, `beacon_url`) is plaintext — a passive observer learns "this party has a message scheduled to open near block N via beacon B." For a dead-man's-switch, that an irreversible disclosure is armed and its deadline. A named non-protection.                                                                                                                                                                                                 |
+| **S11** | **Standing-delivery false-fire.** A beacon outage could trigger an irreversible disclosure the owner intended to prevent by checking in. A mandatory **second check-in channel** is required so a single beacon's liveness cannot release alone.                                                                                                                                                                                                                                                                            |
+| **S18** | **The v0 seal opens at an APPROXIMATE time, not exactly at the block.** The block→round derivation is an estimate; the [hard chain gate](/chat/seal#the-hard-chain-gate-normative) removes the _early_ side on a conforming client (the body never surfaces before the chain reaches the height), so a seal opens only _later_ than the estimate, never materially earlier. A non-conforming client or a colluding threshold can still read early. The released-message UI MUST show the real observed height + block hash. |
+
+### Postage
+
+| #      | Non-protection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **S7** | **Postage replay — specified, with a named ceiling.** A preimage proves _a_ payment settled, not _which_ DM it was for. v0 binds it via the recipient's endpoint minting a fresh per-DM invoice committing `recipient + amount + nonce`, re-derived by the recipient itself, plus a local spent-`payment_hash` ledger — making a preimage **non-replayable to the recipient**. The honest ceiling: **recipient-scoped, not third-party transferable**; the recipient's endpoint is a **named trust anchor**; wallets no longer enforce the description-hash (OC recomputes it); the spent-ledger is local; it is a **bearer proof, not on-chain settlement proof**. Full text in [Postage](/chat/postage#why-this-is-non-replayable-and-its-honest-ceiling). |
+
+### The directory
+
+| #       | Non-protection                                                                                                                                                                                                                                                                                                                                             |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S14** | **The directory is a reachability oracle, and listings are scrapeable.** The salted-handle `d`-tag stops BULK enumeration, not TARGETED confirmation of a guessed handle. Anything published is permanently harvestable. The threat model is _who may ask_, not _can anyone ask_. Default is invisible; choose the lowest disclosure that meets your need. |
+| **S15** | **Directory revocation is forward-effective only.** A tombstone stops new resolution on conforming relays; it cannot make a non-conforming relay or an archive forget an indexed handle. Never present removal as "delete yourself completely."                                                                                                            |
+| **S16** | **A public handle is an intentional deanonymization.** It binds a human name to your Bitcoin address (whose on-chain history is public) and your `ochk.io/u/<addr>` footprint. A feature _for the user who chooses it_ — but stated plainly; the invisible default is the mitigation.                                                                      |
+| **S17** | **Handles are non-authoritative; the address is the trust root.** A client MUST render the address + trust tier alongside any handle and verify the [Bitcoin gate](/chat/directory#the-bitcoin-gate-normative) before honoring it. A privacy-sensitive resolution MUST NOT route through a centralized indexer (a who-looks-up-whom observation point).    |
+
+### Public channels
+
+| #            | Non-protection                                                                                                                                                                                                                                                                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S-CH-1**   | **A public channel post is permanently public.** It makes NO confidentiality claim — every relay, reader, and archive sees the plaintext body and the author's Bitcoin address forever. Removal tombstones are forward-effective only. Do NOT carry the DM "relays learn nothing" headline onto channel posts.                                          |
+| **S-CH-2**   | **Only `utxo-floor`/`pay-to-post` are Bitcoin-load-bearing on write.** `allowlist`/`founder`/`open` fail the Ed25519 test — pure signature gates. The `rooted` flag is structural; a non-rooted channel renders in the muted "via ochk.io" tier. v1 defaults to `utxo-floor`.                                                                           |
+| **S-CH-3**   | **UTXO write-gating publishes an on-chain ownership map.** A `utxo-floor` channel makes every author's `(address → funded UTXO)` binding public and chain-correlatable — a STRONGER on-chain deanonymization than the DM product. A client MUST offer a per-channel posting address distinct from the directory identity and warn at compose time.      |
+| **S-CH-4**   | **No read-side privacy for public channels.** Public channels are broadcast; the boundary between the E2EE DM product and the public channel product MUST be loud in any UI hosting both.                                                                                                                                                               |
+| **S-CH-5**   | **A channel admin is a named trust anchor within the channel.** A malicious admin can replace the descriptor or refuse to act. The governance hash-chain makes every action an auditable signed artifact — but auditable is not preventable in v1. Multi-admin + the chain are the mitigations; a single founder is a single point of trust, disclosed. |
+| **S-CH-6/7** | **(Reserved — private channels.)** When private channels ship: the member-to-member roster leak, and the escalated forward-secrecy blast radius (a leaked epoch key exposes every post in that epoch). Not applicable to v1 public channels.                                                                                                            |
+
+### Institutional composition
+
+| #          | Non-protection                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **S-M7-1** | **An AUTH relay is a named trust anchor, and AUTH is not Bitcoin-load-bearing.** NIP-42 AUTH narrows the S6 `p`-tag leak to admitted clients but does NOT blind the relay **operator**. AUTH shifts exposure from "every passive observer" to "the named relay you authenticate to," and carries no Bitcoin claim.                                |
+| **S-M7-2** | **Source-intake submissions are permanently public; only the reply is private.** The inbound submission is an ordinary public channel post (inherits S-CH-1). A conforming intake client MUST warn the source that the post is public + permanent and default to a fresh throwaway identity. **Not** a SecureDrop-equivalent anonymity guarantee. |
+| **S-M7-3** | **A named-Fedimint postage fallback shifts custody to the federation.** OC is never a guardian and never touches the funds, but the recipient now trusts the federation's guardian threshold. The federation is a named plaintext trust anchor a sender can decline; a deployment MUST clear a money-transmitter analysis first.                  |
+
+### The relay residue
+
+**S6 — Recipient-pubkey leak on public relays.** NIP-59 places the recipient
+inbox pubkey in the kind-1059 `p` tag; a relay storing those events can
+enumerate who _receives_. On the [durable inbox](/chat/transport#durable-inbox)
+this is mitigated by opaque per-conversation `queue_id`s — the operator sees N
+unlinkable queues, never a recipient pubkey or Bitcoin address. The residual
+leak is the **bootstrap queue** (first message of a new conversation) and any
+message ridden over an arbitrary public relay — both disclosed; a
+[NIP-42 AUTH](/chat/transport#relay-auth-nip-42) relay narrows the relay case.
+
+## The custody / money boundary
+
+OC operates **no payment rail** for postage; sender and recipient transact
+directly and OC verifies the preimage offline. The subscription BTCPay store is
+**inbound-only** with no outbound leg. The seal beacon releases a **key share,
+never funds**, and OC holds no share. Any custodial Lightning fallback is a
+**named Fedimint federation** that custodies — OC is never a guardian. These
+boundaries are load-bearing for both the [no-custody invariant](/charter) and
+the money-transmitter posture; weakening any of them (an OC-operated postage
+gateway, a held user balance, an OC-held bond HTLC) reintroduces custody and is
+**forbidden**.
+
+## Reporting a vulnerability
+
+Email **security@ochk.io** with a description, reproduction steps (a minimal
+test vector is ideal), an impact assessment, and whether you want credit.
+Protocol-level concerns (a clause that is unsound, not an implementation bug)
+get the subject prefix `[protocol]`. Do not file public issues for suspected
+vulnerabilities.
+
+## Next
+
+- [Seal-til-block](/chat/seal) — the beacon-trust posture in depth.
+- [Postage](/chat/postage) — the S7 replay ceiling in full.
+- [Specification](/chat/spec) — the normative compliance checklist.

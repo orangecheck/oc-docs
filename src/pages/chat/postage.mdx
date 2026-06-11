@@ -1,0 +1,161 @@
+export const metadata = {
+    title: 'Postage (pay-to-reach) · OC Chat',
+    description:
+        'How a stranger pays Lightning postage directly to a recipient to land in their inbox — the recipient policy, the sender postage block, the offline recipient-side verification, the honest replay ceiling, and the named-Fedimint custodial fallback. OC operates no payment rail.',
+};
+
+# Postage (pay-to-reach)
+
+Postage is OC Chat's anti-spam for strangers: a first message from someone who
+is not a contact must carry a Lightning **preimage** proving a payment **to the
+recipient**. Attention is **priced, not filtered** — _sats as signal_, the
+inverse of hashcash, where the cost accrues to the recipient as value. **OC
+operates no payment rail and collects nothing**; sender and recipient transact
+directly.
+
+This is the `pay-to-reach` mode (`kind="chat"` with a `postage` block). Contacts
+message for free; only stranger → inbox is gated.
+
+## Recipient policy
+
+A recipient MAY publish a postage policy: a `floor_sats` and a Lightning
+receiving endpoint resolving to a wallet **the recipient controls**. The
+endpoint string MUST live inside a record **signed by the recipient's Bitcoin
+identity** (e.g. the kind-30078-bound [directory listing](/chat/directory)) —
+otherwise an attacker substitutes their own endpoint and the binding binds to
+the wrong party. **No OC service mints, proxies, or relays this invoice.**
+
+The endpoint is one of:
+
+- A **BOLT12 offer** (RECOMMENDED, stronger), or
+- The **shipped v0 rail**: an **LNURL Lightning Address** (LUD-16) with **LUD-18
+  payerData**.
+
+v0 ships LNURL because BOLT12 `invoice_request` cannot reliably echo a per-DM
+nonce today. For the binding to hold, the endpoint MUST mint a **fresh per-DM
+invoice** committing the sender's nonce; a static/reusable invoice degrades the
+proof to settlement-evidence-only.
+
+## The sender postage block
+
+In v0, `postage` rides **inside the encrypted payload**, not as a top-level
+envelope field — the shipped `lock-core` `seal()` cannot commit a `postage`
+parameter field-by-field in the `chat_envelope_id`. Integrity rests on the
+**AEAD**: `postage` is inside the ciphertext, which _is_ committed in the `id`
+and signed by the device, so any tamper changes the ciphertext → the `id` →
+breaks the signature. (True per-field commitment is a deferred `lock-core`
+change.)
+
+```jsonc
+"postage": {
+  "floor_sats":   100,
+  "amount_sats":  100,            // >= floor_sats
+  "payment_hash": "<64-char hex>",
+  "preimage":     "<64-char hex>",
+  "nonce":        "<hex; the sender's per-DM nonce, carried in payerData>",
+  "recipient":    "<recipient btc address — must match the endpoint's identifier>",
+  // carrier fields the recipient needs to re-verify the binding OFFLINE:
+  "bolt11":         "<the paid invoice; carries payment_hash + the description_hash 'h' tag>",
+  "lnurl_metadata": "<the recipient endpoint's metadata, VERBATIM bytes>",
+  "payerdata":      "<the url-encoded payerData the sender sent (carries the nonce)>"
+}
+```
+
+## Recipient-side verification (mostly offline) — NORMATIVE
+
+A recipient verifying inbound `postage` MUST run all six checks:
+
+1. **Settlement** — `SHA-256(preimage) == payment_hash`. The load-bearing
+   Lightning bearer proof.
+2. **Binding (re-derived by OC itself)** — decode `bolt11`, read its
+   description-hash (`h`) tag, and assert it equals
+   `SHA-256( lnurl_metadata || urlDecode(payerdata) )`. The verifier MUST
+   recompute this hash **itself** — wallets stopped enforcing the LNURL
+   description-hash (lnurl PR #234, 2026-05) — and MUST hash the **verbatim**
+   `lnurl_metadata` bytes (never `JSON.stringify(JSON.parse(x))`, which reorders
+   and breaks the match).
+3. **Recipient** — the `lnurl_metadata` `text/identifier` equals the claimed
+   `recipient`, resolved from an identity-signed endpoint.
+4. **Amount** — the `bolt11` carries an explicit amount AND
+   `amount_sats >= floor_sats` (reject amountless invoices).
+5. **Nonce** — the in-body `nonce` is the one committed in `payerdata`.
+6. **Anti-replay** — the `payment_hash` is not in the recipient's **local
+   spent-ledger** (one-time use). On accept, record it.
+
+The recipient does **not** re-enforce the invoice's expiry: the preimage already
+proves the HTLC settled, and a short invoice expiry would wrongly reject valid
+postage that took a while to _deliver_. Invoice freshness is the **sender's**
+pay-time concern; per-DM freshness comes from the nonce + the spent-ledger.
+
+All checks pass + not-spent → **inbox**. Any fail OR already-spent → the message
+is **delivered but held in the filtered/pending state** (the "Requests"
+surface), never dropped.
+
+### Why this is non-replayable — and its honest ceiling
+
+Because the recipient's _own_ endpoint minted the per-DM invoice committing
+**this** recipient + amount + nonce into the description-hash, a preimage
+replayed to a _different_ recipient fails the binding there; a preimage replayed
+to the _same_ recipient is caught by the local spent-ledger. The residual
+ceiling, which MUST be disclosed and MUST NOT be over-claimed:
+
+> - **Recipient-scoped, NOT third-party transferable.** A party seeing only
+>   `{preimage, nonce}` — without the recipient-signed invoice + carrier fields
+>   — cannot verify the binding. Never render a verified-postage badge as "proof
+>   anyone can verify."
+> - **The recipient's endpoint is a NAMED trust anchor.** It chooses what the
+>   invoice commits to and MUST mint a fresh per-DM invoice; a pre-minted shared
+>   invoice reintroduces replay. The endpoint string MUST be identity-signed and
+>   surfaced plaintext.
+> - **Wallets no longer enforce the description-hash** — OC MUST recompute it
+>   itself, over verbatim bytes, or the binding silently does nothing.
+> - **The spent-ledger is local** and per-recipient-device — best-effort across
+>   that recipient's synced devices, not a global consensus ledger.
+> - **Bearer proof, not on-chain settlement proof.** A cold observer can check
+>   the hash and the binding, but cannot independently confirm the HTLC settled.
+
+This is [Security S7](/chat/security) stated in full. The value is real and the
+limits are named — that is the family posture.
+
+## OC operates no payment rail
+
+OC operates **no postage gateway**. Any Lightning gateway in a recipient's
+postage path is operated by a **named** third party, never OC. Zap receipts
+(NIP-57) MUST NOT be used as postage proof — they are server-signed and
+forgeable; only the BOLT11/BOLT12 **preimage** is a bearer proof. This is the
+[OC-never-pays-users](/charter) corollary applied to receiving: OC's only money
+flow is **inbound** subscription billing, and even that has no outbound leg.
+
+## Named-Fedimint custodial fallback (institutional last-mile)
+
+A recipient with no Lightning endpoint of their own — an institution, a
+non-technical staff member — MAY name a **Fedimint federation** as their postage
+last-mile. The federation's LNURL/Lightning-Address endpoint is published in the
+recipient's own kind-30078-bound listing exactly like any other endpoint, so the
+six-step verification is **unchanged and endpoint-agnostic**. The structural
+difference is **custody**: the federation receives the sats and settles ecash to
+the recipient's federation account.
+
+- **OC stays absent + non-custodial.** OC touches no sats, runs no guardian
+  share, holds no hot wallet, and is never in the HTLC path — the federation
+  custodies and settles, exactly as the family corollary requires ("federations
+  settle to users; OC has no payout hot wallet").
+- **Named trust anchor.** The federation is surfaced in plaintext in the listing
+  — its `federation_id`, human name, and invite — so a sender sees who custodies
+  before paying, and MUST be able to decline a federation-fronted endpoint it
+  does not trust.
+- **Deployment gate.** Because a federation custodies inbound funds, a
+  deployment MUST clear a **money-transmitter analysis** before enabling this
+  path. The failure codes are `E_FEDIMINT_UNAVAILABLE` and
+  `E_FEDIMINT_BINDING_MISMATCH`.
+- **Ed25519 verdict.** Lightning settlement IS the Bitcoin-load-bearing hook (a
+  preimage has no Ed25519 analog). The fallback adds custody convenience, not a
+  new Bitcoin claim, and is honest that the federation is a trusted custodian,
+  not a trustless rail.
+
+## Next
+
+- [The three send modes](/chat/modes) — where pay-to-reach sits.
+- [Security posture](/chat/security) — S7 (postage replay) and the custody
+  boundary.
+- [Specification](/chat/spec) — the normative §6 rules and error codes.

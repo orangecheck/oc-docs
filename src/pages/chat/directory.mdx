@@ -1,0 +1,150 @@
+export const metadata = {
+    title: 'Discoverability directory · OC Chat',
+    description:
+        'The opt-in, UTXO-gated, revocable directory that lets you be found by a human-readable handle without the searcher knowing your address. The Bitcoin gate, the social-graph firewall, forward-only revocation, and the deanonymization disclosures.',
+};
+
+# Discoverability directory
+
+Your [device record](/lock/device-keys) already _is_ your inbox: anyone who
+knows your Bitcoin address can reach you. The directory adds the missing half —
+being **found by a human-readable handle** without the searcher knowing your
+address. It is **strictly opt-in, revocable, and graduated**, and the default is
+**invisible**: a conforming client publishes no directory record unless you
+explicitly opt in.
+
+The directory is a **kind-30114** addressable (NIP-33-replaceable) Nostr event.
+
+## The listing record
+
+A listing is signed by your **inbox key** (`deriveNostrKey(device_sk)` — the
+same key that signs gift-wraps):
+
+```jsonc
+// kind 30114, addressable.
+// d-tag = "oc-lock-chat-dir:" || base64url(SHA-256("oc-lock-chat-dir/v1:" || lower(handle)))
+{
+    "v": 1,
+    "handle": "<[a-z0-9_]{3,32}>",
+    "address": "<bitcoin address the inbox key is bound to>",
+    "inbox_pubkey": "<hex; the reachability pointer = the event pubkey>",
+    "display_name": "<=48 chars, optional>",
+    "bio": "<=80 chars, optional>",
+    "avatar": "<small inline raster data: URL, ≤24KB, optional>",
+    "opted_in": true,
+    "created_at": 1733846400,
+}
+// listing_id = SHA-256(canonical(content))   // content-addressed
+```
+
+The `d`-tag is a **salted hash of the handle**, so a conforming directory is
+**lookup-by-known-handle, never enumerate-all** — there is no `GET /all` and no
+bulk-dump. It is keyed by the handle hash, not the raw address (a raw-address
+key would be deterministically enumerable).
+
+> **`avatar` is an inline `data:` raster URL, never an external link.** An
+> external `https` avatar would turn every directory lookup into a **tracking
+> pixel** leaking the viewer's IP + timing, and a non-content-addressed image
+> could be swapped after signing. A conforming client renders an avatar **only**
+> if it is a bounded raster `data:` URL — never `image/svg+xml`, `text/html`, or
+> any non-raster type (the [`data:`/blob-URL XSS class](/chat/security)). An
+> unsafe or oversized avatar is dropped; the listing still resolves.
+
+## The Bitcoin gate (NORMATIVE)
+
+A bare listing is **not** Bitcoin-load-bearing: _"address X, here is my inbox
+key, signed by X"_ substitutes perfectly to an Ed25519 npub signed by an npub. A
+conforming resolver MUST refuse to honor a handle unless **all three** hold:
+
+1. The kind-30114 event is signed by `inbox_pubkey`.
+2. `inbox_pubkey` is bound to `address` via a valid kind-30078 device record
+   (the existing BIP-322 binding). **The directory inherits its Bitcoin proof
+   from the device record — no second wallet ceremony.**
+3. **`address` clears the UTXO floor:** it controls at least one confirmed UTXO
+   of age ≥ the deployment's `dir_utxo_floor`. This is the load-bearing hook —
+   **an Ed25519 keypair has no analog to an aged, funded UTXO**, so a handle
+   costs Bitcoin maturity to claim (Sybil-resistance doubling as anti-squat).
+   UTXO state is public chain data, so the check preserves
+   offline-verifiability.
+
+The RECOMMENDED v0 floor is _funded + ≥ 144 confirmations (~1 day)_, with the
+actual UTXO age surfaced as a **graduated trust signal** (older = more trusted).
+A handle that fails (2) or (3) MUST be treated as un-listed
+(`E_DIR_UNVERIFIED`). Handle uniqueness is **first-writer-wins, best-effort
+across relays, explicitly NOT global consensus** — the **address is the trust
+root; the handle is a non-authoritative display label.** A `did:oc`-only
+identity (the session bridge, no Bitcoin address) MAY publish a bridge listing
+but MUST NOT claim a scarce handle; a conforming client surfaces it with a muted
+"via ochk.io" tier and prompts attaching a Bitcoin address to graduate.
+
+## The social-graph firewall (NORMATIVE)
+
+The listing record MUST NOT contain, reference, or be co-indexed with any
+`queue_id`, `recv_queue`, `conversation_id`, contact list, or message-routing
+metadata.
+
+> **The directory reveals a NODE — "this identity is reachable" — and NEVER an
+> EDGE — who messages whom.**
+
+The only reachability pointer it republishes is `inbox_pubkey`, which a sender
+who resolved your handle needs anyway and which the device record already
+exposes. This is the same firewall that keeps the
+[Requests allowlist](/chat/modes#speak-now-the-daily-driver-free) private.
+
+## Revocation (forward-effective only)
+
+Self-removal = publish a replacement kind-30114 event with the **same d-tag**,
+`opted_in: false`, optional fields stripped, signed by the inbox key. Because
+the event is NIP-33-addressable, the tombstone **replaces** the prior record at
+conforming relays. A conforming client treats a tombstone — or an absent record
+— as not-discoverable, refuses to resolve the handle, treats a tombstone seen on
+**any** relay as authoritative even if a stale live copy exists elsewhere, and
+SHOULD fire a NIP-09 deletion request.
+
+> **Revocation is forward-effective only.** A tombstone stops new resolution on
+> conforming relays; it cannot retract copies on non-conforming relays,
+> archives, or scrapers. The promise is **"stop new discovery," never "delete
+> yourself completely."** This is disclosed verbatim at opt-in time. Removal
+> does not unsend or break existing conversations.
+
+## Resolution
+
+To find a user, a client computes the `d`-tag from the queried handle, fetches
+the kind-30114 events for that `d`-tag across its relay set (freshest
+`created_at` wins; a tombstone wins over any live copy), verifies the three gate
+conditions, and on success surfaces `address` + profile + a **trust tier** so
+the user can start a thread. First-contact still passes the recipient's
+[anti-spam policy](/chat/modes) — **being listed is not a free-message bypass.**
+Privacy-sensitive resolution SHOULD query relays **directly**, not a third-party
+indexer (which would learn who-searches-for-whom).
+
+## The honest disclosures
+
+A directory is a powerful deanonymizer, and the protocol names every edge:
+
+| #   | Disclosure                                                                                                                                                                                                                                                                        |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S14 | The directory is a **reachability oracle**: the salted handle stops BULK enumeration, not TARGETED confirmation of a guessed handle. Anything published is permanently harvestable.                                                                                               |
+| S15 | **Revocation is forward-effective only** — a tombstone cannot make an archive forget an indexed handle.                                                                                                                                                                           |
+| S16 | A public handle is an **intentional deanonymization**: it binds a human name to your Bitcoin address (whose on-chain history is public) and your `ochk.io/u/<addr>` footprint. A feature _for the user who chooses it_ — stated plainly; the invisible default is the mitigation. |
+| S17 | **Handles are non-authoritative; the address is the trust root.** A client MUST render the address + trust tier alongside any handle and verify the gate before honoring it.                                                                                                      |
+
+See [Security posture](/chat/security) for the full text.
+
+## Channels in the directory
+
+A public [channel](/chat/channels) with `directory_opt_in: true` MAY publish a
+listing under the **same** opt-in, UTXO-gated, tombstone-revocable rules as a
+person — but in a **distinct handle namespace** (`oc-lock-chat-chdir:`) so a
+channel handle can never collide with a person's. A `did:oc`-founded channel
+cannot claim a directory handle (the anti-squat floor applies unchanged). The
+firewall holds: a public channel reveals a NODE (the channel exists, its
+founder), never a member roster.
+
+## Next
+
+- [Channels](/chat/channels) — founder-rooted public channels and their
+  directory composition.
+- [Transport & durable inbox](/chat/transport) — the reachability layer the
+  directory points at.
+- [Security posture](/chat/security) — S14–S17 in full.

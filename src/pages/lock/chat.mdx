@@ -6,6 +6,14 @@ export const metadata = {
 
 # Chat transport
 
+> **Looking for the OC Chat product?** This page documents the **v0 prototype**
+> transport built directly into `lock.ochk.io` — chat as a thin auto-delivery
+> layer over one-shot envelopes. The standalone messenger that fixes its limits
+> (sub-second send, durable delivery, postage, a block-height seal) is
+> **[OC Chat](/chat/)** at chat.ochk.io — a mode of OC Lock with its own
+> [spec](/chat/spec). Start there for the shipping product; this page is the
+> historical transport it grew out of.
+
 OC Lock's core protocol seals a single envelope from a sender to a recipient.
 Chat is that same primitive _applied repeatedly, over a persistent transport,
 with local thread state._ Nothing new happens cryptographically — the envelope

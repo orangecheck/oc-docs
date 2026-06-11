@@ -618,6 +618,88 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'chat',
+        label: 'OC Chat',
+        blurb: 'Consumer commercial product · your Bitcoin address is your inbox. E2EE messaging, Lightning postage, a block-height seal. A mode of OC Lock, not a seventh verb.',
+        items: [
+            {
+                href: '/chat',
+                label: 'Overview',
+                blurb: 'What chat.ochk.io is — OC Lock + threads + postage + a block-height seal. The three modes, the layers, the honest-by-design posture, pricing.',
+            },
+            {
+                href: '/chat/why',
+                label: 'Why OC Chat',
+                blurb: 'The lock.ochk.io chat postmortem → a real messenger; why chat is a mode of OC Lock; the Ed25519 substitution test run out loud on the seal.',
+            },
+            {
+                href: '/chat/quickstart',
+                label: 'Quickstart',
+                blurb: 'Sign in with Bitcoin, send your first E2EE message, try each of the three send modes.',
+            },
+            {
+                href: '/chat/how-it-works',
+                label: 'How it works',
+                blurb: 'Device key → inbox → directory → gift-wrap → threading. One signature, then zero-click forever.',
+            },
+            {
+                href: '/chat/modes',
+                label: 'The three send modes',
+                blurb: 'speak-now / pay-to-reach / seal-til-block — each adding exactly one Bitcoin-unique property.',
+            },
+            {
+                href: '/chat/threading',
+                label: 'Threading & attachments',
+                blurb: 'The parent_id hash-chain inside the ciphertext, conversation ids, E2EE inline files.',
+            },
+            {
+                href: '/chat/postage',
+                label: 'Postage (pay-to-reach)',
+                blurb: 'Lightning postage paid direct to the recipient, the offline six-step verification, the replay ceiling, the named-Fedimint fallback. OC operates no rail.',
+            },
+            {
+                href: '/chat/seal',
+                label: 'Seal-til-block',
+                blurb: 'The named beacon, the v0 drand-tlock profile, the hard chain gate, redundant beacons, standing delivery (dead-man’s-switch).',
+            },
+            {
+                href: '/chat/directory',
+                label: 'Discoverability directory',
+                blurb: 'Opt-in, UTXO-gated, revocable by-handle discovery; the social-graph firewall; forward-only revocation; the deanonymization disclosures.',
+            },
+            {
+                href: '/chat/channels',
+                label: 'Channels',
+                blurb: 'Founder-rooted public channels — the kind-30110 descriptor, write policies, roles, moderation, directory composition, source-intake.',
+            },
+            {
+                href: '/chat/transport',
+                label: 'Transport & durable inbox',
+                blurb: 'Gift-wrap, the v2 encrypted wrap, opaque per-conversation queue routing, NIP-42 relay AUTH.',
+            },
+            {
+                href: '/chat/envelope',
+                label: 'Envelope & content addressing',
+                blurb: 'The two new kinds and the recipient-exclusion id/AAD rule that makes a held envelope re-wrap-safe.',
+            },
+            {
+                href: '/chat/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'The six flows narrated end to end — speak-now through institutional source-intake.',
+            },
+            {
+                href: '/chat/security',
+                label: 'Security posture',
+                blurb: 'The threat model and every named non-protection — no per-message FS, the beacon-trust seal, the postage ceiling, the channel boundary, the custody line.',
+            },
+            {
+                href: '/chat/spec',
+                label: 'Specification',
+                blurb: 'Normative rules, error codes, the 30110–30115 kind registry, the compliance checklist.',
+            },
+        ],
+    },
+    {
         slug: 'api-reference',
         label: 'API reference',
         blurb: 'Machine-readable OpenAPI 3.1 specs + interactive explorers, one per product / protocol surface that ships HTTP APIs.',

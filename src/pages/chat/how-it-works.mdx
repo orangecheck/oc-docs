@@ -1,0 +1,134 @@
+export const metadata = {
+    title: 'How it works · OC Chat',
+    description:
+        'The OC Chat mental model: one BIP-322 signature per device, an inbox derived from the device key, discovery by Bitcoin address over Nostr, gift-wrapped envelopes relays cannot read, and threading as a hash-chain inside the ciphertext.',
+};
+
+# How it works
+
+OC Chat is OC Lock operating **continuously over a thread**. The cryptography is
+unchanged from [OC Lock](/lock/how-it-works); what changes is that the same
+seal/unseal primitive runs in a loop, over a persistent transport, with thread
+state inside the ciphertext. This page is the mental model end to end.
+
+## One signature, then zero-click forever
+
+```
+  one BIP-322 signature per device, ever
+        │
+        ▼
+  device_pk (X25519) ──published──▶ Nostr kind-30078  (find me by my bitcoin address)
+        │                                   │
+        │ inbox pubkey = HKDF(device_sk)     │ fetch by addr
+        ▼                                   ▼
+  every message: seal an OC Lock envelope ─▶ gift-wrap (kind-1059) ─▶ relay ─▶ recipient
+                 (no per-message wallet popup)
+```
+
+The recipient's inbox pubkey is **derived** from the device key
+(`HKDF(device_sk)`), so _publishing a device record is creating an inbox_. After
+the one binding signature, sending and receiving are zero-click — the per-device
+X25519 key authenticates every send, and BIP-322 was spent once at registration.
+This is the single decision that takes the send loop from the old chat's 5–10s
+wallet popup to sub-second.
+([Why](/chat/why#kill-the-per-message-signature-keep-the-device-key).)
+
+## The four moving parts
+
+### 1. Identity — a Bitcoin address
+
+Your identity is a Bitcoin address. A
+[kind-30078 device record](/lock/device-keys) binds your X25519 `device_pk` to
+that address with a BIP-322 signature, published to Nostr. Anyone can fetch it
+by address and **verify the binding offline** — no server is trusted. A new
+device is authorized by a fresh BIP-322 signature from your primary wallet over
+a link statement naming the new `device_pk`.
+
+### 2. Discovery — fetch a device key by address
+
+To message someone you know, you type their Bitcoin address; the client fetches
+their device record and verifies it. To be findable by a **handle** instead, opt
+in to the [directory](/chat/directory) (kind-30114) — strictly optional,
+UTXO-gated, and revocable. The default is invisible.
+
+### 3. Transport — gift-wrap that leaks nothing
+
+Each message is a sealed OC Lock envelope carried as the inner blob of a Nostr
+**kind-1059 gift-wrap**, signed by an **ephemeral, discarded Schnorr key**, with
+`created_at` rounded to the minute and the recipient inbox pubkey in the `p`
+tag. The v2 wrap **encrypts** its content to the inbox key, so a relay — or a
+durable-inbox operator — sees only:
+
+| The relay sees      | The relay does **not** see                                  |
+| ------------------- | ----------------------------------------------------------- |
+| an ephemeral pubkey | who sent the message (fresh throwaway key every time)       |
+| an inbox pubkey     | the sender's Bitcoin address or stable device pubkey        |
+| a minute timestamp  | the recipient's Bitcoin address or device set               |
+| ciphertext          | the body, the conversation, or anything inside the envelope |
+
+Full transport detail, including the v2 wrap construction and the durable inbox,
+is in [Transport & durable inbox](/chat/transport).
+
+### 4. Threading — a hash-chain inside the ciphertext
+
+Thread state never touches the plaintext envelope. The decrypted payload is JSON
+carrying `conversation_id`, a per-sender `seq`, and a `parent_id` that **MUST
+equal the content-addressed `id` of the message it replies to**. That makes each
+thread a tamper-evident hash-chain; clients order and validate by the chain and
+**never trust `created_at`** (which is plaintext). A missing parent is a
+detectable gap. See [Threading & attachments](/chat/threading).
+
+## Sending, step by step
+
+1. You type a Bitcoin address (or resolve a handle) and a message.
+2. The client fetches and **BIP-322-verifies** the recipient's device record(s).
+3. It builds the payload `{body, conversation_id, seq, parent_id}`, seals it to
+   the recipient's device key(s) with a fresh `content_key`, and computes the
+   `chat_envelope_id` **excluding `recipients[]`** (the re-wrap-safe rule,
+   [§3](/chat/envelope)).
+4. **No wallet popup** — the device key authenticates the send.
+5. The envelope is gift-wrapped (fresh ephemeral key, minute-rounded
+   `created_at`) and published to the relay pool.
+
+## Receiving, step by step
+
+1. Your device subscribes to kind-1059 events tagged with your inbox pubkey (and
+   drains your [durable queues](/chat/transport#durable-inbox)).
+2. For each event, the client decrypts the v2 wrap, parses the envelope, finds
+   your `device_id`, unwraps the `content_key`, and decrypts.
+3. If the sender authenticated (BIP-322-bound device record), their address is
+   verifiable; the message chains by `parent_id`.
+4. A first message from a non-contact lands in **Requests** (filtered/pending),
+   never the main inbox and never dropped — you approve the sender to let them
+   through thereafter, and may revoke at any time.
+
+## Multi-device
+
+Each of your devices has its own device key and its own kind-30078 record. A
+sender's client wraps the one `content_key` once per active device, so a message
+fans out to your laptop and phone alike. **The portability cliff, disclosed:** a
+message sent _before_ a device existed was never wrapped to it, so a newly added
+device cannot read it without a backfill (the old device re-wraps the key, or a
+sealed key-bundle is retrieved by BIP-322 proof from the same address). A
+deployment promising "multi-device history" must implement one of these and
+state the limit.
+
+## Where it differs from the old lock.ochk.io chat
+
+| Concern                   | lock.ochk.io chat (v0 prototype)               | OC Chat                                        |
+| ------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| Send                      | BIP-322 wallet popup every message (5–10s)     | sub-second; BIP-322 once at registration       |
+| Ordering                  | sorts by untrusted minute-rounded `created_at` | hash-chain `parent_id`                         |
+| Offline delivery          | message can vanish if the relay GC's it        | best-effort store-and-forward, free tier       |
+| Anti-spam                 | none                                           | postage (paid) or a free BIP-322 UTXO floor    |
+| Future delivery           | none                                           | `seal-til-block`                               |
+| Re-keying a held envelope | breaks `id` + tag                              | `id`/AAD exclude `recipients[]` (re-wrap safe) |
+
+## Next
+
+- [The three send modes](/chat/modes) — speak-now / pay-to-reach /
+  seal-til-block.
+- [Protocol walkthrough](/chat/protocol) — the six flows narrated with realistic
+  detail.
+- [Envelope & content addressing](/chat/envelope) — why the `id` excludes
+  `recipients[]`.

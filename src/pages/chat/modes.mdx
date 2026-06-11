@@ -1,0 +1,119 @@
+export const metadata = {
+    title: 'The three send modes · OC Chat',
+    description:
+        'speak-now, pay-to-reach, and seal-til-block — the three canonical OC Chat send modes, each adding exactly one Bitcoin-unique property: BIP-322 identity, a Lightning settled-sats preimage, and a block-height predicate.',
+};
+
+# The three send modes
+
+OC Chat has exactly **three canonical send modes**, and the discipline is
+deliberate: each adds **exactly one** Bitcoin-unique property over plain
+end-to-end-encrypted messaging. Everything beyond these three is a registry
+extension, not a new canonical surface — the
+[small-canonical-surface invariant](/ecosystem/security) in action.
+
+| Mode               | `kind`      | Bitcoin property it adds            | New envelope fields             |
+| ------------------ | ----------- | ----------------------------------- | ------------------------------- |
+| **speak-now**      | `chat`      | identity (BIP-322)                  | — (none)                        |
+| **pay-to-reach**   | `chat`      | a settled-sats preimage (Lightning) | `postage` ([§6](/chat/postage)) |
+| **seal-til-block** | `chat-seal` | a block-height predicate (Bitcoin)  | `seal` ([§7](/chat/seal))       |
+
+## speak-now — the daily driver (free)
+
+`kind="chat"`, no `postage`, no `seal`. An identity-mode OC Lock envelope sealed
+to the recipient's device keys. The per-device X25519 key authenticates the send
+— **the sender does not sign each message with BIP-322**; that was performed
+once per device at [device-record binding time](/lock/device-keys). The send
+loop is sub-second.
+
+**Receiving is never gated by payment.** Free-tier anti-spam is _recipient
+policy_, enforced by the recipient's client, not the protocol:
+
+- require a **mutual contact**, or
+- a **BIP-322 proof of control of a funded / aged UTXO** (no sats move — the
+  UTXO floor is a Sybil cost, not a payment).
+
+A first message that does not clear the policy is **delivered and decrypted,
+never dropped** — it is placed in a distinct **filtered/pending** state (the
+"Requests" surface) so the recipient always sees that someone reached them.
+Acceptance is a client-local, **explicit and revocable allowlist**: opening a
+filtered conversation lets that sender reach your inbox normally thereafter, and
+you may revoke at any time. The allowlist is private — it is never published,
+never carried on the wire, and never co-indexed with the directory (the
+[social-graph firewall](/chat/directory#the-social-graph-firewall)). A recipient
+signals acceptance only by **replying** — there is deliberately no "your request
+was opened" receipt, which would be a read-receipt-style metadata leak.
+
+## pay-to-reach — a stranger reaches you (paid, peer-to-peer)
+
+`kind="chat"` with a `postage` block. A stranger's first message to a recipient
+who has published a **postage floor** must carry a valid Lightning **preimage**
+proving payment **to the recipient**. The payment is **sender → recipient
+direct**; no OC service is in the path.
+
+The flow, end to end:
+
+1. The recipient publishes a postage policy — `floor_sats` plus a Lightning
+   endpoint resolving to **their own** wallet, inside an identity-signed record.
+2. A stranger's wallet fetches an invoice **directly** from that endpoint, pays
+   it, and obtains the preimage.
+3. The client embeds
+   `{payment_hash, preimage, nonce, amount_sats, recipient, …}` in the sealed
+   envelope.
+4. The recipient verifies `SHA-256(preimage) == payment_hash` **offline** plus a
+   recipient-binding so the preimage can't be replayed. Valid → inbox.
+   Invalid/absent → delivered but held in **Requests**, never dropped.
+
+This is _sats as signal_ — attention **priced, not filtered**, and the inverse
+of hashcash: the cost is hardware-neutral and accrues to the recipient as value.
+Contacts message for free; only stranger → inbox is gated. **OC collects
+nothing.** The full offline-verification construction, its honest ceiling, and
+the named-Fedimint custodial fallback are in [Postage](/chat/postage).
+
+## seal-til-block — a message that opens in the future (the timelock mode)
+
+`kind="chat-seal"` with a `seal` block. The `content_key` is wrapped to a
+**named beacon**, not the recipient; the beacon releases it only after the
+Bitcoin chain passes `seal.unlock_block`. The recipient receives the ciphertext
+immediately but holds no key.
+
+> **This is beacon-enforced policy, not Bitcoin consensus.** The word
+> "trustless" MUST NOT describe a `chat-seal` envelope whose anchor is a beacon.
+> A conforming client surfaces the beacon identity and the early-release / brick
+> risk at compose time, and caps the v0 horizon at ~30 days.
+
+A **hard chain gate** makes the displayed promise true on a conforming client:
+the body is not surfaced until the client independently confirms
+`chain_tip ≥ unlock_block + confirmations`, even if the timelock beacon already
+yielded the key — so the message opens at the **later** of (the beacon
+releasing, the chain reaching the height). The block height is a _verified
+condition_, never the lock. This mode is the one that **fails the Ed25519
+substitution test by design**, and the protocol says so on every surface —
+[the seal page](/chat/seal) and
+[Why](/chat/why#the-ed25519-test-on-the-seal-out-loud) run the test out loud.
+
+## What is _not_ a fourth mode
+
+By design, the following are **registry extensions or compositions**, never new
+canonical send modes:
+
+- **Channels** ([§8.3](/chat/channels)) — public, founder-rooted broadcast, a
+  composition of a descriptor + posts + a write gate, on a distinct
+  `chat-channel` kind. Not a DM mode.
+- **`pay-to-post`** — Lightning postage _per channel post_ — a reserved
+  kind-30115 extension, not v1-canonical (it is not offline-verifiable).
+- **Private / group channels** — reserved behind the same channel descriptor,
+  gated on an MLS-grade group protocol.
+- **The CLTV-witness seal** — the consensus-enforced upgrade to
+  `seal-til-block`, structurally pre-wired (`seal.cltv_outpoint`) but not
+  shipped.
+
+Holding the line at three modes is what keeps every implementation
+byte-compatible.
+
+## Next
+
+- [Postage](/chat/postage) — the full pay-to-reach construction.
+- [Seal-til-block](/chat/seal) — the beacon model and the dead-man's-switch.
+- [Envelope & content addressing](/chat/envelope) — the kinds and the
+  recipient-exclusion rule.

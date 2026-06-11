@@ -1,0 +1,108 @@
+export const metadata = {
+    title: 'Quickstart · OC Chat',
+    description:
+        'Sign in with your Bitcoin wallet, send your first end-to-end-encrypted message, and try each of the three send modes — speak-now, pay-to-reach, and seal-til-block.',
+};
+
+# Quickstart
+
+Five minutes from a Bitcoin wallet to your first end-to-end-encrypted message.
+No account, no email, no app install — [chat.ochk.io](https://chat.ochk.io) runs
+in the browser.
+
+## 1. Sign in with Bitcoin
+
+Open [chat.ochk.io](https://chat.ochk.io) and sign in. The ceremony is the
+family [BIP-322 sign-in](/ecosystem/bip322): your wallet signs a challenge,
+proving you control the address. There is **no password and no email** — your
+Bitcoin address _is_ your account. (An email-OTP bridge exists on the
+[auth host](/api-reference/auth-host) as a UX fallback, but the canonical
+identity is always the address.)
+
+The first time you sign in on a device, the browser generates an **X25519 device
+key** and publishes a [kind-30078 device record](/lock/device-keys) binding that
+key to your address via BIP-322. **This is the only wallet signature you will
+make.** From here, sending and receiving are zero-click.
+
+> Your inbox pubkey is `HKDF(device_sk)` — derived from the device key, not
+> chosen. Publishing a device record _is_ creating an inbox; there is no second
+> ceremony.
+
+## 2. Send your first message (speak-now)
+
+1. Paste the recipient's **Bitcoin address** into the composer.
+2. The app fetches their kind-30078 device record from Nostr and **verifies the
+   BIP-322 binding offline** — a malicious relay cannot forge a device record.
+3. Type and send. The app seals an OC Lock envelope to the recipient's device
+   key, gift-wraps it (NIP-59, kind-1059) with a throwaway Schnorr key, and
+   publishes it.
+4. The relay sees an ephemeral pubkey, the recipient's inbox pubkey, a
+   minute-rounded timestamp, and an opaque blob — **not who sent it, what it
+   says, or which conversation it belongs to.**
+
+No wallet popup. The send loop is sub-second.
+
+### Note to self
+
+Start a thread with **your own** address: the client seals to your own device
+key, the subscription loops the gift-wrap back, and it lands in a thread labeled
+"note to self." Every device you have registered under that address receives it
+— so this doubles as an end-to-end-encrypted cross-device clipboard.
+
+## 3. Let strangers reach you (pay-to-reach)
+
+A first message from someone who is **not** an existing contact lands in a
+separate **Requests** surface, not your main inbox — it is delivered and
+decrypted, never dropped. To price that attention instead of merely filtering
+it, publish a **postage policy**: a `floor_sats` and a Lightning receiving
+endpoint (an LNURL Lightning Address today; BOLT12 recommended) resolving to a
+wallet **you** control.
+
+A stranger's wallet then fetches an invoice **directly from your endpoint**,
+pays it, and attaches the preimage to their first message. Your client verifies
+`SHA-256(preimage) == payment_hash` offline and that the payment is bound to you
+and this message. Valid → inbox. **OC is never in the payment path and collects
+nothing.** Full mechanics in [Postage](/chat/postage).
+
+## 4. Send a message that opens in the future (seal-til-block)
+
+Compose a message and pick a future **Bitcoin block height**. The app locks the
+body under a reveal secret and timelock-encrypts that secret to a **named
+beacon** (drand quicknet by default), then sends it. The recipient receives the
+ciphertext immediately but holds no key until the chain passes the height.
+
+The compose flow **forces you to acknowledge** the trust posture before you
+send:
+
+> The named beacon can release early if its threshold colludes, and the seal is
+> permanently bricked if the beacon disappears. A v0 seal is **beacon-enforced,
+> not trustless.** The reference build caps the horizon at ~30 days.
+
+See [Seal-til-block](/chat/seal) for the beacon model, the hard chain gate, and
+the dead-man's-switch (standing delivery) composition.
+
+## 5. Be findable by a handle (optional)
+
+By default you are **invisible** — discoverable only by someone who already
+knows your Bitcoin address. If you opt in, you can publish a revocable
+[directory listing](/chat/directory) so people can find you by a human-readable
+`@handle`. Claiming a handle requires your address to clear a **UTXO-age floor**
+(funded + aged on-chain), which prices out squatting. Opt-in surfaces the
+deanonymization trade-off plainly; revocation is forward-effective only.
+
+## What you get on the free tier
+
+Everything above works on the **free tier**: all three send modes, the opt-in
+directory, public [channels](/chat/channels), and a best-effort **durable
+inbox** so a message sent while you are offline still arrives. The paid
+**Personal** rung (1,000 sats / 30 days, prepaid over Lightning, no auto-renew)
+only extends the retention horizon, multi-device fan-out, and history depth —
+durability of basic delivery is never the paywall.
+
+## Next steps
+
+- [How it works](/chat/how-it-works) — the device-key → inbox → gift-wrap mental
+  model.
+- [The three send modes](/chat/modes) — what each mode adds and when to use it.
+- [Security posture](/chat/security) — what OC Chat protects and what it
+  explicitly does not.

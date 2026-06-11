@@ -1,0 +1,148 @@
+export const metadata = {
+    title: 'OC Chat · chat.ochk.io',
+    description:
+        'Bitcoin-identity messaging: your address is your inbox. End-to-end-encrypted chat where the identity is a Bitcoin address (BIP-322), the anti-spam is Lightning postage paid directly to the recipient, and a message can be sealed to open only at a future Bitcoin block height. A mode of OC Lock, not a seventh verb.',
+};
+
+# OC Chat
+
+**Your Bitcoin address is your inbox.** [chat.ochk.io](https://chat.ochk.io) is
+an end-to-end-encrypted messenger where the identity is a **Bitcoin address**
+(BIP-322), the anti-spam is **Lightning postage paid directly to the
+recipient**, and a message can be **sealed to open only at a future Bitcoin
+block height**. No phone number, no account, no custody.
+
+It is **not a new verb.** OC Chat is a _mode of [OC Lock](/lock/)_ — it reuses
+OC Lock's envelope crypto (X25519 ECDH + AES-256-GCM, BIP-322 identity binding,
+RFC 8785 canonicalization) verbatim and adds two envelope `kind` values plus a
+thin threading / postage / seal layer. The way [vault.ochk.io](/vault/) is OC
+Lock Flow 4 + Lightning, chat.ochk.io is OC Lock + threads + postage + a
+block-height seal.
+
+## The three send modes
+
+Each mode adds exactly one Bitcoin-unique property — **identity** (BIP-322), **a
+settled-sats preimage** (Lightning), **a block-height predicate** (Bitcoin).
+Everything past these is a registry extension, not a new canonical surface.
+
+| Mode               | Envelope `kind` | What it adds                                                                                         |
+| ------------------ | --------------- | ---------------------------------------------------------------------------------------------------- |
+| **speak-now**      | `chat`          | Free 1:1 E2EE. Your BIP-322 identity is the account. Sub-second send, no per-message popup.          |
+| **pay-to-reach**   | `chat`          | A stranger pays Lightning postage to **you** to land in your inbox. OC never touches the sats.       |
+| **seal-til-block** | `chat-seal`     | A named beacon releases the key only after the chain passes block N. Beacon-enforced, not consensus. |
+
+See [The three send modes](/chat/modes) for the full breakdown.
+
+## How it works, in one paragraph
+
+You sign in once with BIP-322; your browser generates an X25519 device key bound
+to your Bitcoin address and published to Nostr
+([OC Lock kind-30078](/lock/device-keys)). To message someone, you fetch their
+device key by Bitcoin address, seal an OC Lock envelope to it, and gift-wrap it
+over Nostr (NIP-59) so relays learn nothing — not who, not when, not what.
+Threading lives inside the ciphertext as a hash-chain. A stranger attaches a
+Lightning preimage (paid to your own wallet) to reach you. To seal a message for
+the future, you wrap its key to a **named** beacon that releases it after a
+Bitcoin block height — and the protocol is honest that, until the CLTV-witness
+upgrade ships, that beacon is a trust anchor, not the chain. Full tour in
+[How it works](/chat/how-it-works).
+
+## The layers
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  chat.ochk.io           threads, postage UI, seal compose       │
+├────────────────────────────────────────────────────────────────┤
+│  oc-chat-protocol       kind=chat / chat-seal, threading, seal   │
+│  oc-lock-protocol       envelope crypto, canonicalization        │
+│  @orangecheck/lock-*    X25519 ECDH, HKDF, AES-256-GCM           │
+├────────────────────────────────────────────────────────────────┤
+│  OrangeCheck            identity (BIP-322 sign-in, did_oc)       │
+│  Nostr                  device directory (30078) + gift-wrap     │
+│  Lightning              postage preimage; drand beacon for seal  │
+│  Bitcoin                address ownership + block-height clock    │
+└────────────────────────────────────────────────────────────────┘
+```
+
+## Honest by design
+
+The family invariants demand the
+[Ed25519 substitution test](/ecosystem/security) be run out loud on every
+feature. OC Chat passes it on identity and postage — and fails it, on purpose
+and in writing, on the v0 seal. We say so on every surface.
+
+- The `seal-til-block` v0 unlock is **beacon-enforced, not
+  Bitcoin-consensus-enforced**. We name the beacon (drand quicknet) and we ban
+  the word "trustless" from v0 seal surfaces. The consensus-enforced path
+  (CLTV-witness) is structurally pre-wired, not shipped. See
+  [Seal-til-block](/chat/seal).
+- We do **not** match Signal's per-message forward secrecy in v0. Compromising a
+  device key decrypts its history. We say so; forward-secrecy-critical users —
+  journalists protecting sources above all — should use Signal. See
+  [Security](/chat/security).
+- OC operates **no payment rail** for postage. Sender and recipient transact
+  directly; OC only verifies the preimage, offline, and never custodies sats.
+  See [Postage](/chat/postage).
+
+## Pricing
+
+chat.ochk.io is paid in **sats over Lightning — no fiat, no cards, no
+auto-renew, no stored balance**. The free tier is genuine and forever: **durable
+delivery is the free-tier floor, never the paywall**. A conforming deployment
+provides at least best-effort store-and-forward so a message sent while you are
+offline still arrives.
+
+| SKU          | Price                | For                                                                                       |
+| ------------ | -------------------- | ----------------------------------------------------------------------------------------- |
+| **Free**     | 0 sats               | All three send modes, best-effort durable inbox, the directory, channels.                 |
+| **Personal** | 1,000 sats / 30 days | Extends only the retention horizon, multi-device fan-out, and history depth on the inbox. |
+
+Personal is a prepaid Lightning period with **no auto-renew** and a finite
+expiry, so OC's hosting obligation is always bounded and there is never a stored
+balance to custody. Paying while still subscribed **stacks** the period — paying
+early never loses days.
+
+## Sub-pages in this section
+
+- [Why OC Chat](/chat/why) — the lock.ochk.io chat postmortem and what a real
+  messenger fixes; the Ed25519 verdict run out loud.
+- [Quickstart](/chat/quickstart) — sign in, send your first message, try each
+  mode.
+- [How it works](/chat/how-it-works) — device key → inbox → directory →
+  gift-wrap → threading, the zero-click send loop.
+- [The three send modes](/chat/modes) — speak-now / pay-to-reach /
+  seal-til-block, each adding one Bitcoin property.
+- [Threading & attachments](/chat/threading) — the `parent_id` hash-chain,
+  conversation ids, end-to-end-encrypted files.
+- [Postage](/chat/postage) — pay-to-reach Lightning postage, the offline
+  verification, the no-OC-rail rule, the Fedimint fallback.
+- [Seal-til-block](/chat/seal) — the beacon model, the v0 drand-tlock profile,
+  the hard chain gate, standing delivery (dead-man's-switch).
+- [Discoverability directory](/chat/directory) — opt-in, UTXO-gated, revocable
+  by-handle discovery; the social-graph firewall.
+- [Channels](/chat/channels) — founder-rooted public channels, write policies,
+  roles, moderation, source-intake.
+- [Transport & durable inbox](/chat/transport) — gift-wrap, the v2 encrypted
+  wrap, opaque per-conversation queue routing, relay AUTH.
+- [Envelope & content addressing](/chat/envelope) — the two new kinds and the
+  recipient-exclusion `id`/AAD rule that makes re-wrap safe.
+- [Protocol walkthrough](/chat/protocol) — the six flows, narrated end to end.
+- [Security posture](/chat/security) — the threat model and the nineteen+ named
+  non-protections.
+- [Specification](/chat/spec) — normative rules, error codes, kind registry,
+  compliance checklist.
+
+## Where things live
+
+- **Product** — [chat.ochk.io](https://chat.ochk.io)
+- **Protocol** —
+  [`oc-chat-protocol`](https://github.com/orangecheck/oc-chat-protocol) (prose +
+  fixtures; depends on [OC Lock](/lock/))
+- **Crypto** — [`@orangecheck/lock-core`](/sdk/lock-core/README) +
+  [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) +
+  [`@orangecheck/lock-device`](/sdk/lock-device/README)
+- **Transport** — Nostr gift-wrap (NIP-59, kind-1059) over the family relay
+  [relay.ochk.io](/infrastructure/relay) and public relays
+- **Auth** — the family [auth host](/api-reference/auth-host) at `ochk.io`
+- **Kinds** — 30110–30115 in the
+  [family kind registry](/ecosystem/nostr-kind-30078)

@@ -1,0 +1,205 @@
+export const metadata = {
+    title: 'Channels · OC Chat',
+    description:
+        'Founder-rooted public channels in OC Chat v1: the kind-30110 governance descriptor, kind-30111 posts, the Bitcoin-priced write gate (utxo-floor), roles, moderation tombstones, directory composition, and source-intake. Public channels make no E2EE claim — by design.',
+};
+
+# Channels
+
+A **channel** is a composition, not a new verb and not a new mode: a
+**kind-30110 governance descriptor** + **kind-30111 posts** + an opt-in
+[kind-30114 directory listing](/chat/directory) + a **Bitcoin-priced write
+gate**. v1 ships **public** channels (public read, signed posts, Bitcoin-gated
+write). Private/encrypted channels are reserved behind the _same_ descriptor —
+one descriptor, phased by its `read` + `encryption` fields.
+
+> **A public channel makes NO E2EE claim.** It uses OC Lock's _identity binding_
+> (BIP-322 device signatures) and OC Chat's _Bitcoin-priced access control_, not
+> its confidentiality. Clients MUST NOT carry the DM "relays learn nothing"
+> headline onto channel posts — relays, readers, and archives see the plaintext
+> body and the author's Bitcoin address **forever.** This is the inverse of the
+> 1:1 product, and it must be loud in any UI that hosts both.
+
+## The channel descriptor — kind 30110
+
+One descriptor per channel, signed by the **founder's inbox key**,
+BIP-322-rooted to `founder_address` via that device's kind-30078 record. It is
+the single source of truth for identity, roles, and the read/write policy.
+Content-addressed.
+
+```jsonc
+// kind 30110, addressable. d-tag = "oc-lock-chat-ch:" || base64url(SHA-256("oc-lock-chat-ch/v1:" || channel_id))
+{
+    "v": 1,
+    "channel_id": "<hex = SHA-256('oc-lock-chat-ch/v1:' || founder_address || ':' || slug)>",
+    "slug": "<[a-z0-9-]{3,48}; NON-authoritative display label>",
+    "founder_address": "<bitcoin address OR did:oc:...; the channel's trust root>",
+    "founder_inbox_pubkey": "<hex; the event pubkey; bound to founder_address via kind-30078>",
+
+    "read": "public", // "public" (v1) | "members" (reserved)
+    "encryption": null, // null ⇒ public (v1)
+
+    "write": {
+        // EXACTLY ONE policy
+        "policy": "utxo-floor", // "utxo-floor" | "allowlist" | "founder" | "open"
+        "utxo_floor_confs": 144,
+        "utxo_floor_sats": 0,
+        "allowlist_root": null,
+        "rooted": true, // MUST be true for utxo-floor; false for the others
+    },
+
+    "admins": [], // may replace the descriptor + post any tombstone
+    "moderators": [], // may post removal tombstones ONLY
+
+    "title": "<=80>",
+    "description": "<=280>",
+    "rules": "<=1000, optional>",
+    "directory_opt_in": false,
+    "created_at": 1733846400,
+    "supersedes": null, // descriptor_id of the prior version, or null for genesis
+}
+// descriptor_id = SHA-256(canonical(content))
+```
+
+Normative rules a conforming client MUST honor:
+
+- **`channel_id` binds to `founder_address`** — identity is
+  `SHA-256(founder_address || slug)`. Two founders may reuse a `slug` →
+  different `channel_id`s. The slug is non-authoritative; the client MUST render
+  `founder_address` + its trust tier alongside the slug.
+- **The descriptor is a governance hash-chain.** Every change (add admin, raise
+  the floor, change policy) is a new kind-30110 at the same d-tag with
+  `supersedes` → the prior `descriptor_id`. A client MUST validate the new
+  descriptor's signing inbox key is device-bound (kind-30078) to the founder OR
+  an address in the **prior** `admins` set — making governance tamper-evident
+  and offline-verifiable (the [`parent_id` trick](/chat/threading) applied to
+  governance). A descriptor not so authored is `E_CH_UNAUTHORIZED`.
+- **Exactly one `write.policy`, with a `rooted` flag that MUST match it.**
+  `utxo-floor` ⇒ `rooted:true`; `allowlist`/`founder`/`open` ⇒ `rooted:false`. A
+  mismatch is `E_CH_POLICY_INVALID`. This makes the Bitcoin claim a property of
+  the **artifact**, not a UI label.
+
+## The write gate (the Bitcoin-load-bearing axis)
+
+| Policy           | `rooted` | Ed25519 verdict | Behaviour                                                                                                                                                                            |
+| ---------------- | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`utxo-floor`** | `true`   | **passes**      | Author proves control of a funded UTXO of age ≥ `utxo_floor_confs` (the [directory gate](/chat/directory) applied to write). Spam is priced in Bitcoin maturity. **The v1 default.** |
+| `allowlist`      | `false`  | fails           | Writers are the addresses hashing to `allowlist_root`; a signature-only gate, not Bitcoin-load-bearing. Muted "via ochk.io" tier.                                                    |
+| `founder`        | `false`  | fails           | Only founder + admins post (an announcement channel).                                                                                                                                |
+| `open`           | `false`  | fails           | Anyone with a valid device posts. Legal but defaulted-against.                                                                                                                       |
+| `pay-to-post`    | —        | (reserved)      | Lightning postage per post — a **kind-30115 registry extension, NOT v1-canonical** (needs an invoice round-trip + spent-ledger, so it is not offline-verifiable).                    |
+
+The `utxo-floor` `write_proof` is **self-contained and height-anchored**, so
+verification is offline and needs no per-post live point-query:
+
+```jsonc
+"write_proof": {
+  "outpoint": "<txid:vout>",
+  "value_sats": 100000,
+  "anchor_block_height": 899000,
+  "anchor_block_hash": "<hex>",                 // pins the anchor
+  "control_sig": "<BIP-322 by the UTXO's address over post_id>"
+}
+```
+
+A reader verifies `control_sig` over `post_id`, `value_sats >= utxo_floor_sats`,
+and `current_tip_height - anchor_block_height + 1 >= utxo_floor_confs` using the
+reader's own tip (one tip read per render batch, not per post). Below-floor or
+bad-signature ⇒ `E_CHAN_FLOOR`.
+
+> **Only `utxo-floor` (and the deferred `pay-to-post`) carry the Bitcoin
+> claim.** The `rooted:false` flag is structural, and a conforming client MUST
+> render a non-rooted channel in the muted "via ochk.io" tier exactly as a
+> `did:oc` identity. Membership by signature alone is not a Bitcoin gate — v1
+> says so on every surface, and defaults the create flow to `utxo-floor`.
+
+## Channel posts — kind 30111
+
+A public post is an addressable kind-30111 event, the `chat-channel` envelope,
+`recipients=[]`, **plaintext** body, signed by the author's inbox key bound to
+`author_address` via kind-30078. It carries an indexable `["t", channel_id]` tag
+so a reader can fetch one channel's posts relay-side. An optional inline
+`attachment` (same shape as a
+[DM attachment](/chat/threading#attachments-end-to-end-encrypted)) is **public**
+— committed to `post_id`, capped at the same ~100 KiB inline ceiling, not a
+file-hosting layer.
+
+A conforming reader MUST:
+
+1. **Verify the author device signature + kind-30078 binding** — a post with no
+   resolvable signature is `E_CH_UNAUTHORIZED` and MUST NOT render (authorship
+   is never optional).
+2. **Evaluate the channel's `write.policy`** — a post failing the gate is
+   `E_CH_WRITE_DENIED` and MUST NOT render.
+3. **Confirm the author is permitted to write** — a reader-only role posting is
+   `E_CH_NOT_WRITER`.
+4. **Order the feed deterministically.** A public multi-author channel has no
+   single hash-chain (independent broadcasters), so a top-level post sets
+   `parent_id:null` and the feed is ordered by the event `created_at` as a
+   **display hint, tie-broken by the content-addressed `post_id`** so any two
+   clients agree. `created_at` is untrusted; the `post_id` tiebreak makes
+   ordering stable + reproducible. A non-null `parent_id` threads an explicit
+   reply under its parent. (This relaxes the
+   [strict DM chain rule](/chat/threading) — channels are fan-out.)
+
+## Roles & moderation
+
+Five roles, all enforced **offline by signature** against the current descriptor
+epoch:
+
+| Role          | May                                                         |
+| ------------- | ----------------------------------------------------------- |
+| **founder**   | anything, including replace the descriptor (the trust root) |
+| **admin**     | replace the descriptor + post any tombstone                 |
+| **moderator** | post removal tombstones only                                |
+| **writer**    | post, gated by the write policy                             |
+| **reader**    | read only (a reader post is `E_CH_NOT_WRITER`)              |
+
+Moderation is by **tombstone**: an admin/moderator publishes a kind-30111
+removal tombstone (`body:""`, a `removes` field naming the target `post_id`).
+Removal is **forward-effective only** — conforming clients hide the target on
+sight, but scraped copies are not retracted. A tombstone by a non-roster signer
+is `E_CH_UNAUTHORIZED`. A channel admin is the family's **first per-room named
+trust anchor**: every admin action is an auditable signed artifact (the
+governance chain), but _auditable is not preventable_ in v1 — a single founder
+is a single point of trust, disclosed (see [Security S-CH-5](/chat/security)).
+
+## Source-intake (institutional composition)
+
+A SecureDrop-shaped one-way tip line is a **composition of shipped primitives**,
+not a new ceremony: a public intake channel (`write:"open"` or `utxo-floor`) is
+the org's advertised drop; a **source** the org does not pre-know posts material
+under a fresh throwaway identity; the org reads the public post and **replies
+privately** by gift-wrapping a [speak-now DM](/chat/modes) to the post's
+`author_inbox_pubkey`. The **inbound** submission is public; only the **reply**
+is E2EE.
+
+> **Honest boundary (S-M7-2):** the intake post is public and permanent — only
+> the org's reply is private. A conforming intake client warns the source at
+> submission time, defaults the source to a fresh throwaway identity, and
+> **never claims SecureDrop-grade anonymity** for the inbound leg. Two opt-in
+> hardenings ride on top: an org-run
+> [NIP-42 AUTH relay](/chat/transport#relay-auth-nip-42) hides the reply's
+> recipient tag from passive observers, and a
+> [named-Fedimint postage last-mile](/chat/postage#named-fedimint-custodial-fallback)
+> lets a staff recipient with no Lightning node still accept pay-to-reach.
+
+## Private channels (reserved — not v1)
+
+`read:"members"` + an `encryption` block (`scheme ∈ {rewrap, sender-keys, mls}`)
+under the **same** kind-30110 descriptor enables private channels in a later
+phase, using the reserved kind-30113 group-key rotation record. The descriptor,
+roles, write gates, moderation, and governance chain are inherited unchanged;
+only the encryption block + the epoch machine are added. v1 does not implement
+this — the public-channel descriptor is forward-compatible by a flag, not a
+format break. The member-to-member roster leak and the epoch forward-secrecy
+blast radius apply only to those phases.
+
+## Next
+
+- [Discoverability directory](/chat/directory) — the kind-30114 listing channels
+  compose with.
+- [Transport & durable inbox](/chat/transport) — relay AUTH for institutional
+  metadata hardening.
+- [Security posture](/chat/security) — S-CH-1 through S-CH-7 and the
+  source-intake disclosures.

@@ -1,0 +1,167 @@
+export const metadata = {
+    title: 'Protocol walkthrough · OC Chat',
+    description:
+        'A narrative tour of the six OC Chat flows: speak-now, multi-device, pay-to-reach, seal-til-block + release, standing-delivery (dead-man’s-switch), and institutional source-intake. The spec says what; this says why and how the flows compose.',
+};
+
+# Protocol walkthrough
+
+A narrative companion to the [specification](/chat/spec). The spec has the
+normative rules; this walks the six flows end to end with realistic detail and
+explains how they compose. Throughout, Alice and Bob are identified by their
+**Bitcoin addresses**, and every device key is published as a
+[kind-30078 record](/lock/device-keys).
+
+## The mental model
+
+```
+  one BIP-322 signature per device, ever
+        │
+        ▼
+  device_pk (X25519) ──published──▶ Nostr kind-30078  (find me by my bitcoin address)
+        │                                   │
+        │ inbox pubkey = HKDF(device_sk)     │ fetch by addr
+        ▼                                   ▼
+  every message: seal an OC Lock envelope ─▶ gift-wrap (kind-1059) ─▶ relay ─▶ recipient
+                 (no per-message wallet popup)
+```
+
+After the one binding signature, sending and receiving are zero-click.
+
+## Flow 1 — speak-now (the daily driver)
+
+1. Alice types Bob's Bitcoin address. The app fetches Bob's kind-30078 device
+   record and **verifies the BIP-322 binding offline**.
+2. Alice writes "gm". The app builds the payload
+   `{body:"gm", conversation_id, seq:1, parent_id:null}`, seals it to Bob's
+   device key with a fresh `content_key`, and computes the `chat_envelope_id`
+   [excluding `recipients[]`](/chat/envelope).
+3. **No wallet popup.** The per-device key authenticates the send; BIP-322 was
+   spent once at registration. The send loop is sub-second.
+4. The envelope is gift-wrapped (ephemeral Schnorr key, minute-rounded
+   `created_at`) and published. The relay sees a throwaway pubkey, Bob's inbox
+   pubkey, and an opaque blob.
+5. Bob's subscription receives it, finds his `device_id`, unwraps `content_key`,
+   decrypts, and chains it by `parent_id`. Total on-screen time: under a second.
+
+**Durable delivery.** Relays are best-effort and may garbage-collect events. A
+conforming deployment SHOULD provide at least best-effort store-and-forward so a
+message sent while Bob is offline still arrives — the **free-tier floor, not a
+paid feature**. It works by depositing the same opaque gift-wrap blob to an
+operator-run queue keyed by an opaque per-conversation
+[`queue_id`](/chat/transport#durable-inbox): the first message lands on Bob's
+derivable bootstrap queue, then both sides exchange per-conversation `queue_id`s
+inside the encrypted payload and migrate off it, so the operator sees unlinkable
+queues of ciphertext it can neither read nor tie to a Bitcoin address.
+
+## Flow 2 — multi-device
+
+Bob has a laptop and a phone, each with its own device key and kind-30078
+record. Alice's client wraps the one `content_key` once per active device
+(vector `vc02`). A new device is authorized by a **BIP-322 signature from Bob's
+primary wallet** over a link statement naming the new `device_pk` —
+Bitcoin-load-bearing and auditable.
+
+**Portability cliff (disclosed):** a message sent _before_ a device existed was
+never wrapped to it, so the new device cannot read it without a backfill —
+either the old device re-wraps the `content_key` to the new `device_pk`, or a
+sealed key-bundle is retrieved by BIP-322 proof from the same address. A
+deployment promising "multi-device history" MUST implement one of these and
+state the limit.
+
+## Flow 3 — pay-to-reach (a stranger reaches you)
+
+1. Bob publishes a postage policy: `floor_sats: 100` and a Lightning endpoint
+   resolving to **his own** wallet.
+2. Carol (a stranger) wants to message Bob. Her wallet fetches an invoice
+   **directly** from Bob's endpoint (OC is not in the path), pays it, and
+   obtains the preimage.
+3. Carol's client embeds
+   `postage{payment_hash, preimage, nonce, amount_sats, recipient}` in the
+   sealed envelope (vector `vc05`). Because `postage` is committed in the `id`,
+   the binding can't be altered.
+4. Bob's client verifies `SHA-256(preimage) == payment_hash` **offline** and
+   that the `nonce` is one his endpoint minted for this payment. Valid → inbox.
+   Invalid/absent → **delivered but held in Requests**, never dropped; Bob can
+   approve Carol to let her reach his inbox normally thereafter.
+
+OC collects nothing. This is _sats as signal_ — attention priced, not filtered —
+and the inverse of hashcash: the cost is hardware-neutral and accrues to the
+recipient as value. Contacts message for free; only stranger → inbox is gated.
+Full mechanics: [Postage](/chat/postage).
+
+## Flow 4 — seal-til-block + release
+
+Alice wants the contents readable only after block 900000.
+
+**Seal.** Alice picks a named beacon (default: drand quicknet). She locks the
+body under a reveal secret, timelock-encrypts that secret to the beacon, sets
+`kind="chat-seal"` and
+`seal{unlock_block:900000, anchor:"beacon", beacon_id:"drand:quicknet", beacon_url, confirmations:6}`,
+and signs (vector `vc03`). Bob receives the ciphertext immediately but holds no
+key. The compose UI **forces** Alice to acknowledge: _the named beacon can
+release early if its threshold colludes, and the seal is permanently bricked if
+the beacon disappears._
+
+**Release.** After block 900006 confirms, and the drand round elapses, the
+[hard chain gate](/chat/seal#the-hard-chain-gate-normative) lets Bob's client
+surface the body — at the **later** of (the round elapsing, the chain reaching
+the height) — and record the observed block hash as a receipt. In the spec-pure
+beacon-device path, Bob authenticates to the beacon over BIP-322, the beacon
+re-wraps `content_key` for Bob's device and returns a **detached `recipients[]`
+entry**, and the `id` + ciphertext tag are unchanged — proven by vector `vc04`,
+the whole reason chat-kind `id`/AAD [exclude `recipients[]`](/chat/envelope).
+
+This is the same re-wrap machinery as [OC Lock payment mode](/lock/protocol),
+with the release predicate generalized from "payment confirmed" to "block height
+reached." It is **beacon-enforced policy** — see
+[Why H5](/chat/why#the-ed25519-test-on-the-seal-out-loud) for why we ship this
+and not the CLTV-witness path yet.
+
+## Flow 5 — standing-delivery (dead-man's-switch)
+
+A journalist arms a disclosure: a `seal-til-block` envelope to a trusted
+recipient, set to release at a future height, **unless** the journalist checks
+in before then. Check-in re-anchors the seal (pushes `unlock_block` forward) via
+a fresh sealed envelope superseding the prior, under a shared `standing_id`. If
+check-ins stop, the chain reaches the height and the beacon releases. **The
+switch fires on silence.**
+
+This is the one seal use case with real, repeat, high-stakes demand — and the
+sharpest failure mode: a beacon outage could false-fire an irreversible
+disclosure. A conforming deployment MUST provide a mandatory **second check-in
+channel** so a single beacon's liveness cannot trigger release alone, and MUST
+state plainly that a multi-year seal depends on the named beacon existing and
+cooperating that far out (the drand `fastnet` sunset, which permanently bricked
+its ciphertexts, is the cautionary precedent). Full construction:
+[Seal-til-block § standing delivery](/chat/seal#standing-delivery-dead-mans-switch).
+
+## Flow 6 — institutional / source-intake
+
+The institutional tier is **composition, not new crypto**. A newsroom founds a
+public [intake channel](/chat/channels) (`write:"open"`, or a Bitcoin-gated
+`utxo-floor` if it wants to price out flooding) and publishes its handle. A
+**source** the newsroom does not pre-know opens OC Chat under a fresh throwaway
+identity and posts material to that channel (an ordinary kind-30111 post). The
+newsroom reads the public post and clicks **"Message privately"**: the client
+opens a [speak-now](/chat/modes) gift-wrap to the source's inbox key — the
+**reply** is end-to-end encrypted even though the **intake** was public.
+
+> The inbound post is **permanent and public** — that is the honest boundary,
+> _not_ a SecureDrop-grade anonymity claim. The reply does not protect the
+> inbound leg.
+
+Two institutional hardenings ride on top, both opt-in and owner-operated: the
+newsroom can run its own [NIP-42 AUTH relay](/chat/transport#relay-auth-nip-42)
+so the recipient inbox tags on its private replies never appear to a passive
+observer, and a staff recipient with no Lightning node can name a
+[Fedimint federation](/chat/postage#named-fedimint-custodial-fallback) as their
+postage last-mile (the federation custodies and settles; OC touches no sats),
+gated on a money-transmitter analysis.
+
+## Where to go next
+
+- [Specification](/chat/spec) — the normative rules behind every flow above.
+- [Why OC Chat](/chat/why) — every design decision and its rationale.
+- [Security posture](/chat/security) — the threat model and what v0 does not
+  solve.

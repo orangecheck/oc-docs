@@ -1,0 +1,153 @@
+export const metadata = {
+    title: 'Why OC Chat · chat.ochk.io',
+    description:
+        'The rationale behind OC Chat: why chat is a mode of OC Lock and not a seventh verb, why a Bitcoin address is the right identity, why the per-message signature had to die, and the Ed25519 substitution test run out loud on the block-height seal.',
+};
+
+# Why OC Chat
+
+OC Chat exists because [lock.ochk.io](/lock/) proved the crypto and the
+transport work, but its chat was unusable — a wallet signature on **every**
+send, no real push, messages lost while offline, no way to move to a new phone.
+You could not fix that inside a one-shot file-drop tool. So we extracted a real
+messenger. The constraint: **change the UX, not the cryptography, and stay
+inside the [OrangeCheck invariants](/ecosystem/security).**
+
+This page is the rationale, decision by decision. The [spec](/chat/spec) says
+_what_; this says _why_ — and is honest about what we gave up.
+
+## Chat is a mode of OC Lock, not a seventh verb
+
+We considered making "chat" its own protocol family. We rejected it. The six
+verbs (attest, lock, vote, stamp, agent, pledge) are complete; an unmet need
+reduces to a new _mode_ of a verb or a composition of two. Messaging is
+continuous confidentiality — it _is_ the lock verb, operating over a thread. So
+OC Chat adds two `kind` values to the OC Lock envelope and ships a thin
+dependent spec. The verb count stays six. The reference crypto is unchanged
+`@orangecheck/lock-*`.
+
+## A Bitcoin address is the right identity — and it is the whole wedge
+
+Every rival anchors identity to something weaker:
+
+| Messenger                     | Identity anchor                 | The cost                                                                                                      |
+| ----------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Signal, WhatsApp              | phone number                    | KYC-adjacent; carrier/SIM metadata; compellable                                                               |
+| SimpleX, Session, Keet, Nostr | a rootless keypair / npub       | you cannot _prove_ you own it; no discovery, no scarcity                                                      |
+| XMTP, Status                  | another chain's account         | not Bitcoin; different trust + tooling                                                                        |
+| **OC Chat**                   | **a Bitcoin address (BIP-322)** | self-sovereign, chain-verifiable, discoverable, and able to carry a Lightning preimage + a block-height clock |
+
+We do not win on "better crypto" — we win on the **account model**. Run the
+[Ed25519 substitution test](/ecosystem/security) on identity: replace the
+Bitcoin address with an Ed25519 npub and the discovery, the UTXO-age anti-spam
+floor, and the postage proof all collapse. Identity is genuinely
+Bitcoin-load-bearing.
+
+## Kill the per-message signature; keep the device key
+
+The single worst thing about the old chat was a BIP-322 wallet popup on every
+send. That is pure UX debt with no security value: the per-device X25519 key
+already authenticates every message, and the device's authority comes from the
+_one_ BIP-322 binding signature in its kind-30078 record (verifiable offline,
+forever). So we moved BIP-322 to registration only. This takes the send loop
+from 5–10s to sub-second at zero cost to authenticity. It is the
+highest-leverage decision in the protocol — and it is why we did **not** rebuild
+on MLS / Waku / Hypercore. The failure was UX, not the substrate.
+
+## Recipients are routing, not content (the re-wrap fix)
+
+A subtle but load-bearing decision. In base OC Lock the envelope `id` and the
+AEAD AAD both include `recipients[]`. That makes a sealed envelope
+un-re-keyable: when a beacon (for a seal) or a payment relay re-wraps the key
+for the eventual recipient, it mutates `recipients[]`, which breaks the `id`
+(and the BIP-322 signature over it) and the ciphertext tag. An adversarial
+review caught that the first design would have shipped un-round-trippable sealed
+messages. The fix: for chat kinds, the `id` and AAD **exclude `recipients[]`
+entirely** — the recipient set is mutable delivery routing; the _content_ is
+what is addressed. Re-wrap then preserves the `id`, the signature, and the tag.
+Test vector `vc04` proves it with real crypto. See
+[Envelope & content addressing](/chat/envelope).
+
+## Postage is a preimage, sender → recipient direct
+
+Anti-spam should be **priced, not filtered** — _sats as signal_. The proof must
+be a bearer proof of settled sats: the BOLT11/BOLT12 preimage, verifiable
+offline as `SHA-256(preimage) == payment_hash`. We explicitly reject NIP-57 zap
+receipts (the NIP-57 spec itself says a zap receipt is "not a proof of payment"
+— server-signed, forgeable) and we reject per-message Lightning for all sends
+(the model that requires every user to run a node). Postage gates only stranger
+→ inbox; contacts message free. OC operates **no gateway** and is structurally
+absent from the path. The hard part — binding the preimage to
+`recipient + amount + nonce` so it cannot be replayed — is solved in v0 by the
+recipient's own endpoint minting a per-DM invoice; the [Postage](/chat/postage)
+page has the full construction and its honest ceiling.
+
+## The block-height seal ships beacon-enforced — and we say so
+
+We want "a message the chain unlocks at block N." The honest truth is that there
+is no browser-shippable, consensus-enforced decrypt-at-height primitive today:
+adaptor-signature / CLTV-witness extraction has no shippable secp256k1 WASM
+build, and the PSBT loop is UX death. So v0 reuses OC Lock payment-mode's
+re-wrap pattern, generalizing the release predicate from "payment confirmed" to
+"block height reached," with the key escrowed to a **named beacon** (drand
+quicknet). We refuse to call this "trustless." The envelope carries an optional
+`seal.cltv_outpoint` so the consensus-enforced path can be added later **without
+a format break** — structurally pre-wired, not promised.
+
+### The Ed25519 test on the seal, out loud
+
+> Replace Bitcoin with an Ed25519 world. Does the v0 seal still work? **Yes —
+> almost entirely.** The seal's enforcement is a BLS/threshold committee that
+> watches a clock and releases a key. Swap "block height N" for "NTP timestamp
+> T" and the machinery is identical; this is literally drand/tlock, which is
+> Bitcoin-independent. So **the v0 seal, in isolation, FAILS the substitution
+> test.**
+
+We do not paper over this. The BLS threshold is load-bearing for _enforcement_;
+Bitcoin block height is load-bearing only as the _predicate the committee
+voluntarily honors_. What keeps the **product** Bitcoin-load-bearing is **not**
+the seal — it is `speak-now`'s BIP-322 identity + UTXO-age anti-spam, and
+`pay-to-reach`'s Lightning preimage, and the unshipped CLTV-witness where the
+chain finally becomes the enforcer. We never let the seal alone carry the
+Bitcoin claim. A **hard chain gate** pulls the Bitcoin leg as far as a browser
+honestly can: a conforming client refuses to surface the body until it
+independently verifies `chain_tip ≥ unlock_block + confirmations`, even if the
+drand round already yielded the key — so a sealed message opens at the **later**
+of (the round elapsing, the chain reaching the height). The block is a _verified
+condition_ (offline-checkable), never the lock.
+
+## Threads are a hash-chain, not a timestamp sort
+
+The old chat sorted messages by `created_at`, which is plaintext and
+minute-rounded — attacker- and relay-influenceable. We move ordering into the
+ciphertext: `parent_id` MUST equal the content-addressed `id` of the parent
+message, making each thread a tamper-evident hash-chain. This is the only
+cryptographic anti-reorder available without a ratchet; it does not prevent a
+relay from _withholding_ delivery — we do not claim transport-layer anti-replay.
+See [Threading](/chat/threading).
+
+## What we still don't have
+
+We name the gaps rather than paper over them:
+
+- **Per-message forward secrecy.** Compromising a device key decrypts that
+  device's whole history; we provide only coarse forward secrecy via ~90-day key
+  rotation. A real gap against Signal — forward-secrecy-critical users should
+  use Signal.
+- **A consensus-enforced seal** (CLTV-witness). Pre-wired, not shipped.
+- **Group chat without social-graph leakage at the relay.** Held until an
+  MLS-grade group protocol is production-ready; private channels are reserved
+  behind the same descriptor.
+- **Account/device recovery without the Bitcoin key.** A lost key loses history
+  and contacts; social-recovery is roadmapped, never pretended trivial.
+- **Post-quantum confidentiality.** X25519 / secp256k1 / BLS12-381 are
+  classically secure only; long-range seals carry quantum risk over their
+  lifetime.
+
+## Acknowledgement
+
+The reframing that makes this buildable — Bitcoin as identity, not access oracle
+— is owed to [Bram Kanstein](https://bramk.substack.com/). It is why the daily
+messenger leans on a BIP-322 identity instead of a chain transaction in the send
+path, and why we could delete the per-message signature without deleting the
+security.

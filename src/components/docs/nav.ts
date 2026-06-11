@@ -963,6 +963,38 @@ export function findSectionFor(pathname: string): DocsSection | undefined {
     return DOCS_NAV.find((s) => s.items.some((i) => i.href === normalized));
 }
 
+/**
+ * Per-route SEO metadata, derived from the nav — the single source of truth.
+ * The MDX `export const metadata` on each page is NOT reachable from `_app`
+ * in the Pages Router (named exports don't flow to `pageProps` without
+ * disabling Automatic Static Optimization), so the document `<title>` and
+ * `<meta description>` are resolved here instead. This also covers the `.tsx`
+ * pages and can never drift from the sidebar.
+ *
+ * Returns `{}` for the docs root so the site-level brand title/description
+ * apply. For a page outside the nav (deep SDK function/interface reference),
+ * a readable title is derived from the path so the tab is never the generic
+ * site default.
+ */
+export function findDocsMeta(pathname: string): { title?: string; description?: string } {
+    const normalized = pathname.replace(/\/$/, '') || '/';
+    if (normalized === '/') return {};
+
+    for (const section of DOCS_NAV) {
+        const item = section.items.find((i) => i.href === normalized);
+        if (item) {
+            return { title: `${item.label} · ${section.label}`, description: item.blurb };
+        }
+    }
+
+    // Not in the nav — derive a title from the trailing path segment(s).
+    const segs = normalized.split('/').filter(Boolean);
+    const last = segs[segs.length - 1] ?? '';
+    const parent = segs.length > 1 ? segs[segs.length - 2] : undefined;
+    const label = last === 'README' && parent ? parent : last;
+    return { title: label };
+}
+
 export function prevNextFor(pathname: string) {
     const normalized = pathname.replace(/\/$/, '') || '/';
     const idx = DOCS_FLAT.findIndex((p) => p.href === normalized);

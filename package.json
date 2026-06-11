@@ -6,6 +6,8 @@
     "description": "docs.ochk.io — unified documentation for the OrangeCheck ecosystem (OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent).",
     "scripts": {
         "dev": "rm -rf .next && next dev",
+        "predev": "node scripts/gen-doc-sources.mjs",
+        "prebuild": "node scripts/gen-doc-sources.mjs",
         "build": "next build",
         "start": "next start",
         "lint": "eslint",

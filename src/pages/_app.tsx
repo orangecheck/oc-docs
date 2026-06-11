@@ -42,11 +42,7 @@ export default function App({ Component, pageProps }: AppProps) {
                         <LayoutHeader />
                         <LayoutSubHeader
                             product="oc · docs"
-                            tags={[
-                                { label: 'specs · api · guides' },
-                                { label: 'cc-by-4.0', hideBelow: 'sm' },
-                                { label: 'every artifact verifies offline', hideBelow: 'md' },
-                            ]}
+                            tags={[{ label: 'specs · api · guides' }]}
                         />
                         <main className="min-h-[calc(100vh-3rem)] py-8">
                             <DocsLayout>

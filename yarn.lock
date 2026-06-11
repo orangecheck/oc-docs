@@ -617,24 +617,24 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.17.2":
-  version "2.17.2"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.17.2.tgz#1b1bf6675d3c4d275d2abebafefb780588b02797"
-  integrity sha512-14frnkxLr6NKWTLLA2S/UzVEgMo7w4ZrOPnkhN/3mutqlW8scvEVFpSV4XM+Yr865+gZUScCVT3Ukrc2Eifklw==
+"@orangecheck/auth-client@^2.18.0":
+  version "2.18.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.18.0.tgz#c5998a443e3b27c1ac3864370f0346e2c950e89c"
+  integrity sha512-bfg6b1kGn0fSsv4++RjbpBW1804d6VlkZ1JYUEldDty9WTaYNoHzDHIBWVoevB2vdrLBWRVzK7UK2Q9vr5RLZg==
   dependencies:
     "@simplewebauthn/browser" "^13.3.0"
 
-"@orangecheck/auth-core@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-2.4.0.tgz#3b74dc073f3405573c0a358030b7778cc4187ca9"
-  integrity sha512-lch0p9zT2TmH/Vd5JfHtkt4NZNBykcWhUC49pSSd39QTWqV5ljed8PzHq+zDp4K3AbiqASPWVYfq2jzy7EeSow==
+"@orangecheck/auth-core@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-2.5.0.tgz#e1f8a5e84f08e0b19a5c318757c5852df1b5177c"
+  integrity sha512-VSru4R7NCSRV/W99lIrGyQyc+/NUJyKK+qhYa9GPj+9/wv7NubxOdPWOVVoc6l48JByaAYybMIsdqb2vx07YyQ==
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/design@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.9.1.tgz#87bbecab80cd1f6a8d05b64ada59526f7ba6c91a"
-  integrity sha512-RKZAw65/ZDwq9DGCcfUf6NmwrykQ+UpFNqgjiMKbJetXzrB/SS34pGr0Y6X6I66QXKm+vwBi8Xu7P55ldVkXEQ==
+"@orangecheck/design@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.15.0.tgz#202f79ccba08391d748c16fad0d012668a05a2a5"
+  integrity sha512-F/TxY5L1A7TsH5krk+tal+6pXEhQEa0W+3lE/PT3ffHsEgAe95VXBcsXx2R/hucA57gNV9AxL68eeSykedgvBA==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"

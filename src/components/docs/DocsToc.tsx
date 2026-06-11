@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils/utils';
@@ -33,13 +34,31 @@ function collectHeadings(): TocItem[] {
 }
 
 export function DocsToc() {
+    const router = useRouter();
+    // Strip the hash so clicking an in-page anchor doesn't re-collect.
+    const path = router.asPath.split('#')[0] ?? '';
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
 
+    // Re-collect headings on EVERY route change. DocsToc is mounted once inside
+    // DocsLayout (which is mounted once in _app), so an empty-deps effect froze
+    // the list on the first page visited — every client-side navigation then
+    // showed the wrong page's headings. Keying on `path` (and resetting first)
+    // rebuilds the list for the page actually on screen. By the time this effect
+    // runs the new page's DOM has committed; a rAF adds a safety margin for any
+    // late layout before we read #docs-content.
     useEffect(() => {
-        const t = setTimeout(() => setItems(collectHeadings()), 50);
-        return () => clearTimeout(t);
-    }, []);
+        setActiveId('');
+        let raf = 0;
+        const run = () => setItems(collectHeadings());
+        raf = requestAnimationFrame(run);
+        // Belt-and-suspenders for content that settles a tick later.
+        const t = setTimeout(run, 60);
+        return () => {
+            cancelAnimationFrame(raf);
+            clearTimeout(t);
+        };
+    }, [path]);
 
     useEffect(() => {
         if (items.length === 0) return;

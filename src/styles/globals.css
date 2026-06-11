@@ -16,3 +16,13 @@
    are still provided by next/font in _app.tsx
    (--font-sans-display / --font-mono-display). */
 @import '@orangecheck/design/styles.css';
+
+/* Site-specific utilities live AFTER the package import so they are preserved.
+   Anchored headings (the "on this page" ToC links and deep links like
+   /chat/seal#timing-is-approximate) must clear the sticky top bar (top-12 +
+   the mobile sub-header), otherwise the target heading lands hidden underneath. */
+@layer utilities {
+    .docs-prose :is(h1, h2, h3, h4) {
+        scroll-margin-top: 5rem;
+    }
+}

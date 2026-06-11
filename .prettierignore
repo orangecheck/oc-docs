@@ -5,6 +5,11 @@
 # output as the source of truth.
 src/pages/sdk/
 
+# Route → source-file manifest. Owned by scripts/gen-doc-sources.mjs and
+# regenerated on every prebuild; the generator is the source of truth, so
+# keep it out of format-check to avoid drift between regen and prettier.
+src/generated/doc-sources.json
+
 # Other auto-generated artifacts.
 .next/
 out/

@@ -12,10 +12,14 @@ cryptography — X25519 ECDH + HKDF-SHA256 + AES-256-GCM, RFC 8785
 canonicalization, BIP-322 identity binding — is **unchanged from
 [OC Lock](/lock/spec) and not restated here.** Read the OC Lock spec first.
 
-The full normative document lives in
-[`oc-chat-protocol/SPEC.md`](https://github.com/orangecheck/oc-chat-protocol/blob/main/SPEC.md);
-this page mirrors its structure. The key words MUST, MUST NOT, SHOULD, MAY are
-per RFC 2119.
+<SpecRef
+    repo="oc-chat-protocol"
+    kind="spec"
+    version="v0"
+    note="This page mirrors the structure of the full normative document, which lives in the spec repo."
+/>
+
+The key words MUST, MUST NOT, SHOULD, MAY are per RFC 2119.
 
 > **Status: v0, draft.** New `kind` values and new optional blocks (`postage`,
 > `seal` sub-fields) are additive; clients MUST preserve unknown fields when

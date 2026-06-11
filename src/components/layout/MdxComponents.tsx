@@ -6,6 +6,8 @@ import React, { isValidElement } from 'react';
 
 import { cn } from '@/lib/utils/utils';
 
+import { SpecRef } from '@/components/docs/SpecRef';
+
 // Mermaid renders its SVG client-side (dynamic `import('mermaid')` + DOM
 // injection), so server-rendering it produces output that never matches the
 // client — a React #418 hydration mismatch on any page with a diagram (the
@@ -52,6 +54,7 @@ function getCodeLang(child: React.ReactNode): string | null {
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
         wrapper: MDXWrapper,
+        SpecRef,
 
         h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
             <h1

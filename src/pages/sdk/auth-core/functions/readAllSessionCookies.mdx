@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: readAllSessionCookies()",
+    description: "Auto-generated API reference for Function: readAllSessionCookies(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / readAllSessionCookies
+
+# Function: readAllSessionCookies()
+
+```ts
+function readAllSessionCookies(cookieHeader: string | null | undefined): string[];
+```
+
+Defined in: [index.ts:440](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L440)
+
+Read EVERY oc_session value out of a raw `Cookie:` header string.
+Multiple same-name cookies are legitimate (e.g. a stale host-scoped
+cookie shadowing the `Domain=.ochk.io` one) — verification should
+try each rather than trust ordering.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `cookieHeader` | `string` \| `null` \| `undefined` |
+
+## Returns
+
+`string`[]

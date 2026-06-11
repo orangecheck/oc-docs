@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: resolveSessionFromRequest()",
+    description: "Auto-generated API reference for Function: resolveSessionFromRequest(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / resolveSessionFromRequest
+
+# Function: resolveSessionFromRequest()
+
+```ts
+function resolveSessionFromRequest(headers: IncomingRequestHeaders, cfg: VerifyConfig): Promise<ResolveSessionResult>;
+```
+
+Defined in: [index.ts:501](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L501)
+
+Resolve the EFFECTIVE session for a request — the per-tab choke
+point every consumer's `readJwtSession` should delegate to.
+
+Precedence:
+  1. `x-oc-tab-session` header, when present. **Fail-closed**: a
+     present-but-invalid tab token resolves to
+     `{ ok: false, reason: 'tab_invalid' }` rather than silently
+     falling back to the cookie — falling back would execute the
+     request as a DIFFERENT account than the tab is displaying,
+     which is precisely the bug per-tab pinning exists to prevent.
+     Clients clear their pin on 401 and re-resolve.
+  2. Every `oc_session` cookie in the jar, first one that verifies.
+
+Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken.mdx));
+revocation-aware checks remain the auth host's job. Never throws.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `headers` | [`IncomingRequestHeaders`](../type-aliases/IncomingRequestHeaders.mdx) |
+| `cfg` | [`VerifyConfig`](../interfaces/VerifyConfig.mdx) |
+
+## Returns
+
+`Promise`\&lt;[`ResolveSessionResult`](../type-aliases/ResolveSessionResult.mdx)\>

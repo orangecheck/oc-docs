@@ -20,7 +20,6 @@ contract.
 | ------------- | ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
 | **Auth host** | [`ochk.io`](https://ochk.io)               | [/api/openapi](https://ochk.io/api/openapi)        | [/api-explorer](https://ochk.io/api-explorer)        |
 | **OC Attest** | [`attest.ochk.io`](https://attest.ochk.io) | [/api/openapi](https://attest.ochk.io/api/openapi) | [/api-explorer](https://attest.ochk.io/api-explorer) |
-| **Fleet**     | [`fleet.ochk.io`](https://fleet.ochk.io)   | [/api/openapi](https://fleet.ochk.io/api/openapi)  | [/api-explorer](https://fleet.ochk.io/api-explorer)  |
 | **Me**        | [`me.ochk.io`](https://me.ochk.io)         | [/api/openapi](https://me.ochk.io/api/openapi)     | inline at [/me](/me)                                 |
 
 The narrowed product pages (linked in the sidebar under this group) embed the
@@ -38,13 +37,13 @@ same spec rendered inline + cross-link to the live explorer.
 ## Generating clients
 
 Each spec is canonical OpenAPI 3.1 — works with every standard generator.
-Example: a Python client for the Fleet API:
+Example: a Python client for the Me API:
 
 ```bash
 openapi-generator-cli generate \
-    -i https://fleet.ochk.io/api/openapi \
+    -i https://me.ochk.io/api/openapi \
     -g python \
-    -o ./fleet-client
+    -o ./me-client
 ```
 
 Same recipe with `-g go`, `-g rust`, `-g typescript-fetch`, etc. The specs are
@@ -57,5 +56,5 @@ response.
 These OpenAPI specs are **documentation**, not protocol artifacts. The canonical
 contracts are still the TypeScript handler source + `@orangecheck/*` SDK
 conformance vectors. If a spec ever drifts from the implementation, **the
-implementation wins** — file an issue on `oc-fleet-web` / `oc-www` /
+implementation wins** — file an issue on `oc-me-web` / `oc-www` /
 `oc-attest-web` and the spec gets corrected on the next deploy.

@@ -4,7 +4,7 @@
  * Top-level reading order:
  *   1. Getting started · Ecosystem (shared)              — landing + plumbing
  *   2. Protocols · Attest / Lock / Stamp / Vote / Agent / Pledge — six siblings
- *   3. Commercial products · Fleet / Me / Vault         — managed offerings
+ *   3. Commercial products · Me / Vault                 — managed offerings
  *   4. SDKs                                              — ship-ready packages
  *   5. Company · Charter                                 — cross-product commitments
  *   6. Reference · FAQ / Glossary                        — everything else
@@ -21,7 +21,7 @@
  *      which collects cross-product pages (charter today; legal/about
  *      eventually) — its items live at the docs root, not under /company/*.
  *   3. Protocol sections lead with overview → concepts → API → guides.
- *   4. Commercial product sections (fleet, me) lead with overview →
+ *   4. Commercial product sections (me) lead with overview →
  *      quickstart → SDK reference → integrations → webhooks → API → custody.
  */
 
@@ -462,58 +462,6 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
-        slug: 'fleet',
-        label: 'OC Fleet',
-        blurb: 'Managed infrastructure for the OC Agent family. The commercial layer.',
-        items: [
-            {
-                href: '/fleet',
-                label: 'Overview',
-                blurb: "What fleet is, what it isn't, and where it fits.",
-            },
-            {
-                href: '/fleet/quickstart',
-                label: 'Quickstart',
-                blurb: 'Sign in, bootstrap, register your first delegation, see receipts flow.',
-            },
-            {
-                href: '/fleet/integrations',
-                label: 'Integrations',
-                blurb: 'Drop-in adapters for Anthropic / OpenAI / Vercel AI SDK / LangGraph / MCP.',
-            },
-            {
-                href: '/fleet/reputation',
-                label: 'Bonded reputation',
-                blurb: 'Compose / persist / surface OC Pledge envelopes — the bonded-delivery slice of fleet.',
-            },
-            {
-                href: '/fleet/bond',
-                label: 'Bond verification',
-                blurb: 'GET /api/bond — re-resolve a bond against live bitcoin UTXO state. The load-bearing leg.',
-            },
-            {
-                href: '/fleet/compliance',
-                label: 'Compliance crosswalk',
-                blurb: 'Fleet artifacts mapped to EU AI Act / SOC 2 / NIST AI RMF — with honest rails. The procurement exit.',
-            },
-            {
-                href: '/fleet/interop',
-                label: 'Interop credential',
-                blurb: 'How an OC delegation+bond rides into x402 / AP2 / A2A / ERC-8004 as a portable, offline-verifiable credential. Design intent.',
-            },
-            {
-                href: '/fleet/webhooks',
-                label: 'Webhooks',
-                blurb: 'Receive HMAC-signed deliveries on every accepted envelope.',
-            },
-            {
-                href: '/fleet/api',
-                label: 'API reference',
-                blurb: 'OpenAPI 3.1 spec, auth schemes, error codes, route catalog.',
-            },
-        ],
-    },
-    {
         slug: 'me',
         label: 'OC Me',
         blurb: 'Consumer commercial product · bitcoin-backed identity that pays users in sats.',
@@ -719,11 +667,6 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'attest.ochk.io · OC Attest',
                 blurb: 'Verification API — check / verify / discover / publish-attestation / stats.',
             },
-            {
-                href: '/api-reference/fleet',
-                label: 'fleet.ochk.io · Fleet',
-                blurb: 'Managed agent + pledge infrastructure — delegations, actions, revocations, pledges (V1) + outcomes / abandonments (V2), audit, webhooks.',
-            },
         ],
     },
     // The /sdk group: curated overview + per-package TypeDoc reference.
@@ -912,7 +855,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/charter',
                 label: 'Charter',
-                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, fleet, every protocol sibling).',
+                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, every protocol sibling).',
             },
             {
                 href: '/reference/faq',

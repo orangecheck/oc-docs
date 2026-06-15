@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck documentation',
     description:
-        'Unified docs for the OrangeCheck ecosystem — six open protocols (Attest, Lock, Stamp, Vote, Agent, Pledge), two commercial products (Me, Fleet), and the company-wide charter. Shared concepts up top, protocol and product sections below.',
+        'Unified docs for the OrangeCheck ecosystem — six open protocols (Attest, Lock, Stamp, Vote, Agent, Pledge), the Me commercial product, and the company-wide charter. Shared concepts up top, protocol and product sections below.',
 };
 
 # Overview
@@ -70,18 +70,17 @@ substrate.
 ## Commercial products on top
 
 The protocol family is open and free to self-host. On top of it OrangeCheck
-ships two managed commercial products. They use the same envelopes, the same
-BIP-322 signing, the same anchor pipeline — they're consumers of the protocol,
-not extensions to it.
+ships a managed commercial product. It uses the same envelopes, the same BIP-322
+signing, the same anchor pipeline — a consumer of the protocol, not an extension
+to it.
 
-| Product                | What it is                                                                                                                                                                               | Audience                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| **[OC Me](/me)**       | Consumer-side Bitcoin-backed identity. Sign in with your address; integrators pay you sats per billable event. Federation custody by default with one-click self-custody graduation.     | end users + sites that want sat-paying user auth      |
-| **[OC Fleet](/fleet)** | Managed enterprise tier for OC Agent and OC Pledge. Integration adapters, webhook signing service, audit-bundle generation, compliance review. Same envelopes as the open protocol path. | enterprises running AI agents under bounded authority |
+| Product          | What it is                                                                                                                                                                           | Audience                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| **[OC Me](/me)** | Consumer-side Bitcoin-backed identity. Sign in with your address; integrators pay you sats per billable event. Federation custody by default with one-click self-custody graduation. | end users + sites that want sat-paying user auth |
 
-Both products operate under the same [charter](/charter) — eight commitments
-that bind every OrangeCheck surface (no token, custody you can graduate out of,
-the protocol stays open, audit verifies without us, and so on).
+OC Me operates under the [charter](/charter) — eight commitments that bind every
+OrangeCheck surface (no token, custody you can graduate out of, the protocol
+stays open, audit verifies without us, and so on).
 
 ## How these docs are organized
 
@@ -94,9 +93,9 @@ the protocol stays open, audit verifies without us, and so on).
 - **Per-protocol sections** — one each for Attest, Lock, Stamp, Vote, Agent,
   Pledge. Each follows the same shape: overview → how it works → concepts → API
   → guides. Pattern-match once; navigate them all.
-- **[OC Me](/me) · [OC Fleet](/fleet)** — the two commercial products. Each
-  section follows: overview → quickstart → SDK reference → integrations →
-  webhooks → API → custody/operations.
+- **[OC Me](/me)** — the commercial product. The section follows: overview →
+  quickstart → SDK reference → integrations → webhooks → API →
+  custody/operations.
 - **[SDKs](/sdks)** — every published `@orangecheck/*` package, mapped to which
   protocol or product it serves.
 - **[Charter](/charter)** — single source of truth for the eight company
@@ -136,5 +135,4 @@ the protocol stays open, audit verifies without us, and so on).
 - [**Ecosystem concepts**](/ecosystem) — learn the shared layer once
 - [**OC Attest overview**](/attest) — the base-layer protocol
 - [**OC Me overview**](/me) — sat-paying identity for consumer apps
-- [**OC Fleet overview**](/fleet) — managed Agent + Pledge for enterprises
 - [**Charter**](/charter) — what OrangeCheck commits to, in writing

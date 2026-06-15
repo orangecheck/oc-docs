@@ -1,7 +1,7 @@
 /**
  * Inline OpenAPI spec renderer used by the /api-reference/* pages.
  *
- * Each page hands a remote OpenAPI URL (e.g. https://fleet.ochk.io/api/openapi).
+ * Each page hands a remote OpenAPI URL (e.g. https://me.ochk.io/api/openapi).
  * We render Swagger UI dynamically — ssr:false + a tall placeholder so the
  * MDX page paints fast and the heavy bundle (~1.5MB) only loads on these
  * three routes, code-split by Next.

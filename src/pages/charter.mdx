@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck Charter',
     description:
-        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — me.ochk.io, fleet.ochk.io, vault.ochk.io, and every protocol sibling.',
+        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — me.ochk.io, vault.ochk.io, and every protocol sibling.',
 };
 
 # Charter
@@ -14,10 +14,10 @@ publicly. The full text is committed to git so the diff is auditable; this page
 is the canonical published version.
 
 The charter binds the **whole company**. Every product that ships under the
-OrangeCheck name — `me.ochk.io`, `fleet.ochk.io`, `vault.ochk.io`, and every
-sibling protocol site (`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) —
-operates under these eight commitments. There is one charter, in one place, on
-docs.ochk.io. Product subdomains link here.
+OrangeCheck name — `me.ochk.io`, `vault.ochk.io`, and every sibling protocol
+site (`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) — operates under
+these eight commitments. There is one charter, in one place, on docs.ochk.io.
+Product subdomains link here.
 
 ## The eight commitments
 
@@ -33,9 +33,9 @@ OrangeCheck does not hold customer Bitcoin private keys, does not hold customer
 funds, and does not operate a custodial wallet you cannot graduate out of. On
 `me.ochk.io` the federation custody model is opt-in by default for users who
 don't want to manage keys, and self-custody graduation is a one-click path (same
-address, same history). On `fleet.ochk.io` and the protocol siblings, no custody
-— period. Bonded reputation is attestation-of-unspent: sats stay in the
-customer's own wallet, enforcement is by exposure, never by slashing.
+address, same history). On the protocol siblings, no custody — period. Bonded
+reputation is attestation-of-unspent: sats stay in the customer's own wallet,
+enforcement is by exposure, never by slashing.
 
 ### 03 · The protocol stays open.
 
@@ -49,10 +49,10 @@ through an open PR. No private extensions, no closed conformance vectors.
 
 `attest.ochk.io`, `lock.ochk.io`, `vote.ochk.io`, `stamp.ochk.io`,
 `agent.ochk.io`, `pledge.ochk.io` — every sibling protocol site remains free,
-self-hostable, no-account public goods forever. The commercial managed tier
-(`fleet.ochk.io`) and the consumer commercial product (`me.ochk.io`) are
-optional layers, never the only path to using the protocols. If we ever change
-this, the spec stewardship governance ratifies first.
+self-hostable, no-account public goods forever. The consumer commercial products
+(`me.ochk.io`, `vault.ochk.io`) are optional layers, never the only path to
+using the protocols. If we ever change this, the spec stewardship governance
+ratifies first.
 
 ### 05 · Audit verifies without us.
 
@@ -92,10 +92,6 @@ review window, and a versioned re-ratification.
   Commitments **02** (custody you can graduate out of), **05** (every billable
   envelope verifies offline), and **07** (sats first-class) bind this product
   specifically.
-- **`fleet.ochk.io`** — managed Agent + Pledge enterprise tier. No custody,
-  ever. Commitments **02** (no custody, period), **05** (audit verifies without
-  us), **06** (authority infrastructure positioning), and **08** (one seat, not
-  the chair) bind this product specifically.
 - **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
   secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
   name, type, or payload is ever readable server-side, and there is no recovery

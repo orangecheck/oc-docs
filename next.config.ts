@@ -118,8 +118,8 @@ const nextConfig: NextConfig = {
                             "img-src 'self' data: https:",
                             "font-src 'self' data:",
                             isDev
-                                ? "connect-src 'self' ws: https://ochk.io https://attest.ochk.io https://fleet.ochk.io"
-                                : "connect-src 'self' https://ochk.io https://attest.ochk.io https://fleet.ochk.io",
+                                ? "connect-src 'self' ws: https://ochk.io https://attest.ochk.io"
+                                : "connect-src 'self' https://ochk.io https://attest.ochk.io",
                             "frame-ancestors 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",

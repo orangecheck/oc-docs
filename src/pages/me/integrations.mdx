@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · Integrations',
     description:
-        'OAuth-peer pattern · sample IntegratorPriceConfig archetypes · zero-bitcoin-knowledge user flow · cross-product flows with fleet.ochk.io.',
+        'OAuth-peer pattern · sample IntegratorPriceConfig archetypes · zero-bitcoin-knowledge user flow.',
 };
 
 # OC Me · Integrations
@@ -86,25 +86,6 @@ different choices — there's no "right" config OC sets, just the math.
 The config schema is open and self-served — see
 [/me/sdk](/me/sdk#oc-config--integratorpriceconfig-crud) for the full shape and
 [/developer/config](https://me.ochk.io/developer/config) for the inline editor.
-
-## Cross-product flows · me + fleet
-
-A consumer using me.ochk.io may sign into a SaaS that runs on fleet.ochk.io for
-managed agent infrastructure. The envelopes are the same primitive (oc-attest,
-oc-stamp, oc-agent) — the two products are two integration surfaces over
-identical contracts.
-
-| Flow                                   | Surface                                                                               |
-| -------------------------------------- | ------------------------------------------------------------------------------------- |
-| User signs into a SaaS using OC button | me.ochk.io issues the session · fleet.ochk.io receives it via the family cookie / JWT |
-| Agent takes a stamped action           | fleet.ochk.io publishes the envelope · me.ochk.io credits sats per the SaaS's pricing |
-| User revokes a delegation              | fleet.ochk.io publishes oc-agent-rev:[id] · the verifier drops further envelopes      |
-
-Agent delegation lifecycle (issuance, revocation, list, audit) lives on
-fleet.ochk.io — that's the enterprise managed Agent product. me.ochk.io handles
-the wallet, identity, and billing substrate underneath. See
-[fleet.ochk.io integrations docs](/fleet/integrations) for the operator-side
-view.
 
 ## Errors and edge cases
 

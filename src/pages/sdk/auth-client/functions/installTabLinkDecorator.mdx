@@ -1,0 +1,47 @@
+export const metadata = {
+    title: "Function: installTabLinkDecorator()",
+    description: "Auto-generated API reference for Function: installTabLinkDecorator(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / installTabLinkDecorator
+
+# Function: installTabLinkDecorator()
+
+```ts
+function installTabLinkDecorator(authOrigin: string): () => void;
+```
+
+Defined in: [tab-session.ts:252](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/tab-session.ts#L252)
+
+Install a capture-phase listener that stamps the tab's effective
+`did:oc` onto outgoing family-origin links the instant they're
+activated, so a new/cross-subdomain tab adopts THIS tab's account.
+Returns an uninstaller. Mirrors [installTabFetchInterceptor](installTabFetchInterceptor.mdx)'s
+conservatism:
+  - no pin → never stamps (zero behavior change)
+  - family origins only → never leaks the did to third parties
+  - reads the pin FRESH per event (no install-time capture)
+  - never clobbers an existing `#fragment`, a download, or a
+    non-http(s) scheme
+  - any internal error → leaves the link alone
+
+It mutates `a.href` in place rather than calling `window.open`, so it
+never trips a popup blocker and the browser's own ctrl/⌘/middle-click
+handling (and the context menu's "open in new tab") all carry the
+stamp. The stamp is idempotent and self-healing — React resets the
+href on the next render, and the destination strips the fragment via
+[consumeTabAccountHint](consumeTabAccountHint.mdx).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `authOrigin` | `string` |
+
+## Returns
+
+() => `void`

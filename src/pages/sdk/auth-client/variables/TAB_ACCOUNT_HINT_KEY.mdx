@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Variable: TABACCOUNTHINTKEY",
+    description: "Auto-generated API reference for Variable: TABACCOUNTHINTKEY. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / TAB\_ACCOUNT\_HINT\_KEY
+
+# Variable: TAB\_ACCOUNT\_HINT\_KEY
+
+```ts
+const TAB_ACCOUNT_HINT_KEY: "oc-as" = 'oc-as';
+```
+
+Defined in: [tab-session.ts:39](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/tab-session.ts#L39)
+
+URL-fragment key the link decorator stamps onto family-origin
+navigations so a NEW tab (or a cross-subdomain document GET) inherits
+the OPENER tab's effective account instead of falling back to the
+shared cookie's default account.
+
+The value is the account's `did:oc` — a PUBLIC identifier, never the
+session JWT. It rides a fragment (`#oc-as=<did>`), which is never sent
+to any server, and the host re-validates roster membership before
+minting a tab token for it, so a hand-crafted link grants nothing the
+visitor's own cookie/roster doesn't already authorize.

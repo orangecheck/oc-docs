@@ -1,0 +1,64 @@
+export const metadata = {
+    title: 'How OC Cosign works · OC Cosign',
+    description:
+        'The whole OC Cosign loop on one page: post a project, get cosigned (join / back / zap), match via double opt-in, message, post updates, and notify everyone behind you.',
+};
+
+# How OC Cosign works
+
+The whole product is one loop: **post → cosign → match → message → update**.
+Nothing here requires a node, a contract, or a lawyer.
+
+## 1. Post a project
+
+A founder posts what they’re building and — the part that matters — **what they
+need**: a co-founder, capital, or both. A project carries a title, a one-line
+pitch, the team, traction so far, the ask, optional use-of-funds and a target
+amount, your terms in plain English, and a Lightning address where any sats
+settle. Every project is content-addressed (a SHA-256 over its canonical
+fields), so editing a field produces a new id.
+
+## 2. People cosign it
+
+Anyone signed in can get behind a project three ways:
+
+- **join** — "I want to build this with you." A request to be a co-founder.
+- **back** — "I want to put capital or weight behind this." A patron pledge; any
+  sats settle peer-to-peer to the founder’s Lightning address.
+- **zap** — a small one-way gesture of conviction.
+
+**join** and **back** are requests — they stay private to the founder until
+accepted. **zap** is a public, one-way thank-you.
+
+## 3. You match (double opt-in)
+
+When a founder accepts a join or a back, the cosign becomes **mutual** and a
+private 1:1 thread opens between the two people. Neither side can be messaged
+without both opting in — a founder can’t force a DM, and a backer’s pending
+interest is never shown publicly until it’s mutual.
+
+## 4. You talk, then build
+
+Inside a matched thread you message back and forth — front-load the real
+questions. Founders post **updates** to a project’s feed (a milestone, a win,
+what they need next), and **everyone behind the project gets notified.**
+
+## 5. Notifications keep the loop alive
+
+A bell in the header carries a live unread count. You’re notified when:
+
+- someone cosigns your project,
+- a cosign you sent is accepted (you matched),
+- you get a message, or
+- a project you’re behind posts an update.
+
+Notifications are in-app only — OC Cosign is no-KYC and never holds an email to
+spam.
+
+## Sats: pledged vs settled
+
+When you **back** or **zap** with an amount, you pay the founder’s Lightning
+address directly. OC records the gesture for display — it never takes custody of
+a sat. A backing amount is a **pledge** until it settles peer-to-peer; the money
+moves wallet-to-wallet, never through OrangeCheck. See
+[Trust & safety](/cosign/trust).

@@ -648,6 +648,33 @@ export const DOCS_NAV: DocsSection[] = [
         ],
     },
     {
+        slug: 'cosign',
+        label: 'OC Cosign',
+        blurb: 'Commercial product · get behind a Bitcoiner’s project — join as a co-founder, or back it. Conviction, settled in sats. No KYC, no custody, not a securities platform.',
+        items: [
+            {
+                href: '/cosign',
+                label: 'Overview',
+                blurb: 'What cosign.ochk.io is — a warm marketplace to get behind builders. Join, back, or zap; no custody; not a securities platform.',
+            },
+            {
+                href: '/cosign/how-it-works',
+                label: 'How it works',
+                blurb: 'The whole loop — post → cosign (join/back/zap) → match (double opt-in) → message → update → notify.',
+            },
+            {
+                href: '/cosign/quickstart',
+                label: 'Quickstart',
+                blurb: 'Two minutes either way — post a project as a founder, or get behind one as a backer.',
+            },
+            {
+                href: '/cosign/trust',
+                label: 'Trust & safety',
+                blurb: 'Sats settle peer-to-peer, OC never takes custody, not a securities platform, your interest stays private until you both opt in.',
+            },
+        ],
+    },
+    {
         slug: 'api-reference',
         label: 'API reference',
         blurb: 'Machine-readable OpenAPI 3.1 specs + interactive explorers, one per product / protocol surface that ships HTTP APIs.',

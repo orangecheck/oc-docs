@@ -17,9 +17,15 @@ directly. OrangeCheck records the gesture for display and notifications — it
 escrow, no balance to withdraw. If `cosign.ochk.io` vanished tomorrow, the
 payments you already made are unaffected, because they never went through OC.
 
-A backing amount shown on a project is a **pledge** — a stated intent that
-settles peer-to-peer. The headline conviction signal is the sats that actually
-move between wallets, not a number OC holds.
+A backing amount shown on a project is a **pledge** until the founder **confirms
+they received it**, at which point it becomes **settled**. Only settled sats
+move a goal bar or earn recognition — the headline conviction signal is the sats
+that actually moved between wallets, not a number OC holds.
+
+**Back monthly** is the same promise extended in time: a standing _reminder_ to
+send sats yourself each period. OC stores no card and no credential, holds no
+balance, and never auto-pulls or charges you — you always initiate the payment
+from your own wallet.
 
 ## It is not a securities platform
 
@@ -48,6 +54,11 @@ Proving control of a Bitcoin address (the verified-Bitcoiner upgrade) is
 
 - **The founder’s Lightning address** is the only place sats go. It’s shown in
   plain text on the project; verify it before you pay.
+- **The founder’s receipt confirmation.** Because OC never sees the payment, a
+  backing becomes _settled_ when the founder marks it received — a named
+  attestation, not cryptographic proof. It’s a web-of-trust signal, log-damped
+  and backing-only so it can’t be cheaply gamed; LUD-21 auto-verification is the
+  planned cryptographic hardening that removes the attestation step.
 - **The OrangeCheck auth host** ([ochk.io](https://ochk.io)) issues the identity
   session every `.ochk.io` site shares.
 

@@ -55,10 +55,74 @@ A bell in the header carries a live unread count. You’re notified when:
 Notifications are in-app only — OC Cosign is no-KYC and never holds an email to
 spam.
 
-## Sats: pledged vs settled
+## Honest sats: pledged vs settled
 
-When you **back** or **zap** with an amount, you pay the founder’s Lightning
-address directly. OC records the gesture for display — it never takes custody of
-a sat. A backing amount is a **pledge** until it settles peer-to-peer; the money
-moves wallet-to-wallet, never through OrangeCheck. See
-[Trust & safety](/cosign/trust).
+When you **back** with an amount, you pay the founder’s Lightning address
+directly — OC records the gesture for display and never takes custody of a sat.
+A backing is a **pledge** until the founder **confirms they received it**, at
+which point it becomes **settled**. Only settled sats move a project’s goal bar
+and count toward recognition. The page is honest about the difference — a faint
+“pledged” trail behind the settled fill — so a number is never inflated by
+unconfirmed intent. (A cryptographic auto-confirm via LUD-21 is the planned
+hardening; today receipt is the founder’s named attestation.)
+
+Founders confirm receipts from a **“backing to confirm”** inbox on their
+dashboard; backers see each of their backings as **settled** or **awaiting
+confirmation** under **“your backings.”** See [Trust & safety](/cosign/trust).
+
+## Run a time-bound campaign
+
+A founder can open a **funding window** with a goal and a deadline — and the
+deadline is a **Bitcoin block height**, the one clock no founder or platform can
+fast-forward. The page shows momentum in plain language (“almost there — 560,000
+sats to go”, “closing soon”, “goal met · settled”) and an “ends at block N · ~Nd
+left” line. There is no escrow and no refund leg: closing a window changes
+nothing about settlement — keep-what-you-raise is the only model, because OC
+holds nothing.
+
+## Reward tiers & stretch goals
+
+- **Reward tiers** (up to five) let backers _back at a level_ for an
+  off-platform, founder-fulfilled reward — early access, a call, your name in
+  the README. A banned-terms gate keeps tiers on patronage framing: they can
+  never promise equity, a revenue share, or a return.
+- **Stretch goals** are a settled-sats ladder above the base goal — founder
+  **commitments** (“open-source the firmware”) that unlock as backing climbs.
+  When settled crosses a threshold, a **block-stamped milestone** posts to the
+  updates feed and notifies everyone behind the project.
+
+## Recognition: who’s behind it
+
+Backers earn recognition from **settled sats only** — never pledged:
+
+- a **backer ordinal** (“§07” — the order people got behind a project), and
+- a **conviction tier** — supporter / patron / champion — by lifetime settled
+  backing.
+
+It is web-of-trust recognition, not a cap table; it shows on the cosigner list
+and on profiles next to the verified-Bitcoiner badge.
+
+## Back a builder monthly
+
+**Back monthly** sets a standing intent to send a builder sats each period. It
+is a **reminder, never an auto-pull** — OC stores no card and no credential,
+holds no balance, and never charges you. When a backing comes due you get a
+nudge to send it from your own wallet; pause, resume, or cancel any time from
+your dashboard.
+
+## Sign your campaign (optional)
+
+A founder can **BIP-322-sign** their campaign’s content hash, so anyone can
+verify — offline, against the chain — that they authored the exact bytes of the
+page. A “founder signed” chip surfaces it. Editing the project clears the
+signature (the content it attests changed), so the badge always means _this_
+campaign. The only trust escalation cosign asks for is a signature — never a
+document.
+
+## Find projects
+
+The **directory** is built to surface momentum: search and filter, plus curated
+rails — **trending** (7-day settled velocity), **almost there**, **closing
+soon**, **just launched** — and a calm **activity pulse** of recent settled
+backings, matches, and launches. Ranking is driven by settled sats moving, not
+lifetime totals.

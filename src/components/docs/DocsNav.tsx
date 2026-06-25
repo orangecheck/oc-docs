@@ -100,7 +100,7 @@ export function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
                                                 className={cn(
                                                     'relative block border-l-2 px-3 py-1.5 text-[12.5px] leading-relaxed transition-colors',
                                                     itemActive
-                                                        ? 'border-primary text-foreground bg-primary/5 font-semibold'
+                                                        ? 'border-primary text-foreground bg-primary/5 rounded-r-lg font-semibold'
                                                         : 'text-muted-foreground hover:text-foreground hover:border-muted-foreground/30 border-transparent'
                                                 )}
                                             >

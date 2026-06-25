@@ -13,7 +13,7 @@ export function DocsPagination({ pathname }: { pathname: string }) {
             {prev ? (
                 <Link
                     href={prev.href}
-                    className="group hover:border-primary/40 block border p-4 transition-colors"
+                    className="group hover:border-primary/40 bg-card block rounded-xl border p-4 shadow-sm transition-colors"
                 >
                     <div className="text-muted-foreground mb-1 text-[10px] tracking-widest uppercase">
                         ← prev · {prev.section}
@@ -28,7 +28,7 @@ export function DocsPagination({ pathname }: { pathname: string }) {
             {next ? (
                 <Link
                     href={next.href}
-                    className="group hover:border-primary/40 block border p-4 text-right transition-colors"
+                    className="group hover:border-primary/40 bg-card block rounded-xl border p-4 text-right shadow-sm transition-colors"
                 >
                     <div className="text-muted-foreground mb-1 text-[10px] tracking-widest uppercase">
                         next · {next.section} →

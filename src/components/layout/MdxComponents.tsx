@@ -135,7 +135,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         ),
         table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
             <div className="my-6 w-full overflow-y-auto">
-                <table className={cn('w-full', props.className)} {...props} />
+                <table className={cn('oc-data-table w-full', props.className)} {...props} />
             </div>
         ),
         tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => (

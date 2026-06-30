@@ -631,10 +631,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/design@^0.23.0":
-  version "0.23.0"
-  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.23.0.tgz#a2f2411f37930f166aa4bcc725467b38c4f9ad13"
-  integrity sha512-7uzCUEzmop1+1cjFinYJMH2FjjM2072x6M8lER0Bvjav6VUp0zQO90QFmNTt+3GLoOc1W2qqhQddtBhgmmCHAA==
+"@orangecheck/design@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.25.0.tgz#f9a5ad40e65c3b63a57d61de5c6dfe1996da45c7"
+  integrity sha512-k81gO1q/eZk/wTE9w9qg/JnfNVJ2d4Yz6ExcaCyQ/rTeFbWSbrc7M0BYEfTpkdWRA4yWDbfcWpD4kGts+/959Q==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"

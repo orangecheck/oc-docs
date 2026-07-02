@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
         >
             <OcThemeBridge />
             {/* docs is reading-heavy — keep the ambient aurora faint behind long prose */}
-            <OcThemeProvider aurora={{ intensity: 0.5 }}>
+            <OcThemeProvider aurora={{ intensity: 0.5, gl: false }}>
                 <Seo
                     title={docsMeta.title}
                     description={docsMeta.description}

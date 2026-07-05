@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: IntegratorPriceConfig
 
-Defined in: [me-client/src/types.ts:117](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L117)
+Defined in: [me-client/src/types.ts:128](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L128)
 
 A complete integrator pricing config. Posted to me.ochk.io once at
  integration time, mutable via the configurator UI or this SDK any time
@@ -21,8 +21,8 @@ A complete integrator pricing config. Posted to me.ochk.io once at
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-display_name">&lt;/a> `display_name` | `string` | - | [me-client/src/types.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L119) |
-| &lt;a id="property-domain">&lt;/a> `domain` | `string` | - | [me-client/src/types.ts:120](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L120) |
-| &lt;a id="property-events">&lt;/a> `events` | `Partial`\&lt;`Record`\&lt;[`EventSubtype`](../type-aliases/EventSubtype.mdx), [`IntegratorEventConfig`](IntegratorEventConfig.mdx)\>\> | Per-subtype configs. Subtypes not listed are disabled by default. | [me-client/src/types.ts:124](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L124) |
-| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | - | [me-client/src/types.ts:118](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L118) |
-| &lt;a id="property-updated_at">&lt;/a> `updated_at` | `string` | ISO-8601 timestamp the config was last updated. | [me-client/src/types.ts:122](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L122) |
+| &lt;a id="property-display_name">&lt;/a> `display_name` | `string` | - | [me-client/src/types.ts:130](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L130) |
+| &lt;a id="property-domain">&lt;/a> `domain` | `string` | - | [me-client/src/types.ts:131](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L131) |
+| &lt;a id="property-events">&lt;/a> `events` | `Partial`\&lt;`Record`\&lt;[`EventKey`](../type-aliases/EventKey.mdx), [`IntegratorEventConfig`](IntegratorEventConfig.mdx)\>\> | Per-event configs, keyed by event key. Open catalog: built-in subtypes AND your own custom keys. Keys not listed are disabled by default. | [me-client/src/types.ts:136](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L136) |
+| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | - | [me-client/src/types.ts:129](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L129) |
+| &lt;a id="property-updated_at">&lt;/a> `updated_at` | `string` | ISO-8601 timestamp the config was last updated. | [me-client/src/types.ts:133](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L133) |

@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: BillableEvent
 
-Defined in: [me-client/src/types.ts:248](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L248)
+Defined in: [me-client/src/types.ts:260](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L260)
 
 ## Extended by
 
@@ -21,17 +21,17 @@ Defined in: [me-client/src/types.ts:248](https://github.com/orangecheck/oc-packa
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-class">&lt;/a> `class` | [`EventClass`](../type-aliases/EventClass.mdx) | - | [me-client/src/types.ts:251](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L251) |
-| &lt;a id="property-drop">&lt;/a> `drop?` | \| \&#123; `close_height_target`: `number` \| `null`; `window_id`: `string`; \&#125; \| `null` | Drop-period stamp · present when the project covers this subtype with a drop schedule. The user-share of a stamped event MATURES until the window's boundary, then vests as one batch (the drop). Billing is untouched. Part of the SIGNED canonical bytes (encoder branches to v=4 when present). No clawback exists — vesting is unconditional, and an open window's boundary can only ever move earlier. | [me-client/src/types.ts:273](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L273) |
-| &lt;a id="property-gross_fee_sats">&lt;/a> `gross_fee_sats` | `number` | - | [me-client/src/types.ts:254](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L254) |
-| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [me-client/src/types.ts:249](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L249) |
-| &lt;a id="property-is_agent">&lt;/a> `is_agent?` | `boolean` | Per OCHK-V3-PLAN §7 phase-1 · true when the event was fired by an oc-agent delegation rather than a human session. The integrator's IntegratorEventConfig.agent block may price these differently or refuse them. Optional · canonical encoder branches to v=3 only when present, so legacy human-fired events keep their v=2 hash + signature. | [me-client/src/types.ts:265](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L265) |
-| &lt;a id="property-occurred_at">&lt;/a> `occurred_at` | `string` | - | [me-client/src/types.ts:250](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L250) |
-| &lt;a id="property-platform_fee_sats">&lt;/a> `platform_fee_sats` | `number` | - | [me-client/src/types.ts:255](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L255) |
-| &lt;a id="property-site">&lt;/a> `site` | \&#123; `display_name`: `string`; `domain`: `string`; \&#125; | - | [me-client/src/types.ts:253](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L253) |
-| `site.display_name` | `string` | - | [me-client/src/types.ts:253](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L253) |
-| `site.domain` | `string` | - | [me-client/src/types.ts:253](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L253) |
-| &lt;a id="property-site_rebate_sats">&lt;/a> `site_rebate_sats` | `number` | - | [me-client/src/types.ts:257](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L257) |
-| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | - | [me-client/src/types.ts:252](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L252) |
-| &lt;a id="property-user_earned_sats">&lt;/a> `user_earned_sats` | `number` | - | [me-client/src/types.ts:256](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L256) |
-| &lt;a id="property-verify_url">&lt;/a> `verify_url` | `string` | - | [me-client/src/types.ts:258](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L258) |
+| &lt;a id="property-class">&lt;/a> `class` | [`EventClass`](../type-aliases/EventClass.mdx) | - | [me-client/src/types.ts:263](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L263) |
+| &lt;a id="property-drop">&lt;/a> `drop?` | \| \&#123; `close_height_target`: `number` \| `null`; `window_id`: `string`; \&#125; \| `null` | Drop-period stamp · present when the project covers this subtype with a drop schedule. The user-share of a stamped event MATURES until the window's boundary, then vests as one batch (the drop). Billing is untouched. Part of the SIGNED canonical bytes (encoder branches to v=4 when present). No clawback exists — vesting is unconditional, and an open window's boundary can only ever move earlier. | [me-client/src/types.ts:285](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L285) |
+| &lt;a id="property-gross_fee_sats">&lt;/a> `gross_fee_sats` | `number` | - | [me-client/src/types.ts:266](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L266) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [me-client/src/types.ts:261](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L261) |
+| &lt;a id="property-is_agent">&lt;/a> `is_agent?` | `boolean` | Per OCHK-V3-PLAN §7 phase-1 · true when the event was fired by an oc-agent delegation rather than a human session. The integrator's IntegratorEventConfig.agent block may price these differently or refuse them. Optional · canonical encoder branches to v=3 only when present, so legacy human-fired events keep their v=2 hash + signature. | [me-client/src/types.ts:277](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L277) |
+| &lt;a id="property-occurred_at">&lt;/a> `occurred_at` | `string` | - | [me-client/src/types.ts:262](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L262) |
+| &lt;a id="property-platform_fee_sats">&lt;/a> `platform_fee_sats` | `number` | - | [me-client/src/types.ts:267](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L267) |
+| &lt;a id="property-site">&lt;/a> `site` | \&#123; `display_name`: `string`; `domain`: `string`; \&#125; | - | [me-client/src/types.ts:265](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L265) |
+| `site.display_name` | `string` | - | [me-client/src/types.ts:265](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L265) |
+| `site.domain` | `string` | - | [me-client/src/types.ts:265](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L265) |
+| &lt;a id="property-site_rebate_sats">&lt;/a> `site_rebate_sats` | `number` | - | [me-client/src/types.ts:269](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L269) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventKey`](../type-aliases/EventKey.mdx) | - | [me-client/src/types.ts:264](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L264) |
+| &lt;a id="property-user_earned_sats">&lt;/a> `user_earned_sats` | `number` | - | [me-client/src/types.ts:268](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L268) |
+| &lt;a id="property-verify_url">&lt;/a> `verify_url` | `string` | - | [me-client/src/types.ts:270](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L270) |

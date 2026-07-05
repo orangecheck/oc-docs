@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: WebhookHeaders
 
-Defined in: [me-client/src/types.ts:412](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L412)
+Defined in: [me-client/src/types.ts:424](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L424)
 
 HTTP headers OC sends with every webhook delivery. Capture these in
 the receive handler · `OC-Signature` is what verifies the body.
@@ -20,9 +20,9 @@ the receive handler · `OC-Signature` is what verifies the body.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-oc-class">&lt;/a> `OC-Class` | [`EventClass`](../type-aliases/EventClass.mdx) | Class · matches payload.class. | [me-client/src/types.ts:426](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L426) |
-| &lt;a id="property-oc-delivery-attempt">&lt;/a> `OC-Delivery-Attempt` | `string` | 1-indexed delivery attempt count. >1 means the prior attempt did not return a 2xx within the timeout · idempotency key on payload.id is critical. | [me-client/src/types.ts:430](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L430) |
-| &lt;a id="property-oc-envelope-id">&lt;/a> `OC-Envelope-Id` | `string` | Envelope id · matches payload.id; useful for idempotent receive handlers that dedupe on this header without parsing the body. | [me-client/src/types.ts:421](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L421) |
-| &lt;a id="property-oc-key-id">&lt;/a> `OC-Key-Id` | `string` | Stable kid of the signing key · resolves against ochk.io/.well-known/jwks.json. | [me-client/src/types.ts:417](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L417) |
-| &lt;a id="property-oc-signature">&lt;/a> `OC-Signature` | `string` | Ed25519 signature over the raw response body, hex-encoded. | [me-client/src/types.ts:414](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L414) |
-| &lt;a id="property-oc-subtype">&lt;/a> `OC-Subtype` | [`EventSubtype`](../type-aliases/EventSubtype.mdx) | Subtype · matches payload.subtype; lets routers branch on the header before parsing. | [me-client/src/types.ts:424](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L424) |
+| &lt;a id="property-oc-class">&lt;/a> `OC-Class` | [`EventClass`](../type-aliases/EventClass.mdx) | Class · matches payload.class. | [me-client/src/types.ts:438](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L438) |
+| &lt;a id="property-oc-delivery-attempt">&lt;/a> `OC-Delivery-Attempt` | `string` | 1-indexed delivery attempt count. >1 means the prior attempt did not return a 2xx within the timeout · idempotency key on payload.id is critical. | [me-client/src/types.ts:442](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L442) |
+| &lt;a id="property-oc-envelope-id">&lt;/a> `OC-Envelope-Id` | `string` | Envelope id · matches payload.id; useful for idempotent receive handlers that dedupe on this header without parsing the body. | [me-client/src/types.ts:433](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L433) |
+| &lt;a id="property-oc-key-id">&lt;/a> `OC-Key-Id` | `string` | Stable kid of the signing key · resolves against ochk.io/.well-known/jwks.json. | [me-client/src/types.ts:429](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L429) |
+| &lt;a id="property-oc-signature">&lt;/a> `OC-Signature` | `string` | Ed25519 signature over the raw response body, hex-encoded. | [me-client/src/types.ts:426](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L426) |
+| &lt;a id="property-oc-subtype">&lt;/a> `OC-Subtype` | [`EventKey`](../type-aliases/EventKey.mdx) | Subtype · matches payload.subtype (built-in or a custom event key); lets routers branch on the header before parsing. | [me-client/src/types.ts:436](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L436) |

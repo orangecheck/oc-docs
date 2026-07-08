@@ -11,7 +11,7 @@ export const metadata = {
 
 # Class: MeClientError
 
-Defined in: [me-client/src/transport.ts:103](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L103)
+Defined in: [me-client/src/transport.ts:113](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L113)
 
 ## Extends
 
@@ -31,7 +31,7 @@ new MeClientError(
 }): MeClientError;
 ```
 
-Defined in: [me-client/src/transport.ts:114](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L114)
+Defined in: [me-client/src/transport.ts:124](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L124)
 
 #### Parameters
 
@@ -57,12 +57,12 @@ Error.constructor
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| &lt;a id="property-errorcode">&lt;/a> `errorCode` | `readonly` | `string` \| `undefined` | Server-side error code (the `error` field on the JSON body, e.g. `project_rate_limit_exceeded`). Stable across versions; safe to match on. The human-readable `message` may change. | - | [me-client/src/transport.ts:108](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L108) |
+| &lt;a id="property-errorcode">&lt;/a> `errorCode` | `readonly` | `string` \| `undefined` | Server-side error code (the `error` field on the JSON body, e.g. `project_rate_limit_exceeded`). Stable across versions; safe to match on. The human-readable `message` may change. | - | [me-client/src/transport.ts:118](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L118) |
 | &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | - | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | - | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
-| &lt;a id="property-retryafterseconds">&lt;/a> `retryAfterSeconds` | `readonly` | `number` \| `undefined` | Seconds to wait before retrying. Set when the server responded 429 with a Retry-After header (or a `retry_after_seconds` body field). Undefined for any other status. Use with `withRateLimitRetry()` or your own backoff loop. | - | [me-client/src/transport.ts:113](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L113) |
+| &lt;a id="property-retryafterseconds">&lt;/a> `retryAfterSeconds` | `readonly` | `number` \| `undefined` | Seconds to wait before retrying. Set when the server responded 429 with a Retry-After header (or a `retry_after_seconds` body field). Undefined for any other status. Use with `withRateLimitRetry()` or your own backoff loop. | - | [me-client/src/transport.ts:123](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L123) |
 | &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | - | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |
-| &lt;a id="property-status">&lt;/a> `status` | `readonly` | `number` | - | - | [me-client/src/transport.ts:104](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L104) |
+| &lt;a id="property-status">&lt;/a> `status` | `readonly` | `number` | - | - | [me-client/src/transport.ts:114](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L114) |
 
 ## Accessors
 
@@ -74,7 +74,7 @@ Error.constructor
 get isRateLimited(): boolean;
 ```
 
-Defined in: [me-client/src/transport.ts:127](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L127)
+Defined in: [me-client/src/transport.ts:137](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L137)
 
 True for the 429 surface · convenience boolean so callers don't
  have to compare status === 429 every time.

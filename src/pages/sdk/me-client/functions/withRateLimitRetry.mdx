@@ -15,7 +15,7 @@ export const metadata = {
 function withRateLimitRetry<T>(fn: () => Promise<T>, opts?: WithRateLimitRetryOptions): Promise<T>;
 ```
 
-Defined in: [me-client/src/transport.ts:170](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L170)
+Defined in: [me-client/src/transport.ts:180](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L180)
 
 Wrap a transport call with automatic 429 retry, honoring Retry-After.
 

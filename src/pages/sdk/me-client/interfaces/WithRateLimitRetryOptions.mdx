@@ -11,12 +11,12 @@ export const metadata = {
 
 # Interface: WithRateLimitRetryOptions
 
-Defined in: [me-client/src/transport.ts:132](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L132)
+Defined in: [me-client/src/transport.ts:142](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L142)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-basebackoffms">&lt;/a> `baseBackoffMs?` | `number` | Floor backoff in milliseconds when no Retry-After is present. Multiplied by 2^attempt for exponential growth. Default 250ms. | [me-client/src/transport.ts:143](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L143) |
-| &lt;a id="property-maxretries">&lt;/a> `maxRetries?` | `number` | Maximum retry attempts on 429. Default 2 (= up to 3 total invocations of the wrapped function). | [me-client/src/transport.ts:135](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L135) |
-| &lt;a id="property-maxretryafterseconds">&lt;/a> `maxRetryAfterSeconds?` | `number` | Cap on Retry-After we'll actually honor in seconds. Some server configs return very large values; the SDK refuses to sleep beyond this and re-throws the original error so the caller decides. Default 30. | [me-client/src/transport.ts:140](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L140) |
+| &lt;a id="property-basebackoffms">&lt;/a> `baseBackoffMs?` | `number` | Floor backoff in milliseconds when no Retry-After is present. Multiplied by 2^attempt for exponential growth. Default 250ms. | [me-client/src/transport.ts:153](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L153) |
+| &lt;a id="property-maxretries">&lt;/a> `maxRetries?` | `number` | Maximum retry attempts on 429. Default 2 (= up to 3 total invocations of the wrapped function). | [me-client/src/transport.ts:145](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L145) |
+| &lt;a id="property-maxretryafterseconds">&lt;/a> `maxRetryAfterSeconds?` | `number` | Cap on Retry-After we'll actually honor in seconds. Some server configs return very large values; the SDK refuses to sleep beyond this and re-throws the original error so the caller decides. Default 30. | [me-client/src/transport.ts:150](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L150) |

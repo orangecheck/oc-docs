@@ -1,0 +1,177 @@
+export const metadata = {
+    title: 'Quickstart',
+    description:
+        'Goal: get a real sybil-gate decision out of OC Attest with one curl, no account and no key.',
+};
+
+export const meta = {
+    title: 'Quickstart — OC Attest',
+    description:
+        'One curl to a real gate decision. No account, no key, no SDK.',
+};
+
+# Quickstart
+
+**Goal: a real sybil-gate decision in one command.**
+
+You need `curl`. Not a wallet, not an account, not an API key — checking is a
+public read.
+
+## 1. Ask the gate about an address
+
+```sh
+curl -s 'https://attest.ochk.io/api/check?addr=bc1pezn5yjxmz9nuahtqprvhfeya2nv4zdfk49u5amquhqptykx695rs60hqa2'
+```
+
+```json
+{
+    "ok": true,
+    "sats": 10000,
+    "days": 307,
+    "score": 103.46,
+    "attestation_id": "bbde80f884ae849d2cc8d4fa19687e7ec862f8b7c85a3ee8cf93739548e23658",
+    "address": "bc1pezn5yjxmz9nuahtqprvhfeya2nv4zdfk49u5amquhqptykx695rs60hqa2",
+    "identities": [
+        {
+            "protocol": "nostr",
+            "identifier": "npub1yfk7w33n60g05whqdmzluaftan390q89mqhht67wf4r8y90m3h9spyzpyn"
+        }
+    ],
+    "network": "mainnet"
+}
+```
+
+That is the whole product in one response. This address has proved control of an
+unspent 10,000-sat output that has sat still for 307 days, and has bound a Nostr
+identity to it. `ok` is the answer to "should I let this one in".
+
+`score` is **advisory** — a convenience number, not a consensus value. Gate on
+`sats` and `days`, which are facts about the chain. See
+[Scoring](/attest/scoring) for why.
+
+## 2. Set your own bar
+
+`ok` is computed against thresholds you pass. Nothing is hardcoded.
+
+```sh
+# a floor this address clears
+curl -s '.../api/check?addr=bc1pezn…&min_sats=5000&min_days=90'
+{"ok": true,  "sats": 10000, "days": 307, "score": 103.46}
+
+# a floor it does not
+curl -s '.../api/check?addr=bc1pezn…&min_sats=100000000&min_days=3650'
+{"ok": false, "sats": 10000, "days": 307, "score": 103.46}
+```
+
+Note that a failing check still returns the facts. You decide what to do with a
+10,000-sat, 307-day identity — the endpoint does not moralise about it.
+
+An address that has never attested is a different answer:
+
+```sh
+curl -s 'https://attest.ochk.io/api/check?addr=bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080'
+{"ok": false, "reasons": ["not_found"]}
+```
+
+Distinguish those two cases in your own code. `not_found` means "no proof
+exists", which is not the same as "proof exists and is too small".
+
+## 3. Look up by identity instead of address
+
+If what you hold is a Nostr npub rather than a Bitcoin address, ask by identity.
+The value is `protocol:identifier` — a bare npub is rejected.
+
+```sh
+curl -s 'https://attest.ochk.io/api/check?identity=nostr:npub1yfk7w33n60g05whqdmzluaftan390q89mqhht67wf4r8y90m3h9spyzpyn'
+{"ok": true, "sats": 10000, "days": 307, "address": "bc1pezn…"}
+```
+
+## 4. See everything an address has published
+
+```sh
+curl -s 'https://attest.ochk.io/api/discover?addr=bc1pezn…&limit=5'
+```
+
+Returns every attestation for that subject, each with its `attestation_id`,
+`scheme` (`bip322`), and bound identities. Use it when you want the history
+rather than a yes/no.
+
+## Then: gate your own thing
+
+You now have the read path. The three next steps, in the order most people want
+them:
+
+- **[Gate an Express route](/attest/guides/express)** — the check above as
+  drop-in middleware, about ten lines.
+- **[Sybil-filter a Nostr relay](/attest/guides/nostr-relay)** — a Strfry plugin
+  that rejects events from unproofed npubs.
+- **[Filter an airdrop](/attest/guides/airdrop)** — turn a candidate list into a
+  sybil-resistant allowlist.
+
+## Verify without trusting us
+
+Everything above is a convenience over a pure function. `/api/check` is
+`attest.ochk.io` reading a public index; if you would rather not trust that,
+don't.
+
+```sh
+npm i @orangecheck/sdk@^1.4.0
+```
+
+The version floor matters. In `1.3.0` and earlier, `check()` filtered relays on
+a multi-letter `#address` tag, which NIP-12 relays do not index — so it answered
+`not_found` for every real attestation. Fixed in `1.4.0`.
+
+```ts
+import { check } from '@orangecheck/sdk';
+
+const result = await check({
+    addr: 'bc1pezn5yjxmz9nuahtqprvhfeya2nv4zdfk49u5amquhqptykx695rs60hqa2',
+    minSats: 5000,
+    minDays: 90,
+});
+// { ok: true, sats: 10000, days: 307, score: 103.46 }
+```
+
+Same shape as the HTTP response, and **no call to `attest.ochk.io`** — `check()`
+reads the attestations off Nostr relays and re-derives the answer locally from
+the envelope plus public chain data. Pass `relays` to point it at your own. That
+is the whole point of the protocol, and the reason the HTTP API is optional
+rather than load-bearing.
+
+`verify({ msg, addr, sig })` is the lower-level primitive if you hold a raw
+signed message rather than a published envelope, and `createAttestation()`
+builds and signs a new one.
+
+To check an envelope you already hold without installing anything:
+
+```sh
+curl -s -X POST https://attest.ochk.io/api/verify \
+  -H 'content-type: application/json' \
+  -d '{"envelope": { … }, "policy": {"min_sats": 5000, "min_days": 90}}'
+```
+
+`envelope` is the full canonical `AttestationEnvelope` JSON as produced by
+`createAttestation()`. See [Verification](/attest/verification) for the exact
+checks a verifier performs, and
+[Self-host the verifier](/attest/guides/self-hosting) to run the whole stack
+yourself.
+
+## Get your own attestation
+
+Signing needs a wallet that can do BIP-322 (UniSat, Xverse, Leather, Sparrow,
+Electrum, OKX, Phantom). Open [attest.ochk.io](https://attest.ochk.io), connect
+it, and sign one short canonical message — your Bitcoin never moves and no
+private key leaves your wallet. [How it works](/attest/how-it-works) is the
+whole protocol on one page.
+
+## The machine-readable contract
+
+```sh
+curl -s https://attest.ochk.io/api/openapi
+```
+
+OpenAPI 3.1, covering `/api/check`, `/api/verify`, `/api/discover`,
+`/api/publish-attestation` and `/api/stats`. Generate a client from it in any
+language. (`/api/stats` reports a rolling **10-minute** window, so zeros there
+mean "quiet right now", not "empty".)

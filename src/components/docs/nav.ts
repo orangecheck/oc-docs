@@ -127,6 +127,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'What Attest is and who it is for.',
             },
             {
+                href: '/attest/quickstart',
+                label: 'Quickstart',
+                blurb: 'One curl to a real gate decision. No account, no key.',
+            },
+            {
                 href: '/attest/how-it-works',
                 label: 'How it works',
                 blurb: 'Sign → publish → verify. The whole protocol on one page.',

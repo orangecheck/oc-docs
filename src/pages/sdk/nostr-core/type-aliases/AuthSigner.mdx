@@ -17,7 +17,7 @@ type AuthSigner = (challenge: string, relayUrl: string) =>
 | Promise<NostrEvent>;
 ```
 
-Defined in: [index.ts:159](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L159)
+Defined in: [index.ts:167](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L167)
 
 Sign a [NIP-42](https://nips.nostr.com/42) AUTH challenge. Given the relay's
 `challenge` string and `relayUrl`, return a signed kind-22242 event (tags

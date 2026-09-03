@@ -73,7 +73,7 @@ Any verifier does six deterministic steps (full detail on
    return pass/fail with metrics.
 
 ```bash
-curl "https://ochk.io/api/check?addr=bc1q...&min_sats=100000&min_days=30"
+curl "https://attest.ochk.io/api/check?addr=bc1q...&min_sats=100000&min_days=30"
 ```
 
 ```json
@@ -87,8 +87,12 @@ curl "https://ochk.io/api/check?addr=bc1q...&min_sats=100000&min_days=30"
 }
 ```
 
-That's the whole API surface for most gates. The hosted API at `ochk.io` caches
-results for 60 seconds; self-hosted verifiers can tune their own caching.
+That's the whole API surface for most gates. The hosted verifier lives at
+`attest.ochk.io` — `ochk.io` is the auth host and serves no `/api/check`. It
+answers `Cache-Control: public, max-age=60` and rate-limits at 60 requests per
+minute per IP; self-hosted verifiers can tune both. See
+[Quickstart](/attest/quickstart) for the other endpoints and
+[Self-host the verifier](/attest/guides/self-hosting) to run it yourself.
 
 ## Revocation
 

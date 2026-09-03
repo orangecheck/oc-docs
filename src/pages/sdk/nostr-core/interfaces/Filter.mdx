@@ -11,28 +11,71 @@ export const metadata = {
 
 # Interface: Filter
 
-Defined in: [index.ts:98](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L98)
+Defined in: [index.ts:128](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L128)
 
-## Indexable
+## Extends
 
-```ts
-[key: `#${string}`]: string[] | undefined
-```
-
-Other indexable single-letter tags clients may filter on.
+- `Partial`\&lt;`Record`\&lt;[`IndexableTagFilter`](../type-aliases/IndexableTagFilter.mdx), `string`[]\>\>
 
 ## Properties
 
-| Property | Type | Description | Defined in |
+| Property | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-creator">&lt;/a> `#creator?` | `string`[] | Used by OC Vote (kind 30080 polls). | [index.ts:114](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L114) |
-| &lt;a id="property-d">&lt;/a> `#d?` | `string`[] | NIP-12 indexable `d`-tag filter. | [index.ts:106](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L106) |
-| &lt;a id="property-poll_id">&lt;/a> `#poll_id?` | `string`[] | Used by OC Vote (kind 30081 ballots). | [index.ts:110](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L110) |
-| &lt;a id="property-t">&lt;/a> `#t?` | `string`[] | NIP-12 indexable single-letter tag filter. | [index.ts:108](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L108) |
-| &lt;a id="property-voter">&lt;/a> `#voter?` | `string`[] | Used by OC Vote (kind 30081 ballots). | [index.ts:112](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L112) |
-| &lt;a id="property-authors">&lt;/a> `authors?` | `string`[] | - | [index.ts:100](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L100) |
-| &lt;a id="property-ids">&lt;/a> `ids?` | `string`[] | - | [index.ts:101](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L101) |
-| &lt;a id="property-kinds">&lt;/a> `kinds?` | `number`[] | - | [index.ts:99](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L99) |
-| &lt;a id="property-limit">&lt;/a> `limit?` | `number` | - | [index.ts:102](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L102) |
-| &lt;a id="property-since">&lt;/a> `since?` | `number` | - | [index.ts:103](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L103) |
-| &lt;a id="property-until">&lt;/a> `until?` | `number` | - | [index.ts:104](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L104) |
+| &lt;a id="property-a">&lt;/a> `#a?` | `string`[] | `Filter`.[`#a`](#property-a) |  |
+| &lt;a id="property-a-1">&lt;/a> `#A?` | `string`[] | `Filter`.[`#A`](#property-a-1) |  |
+| &lt;a id="property-b">&lt;/a> `#b?` | `string`[] | `Filter`.[`#b`](#property-b) |  |
+| &lt;a id="property-b-1">&lt;/a> `#B?` | `string`[] | `Filter`.[`#B`](#property-b-1) |  |
+| &lt;a id="property-c">&lt;/a> `#c?` | `string`[] | `Filter`.[`#c`](#property-c) |  |
+| &lt;a id="property-c-1">&lt;/a> `#C?` | `string`[] | `Filter`.[`#C`](#property-c-1) |  |
+| &lt;a id="property-d">&lt;/a> `#d?` | `string`[] | `Filter`.[`#d`](#property-d) |  |
+| &lt;a id="property-d-1">&lt;/a> `#D?` | `string`[] | `Filter`.[`#D`](#property-d-1) |  |
+| &lt;a id="property-e">&lt;/a> `#e?` | `string`[] | `Filter`.[`#e`](#property-e) |  |
+| &lt;a id="property-e-1">&lt;/a> `#E?` | `string`[] | `Filter`.[`#E`](#property-e-1) |  |
+| &lt;a id="property-f">&lt;/a> `#f?` | `string`[] | `Filter`.[`#f`](#property-f) |  |
+| &lt;a id="property-f-1">&lt;/a> `#F?` | `string`[] | `Filter`.[`#F`](#property-f-1) |  |
+| &lt;a id="property-g">&lt;/a> `#g?` | `string`[] | `Filter`.[`#g`](#property-g) |  |
+| &lt;a id="property-g-1">&lt;/a> `#G?` | `string`[] | `Filter`.[`#G`](#property-g-1) |  |
+| &lt;a id="property-h">&lt;/a> `#h?` | `string`[] | `Filter`.[`#h`](#property-h) |  |
+| &lt;a id="property-h-1">&lt;/a> `#H?` | `string`[] | `Filter`.[`#H`](#property-h-1) |  |
+| &lt;a id="property-i">&lt;/a> `#i?` | `string`[] | `Filter`.[`#i`](#property-i) |  |
+| &lt;a id="property-i-1">&lt;/a> `#I?` | `string`[] | `Filter`.[`#I`](#property-i-1) |  |
+| &lt;a id="property-j">&lt;/a> `#j?` | `string`[] | `Filter`.[`#j`](#property-j) |  |
+| &lt;a id="property-j-1">&lt;/a> `#J?` | `string`[] | `Filter`.[`#J`](#property-j-1) |  |
+| &lt;a id="property-k">&lt;/a> `#k?` | `string`[] | `Filter`.[`#k`](#property-k) |  |
+| &lt;a id="property-k-1">&lt;/a> `#K?` | `string`[] | `Filter`.[`#K`](#property-k-1) |  |
+| &lt;a id="property-l">&lt;/a> `#l?` | `string`[] | `Filter`.[`#l`](#property-l) |  |
+| &lt;a id="property-l-1">&lt;/a> `#L?` | `string`[] | `Filter`.[`#L`](#property-l-1) |  |
+| &lt;a id="property-m">&lt;/a> `#m?` | `string`[] | `Filter`.[`#m`](#property-m) |  |
+| &lt;a id="property-m-1">&lt;/a> `#M?` | `string`[] | `Filter`.[`#M`](#property-m-1) |  |
+| &lt;a id="property-n">&lt;/a> `#n?` | `string`[] | `Filter`.[`#n`](#property-n) |  |
+| &lt;a id="property-n-1">&lt;/a> `#N?` | `string`[] | `Filter`.[`#N`](#property-n-1) |  |
+| &lt;a id="property-o">&lt;/a> `#o?` | `string`[] | `Filter`.[`#o`](#property-o) |  |
+| &lt;a id="property-o-1">&lt;/a> `#O?` | `string`[] | `Filter`.[`#O`](#property-o-1) |  |
+| &lt;a id="property-p">&lt;/a> `#p?` | `string`[] | `Filter`.[`#p`](#property-p) |  |
+| &lt;a id="property-p-1">&lt;/a> `#P?` | `string`[] | `Filter`.[`#P`](#property-p-1) |  |
+| &lt;a id="property-q">&lt;/a> `#q?` | `string`[] | `Filter`.[`#q`](#property-q) |  |
+| &lt;a id="property-q-1">&lt;/a> `#Q?` | `string`[] | `Filter`.[`#Q`](#property-q-1) |  |
+| &lt;a id="property-r">&lt;/a> `#r?` | `string`[] | `Filter`.[`#r`](#property-r) |  |
+| &lt;a id="property-r-1">&lt;/a> `#R?` | `string`[] | `Filter`.[`#R`](#property-r-1) |  |
+| &lt;a id="property-s">&lt;/a> `#s?` | `string`[] | `Filter`.[`#s`](#property-s) |  |
+| &lt;a id="property-s-1">&lt;/a> `#S?` | `string`[] | `Filter`.[`#S`](#property-s-1) |  |
+| &lt;a id="property-t">&lt;/a> `#t?` | `string`[] | `Filter`.[`#t`](#property-t) |  |
+| &lt;a id="property-t-1">&lt;/a> `#T?` | `string`[] | `Filter`.[`#T`](#property-t-1) |  |
+| &lt;a id="property-u">&lt;/a> `#u?` | `string`[] | `Filter`.[`#u`](#property-u) |  |
+| &lt;a id="property-u-1">&lt;/a> `#U?` | `string`[] | `Filter`.[`#U`](#property-u-1) |  |
+| &lt;a id="property-v">&lt;/a> `#v?` | `string`[] | `Filter`.[`#v`](#property-v) |  |
+| &lt;a id="property-v-1">&lt;/a> `#V?` | `string`[] | `Filter`.[`#V`](#property-v-1) |  |
+| &lt;a id="property-w">&lt;/a> `#w?` | `string`[] | `Filter`.[`#w`](#property-w) |  |
+| &lt;a id="property-w-1">&lt;/a> `#W?` | `string`[] | `Filter`.[`#W`](#property-w-1) |  |
+| &lt;a id="property-x">&lt;/a> `#x?` | `string`[] | `Filter`.[`#x`](#property-x) |  |
+| &lt;a id="property-x-1">&lt;/a> `#X?` | `string`[] | `Filter`.[`#X`](#property-x-1) |  |
+| &lt;a id="property-y">&lt;/a> `#y?` | `string`[] | `Filter`.[`#y`](#property-y) |  |
+| &lt;a id="property-y-1">&lt;/a> `#Y?` | `string`[] | `Filter`.[`#Y`](#property-y-1) |  |
+| &lt;a id="property-z">&lt;/a> `#z?` | `string`[] | `Filter`.[`#z`](#property-z) |  |
+| &lt;a id="property-z-1">&lt;/a> `#Z?` | `string`[] | `Filter`.[`#Z`](#property-z-1) |  |
+| &lt;a id="property-authors">&lt;/a> `authors?` | `string`[] | - | [index.ts:130](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L130) |
+| &lt;a id="property-ids">&lt;/a> `ids?` | `string`[] | - | [index.ts:131](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L131) |
+| &lt;a id="property-kinds">&lt;/a> `kinds?` | `number`[] | - | [index.ts:129](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L129) |
+| &lt;a id="property-limit">&lt;/a> `limit?` | `number` | - | [index.ts:132](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L132) |
+| &lt;a id="property-since">&lt;/a> `since?` | `number` | - | [index.ts:133](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L133) |
+| &lt;a id="property-until">&lt;/a> `until?` | `number` | - | [index.ts:134](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L134) |

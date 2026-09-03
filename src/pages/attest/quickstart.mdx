@@ -66,15 +66,47 @@ curl -s '.../api/check?addr=bc1pezn…&min_sats=100000000&min_days=3650'
 Note that a failing check still returns the facts. You decide what to do with a
 10,000-sat, 307-day identity — the endpoint does not moralise about it.
 
-An address that has never attested is a different answer:
+An address that has never attested is a different answer — and it comes back
+with a **404**, not a 200:
 
 ```sh
 curl -s 'https://attest.ochk.io/api/check?addr=bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080'
 {"ok": false, "reasons": ["not_found"]}
 ```
 
-Distinguish those two cases in your own code. `not_found` means "no proof
-exists", which is not the same as "proof exists and is too small".
+### Read the status code, not just `ok`
+
+There are four outcomes and the HTTP status separates two of them that `ok`
+alone does not:
+
+| meaning                  | status | body                                  |
+| ------------------------ | ------ | ------------------------------------- |
+| clears your bar          | `200`  | `ok: true` plus the facts             |
+| attested, below your bar | `200`  | `ok: false` plus the facts            |
+| no attestation exists    | `404`  | `ok: false`, `reasons: ["not_found"]` |
+| malformed request        | `400`  | `error: "bad_request"`, `issues[]`    |
+
+This matters more than it looks. The obvious client is wrong:
+
+```ts
+// WRONG — throws on a perfectly normal "this address never attested"
+const res = await fetch(url);
+if (!res.ok) throw new Error('check failed');
+const { ok } = await res.json();
+```
+
+```ts
+// Right — 404 is an answer, not a failure.
+const res = await fetch(url);
+if (res.status === 400) throw new Error('bad address');
+if (res.status >= 500) throw new Error('verifier unavailable');
+const body = await res.json(); // 200 and 404 both carry usable JSON
+const admit = body.ok === true; // 404 lands here as false, correctly
+```
+
+"No proof exists" and "proof exists and is too small" are different facts about
+a person, and a gate usually wants to treat them differently — the first is a
+stranger, the second is someone who showed up with too little.
 
 ## 3. Look up by identity instead of address
 

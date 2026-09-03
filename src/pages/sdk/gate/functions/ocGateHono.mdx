@@ -12,7 +12,7 @@ export const metadata = {
 # Function: ocGateHono()
 
 ```ts
-function ocGateHono(opts: GateOptions): (c: any, next: AnyNext) => Promise<void | Response>;
+function ocGateHono(opts: GateOptions): (c: any, next: AnyNext) => Promise<any>;
 ```
 
 Defined in: [hono.ts:30](https://github.com/orangecheck/oc-packages/blob/main/gate/src/hono.ts#L30)
@@ -25,4 +25,4 @@ Defined in: [hono.ts:30](https://github.com/orangecheck/oc-packages/blob/main/ga
 
 ## Returns
 
-(`c`: `any`, `next`: `AnyNext`) => `Promise`\&lt;`void` \| `Response`\>
+(`c`: `any`, `next`: `AnyNext`) => `Promise`\&lt;`any`\>

@@ -15,7 +15,7 @@ export const metadata = {
 function unwrapVaultKey(w: WrappedKey, passphrase: string): Uint8Array;
 ```
 
-Defined in: [vault-core/src/crypto.ts:111](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L111)
+Defined in: [vault-core/src/crypto.ts:112](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/crypto.ts#L112)
 
 Unwrap the vault key from its escrowed `WrappedKey` using the passphrase.
 scrypt-derives the wrap key, then AES-256-GCM-decrypts. Throws

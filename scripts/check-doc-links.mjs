@@ -18,12 +18,21 @@
  * illustrative attestation id, a placeholder API key). Each entry needs a
  * reason, so the list cannot quietly become a dumping ground for real rot.
  *
+ * Relative links are checked too, resolved against SITE. That matters: this
+ * repo carries deliberate 308 redirects from a 2026-05-09 SDK restructure, so
+ * `/sdks/gate` is a WORKING link that lands on `/sdk/gate/README`. Comparing
+ * link paths against the pages tree locally — the obvious cheap approach —
+ * calls those four broken and misses that `/sdk/me-client` really is a 404
+ * (the package dirs hold README.mdx, not index.mdx). Asking the live site is
+ * the only way to tell a redirect from a hole.
+ *
  * Usage: node scripts/check-doc-links.mjs [--verbose]
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PAGES = 'src/pages';
+const SITE = process.env.OC_DOCS_SITE ?? 'https://docs.ochk.io';
 const TIMEOUT_MS = 20_000;
 
 /** URLs that are SUPPOSED to fail — illustrative, not navigational. */
@@ -45,6 +54,8 @@ const PLACEHOLDER = /[<>{}$]|\.\.\.|…/;
 // \S excludes newlines: without it the match ran past the end of the line
 // and swallowed the next line's text into the URL, producing phantom 404s.
 const URL_RE = /https:\/\/[a-z0-9.-]*ochk\.io[^\s"'`)\]]*/g;
+// Markdown links to a site-absolute path: [text](/attest/quickstart)
+const REL_RE = /\]\((\/[^\s")]*)\)/g;
 
 function walk(dir) {
     const out = [];
@@ -61,6 +72,14 @@ for (const file of walk(PAGES)) {
     const text = readFileSync(file, 'utf8');
     for (const m of text.matchAll(URL_RE)) {
         const url = m[0].replace(/[.,;]+$/, '');
+        if (!found.has(url)) found.set(url, new Set());
+        found.get(url).add(file);
+    }
+    for (const m of text.matchAll(REL_RE)) {
+        const path = m[1];
+        // A bare #anchor is in-page; nothing to resolve.
+        if (path.startsWith('/#')) continue;
+        const url = SITE + path.split('#')[0];
         if (!found.has(url)) found.set(url, new Set());
         found.get(url).add(file);
     }

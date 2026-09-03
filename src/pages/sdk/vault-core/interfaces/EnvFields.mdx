@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: EnvFields",
+    description: "Auto-generated API reference for Interface: EnvFields. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vault-core**](../README.mdx)
+
+***
+
+[@orangecheck/vault-core](../README.mdx) / EnvFields
+
+# Interface: EnvFields
+
+Defined in: [vault-core/src/fields.ts:77](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L77)
+
+A bundle of environment variables — the natural shape for `.env` files
+and CI config. Each var is addressable as `ocv://personal/MyEnv/KEY`;
+an `ocv://personal/MyEnv` with no field returns the whole bundle as
+`KEY=value` lines.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-custom">&lt;/a> `custom?` | [`CustomField`](CustomField.mdx)[] | - | [vault-core/src/fields.ts:81](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L81) |
+| &lt;a id="property-notes">&lt;/a> `notes?` | `string` | - | [vault-core/src/fields.ts:80](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L80) |
+| &lt;a id="property-vars">&lt;/a> `vars` | `Record`\&lt;`string`, `string`\> | KEY → value, the env-var bundle. | [vault-core/src/fields.ts:79](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/fields.ts#L79) |

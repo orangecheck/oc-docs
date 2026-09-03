@@ -23,7 +23,7 @@ Well-known relays with good uptime, plus the first-party family relay.
 `relay.ochk.io` was missing here while attest.ochk.io's verifier has always
 read from it, so the SDK and the reference implementation were looking in
 different places — the SDK could miss a family attestation that the hosted
-API found. It runs a kind allowlist (30078–30086) and canonical OC d-tag
+API found. It runs a kind allowlist (30078-30087, 30110-30114) and canonical OC d-tag
 prefixes, and is always co-published alongside the public relays, never the
 only copy. See https://github.com/orangecheck/oc-relay-infra.
 

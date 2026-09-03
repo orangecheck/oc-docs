@@ -460,6 +460,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Address linkability, dispute-gaming, bond-draining attacks, mitigations.',
             },
             {
+                href: '/pledge/protocol',
+                label: 'Protocol walkthrough',
+                blurb: 'Narrative companion to the spec — five flows, end to end.',
+            },
+            {
                 href: '/pledge/spec',
                 label: 'Specification',
                 blurb: 'Normative rules; reference impls must pass the 28 conformance vectors.',

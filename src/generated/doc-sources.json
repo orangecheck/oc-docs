@@ -83,6 +83,7 @@
   "/pledge/composition": "src/pages/pledge/composition.mdx",
   "/pledge/enforcement-by-exposure": "src/pages/pledge/enforcement-by-exposure.mdx",
   "/pledge/how-it-works": "src/pages/pledge/how-it-works.mdx",
+  "/pledge/protocol": "src/pages/pledge/protocol.mdx",
   "/pledge/quickstart": "src/pages/pledge/quickstart.mdx",
   "/pledge/resolution-grammar": "src/pages/pledge/resolution-grammar.mdx",
   "/pledge/security": "src/pages/pledge/security.mdx",

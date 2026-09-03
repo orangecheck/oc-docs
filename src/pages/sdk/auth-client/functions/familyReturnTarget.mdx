@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: familyReturnTarget()",
+    description: "Auto-generated API reference for Function: familyReturnTarget(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README.mdx)
+
+***
+
+[@orangecheck/auth-client](../README.mdx) / familyReturnTarget
+
+# Function: familyReturnTarget()
+
+```ts
+function familyReturnTarget(input: string | null | undefined): string | undefined;
+```
+
+Defined in: [signin.tsx:218](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L218)
+
+Family-aware return target. Accepts a same-origin relative path
+(exactly like [safeReturnTo](safeReturnTo.mdx)) OR an absolute `https://` URL on
+`ochk.io` / `*.ochk.io` — mirroring the auth host's own post-signin
+redirect allowlist. Returns `undefined` when the input is neither, so
+callers can layer fallbacks.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `string` \| `null` \| `undefined` |
+
+## Returns
+
+`string` \| `undefined`

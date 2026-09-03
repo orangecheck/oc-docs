@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Variable: FANOUTDEADLINEMS",
+    description: "Auto-generated API reference for Variable: FANOUTDEADLINEMS. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / FANOUT\_DEADLINE\_MS
+
+# Variable: FANOUT\_DEADLINE\_MS
+
+```ts
+const FANOUT_DEADLINE_MS: 4000 = 4000;
+```
+
+Defined in: [nostr.ts:63](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/nostr.ts#L63)
+
+Wall-clock budget for a whole relay fan-out, shared by every relay in it.
+
+Queries below use Promise.allSettled, so a fan-out used to take as long as
+its SLOWEST relay — and with a dead relay in DEFAULT_RELAYS that meant the
+per-relay 10s timeout, every single call. Measured on 1.4.0:
+
+    check(&#123; addr &#125;)  with the old defaults   10.4s
+    check(&#123; addr &#125;)  with the dead relay out   1.0s
+
+That is not merely slow, it broke a dependent outright: @orangecheck/gate
+races check() against a 5s lookupTimeoutMs, so a 10.4s lookup lost the race
+every time and no address-based gate decision could ever succeed.
+
+A shared deadline fixes the class: whichever relay is dead or slow next, a
+fan-out costs at most this. Healthy relays answer well inside it (~1s for a
+cold WebSocket plus a query). QUERY_TIMEOUT_MS remains the per-relay ceiling.
+
+The value is deliberately BELOW @orangecheck/gate's 5s default
+lookupTimeoutMs, so a gate decision can still resolve in the worst case
+rather than always losing its own race. Raising this above 5000 silently
+breaks that dependent — change both together, or don't.

@@ -3,6 +3,8 @@ import type { NextApiRequest } from 'next';
 
 import { resolveSessionFromRequest } from '@orangecheck/auth-core';
 
+import { refuseCookieSession } from '@/lib/auth/same-origin';
+
 /**
  * oc-docs is a CONSUMER of the cross-subdomain oc_session.
  * The auth host lives at ochk.io. We hold only the public JWK, never
@@ -30,6 +32,10 @@ function verifyConfig() {
  * one), then every oc_session cookie in the jar.
  */
 export async function readJwtSession(req: NextApiRequest): Promise<SessionPayload | null> {
+    // A cookie the browser attached on its own is not authentication for a
+    // cross-site state change. No route here needs it today; it is wired in
+    // so the first one that does is covered. See lib/auth/same-origin.ts.
+    if (refuseCookieSession(req)) return null;
     const r = await resolveSessionFromRequest(req.headers, verifyConfig());
     return r.ok ? r.payload : null;
 }

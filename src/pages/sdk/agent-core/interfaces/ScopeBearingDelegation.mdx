@@ -1,0 +1,25 @@
+export const metadata = {
+    title: "Interface: ScopeBearingDelegation",
+    description: "Auto-generated API reference for Interface: ScopeBearingDelegation. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / ScopeBearingDelegation
+
+# Interface: ScopeBearingDelegation
+
+Defined in: [agent-core/src/assert-scope.ts:10](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L10)
+
+The minimum an adapter needs to make the authorization decision. Kept
+structural rather than importing `Delegation` so `stampX` helpers can accept
+the narrower shapes they already declare.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-scopes">&lt;/a> `scopes?` | `string`[] | [agent-core/src/assert-scope.ts:11](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L11) |
+| &lt;a id="property-scopes_encrypted">&lt;/a> `scopes_encrypted?` | [`ScopesEncryptedEnvelope`](ScopesEncryptedEnvelope.mdx) | [agent-core/src/assert-scope.ts:12](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L12) |

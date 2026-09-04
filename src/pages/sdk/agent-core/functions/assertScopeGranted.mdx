@@ -1,0 +1,54 @@
+export const metadata = {
+    title: "Function: assertScopeGranted()",
+    description: "Auto-generated API reference for Function: assertScopeGranted(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README.mdx)
+
+***
+
+[@orangecheck/agent-core](../README.mdx) / assertScopeGranted
+
+# Function: assertScopeGranted()
+
+```ts
+function assertScopeGranted(
+   delegation: ScopeBearingDelegation, 
+   scopeExercised: string, 
+   fnName: string): void;
+```
+
+Defined in: [agent-core/src/assert-scope.ts:47](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L47)
+
+Refuse unless `scopeExercised` is a sub-scope of something the delegation
+actually grants. Every `agent-*` adapter's pre-flight check routes here.
+
+The check itself is unchanged and still fails closed. What this adds is
+telling the caller WHICH of three things went wrong, because the five
+adapters each open-coded `(delegation.scopes ?? []).map(parseScope)` and so
+reported all three as the same thing:
+
+- **not_subscope** — scopes are readable and this one is not among them.
+  The integrator's own mistake, and the only case the old message fit.
+- **scopes_encrypted** — v1.2 private mode. `scopes` is absent *because it
+  is sealed to a device key*, so the adapter cannot evaluate the request at
+  all. `?? []` collapsed this into "not a sub-scope of any granted scope",
+  which sends the integrator to audit a scope string that may well be
+  correct, when what they need is `decryptPrivateScopes` and to pass the
+  recovered list. Refusing is right; misnaming why is not.
+- **no_scopes** — neither field present. A delegation granting nothing.
+
+Fail-closed is not a judgement call here: an over-broad stamp is a signed,
+content-addressed authorization artifact that a verifier will accept.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `delegation` | [`ScopeBearingDelegation`](../interfaces/ScopeBearingDelegation.mdx) |
+| `scopeExercised` | `string` |
+| `fnName` | `string` |
+
+## Returns
+
+`void`

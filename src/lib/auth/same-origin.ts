@@ -23,7 +23,7 @@
  * validates `Content-Type`. `readJwtSession` then returned a valid session and
  * the mutation ran — as the signed-in user, from any website they visited.
  *
- * Ported from oc-fleet-web's `server/utils/same-origin.ts`, the family's
+ * The family's
  * reference implementation.
  */
 

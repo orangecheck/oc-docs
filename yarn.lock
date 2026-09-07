@@ -808,9 +808,9 @@
     jose "^6.2.2"
 
 "@orangecheck/design@^0.31.0":
-  version "0.31.0"
-  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.31.0.tgz#65a324bba932796964e8ca01fa7ad8f2d5d5383f"
-  integrity sha512-ob1TtuGNVBNznamUQ34eoNOhYsQXsbWQDREZbGtbVv12PZDcHf9JEwBbqeciNriQVxf9nSlCtkZ5ou5JAg/XYg==
+  version "0.31.1"
+  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.31.1.tgz#f0b80b95ebb0264bf8f74b215ba6d69b03eb688e"
+  integrity sha512-P++/QPKwCWDVSQTj58ycesWFW6/rjUfXa2u8hHGFQ3tsVSEIrUBUdAbDTT5oS5GanS6n/dJLQe3eYxR+mq+Sjg==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"

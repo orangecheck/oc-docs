@@ -108,11 +108,25 @@ const eslintConfig = [
          * appends `|| true` to. At `warn` the findings are visible in every
          * lint run and CI stays honest about what it actually verifies.
          *
-         * Promote to `error` per rule as each is cleared. `purity` first — it
-         * is the only one of these that is a correctness bug rather than a
-         * performance one, because an impure call during render (`Date.now()`
-         * inside a `useMemo`) produces unstable output and hydration
-         * mismatches.
+         * Promote to `error` per rule as each is cleared.
+         *
+         * `purity` was triaged first on the theory that an impure call during
+         * render (`Date.now()` inside a `useMemo`) causes hydration
+         * mismatches. It does not here, and the reason is worth writing down
+         * so nobody re-derives it: all 35 findings sit in components that
+         * render only AFTER a client-side fetch or a user interaction, so
+         * there is no server render for them to disagree with. Checked per
+         * call site, not assumed — ProfileSeal is the clearest case, where
+         * /u/[addr] deliberately fetches the footprint in an effect because
+         * the relay fan-out is too slow to SSR, and ChainDiagram renders only
+         * inside an effect-fetched drawer. Four live pages were also loaded in
+         * a real browser watching for React's hydration diagnostics
+         * (including the minified #418/#423/#425 forms): none fired.
+         *
+         * So these are staleness, not incorrectness — a `Date.now()` memo
+         * that does not refresh with the clock. The fix is a refresh policy
+         * per component, which is a product decision rather than a lint one,
+         * and that is exactly why they are warnings.
          */
         files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
         rules: {

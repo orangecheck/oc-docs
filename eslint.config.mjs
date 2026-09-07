@@ -65,7 +65,31 @@ const eslintConfig = [
         files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
         rules: {
             '@typescript-eslint/no-explicit-any': 'warn',
-            '@typescript-eslint/no-unused-vars': 'warn',
+            /**
+             * `_`-prefixed names are exempt, because the prefix is how you say
+             * "deliberately unused" in this codebase and the rule was
+             * reporting the convention as a fault.
+             *
+             * Family-wide that was 33 of 115 unused-var warnings — destructure
+             * omissions (`const { _omit, ...rest }`), placeholder params, and
+             * caught errors nobody inspects. Every one is intentional, so
+             * every one trains the reader to skim the list, which is where the
+             * other 82 were hiding.
+             *
+             * `caughtErrors: 'all'` is the deliberate half: a caught error
+             * that is genuinely ignored should be written `catch (_e)` or
+             * `catch {}`, not `catch (e)` with `e` dropped silently.
+             */
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrors: 'all',
+                    caughtErrorsIgnorePattern: '^_',
+                    destructuredArrayIgnorePattern: '^_',
+                },
+            ],
             /**
              * Narrowed, not silenced.
              *

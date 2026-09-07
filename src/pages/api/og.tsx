@@ -1,5 +1,20 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 
+/**
+ * Still `runtime: 'edge'`, deliberately, even though next 16 deprecates it.
+ *
+ * The edge config is not decoration on a Pages API route — it selects the
+ * handler contract. With it the route is a Web handler
+ * `(req: Request) => Response`, which is why this returns an ImageResponse and
+ * reads `new URL(req.url)`. Without it the route becomes `(req, res)`: the
+ * returned Response is ignored and `req.url` is a bare path that `new URL()`
+ * rejects. Both shapes type-check and build clean, so the failure appears only
+ * on a request.
+ *
+ * Migrating off edge means rewriting the handler (pipe the ImageResponse body
+ * to `res`, or move the route to the App Router) — real work, not a flag
+ * deletion.
+ */
 export const config = { runtime: 'edge' };
 
 /**

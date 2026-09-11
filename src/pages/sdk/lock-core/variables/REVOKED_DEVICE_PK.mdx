@@ -1,0 +1,21 @@
+export const metadata = {
+    title: "Variable: REVOKEDDEVICEPK",
+    description: "Auto-generated API reference for Variable: REVOKEDDEVICEPK. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-core**](../README.mdx)
+
+***
+
+[@orangecheck/lock-core](../README.mdx) / REVOKED\_DEVICE\_PK
+
+# Variable: REVOKED\_DEVICE\_PK
+
+```ts
+const REVOKED_DEVICE_PK: "revoked";
+```
+
+Defined in: [lock-core/src/types.ts:7](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/types.ts#L7)
+
+SPEC §3.5: a device record is revoked by republishing it with `device_pk`
+ set to this literal. Senders MUST refuse to encrypt to such a record.

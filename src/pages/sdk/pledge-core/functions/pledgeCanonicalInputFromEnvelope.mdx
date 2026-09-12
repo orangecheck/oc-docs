@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: pledgeCanonicalInputFromEnvelope()",
+    description: "Auto-generated API reference for Function: pledgeCanonicalInputFromEnvelope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README.mdx)
+
+***
+
+[@orangecheck/pledge-core](../README.mdx) / pledgeCanonicalInputFromEnvelope
+
+# Function: pledgeCanonicalInputFromEnvelope()
+
+```ts
+function pledgeCanonicalInputFromEnvelope(env: PledgeEnvelope): PledgeCanonicalInput;
+```
+
+Defined in: [pledge-core/src/canonical.ts:94](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/canonical.ts#L94)
+
+Project a signed envelope back to the canonical input its id was computed
+over. The mapping existed in three hand-rolled copies — verifyPledge and two
+components in oc-pledge-web — which is one transcription error away from a
+verifier that disagrees with the signer about what was signed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `env` | [`PledgeEnvelope`](../interfaces/PledgeEnvelope.mdx) |
+
+## Returns
+
+[`PledgeCanonicalInput`](../interfaces/PledgeCanonicalInput.mdx)

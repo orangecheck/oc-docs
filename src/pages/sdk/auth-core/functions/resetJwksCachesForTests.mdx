@@ -1,0 +1,26 @@
+export const metadata = {
+    title: "Function: resetJwksCachesForTests()",
+    description: "Auto-generated API reference for Function: resetJwksCachesForTests(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README.mdx)
+
+***
+
+[@orangecheck/auth-core](../README.mdx) / \_resetJwksCachesForTests
+
+# Function: \_resetJwksCachesForTests()
+
+```ts
+function _resetJwksCachesForTests(): void;
+```
+
+Defined in: [index.ts:770](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L770)
+
+Clear the module-level JWKS caches. Test-only — the caches are process-wide
+by design (that is the point of them), which makes any test that touches
+verification order-dependent without a reset.
+
+## Returns
+
+`void`

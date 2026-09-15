@@ -794,23 +794,23 @@
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
 "@orangecheck/auth-client@^2.22.0":
-  version "2.22.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-client/-/auth-client-2.22.0.tgz#1f72b8cf2ef8a119c1516951adfc85ef1ec06046"
-  integrity sha512-Y+EmxXDDU7aLXEwl7NaJgBxmLV/otRKkNu1NHGz20s2upSHXzyNBQfeMuXPo7ZHpwNGm0o9lzUjr7QyC3w82QQ==
+  version "2.25.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.25.0.tgz#bca1b24ec91c8886b9d13f176199cedb0e4a2616"
+  integrity sha512-PV23O9UrAjttoIiro65rkqfxJ6G+ptD+sqZk4vv13j4MedmHRcDgfeQlzEMGYd1HwP2OJZ51I24OHsPBZbO1Yw==
   dependencies:
     "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/auth-core@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.npmjs.org/@orangecheck/auth-core/-/auth-core-2.5.0.tgz#e1f8a5e84f08e0b19a5c318757c5852df1b5177c"
-  integrity sha512-VSru4R7NCSRV/W99lIrGyQyc+/NUJyKK+qhYa9GPj+9/wv7NubxOdPWOVVoc6l48JByaAYybMIsdqb2vx07YyQ==
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.6.0.tgz#679b84b60f1a452c0ae0faa9b90a2531abae2c9f"
+  integrity sha512-v8xif2THYs7oXpSWWlSVB6zOxxy2+SlTM5OCw2g+kuWUPAY1Ipu8KOdgLLOnNCjc43yR7cNLSPCROtbsRsIUpg==
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/design@^0.31.0":
-  version "0.31.1"
-  resolved "https://registry.npmjs.org/@orangecheck/design/-/design-0.31.1.tgz#f0b80b95ebb0264bf8f74b215ba6d69b03eb688e"
-  integrity sha512-P++/QPKwCWDVSQTj58ycesWFW6/rjUfXa2u8hHGFQ3tsVSEIrUBUdAbDTT5oS5GanS6n/dJLQe3eYxR+mq+Sjg==
+"@orangecheck/design@^0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/design/-/design-0.32.0.tgz#847dc48d985d93a36a9a7881d5667786b9d1bdcd"
+  integrity sha512-AZu0YP6tF+D/hSEI2BesED0159kKoNh6tTBGYhfwr+Vj6tJ53O39wo7nN1JUALLIxYhNp5ebLGXERUEfQqMLRQ==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"
@@ -1226,7 +1226,7 @@
 
 "@simplewebauthn/browser@^13.3.0":
   version "13.3.0"
-  resolved "https://registry.npmjs.org/@simplewebauthn/browser/-/browser-13.3.0.tgz#e12153e71f4a8f4f8f17f94ca9c5161115306239"
+  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-13.3.0.tgz#e12153e71f4a8f4f8f17f94ca9c5161115306239"
   integrity sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==
 
 "@swagger-api/apidom-ast@^1.11.1":
@@ -4588,9 +4588,9 @@ jiti@^2.7.0:
   integrity sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==
 
 jose@^6.2.2:
-  version "6.2.2"
-  resolved "https://registry.npmjs.org/jose/-/jose-6.2.2.tgz#d6b5279b89b3e88d531c202e3fbe351f39a44aac"
-  integrity sha512-d7kPDd34KO/YnzaDOlikGpOurfF0ByC2sEV4cANCtdqLlTfBlw2p14O/5d/zv40gJPbIQxfES3nSx1/oYNyuZQ==
+  version "6.2.12"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-6.2.12.tgz#65663e146edd010b98ece83f81737d3aa95fd0d7"
+  integrity sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==
 
 js-file-download@^0.4.12:
   version "0.4.12"

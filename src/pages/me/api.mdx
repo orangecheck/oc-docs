@@ -92,8 +92,11 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 
 The authenticated user is the cashback recipient; `project_key` (in the body)
 identifies the billing project. Cookie **or** `Authorization: Bearer` — see the
-note above. Production callers should sign the request with the project signing
-secret (`X-OC-Signature`); advisory in the v1 rollout.
+note above. Sign the request with the project signing secret (`X-OC-Signature`) — in
+**both** test and live mode. A user session proves a user, never the paying
+project, so an unsigned POST is admitted only when the session belongs to the
+project's own owner (the CLI test-fire path). Anything else gets
+`401 project_auth_required`.
 
 | Method | Path                          | Purpose                                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------------------------------------- |

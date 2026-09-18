@@ -17,8 +17,9 @@ the OrangeCheck family auth host at `ochk.io`:
 
 - **Bitcoin wallet** — a single BIP-322 challenge. UniSat, Xverse, Leather, OKX,
   Phantom, Sparrow, or a manual paste-and-sign fallback.
-- **Email-OTP** — for users without a wallet, a federation-custodied identity is
-  provisioned silently.
+- **Email-OTP** — for users without a wallet, an OrangeCheck-issued identity is
+  provisioned silently. That is an identity, not custody of your secrets: the
+  vault key is generated in your browser on either path and OC never sees it.
 
 There is no password to choose and none to forget. The session is a short-lived
 signed cookie scoped to `.ochk.io`; vault.ochk.io verifies it locally and stores

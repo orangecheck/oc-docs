@@ -75,9 +75,11 @@ consumer code never branches on how the user signed in.
 3. `GET /api/auth/providers` lists which providers are configured — this is what
    [`<OcSignIn>`](/sdk/auth-client/README) reads to render its provider buttons.
 
-A provider sign-in mints the same federation-custodied account that email-OTP
-does. For layering OrangeCheck onto an integrator's _own_ OAuth instead, see
-[OrangeCheck Connect](/connect).
+A provider sign-in mints the same OrangeCheck-held account that email-OTP does —
+neither path gives the user a signing key of their own. Federation custody is
+the design for those accounts and is not live; see
+[federation custody](/me/federation). For layering OrangeCheck onto an
+integrator's _own_ OAuth instead, see [OrangeCheck Connect](/connect).
 
 ## Multi-account sign-in
 

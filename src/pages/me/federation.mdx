@@ -1,17 +1,27 @@
 export const metadata = {
     title: 'OC Me · Federation custody',
     description:
-        'How me.ochk.io provisions Fedimint federation-held wallets · the charter · how to verify guardians · how to graduate to self-custody.',
+        'The design for Fedimint federation-held wallets on me.ochk.io · the charter · how to verify guardians · how graduation works. Not live yet: OrangeCheck holds user balances during bring-up.',
 };
 
 # OC Me · Federation custody
 
-**OC the company is not your custodian.** When you sign up to me.ochk.io with
-email-OTP, the wallet attached to your account is held by a **Fedimint
-federation** — an M-of-N set of operationally-independent guardians that
-threshold-sign withdrawals together. OC integrates as a _client_ of that
-federation, never as a guardian. OC has zero key shares; OC cannot reach the
-threshold; OC cannot move your funds.
+> **Status: this is the design, not today.** No federation is bound.
+> [`/api/federations`](https://me.ochk.io/api/federations) is the
+> machine-readable answer and it currently serves a single entry with no invite,
+> so no client can join one. **During bring-up OrangeCheck holds every user's
+> accrued balance and is the party that moves it.** That is a stage,
+> deliberately: OrangeCheck operates every role until independent operators take
+> them. Read the rest of this page as the destination, and
+> [me.ochk.io/custody](https://me.ochk.io/custody) as the present tense.
+
+**OC the company is not designed to be your custodian.** The design is that when
+you sign up to me.ochk.io with email-OTP, the wallet attached to your account is
+held by a **Fedimint federation** — an M-of-N set of operationally-independent
+guardians that threshold-sign withdrawals together. OC integrates as a _client_
+of that federation, never as a guardian: zero key shares, no way to reach the
+threshold, no way to move your funds. None of that is in force until a
+federation is bound.
 
 This page is the public-facing version of the operator runbook at
 [`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md)
@@ -108,13 +118,15 @@ Per the charter's exit clause:
   Fedimint-compatible client. OC's UI is convenience, not custody.
 - On-chain withdrawal does not require OC's services to be online — the
   federation's threshold-signing flow is independent of OC.
-- You can graduate to a self-custody Bitcoin wallet from
-  [`/me/graduate`](https://me.ochk.io/me/graduate) at any time.
+- You will be able to graduate to a self-custody Bitcoin wallet from
+  [`/me/graduate`](https://me.ochk.io/me/graduate). That page states today what
+  it can and cannot do; the sweep opens when a federation binds.
 - If you'd rather pick a different federation, any Fedimint client can join it;
   your sats migrate via standard Fedimint cross-federation flow.
 
 ## Graduating to self-custody
 
+Not live — there is no federation balance to sweep. When one is bound,
 [`/me/graduate`](https://me.ochk.io/me/graduate) walks you through:
 
 1. Choose a destination — your own BIP-322-compatible Bitcoin wallet, or a
@@ -129,18 +141,24 @@ Per the charter's exit clause:
 
 ## Current state
 
-As of the latest deploy: **the Fedimint client is wired and the provisioning
-ceremony is implemented**. The production federation invite has not yet been
-bound — the federation operator decision is in active resolution per the
-criteria in
+No federation is bound, and the browser-side Fedimint client that would have
+joined one was removed from `oc-me-web` in September 2026 — it could only ever
+reach its own error path, and code that demonstrates a money movement which
+cannot happen reads as a feature someone forgot to link up. The guardians that
+once ran this were torn down in July 2026. The federation operator decision is
+in active resolution per the criteria in
 [`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md).
-Until it's bound, `/me/wallet` for `did:email:` users shows a "federation not
-yet configured" admin panel that links to this page and to
-[`/custody`](https://me.ochk.io/custody).
+
+So today OrangeCheck holds what you accrue. There is no stored balance to hold,
+strictly speaking — it is recomputed from your signed billable envelopes on
+every read — but the party who owes it is OrangeCheck, and that is the honest
+way to say it.
 
 We are not soft-pedaling this. The in-tree audit at
 [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
 walks the gap with file paths.
 
-If you want a wallet today, sign in via BIP-322 — that path works end-to-end and
-your wallet stays yours.
+Signing in via BIP-322 gives you a real, live self-custody property — your
+signing key never reaches OC. It does not make your earned sats self-custodied.
+Those are two different questions, and conflating them is the mistake this page
+used to make.

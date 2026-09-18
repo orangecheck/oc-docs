@@ -47,11 +47,13 @@ signs in; nobody sees a second login screen.
 
 ## What you get, either way
 
-A **`did:oc`** — an opaque, Bitcoin-backed OrangeCheck identity. It is
-federation-custodied by default, with a path for the user to graduate to full
-self-custody, and it is recognized across every `.ochk.io` family product. How
-your users authenticated is your concern; the `did:oc` is the durable identity
-underneath.
+A **`did:oc`** — an opaque, Bitcoin-backed OrangeCheck identity, recognized
+across every `.ochk.io` family product. Who holds the key behind it depends on
+how the user signed in: a BIP-322 user holds their own signing key, and on every
+other path OrangeCheck holds it. Federation custody by default, with graduation
+to full self-custody, is the design and is not live — see
+[federation custody](/me/federation). How your users authenticated is your
+concern; the `did:oc` is the durable identity underneath.
 
 ## Not covered here
 

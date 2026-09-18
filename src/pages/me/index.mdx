@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · me.ochk.io',
     description:
-        'Consumer commercial product of OrangeCheck. Bitcoin-backed online identity that pays users in sats automatically when they sign into integrating sites. Federation-custodied by default; self-custody graduation on demand.',
+        'Consumer commercial product of OrangeCheck. Bitcoin-backed online identity that pays users in sats automatically when they sign into integrating sites. Sign-in is self-custody; earned sats are a balance OrangeCheck holds during bring-up, with federation custody and self-custody graduation next.',
 };
 
 # OC Me
@@ -11,10 +11,18 @@ export const metadata = {
 End-users sign up once with email-OTP (default · no wallet required), with a
 Bitcoin wallet via BIP-322, or with an existing OC identity from a sibling site,
 and earn sats automatically as integrating sites bill the canonical
-billable-event taxonomy (sessions, payments, state transitions). Email-OTP users
-get a federation-custodied wallet provisioned on their behalf; BIP-322 users are
-self-custody from day one. Both paths sign in **in-place on me.ochk.io** — no
-redirect to a separate auth host.
+billable-event taxonomy (sessions, payments, state transitions). BIP-322 users
+hold their own signing key from day one; email-OTP users hold no key here. Both
+paths sign in **in-place on me.ochk.io** — no redirect to a separate auth host.
+
+**Custody, stated plainly.** Sign-in self-custody is live and real. Earned sats
+are not: there is no stored balance — it is recomputed from signed envelopes on
+every read — and the party who owes it is OrangeCheck. That is deliberate and
+temporary. OrangeCheck operates every role during bring-up, including custodian,
+because that is how the system gets proved before anyone else will take one.
+Federation custody plus self-custody graduation is the destination; the live
+state is published at [me.ochk.io/custody](https://me.ochk.io/custody) and
+machine-readable at `/api/federations`.
 
 The protocol surface is the same OC Attest + OC Lock + OC Stamp + OC Agent
 primitives documented elsewhere in these docs. me.ochk.io is the commercial
@@ -24,25 +32,25 @@ without standing up their own federation.
 
 ## What me.ochk.io is, and what it isn't
 
-|           |                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Is**    | A **consumer identity layer**. Sign in once at any integrating site; sat-earning streams in to your federation-custodied wallet automatically.                                                                                                                                                                                                                                                    |
-| **Is**    | A **drop-in OAuth peer**. Integrators add the OC button alongside Google / Apple / magic-link. First-time users get a federation-custodied wallet provisioned silently — no seed phrase.                                                                                                                                                                                                          |
-| **Is**    | An **integrator-configurable pricing substrate**. Each integrator declares per-event prices and user-share splits via `IntegratorPriceConfig`. OC takes a fixed 20% platform fee.                                                                                                                                                                                                                 |
-| **Is**    | A **graduation path**. Users can sweep to self-custody (`bip-322`) or to a fedimint federation of their choice without losing their oc identity, history, attest tier, or connected-sites list.                                                                                                                                                                                                   |
-| **Isn't** | A _new protocol_. Every envelope me.ochk.io produces is identical to one a user could publish themselves via the canonical OC Attest / Stamp / Agent primitives.                                                                                                                                                                                                                                  |
-| **Isn't** | A _custodian_. The architecture targets federation guardians collectively holding the threshold key, with OC the company as at most one guardian among several. Self-custody (BIP-322) is live and federation-custody integration is in build — see [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md) for the honest current-state breakdown. |
-| **Isn't** | A _token issuer_. Sats are the unit of account. No me.ochk.io token, no governance token, no airdrop. The platform fee is in sats, settled in sats, displayed in USD alongside for human readability.                                                                                                                                                                                             |
+|           |                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Is**    | A **consumer identity layer**. Sign in once at any integrating site; sats accrue to your identity automatically as a signed, verifiable balance.                                                                                                                                                                                                                                   |
+| **Is**    | A **drop-in OAuth peer**. Integrators add the OC button alongside Google / Apple / magic-link. First-time users need no wallet and no seed phrase.                                                                                                                                                                                                                                 |
+| **Is**    | An **integrator-configurable pricing substrate**. Each integrator declares per-event prices and user-share splits via `IntegratorPriceConfig`. OC takes a fixed 20% platform fee.                                                                                                                                                                                                  |
+| **Is**    | A **designed graduation path**. The sweep to self-custody (`bip-322`) or to a fedimint federation of the user's choice preserves the oc identity, history, attest tier and connected-sites list. It is not live: no federation is bound yet, so there is nothing to sweep from.                                                                                                    |
+| **Isn't** | A _new protocol_. Every envelope me.ochk.io produces is identical to one a user could publish themselves via the canonical OC Attest / Stamp / Agent primitives.                                                                                                                                                                                                                   |
+| **Isn't** | A _permanent custodian_. OrangeCheck holds user balances today; it is not the design. The architecture targets federation guardians collectively holding the threshold key, with OC the company as at most one guardian among several — see [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md) for the current-state breakdown. |
+| **Isn't** | A _token issuer_. Sats are the unit of account. No me.ochk.io token, no governance token, no airdrop. The platform fee is in sats, settled in sats, displayed in USD alongside for human readability.                                                                                                                                                                              |
 
 ## Quickstart paths
 
 | For…                         | Start here                                                                                                                                                                                                   |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **End users**                | Sign up at [me.ochk.io/signin](https://me.ochk.io/signin). Email-OTP (default, federation-custodied) or BIP-322 (paste address, sign in-page).                                                               |
+| **End users**                | Sign up at [me.ochk.io/signin](https://me.ochk.io/signin). Email-OTP (default, no key of your own) or BIP-322 (paste address, sign in-page).                                                                 |
 | **Integrators (developers)** | The 5-minute [integrate quickstart](https://me.ochk.io/integrate/quickstart) walks install → drop-in button → configure prices → verify webhook → ship.                                                      |
 | **SDK reference**            | [`@orangecheck/me-client`](/me/sdk) — signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, withOcAuth · paired with `@orangecheck/auth-client` for the React provider + useOcSession hook. |
 | **Protocol grounding**       | [Attest](/attest/), [Lock](/lock/), [Stamp](/stamp/), [Agent](/agent/) — the four protocol verbs me.ochk.io is built on.                                                                                     |
-| **Self-custody graduation**  | [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — three options at threshold, one envelope each.                                                                                                    |
+| **Getting sats out**         | [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — who holds what today, the cash-out that exists now, and the condition that opens graduation.                                                      |
 
 ## Sub-pages in this section
 

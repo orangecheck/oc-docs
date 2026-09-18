@@ -19,11 +19,11 @@ there is no entry name, no type, no payload to read.
 
 ## Three structural differences from a conventional password manager
 
-|                                               |                                                                                                                                                                                                                                                                               |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No OC account**                             | Your OrangeCheck identity (Bitcoin wallet via BIP-322, or a federation-custodied identity via email-OTP) is the account. There is no master password to reset, because there is no account to attach a reset to. OC never sees a wallet key and holds no decryption backdoor. |
-| **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                           |
-| **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/vault-core`](/sdk/vault-core/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears.                                                                                 |
+|                                               |                                                                                                                                                                                                                                                                              |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No OC account**                             | Your OrangeCheck identity (Bitcoin wallet via BIP-322, or an OrangeCheck-issued identity via email-OTP) is the account. There is no master password to reset, because there is no account to attach a reset to. OC never sees a wallet key and holds no decryption backdoor. |
+| **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                          |
+| **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/vault-core`](/sdk/vault-core/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears.                                                                                |
 
 ## What you can store
 

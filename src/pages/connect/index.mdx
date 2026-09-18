@@ -59,10 +59,14 @@ created it).
 { "ok": true, "did_oc": "did:oc:…", "is_new": true }
 ```
 
-The provisioned account is **federation-custodied** — OrangeCheck never holds a
-Bitcoin key it cannot account for, and the user can later graduate to
-self-custody. You now know "my user ↔ this OrangeCheck identity" and can show
-it, or call other OrangeCheck APIs on their behalf.
+The provisioned account is **OrangeCheck-issued**: the user holds no signing key
+of their own on this path, so OrangeCheck holds the identity and anything that
+accrues to it. Federation custody, and the user's graduation to self-custody, is
+where that goes — it is the design and it is not live. The machine-readable
+state is [`/api/federations`](https://me.ochk.io/api/federations); the long form
+is [federation custody](/me/federation). You now know "my user ↔ this
+OrangeCheck identity" and can show it, or call other OrangeCheck APIs on their
+behalf.
 
 ## Notes
 

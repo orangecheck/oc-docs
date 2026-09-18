@@ -29,13 +29,22 @@ Anyone proposing otherwise is not OrangeCheck.
 
 ### 02 · No custody you didn't choose.
 
-OrangeCheck does not hold customer Bitcoin private keys, does not hold customer
-funds, and does not operate a custodial wallet you cannot graduate out of. On
-`me.ochk.io` the federation custody model is opt-in by default for users who
-don't want to manage keys, and self-custody graduation is a one-click path (same
-address, same history). On the protocol siblings, no custody — period. Bonded
-reputation is attestation-of-unspent: sats stay in the customer's own wallet,
-enforcement is by exposure, never by slashing.
+OrangeCheck does not hold customer Bitcoin private keys and does not operate a
+custodial wallet you cannot graduate out of. On the protocol siblings, no
+custody — period. Bonded reputation is attestation-of-unspent: sats stay in the
+customer's own wallet, enforcement is by exposure, never by slashing.
+
+`me.ochk.io` is the one place this commitment has a stated exception, and it is
+a stage rather than a design. **During bring-up OrangeCheck holds what a user
+accrues there and is the party that moves it**, because it is operating every
+role in the system until independent operators take them. The design is
+federation custody — an M-of-N guardian set, OC holding no share — with
+self-custody graduation as a one-click path that keeps the same address and the
+same history. Neither is in force yet: no federation is bound, which is
+machine-readable at [`/api/federations`](https://me.ochk.io/api/federations) and
+stated in the present tense at [me.ochk.io/custody](https://me.ochk.io/custody).
+We say that here rather than in a footnote, because a charter that overstates is
+worth less than one that names its own exception.
 
 ### 03 · The protocol stays open.
 
@@ -86,12 +95,12 @@ review window, and a versioned re-ratification.
 
 ## How this applies per product
 
-- **`me.ochk.io`** — consumer commercial product. Federation custody by default
-  with self-custody graduation. Three-class billable event taxonomy (A/B/C).
-  Integrators set every per-event price; OC retains a fixed 20% platform fee.
-  Commitments **02** (custody you can graduate out of), **05** (every billable
-  envelope verifies offline), and **07** (sats first-class) bind this product
-  specifically.
+- **`me.ochk.io`** — consumer commercial product. OrangeCheck-held during
+  bring-up; federation custody with self-custody graduation is the destination
+  (commitment 02). Three-class billable event taxonomy (A/B/C). Integrators set
+  every per-event price; OC retains a fixed 20% platform fee. Commitments **02**
+  (custody you can graduate out of), **05** (every billable envelope verifies
+  offline), and **07** (sats first-class) bind this product specifically.
 - **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
   secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
   name, type, or payload is ever readable server-side, and there is no recovery

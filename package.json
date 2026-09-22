@@ -2,6 +2,7 @@
     "name": "oc-docs",
     "version": "0.1.0",
     "private": true,
+    "license": "MIT",
     "packageManager": "yarn@1.22.22",
     "description": "docs.ochk.io — unified documentation for the OrangeCheck ecosystem (OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent).",
     "scripts": {

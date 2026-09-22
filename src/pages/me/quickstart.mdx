@@ -80,18 +80,21 @@ var or `/.well-known/jwks.json`.**
 // Next.js Pages — pages/api/auth/me.ts
 import { withOcAuth } from '@orangecheck/me-client/server';
 
-export default withOcAuth(async (req, res) => {
-    if (!req.ocSession) return res.status(401).json({ ok: false });
-    res.status(200).json({
-        ok: true,
-        account: {
-            id: req.ocSession.sub,
-            did_oc: req.ocSession.did_oc,
-            display_name: req.ocSession.name ?? null,
-            nostr_npub: req.ocSession.npub ?? null,
-        },
-    });
-});
+export default withOcAuth(
+    async (req, res) => {
+        if (!req.ocSession) return res.status(401).json({ ok: false });
+        res.status(200).json({
+            ok: true,
+            account: {
+                id: req.ocSession.sub,
+                did_oc: req.ocSession.did_oc,
+                display_name: req.ocSession.name ?? null,
+                nostr_npub: req.ocSession.npub ?? null,
+            },
+        });
+    },
+    { audience: 'https://your-site.example' }
+);
 ```
 
 Express:
@@ -99,7 +102,7 @@ Express:
 ```ts
 import { ocAuthExpress } from '@orangecheck/me-client/server';
 
-app.use(ocAuthExpress());
+app.use(ocAuthExpress({ audience: 'https://your-site.example' }));
 ```
 
 Hono / Workers / Bun / Deno:
@@ -107,11 +110,14 @@ Hono / Workers / Bun / Deno:
 ```ts
 import { ocAuthHono } from '@orangecheck/me-client/server';
 
-app.use('*', ocAuthHono());
+app.use('*', ocAuthHono({ audience: 'https://your-site.example' }));
 ```
 
-The per-stack snippet generator on `/me/projects/[id]` has the copy-paste blocks
-pre-filled with your `project_key`.
+`audience` is your own origin: the sign-in popup issues your site a token bound
+to it, and a token issued to any other site is refused. A `*.ochk.io` site that
+reads the family cookie leaves it out. The per-stack snippet generator on
+`/me/projects/[id]` has the copy-paste blocks pre-filled with your `project_key`
+and your origin.
 
 ## 06 · smoke-test the loop
 

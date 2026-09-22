@@ -52,18 +52,21 @@ code reaches for `@orangecheck/me-client/server` and never touches React.
 // pages/api/auth/me.ts
 import { withOcAuth } from '@orangecheck/me-client/server';
 
-export default withOcAuth(async (req, res) => {
-    if (!req.ocSession) return res.status(401).json({ ok: false });
-    res.status(200).json({
-        ok: true,
-        account: {
-            id: req.ocSession.sub,
-            did_oc: req.ocSession.did_oc,
-            display_name: req.ocSession.name ?? null,
-            nostr_npub: req.ocSession.npub ?? null,
-        },
-    });
-});
+export default withOcAuth(
+    async (req, res) => {
+        if (!req.ocSession) return res.status(401).json({ ok: false });
+        res.status(200).json({
+            ok: true,
+            account: {
+                id: req.ocSession.sub,
+                did_oc: req.ocSession.did_oc,
+                display_name: req.ocSession.name ?? null,
+                nostr_npub: req.ocSession.npub ?? null,
+            },
+        });
+    },
+    { audience: 'https://your-site.example' }
+);
 ```
 
 `ocAuthExpress` for Express:
@@ -73,7 +76,7 @@ import { ocAuthExpress } from '@orangecheck/me-client/server';
 import express from 'express';
 
 const app = express();
-app.use(ocAuthExpress());
+app.use(ocAuthExpress({ audience: 'https://your-site.example' }));
 
 app.get('/api/profile', (req, res) => {
     if (!req.ocSession) return res.status(401).json({ error: 'sign in' });
@@ -88,7 +91,7 @@ import { ocAuthHono } from '@orangecheck/me-client/server';
 import { Hono } from 'hono';
 
 const app = new Hono();
-app.use('*', ocAuthHono());
+app.use('*', ocAuthHono({ audience: 'https://your-site.example' }));
 
 app.get('/api/me', (c) => {
     const session = c.get('ocSession');
@@ -104,6 +107,12 @@ verified `SessionPayload` or `null`. Cookie auth (family) and Bearer auth
 
 The wrappers all take an options bag: `{ required: true }` short-circuits
 unauthenticated requests with a 401 before your handler runs.
+
+**`audience` is your own origin.** The sign-in popup issues your site a token
+bound to it, and with `audience` set, a token issued to any other site is
+refused. Leave it out only on a `*.ochk.io` site that reads the family cookie —
+with an audience set, a plain family session is refused. Requires
+`@orangecheck/me-client` 0.27 or later.
 
 ## browser popup signin
 
@@ -312,11 +321,19 @@ The escape hatch when you want to bill a subtype that isn't covered by
 computed via `computeFees()`; the envelope is recorded under your `project_key`
 and shows up in `/developer/projects/[id]/events`.
 
+Call it from your backend. `signingSecret` signs the request as your project
+(the SDK signs the exact bytes it sends), and `userAddress` names who earns —
+the user's `did_oc`, stored beside your own user row. No user session token is
+forwarded.
+
 ```ts
+// server-side only · the secret never reaches a browser
 const stamp = await oc.event.fire({
     project_key: 'pk_live_yourcompany',
     subtype: 'stamp_signing',
     action_label: 'review · march invoice',
+    signingSecret: process.env.OC_SIGNING_SECRET,
+    userAddress: user.did_oc,
 });
 // stamp.id, stamp.gross_fee_sats, stamp.user_earned_sats, stamp.verify_url
 
@@ -325,6 +342,8 @@ const verify = await oc.event.fire({
     project_key: 'pk_live_yourcompany',
     subtype: 'attest_verification_at_gate',
     payment_amount_sats: 50_000,
+    signingSecret: process.env.OC_SIGNING_SECRET,
+    userAddress: user.did_oc,
 });
 ```
 

@@ -90,13 +90,14 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 
 ## Authenticated · integrator event ingestion
 
-The authenticated user is the cashback recipient; `project_key` (in the body)
-identifies the billing project. Cookie **or** `Authorization: Bearer` — see the
-note above. Sign the request with the project signing secret (`X-OC-Signature`)
-— in **both** test and live mode. A user session proves a user, never the paying
-project, so an unsigned POST is admitted only when the session belongs to the
-project's own owner (the CLI test-fire path). Anything else gets
-`401 project_auth_required`.
+`project_key` (in the body) identifies the billing project. The earner is either
+`user_address` — the user's `did_oc`, inside the body you sign, which is how a
+backend fires — or, from a browser, the signed-in user's cookie or
+`Authorization: Bearer` token (see the note above). Sign the request with the
+project signing secret (`X-OC-Signature`) — in **both** test and live mode. A
+user session proves a user, never the paying project, so an unsigned POST is
+admitted only when the session belongs to the project's own owner (the CLI
+test-fire path). Anything else gets `401 project_auth_required`.
 
 | Method | Path                          | Purpose                                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------------------------------------- |

@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: SignConfig
 
-Defined in: [index.ts:263](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L263)
+Defined in: [index.ts:289](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L289)
 
 ## Extends
 
@@ -21,7 +21,8 @@ Defined in: [index.ts:263](https://github.com/orangecheck/oc-packages/blob/main/
 
 | Property | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Expected `iss` claim. Tokens with a different issuer are rejected. | [`VerifyConfig`](VerifyConfig.mdx).[`issuer`](VerifyConfig.mdx#property-issuer) | [index.ts:260](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L260) |
-| &lt;a id="property-kid">&lt;/a> `kid` | `string` | Short key id placed in the JWT header (`kid`). Must match the JWK. | - | [index.ts:267](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L267) |
-| &lt;a id="property-privatejwk">&lt;/a> `privateJwk` | `string` | Base64url-encoded JWK containing the Ed25519 private key. | - | [index.ts:265](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L265) |
-| &lt;a id="property-publicjwk">&lt;/a> `publicJwk` | `string` | Base64url-encoded JWK containing the Ed25519 public key. | [`VerifyConfig`](VerifyConfig.mdx).[`publicJwk`](VerifyConfig.mdx#property-publicjwk) | [index.ts:258](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L258) |
+| &lt;a id="property-audience">&lt;/a> `audience?` | [`AudienceRule`](../type-aliases/AudienceRule.mdx) | Accepted `aud` · see AudienceRule. Omit for family sessions. | [`VerifyConfig`](VerifyConfig.mdx).[`audience`](VerifyConfig.mdx#property-audience) | [index.ts:286](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L286) |
+| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Expected `iss` claim. Tokens with a different issuer are rejected. | [`VerifyConfig`](VerifyConfig.mdx).[`issuer`](VerifyConfig.mdx#property-issuer) | [index.ts:284](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L284) |
+| &lt;a id="property-kid">&lt;/a> `kid` | `string` | Short key id placed in the JWT header (`kid`). Must match the JWK. | - | [index.ts:293](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L293) |
+| &lt;a id="property-privatejwk">&lt;/a> `privateJwk` | `string` | Base64url-encoded JWK containing the Ed25519 private key. | - | [index.ts:291](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L291) |
+| &lt;a id="property-publicjwk">&lt;/a> `publicJwk` | `string` | Base64url-encoded JWK containing the Ed25519 public key. | [`VerifyConfig`](VerifyConfig.mdx).[`publicJwk`](VerifyConfig.mdx#property-publicjwk) | [index.ts:282](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L282) |

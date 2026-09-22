@@ -14,6 +14,7 @@ export const metadata = {
 ```ts
 function signSession(
    claims: {
+  aud?: string;
   did_oc: string;
   display_identity?: DisplayIdentity | null;
   home_federation?: string | null;
@@ -30,7 +31,7 @@ function signSession(
 ttlSeconds: number): Promise<string>;
 ```
 
-Defined in: [index.ts:335](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L335)
+Defined in: [index.ts:361](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L361)
 
 Mint a fresh oc_session JWT. Only called on the auth host (the only
 place that holds the private key).
@@ -40,22 +41,23 @@ revocation semantics — auth-core is deliberately stateless.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `claims` | \&#123; `did_oc`: `string`; `display_identity?`: [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null`; `home_federation?`: `string` \| `null`; `jti`: `string`; `merged_from?`: `string`[]; `name?`: `string` \| `null`; `npub?`: `string` \| `null`; `signing_method?`: `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null`; `step_up_at?`: `number`; `sub`: `string`; `sudo_at?`: `number`; \&#125; |
-| `claims.did_oc` | `string` |
-| `claims.display_identity?` | [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null` |
-| `claims.home_federation?` | `string` \| `null` |
-| `claims.jti` | `string` |
-| `claims.merged_from?` | `string`[] |
-| `claims.name?` | `string` \| `null` |
-| `claims.npub?` | `string` \| `null` |
-| `claims.signing_method?` | `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null` |
-| `claims.step_up_at?` | `number` |
-| `claims.sub` | `string` |
-| `claims.sudo_at?` | `number` |
-| `cfg` | [`SignConfig`](../interfaces/SignConfig.mdx) |
-| `ttlSeconds` | `number` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `claims` | \&#123; `aud?`: `string`; `did_oc`: `string`; `display_identity?`: [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null`; `home_federation?`: `string` \| `null`; `jti`: `string`; `merged_from?`: `string`[]; `name?`: `string` \| `null`; `npub?`: `string` \| `null`; `signing_method?`: `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null`; `step_up_at?`: `number`; `sub`: `string`; `sudo_at?`: `number`; \&#125; | - |
+| `claims.aud?` | `string` | Bind the token to one relying party (e.g. `https://example.com`). Omit for a family session. A bound token verifies only where that audience is expected — never as a family sign-in. |
+| `claims.did_oc` | `string` | - |
+| `claims.display_identity?` | [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null` | - |
+| `claims.home_federation?` | `string` \| `null` | - |
+| `claims.jti` | `string` | - |
+| `claims.merged_from?` | `string`[] | - |
+| `claims.name?` | `string` \| `null` | - |
+| `claims.npub?` | `string` \| `null` | - |
+| `claims.signing_method?` | `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null` | - |
+| `claims.step_up_at?` | `number` | - |
+| `claims.sub` | `string` | - |
+| `claims.sudo_at?` | `number` | - |
+| `cfg` | [`SignConfig`](../interfaces/SignConfig.mdx) | - |
+| `ttlSeconds` | `number` | - |
 
 ## Returns
 

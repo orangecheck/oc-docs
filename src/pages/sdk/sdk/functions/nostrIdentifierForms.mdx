@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: nostrIdentifierForms()",
+    description: "Auto-generated API reference for Function: nostrIdentifierForms(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README.mdx)
+
+***
+
+[@orangecheck/sdk](../README.mdx) / nostrIdentifierForms
+
+# Function: nostrIdentifierForms()
+
+```ts
+function nostrIdentifierForms(identifier: string): string[];
+```
+
+Defined in: [nostr-pubkey.ts:30](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/nostr-pubkey.ts#L30)
+
+Every spelling of one Nostr key an attestation may carry in its `i` tag.
+SPEC §2 prescribes `npub1…`; the reference site also accepts hex.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `identifier` | `string` |
+
+## Returns
+
+`string`[]

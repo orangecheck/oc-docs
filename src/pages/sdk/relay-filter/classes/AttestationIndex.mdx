@@ -1,0 +1,150 @@
+export const metadata = {
+    title: "Class: AttestationIndex",
+    description: "Auto-generated API reference for Class: AttestationIndex. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/relay-filter**](../README.mdx)
+
+***
+
+[@orangecheck/relay-filter](../README.mdx) / AttestationIndex
+
+# Class: AttestationIndex
+
+Defined in: [attestation-index.ts:81](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L81)
+
+Every OC attestation that binds a Nostr key, held in memory and kept current
+by one standing subscription. `decide()` answers from memory, so a relay's
+write path never waits on the network. Bonds are re-read from the chain in
+the background every `refreshMs`, which bounds how long a spent bond keeps
+passing (SECURITY.md §2, chain finality).
+
+## Constructors
+
+### Constructor
+
+```ts
+new AttestationIndex(options?: IndexOptions): AttestationIndex;
+```
+
+Defined in: [attestation-index.ts:90](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L90)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`IndexOptions`](../interfaces/IndexOptions.mdx) |
+
+#### Returns
+
+`AttestationIndex`
+
+## Accessors
+
+### size
+
+#### Get Signature
+
+```ts
+get size(): number;
+```
+
+Defined in: [attestation-index.ts:183](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L183)
+
+Attestations held, for logging.
+
+##### Returns
+
+`number`
+
+## Methods
+
+### decide()
+
+```ts
+decide(event: MinimalNostrEvent, opts?: FilterOptions): FilterDecision;
+```
+
+Defined in: [attestation-index.ts:119](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L119)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | [`MinimalNostrEvent`](../interfaces/MinimalNostrEvent.mdx) |
+| `opts` | [`FilterOptions`](../interfaces/FilterOptions.mdx) |
+
+#### Returns
+
+[`FilterDecision`](../interfaces/FilterDecision.mdx)
+
+***
+
+### ingest()
+
+```ts
+ingest(event: {
+  content?: string;
+  tags?: string[][];
+}): boolean;
+```
+
+Defined in: [attestation-index.ts:106](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L106)
+
+Add one attestation event. Returns true if it was new and sound.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | \&#123; `content?`: `string`; `tags?`: `string`[][]; \&#125; |
+| `event.content?` | `string` |
+| `event.tags?` | `string`[][] |
+
+#### Returns
+
+`boolean`
+
+***
+
+### markSynced()
+
+```ts
+markSynced(): void;
+```
+
+Defined in: [attestation-index.ts:115](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L115)
+
+Mark the initial backlog as loaded; before this, unknown keys are "not yet", not "no".
+
+#### Returns
+
+`void`
+
+***
+
+### start()
+
+```ts
+start(): void;
+```
+
+Defined in: [attestation-index.ts:92](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L92)
+
+#### Returns
+
+`void`
+
+***
+
+### stop()
+
+```ts
+stop(): void;
+```
+
+Defined in: [attestation-index.ts:99](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L99)
+
+#### Returns
+
+`void`

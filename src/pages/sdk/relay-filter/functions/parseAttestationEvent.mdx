@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: parseAttestationEvent()",
+    description: "Auto-generated API reference for Function: parseAttestationEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/relay-filter**](../README.mdx)
+
+***
+
+[@orangecheck/relay-filter](../README.mdx) / parseAttestationEvent
+
+# Function: parseAttestationEvent()
+
+```ts
+function parseAttestationEvent(event: {
+  content?: string;
+  tags?: string[][];
+}): Attestation | null;
+```
+
+Defined in: [attestation-index.ts:41](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L41)
+
+Parse a kind-30078 event into an attestation, or null if it is not a sound one.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | \&#123; `content?`: `string`; `tags?`: `string`[][]; \&#125; |
+| `event.content?` | `string` |
+| `event.tags?` | `string`[][] |
+
+## Returns
+
+`Attestation` \| `null`

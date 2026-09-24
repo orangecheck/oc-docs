@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Type Alias: SignatureVerifier",
+    description: "Auto-generated API reference for Type Alias: SignatureVerifier. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / SignatureVerifier
+
+# Type Alias: SignatureVerifier
+
+```ts
+type SignatureVerifier = (args: {
+  address: string;
+  message: string;
+  signature: string;
+}) => Promise<boolean> | boolean;
+```
+
+Defined in: [vote-core/src/verify.ts:11](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/verify.ts#L11)
+
+Named-argument BIP-322 verifier, the same shape as `TallyOptions.verify`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \&#123; `address`: `string`; `message`: `string`; `signature`: `string`; \&#125; |
+| `args.address` | `string` |
+| `args.message` | `string` |
+| `args.signature` | `string` |
+
+## Returns
+
+`Promise`\&lt;`boolean`\> \| `boolean`

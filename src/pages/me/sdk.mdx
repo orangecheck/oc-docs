@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Me · SDK reference',
     description:
-        '@orangecheck/me-client SDK reference. Three entry points: main (React surface), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
+        '@orangecheck/me-client SDK reference. Three entry points: main (oc.* calls + OcSignInButton), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
 };
 
 # `@orangecheck/me-client` · SDK reference
@@ -122,8 +122,12 @@ import { signInWithOc } from '@orangecheck/me-client/popup';
 button.addEventListener('click', async () => {
     const result = await signInWithOc();
     if (!result) return; // user cancelled or popup blocked
-    localStorage.setItem('oc-token', result.token); // optional · for cross-domain
-    location.assign('/dashboard');
+    // Outside *.ochk.io, send the token to your backend as a Bearer; it
+    // verifies it with the server adapters above.
+    const me = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${result.token}` },
+    });
+    if (me.ok) location.assign('/dashboard');
 });
 ```
 
@@ -447,10 +451,9 @@ FireEventOptions · OcPublicJwk · VerifyOptions · VerifyResult
 Scope · GrantedOptions · GrantedResult · RequestOptions
 ```
 
-`@orangecheck/me-client` re-exports the React surface from
-`@orangecheck/auth-client`, so `OcAccount`, `OcSessionState`, `OcSessionStatus`,
-and `OcAuthConfig` are available at runtime via that re-export — import them
-directly from `@orangecheck/auth-client` for stable typed access.
+`@orangecheck/me-client` does not re-export the React surface: import
+`OcAccount`, `OcSessionState`, `OcSessionStatus` and `OcAuthConfig` from
+`@orangecheck/auth-client`.
 
 ## Constants and helpers
 

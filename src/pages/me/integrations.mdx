@@ -36,10 +36,13 @@ export function SignInOptions() {
         setBusy(true);
         const result = await signInWithOc();
         setBusy(false);
-        if (result) {
-            localStorage.setItem('oc-token', result.token);
-            location.assign('/dashboard');
-        }
+        if (!result) return;
+        // Your backend verifies the token and starts your own session.
+        const r = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${result.token}` },
+        });
+        if (r.ok) location.assign('/dashboard');
     }
     return (
         <div className="auth-options">
@@ -65,8 +68,8 @@ export function SignInOptions() {
 
 When do they find out? When they want to. [me.ochk.io/me](https://me.ochk.io/me)
 shows their balance, [me.ochk.io/me/wallet](https://me.ochk.io/me/wallet) shows
-receive/send/withdraw, [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate)
-offers self-custody. None of this is in the OAuth path. None of it surfaces
+where it would settle, and [me.ochk.io/custody](https://me.ochk.io/custody) says
+who holds it today. None of this is in the OAuth path. None of it surfaces
 unless the user explicitly visits.
 
 ## Sample integrator archetypes

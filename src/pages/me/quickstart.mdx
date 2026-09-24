@@ -47,26 +47,39 @@ One npm package, three subpath entry points.
 yarn add @orangecheck/me-client @orangecheck/auth-client
 ```
 
-| Entry point                     | What it has                                  |
-| ------------------------------- | -------------------------------------------- |
-| `@orangecheck/me-client`        | React surface (provider + hook + button)     |
-| `@orangecheck/me-client/server` | server-side verification (zero JWK handling) |
-| `@orangecheck/me-client/popup`  | browser-only signin orchestrator             |
+| Entry point                     | What it has                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `@orangecheck/me-client`        | the `oc.*` calls, `setBearerToken`, sign-in button |
+| `@orangecheck/me-client/server` | server-side verification (zero JWK handling)       |
+| `@orangecheck/me-client/popup`  | browser-only signin orchestrator                   |
+
+The React provider and hook (`OcSessionProvider`, `useOcSession`) come from
+`@orangecheck/auth-client`; me-client does not re-export them.
 
 ## 04 · drop the popup signin
 
 Add a button. Inside the click handler, call `signInWithOc()`. A 480x720
-me.ochk.io popup opens, user signs in, popup `postMessage`s the session token
-back to your page, closes itself. Same shape Google and GitHub use.
+me.ochk.io popup opens, user signs in, popup `postMessage`s a token bound to
+your origin back to your page, closes itself. Same shape Google and GitHub use.
+
+OC's session cookie lives on `ochk.io`, so a site outside the family never sees
+it. Carry the token yourself: send it as a Bearer to your backend, which
+verifies it (step 05). A Next.js site can instead trade it once for its own
+cookie, which is what the per-stack snippets on `/me/projects/[id]` do. A
+`*.ochk.io` site already has the family cookie and skips this.
 
 ```ts
+import { setBearerToken } from '@orangecheck/me-client';
 import { signInWithOc } from '@orangecheck/me-client/popup';
 
 document.querySelector('#signin')!.addEventListener('click', async () => {
     const result = await signInWithOc();
     if (!result) return; // user cancelled or popup blocked
-    localStorage.setItem('oc-token', result.token);
-    location.assign('/dashboard');
+    setBearerToken(result.token); // me-client calls ride it
+    const me = await fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${result.token}` },
+    });
+    if (me.ok) location.assign('/dashboard');
 });
 ```
 

@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: VerifyRevocationInput
 
-Defined in: [agent-core/src/verify.ts:575](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L575)
+Defined in: [agent-core/src/verify.ts:591](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L591)
 
 ## Extends
 
@@ -21,8 +21,8 @@ Defined in: [agent-core/src/verify.ts:575](https://github.com/orangecheck/oc-pac
 
 | Property | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| &lt;a id="property-delegation">&lt;/a> `delegation` | [`ChainLink`](../type-aliases/ChainLink) | The envelope targeted by the revocation. Required to check signer is authorized. May be a v1.0 root delegation OR a v1.1 sub-delegation — both have identical `principal`, `agent`, `id`, and `revocation.holders` field shapes per SUB-DELEGATION.md §3. | - | [agent-core/src/verify.ts:583](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L583) |
-| &lt;a id="property-envelope">&lt;/a> `envelope` | [`RevocationEnvelope`](RevocationEnvelope) | - | - | [agent-core/src/verify.ts:576](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L576) |
+| &lt;a id="property-delegation">&lt;/a> `delegation` | [`ChainLink`](../type-aliases/ChainLink) | The envelope targeted by the revocation. Required to check signer is authorized. May be a v1.0 root delegation OR a v1.1 sub-delegation — both have identical `principal`, `agent`, `id`, and `revocation.holders` field shapes per SUB-DELEGATION.md §3. | - | [agent-core/src/verify.ts:599](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L599) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`RevocationEnvelope`](RevocationEnvelope) | - | - | [agent-core/src/verify.ts:592](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L592) |
 | &lt;a id="property-revocations">&lt;/a> `revocations?` | [`RevocationEnvelope`](RevocationEnvelope)[] | Revocations to evaluate against the delegation (or, for an action, every link in its chain). Fetch these from kind-30085 by `#delegation`. | [`VerifyBase`](VerifyBase).[`revocations`](VerifyBase#property-revocations) | [agent-core/src/verify.ts:68](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L68) |
 | &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase).[`scopeMode`](VerifyBase#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L50) |
 | &lt;a id="property-skiprevocationcheck">&lt;/a> `skipRevocationCheck?` | `boolean` | Verify WITHOUT consulting revocation feeds. Required to be explicit. SECURITY §7 item 7: "Query revocation feeds (Nostr kind-30085 by `#delegation`) for the cited delegation id before reporting OK, **unless the caller explicitly opts out**." The default was inverted — revocations were checked only when supplied, and omitting them skipped the check silently, so "checked, clean" was indistinguishable from "never checked". This library has no network by design, so the caller fetches the feed and passes `revocations`. Declining to is a decision they must state. | [`VerifyBase`](VerifyBase).[`skipRevocationCheck`](VerifyBase#property-skiprevocationcheck) | [agent-core/src/verify.ts:63](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L63) |

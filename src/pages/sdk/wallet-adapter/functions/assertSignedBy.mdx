@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: assertSignedBy()",
+    description: "Auto-generated API reference for Function: assertSignedBy(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / assertSignedBy
+
+# Function: assertSignedBy()
+
+```ts
+function assertSignedBy(
+   message: string, 
+   signature: string, 
+address: string): Promise<void>;
+```
+
+Defined in: [wallet-adapter/src/sign.ts:34](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L34)
+
+Throw `WrongAccountError` unless `signature` is a valid BIP-322 (or legacy)
+signature of `message` by `address`. Every signer runs this before returning.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `message` | `string` |
+| `signature` | `string` |
+| `address` | `string` |
+
+## Returns
+
+`Promise`\&lt;`void`\>

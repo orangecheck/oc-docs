@@ -19,6 +19,7 @@ export const metadata = {
 - [Ballot](interfaces/Ballot)
 - [BallotSecret](interfaces/BallotSecret)
 - [BipSig](interfaces/BipSig)
+- [BlockTimeSource](interfaces/BlockTimeSource)
 - [Poll](interfaces/Poll)
 - [PollOption](interfaces/PollOption)
 - [Reveal](interfaces/Reveal)
@@ -32,6 +33,7 @@ export const metadata = {
 
 - [PollMode](type-aliases/PollMode)
 - [SignatureVerifier](type-aliases/SignatureVerifier)
+- [SnapshotResolution](type-aliases/SnapshotResolution)
 - [TallyResult](type-aliases/TallyResult)
 - [Tiebreak](type-aliases/Tiebreak)
 - [UtxoLookup](type-aliases/UtxoLookup)
@@ -42,6 +44,7 @@ export const metadata = {
 ## Variables
 
 - [BALLOT\_VERSION](variables/BALLOT_VERSION)
+- [MIN\_SNAPSHOT\_CONFIRMATIONS](variables/MIN_SNAPSHOT_CONFIRMATIONS)
 - [POLL\_VERSION](variables/POLL_VERSION)
 - [REVEAL\_VERSION](variables/REVEAL_VERSION)
 
@@ -55,8 +58,11 @@ export const metadata = {
 - [commit](functions/commit)
 - [isMainnetAddress](functions/isMainnetAddress)
 - [isSupportedMode](functions/isSupportedMode)
+- [mempoolBlockTimeSource](functions/mempoolBlockTimeSource)
 - [pollId](functions/pollId)
 - [qualifyingUtxos](functions/qualifyingUtxos)
+- [resolveDeadlineSnapshot](functions/resolveDeadlineSnapshot)
+- [resolvePollSnapshot](functions/resolvePollSnapshot)
 - [revealId](functions/revealId)
 - [tally](functions/tally)
 - [totalQualifyingSats](functions/totalQualifyingSats)

@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Interface: OcAppearanceMenuProps",
+    description: "Auto-generated API reference for Interface: OcAppearanceMenuProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcAppearanceMenuProps
+
+# Interface: OcAppearanceMenuProps
+
+Defined in: [tokens/appearance-menu.tsx:23](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/appearance-menu.tsx#L23)
+
+OcAppearanceMenu — the single header control for ALL appearance settings.
+
+One icon button opens a dropdown with both axes:
+  • mode  — light / dark / system   (next-themes `.dark` class)
+  • theme — the registered skins     (data-oc-theme, persisted .ochk.io)
+
+Replaces the separate `ThemeToggle` + `OcThemePicker` so every family site
+carries exactly one appearance control. Self-contained dropdown (no Radix):
+outside-click + Escape to close. Requires `<OcThemeProvider>` above it (skin
+axis) and a next-themes `<ThemeProvider>` (mode axis) — both already mounted
+on every family site.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | [tokens/appearance-menu.tsx:24](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/appearance-menu.tsx#L24) |
+| &lt;a id="property-popoverclassname">&lt;/a> `popoverClassName?` | `string` | [tokens/appearance-menu.tsx:26](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/appearance-menu.tsx#L26) |
+| &lt;a id="property-triggerclassname">&lt;/a> `triggerClassName?` | `string` | [tokens/appearance-menu.tsx:25](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/appearance-menu.tsx#L25) |

@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: subscribeOcTheme()",
+    description: "Auto-generated API reference for Function: subscribeOcTheme(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / subscribeOcTheme
+
+# Function: subscribeOcTheme()
+
+```ts
+function subscribeOcTheme(cb: () => void): () => void;
+```
+
+Defined in: [tokens/scene-tokens.ts:133](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L133)
+
+Observe every signal that can recolor or pause a scene: mode class, skin
+attribute, and the ambient-motion attribute. The callback fires inside a
+double-rAF so computed styles have settled. Returns an unsubscribe.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `cb` | () => `void` |
+
+## Returns
+
+() => `void`

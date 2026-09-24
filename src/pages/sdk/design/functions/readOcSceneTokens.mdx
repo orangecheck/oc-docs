@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: readOcSceneTokens()",
+    description: "Auto-generated API reference for Function: readOcSceneTokens(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / readOcSceneTokens
+
+# Function: readOcSceneTokens()
+
+```ts
+function readOcSceneTokens(host: HTMLElement): OcSceneTokens | null;
+```
+
+Defined in: [tokens/scene-tokens.ts:99](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L99)
+
+Read the scene tokens by probing INSIDE `host` (normally the `.oc-aurora`
+element). Returns null if any slot fails to parse — callers treat null as
+"keep the CSS floor", never as an error.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `host` | `HTMLElement` |
+
+## Returns
+
+[`OcSceneTokens`](../interfaces/OcSceneTokens) \| `null`

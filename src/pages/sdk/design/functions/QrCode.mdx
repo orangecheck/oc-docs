@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: QrCode()",
+    description: "Auto-generated API reference for Function: QrCode(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / QrCode
+
+# Function: QrCode()
+
+```ts
+function QrCode(__namedParameters: QrCodeProps): any;
+```
+
+Defined in: [primitives/qr-code.tsx:22](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/qr-code.tsx#L22)
+
+Client-side QR renderer (inline SVG via the `qrcode` package — no canvas, no
+data-URI). Renders nothing during SSR; encodes on mount. Wrapped in role="img"
+with the supplied label. White quiet-zone background for reliable scanning in
+any theme/mode.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`QrCodeProps`](../interfaces/QrCodeProps) |
+
+## Returns
+
+`any`

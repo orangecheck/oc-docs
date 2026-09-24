@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: normalizeHue()",
+    description: "Auto-generated API reference for Function: normalizeHue(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / normalizeHue
+
+# Function: normalizeHue()
+
+```ts
+function normalizeHue(c: OcSceneRGB, isDark: boolean): OcSceneRGB;
+```
+
+Defined in: [tokens/scene-tokens.ts:84](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L84)
+
+Pin L into the mode's band + cap chroma (~C≤0.14) so every skin's field
+ reads with equal weight — the raw brand tokens vary wildly in both.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `c` | [`OcSceneRGB`](../interfaces/OcSceneRGB) |
+| `isDark` | `boolean` |
+
+## Returns
+
+[`OcSceneRGB`](../interfaces/OcSceneRGB)

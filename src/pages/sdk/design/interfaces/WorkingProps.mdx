@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: WorkingProps",
+    description: "Auto-generated API reference for Interface: WorkingProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / WorkingProps
+
+# Interface: WorkingProps
+
+Defined in: [primitives/working.tsx:11](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/working.tsx#L11)
+
+Cohesive "working" indicator used at every async hold-point. Two styles, same
+DNA — a cypherpunk marching-cursor of three dots (no SVG spinner). The CSS
+lives in `@orangecheck/design/styles.css` (`.oc-working-*`). Each indicator
+carries an `aria-live="polite"` region announcing the activity.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [primitives/working.tsx:18](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/working.tsx#L18) |
+| &lt;a id="property-progress">&lt;/a> `progress?` | `string` | Optional — show a progress ratio (e.g. "2 of 4 relays"). | [primitives/working.tsx:17](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/working.tsx#L17) |
+| &lt;a id="property-size">&lt;/a> `size?` | `"sm"` \| `"md"` | Compact (button-sized) or normal (inline block). | [primitives/working.tsx:15](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/working.tsx#L15) |
+| &lt;a id="property-text">&lt;/a> `text` | `string` | Short verb phrase describing what's happening. Lowercase. | [primitives/working.tsx:13](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/working.tsx#L13) |

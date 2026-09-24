@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: asOf()",
+    description: "Auto-generated API reference for Function: asOf(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / asOf
+
+# Function: asOf()
+
+```ts
+function asOf(iso: string | null | undefined): string | null;
+```
+
+Defined in: [format/index.ts:65](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/index.ts#L65)
+
+"as of HH:MM" provenance footnote. Returns `null` for nullish or
+unparseable input so callers can render nothing
+(`{x && <span>{x}</span>}`) rather than gate on a magic empty
+string. 24-hour, locale-aware. Pairs with `useSpotPrice().fetchedAt`
+to caption a live-rate display.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `iso` | `string` \| `null` \| `undefined` |
+
+## Returns
+
+`string` \| `null`

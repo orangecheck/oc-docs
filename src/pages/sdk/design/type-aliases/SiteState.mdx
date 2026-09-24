@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Type Alias: SiteState",
+    description: "Auto-generated API reference for Type Alias: SiteState. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / SiteState
+
+# Type Alias: SiteState
+
+```ts
+type SiteState = "alpha" | "beta" | "live";
+```
+
+Defined in: [chrome/family-properties.ts:201](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-properties.ts#L201)
+
+Canonical lifecycle states for any family site. Used by both the
+tiny chip rendered next to the wordmark and any other surface that
+wants to display "this site is still settling" UX. Centralised
+vocabulary so we can't accidentally drift to a parallel synonym
+like `preview`/`experimental` on different sites.
+
+  - `live`     — production-ready; **no chip rendered** (the absence
+                 of a chip is the affordance)
+  - `beta`     — feature-complete but still iterating, soft launch
+  - `alpha`    — early, breaking changes expected, integrators beware

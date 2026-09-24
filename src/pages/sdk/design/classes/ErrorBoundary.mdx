@@ -1,0 +1,111 @@
+export const metadata = {
+    title: "Class: ErrorBoundary",
+    description: "Auto-generated API reference for Class: ErrorBoundary. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / ErrorBoundary
+
+# Class: ErrorBoundary
+
+Defined in: [primitives/error-boundary.tsx:19](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L19)
+
+## Extends
+
+- `unknown`\&lt;`Props`, `State`\>
+
+## Constructors
+
+### Constructor
+
+```ts
+new ErrorBoundary(): ErrorBoundary;
+```
+
+#### Returns
+
+`ErrorBoundary`
+
+#### Inherited from
+
+```ts
+React.Component<Props, State>.constructor
+```
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-state">&lt;/a> `state` | `State` | [primitives/error-boundary.tsx:20](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L20) |
+
+## Methods
+
+### componentDidCatch()
+
+```ts
+componentDidCatch(error: Error, info: ErrorInfo): void;
+```
+
+Defined in: [primitives/error-boundary.tsx:26](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L26)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `error` | `Error` |
+| `info` | `ErrorInfo` |
+
+#### Returns
+
+`void`
+
+***
+
+### render()
+
+```ts
+render(): any;
+```
+
+Defined in: [primitives/error-boundary.tsx:34](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L34)
+
+#### Returns
+
+`any`
+
+***
+
+### reset()
+
+```ts
+reset(): any;
+```
+
+Defined in: [primitives/error-boundary.tsx:32](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L32)
+
+#### Returns
+
+`any`
+
+***
+
+### getDerivedStateFromError()
+
+```ts
+static getDerivedStateFromError(error: Error): State;
+```
+
+Defined in: [primitives/error-boundary.tsx:22](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/error-boundary.tsx#L22)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `error` | `Error` |
+
+#### Returns
+
+`State`

@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: createInsightsClient()",
+    description: "Auto-generated API reference for Function: createInsightsClient(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/insights-client**](../README)
+
+***
+
+[@orangecheck/insights-client](../README) / createInsightsClient
+
+# Function: createInsightsClient()
+
+```ts
+function createInsightsClient(config?: InsightsClientConfig): InsightsClient;
+```
+
+Defined in: [index.ts:115](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L115)
+
+Build an insights client bound to an explicit config (handy for tests
+and for services that don't want the env-driven default). Most call
+sites should just use the top-level `emit` / `emitEvent`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `config` | [`InsightsClientConfig`](../interfaces/InsightsClientConfig) |
+
+## Returns
+
+[`InsightsClient`](../interfaces/InsightsClient)

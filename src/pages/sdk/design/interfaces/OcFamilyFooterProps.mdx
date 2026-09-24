@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: OcFamilyFooterProps",
+    description: "Auto-generated API reference for Interface: OcFamilyFooterProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcFamilyFooterProps
+
+# Interface: OcFamilyFooterProps
+
+Defined in: [chrome/family-footer.tsx:31](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L31)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-brand">&lt;/a> `brand` | [`OcFamilyFooterBrand`](OcFamilyFooterBrand) | - | [chrome/family-footer.tsx:32](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L32) |
+| &lt;a id="property-builtwith">&lt;/a> `builtWith?` | `any` | Override the right-hand bitcoin tag (e.g. `'read on bitcoin'`). | [chrome/family-footer.tsx:52](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L52) |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [chrome/family-footer.tsx:53](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L53) |
+| &lt;a id="property-columns">&lt;/a> `columns?` | [`FooterColumn`](FooterColumn)[] | The site's own `§`-labelled link groups. | [chrome/family-footer.tsx:34](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L34) |
+| &lt;a id="property-family">&lt;/a> `family?` | `"products"` \| `"protocols"` \| `"both"` | Append registry-driven family columns (products / protocols) sourced from `FAMILY_PROPERTIES`, so any footer that lists the family can never drift from the canonical table. `'products'` is the five live products, etc. | [chrome/family-footer.tsx:40](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L40) |
+| &lt;a id="property-legalbase">&lt;/a> `legalBase?` | `string` | Origin the legal-bar links resolve against. Defaults to ochk.io. | [chrome/family-footer.tsx:42](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L42) |
+| &lt;a id="property-legalcopyright">&lt;/a> `legalCopyright?` | `any` | Override the left copyright line. Defaults to the canonical OC line. | [chrome/family-footer.tsx:44](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L44) |
+| &lt;a id="property-legallinks">&lt;/a> `legalLinks?` | [`FooterLink`](FooterLink)[] | Override the centre legal links. Defaults to privacy / terms / security / trademarks / contact (resolved against `legalBase`). Pass your own when a site needs an extra link (e.g. a federation charter) or a shorter set. | [chrome/family-footer.tsx:50](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/family-footer.tsx#L50) |

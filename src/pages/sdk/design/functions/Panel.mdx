@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: Panel()",
+    description: "Auto-generated API reference for Function: Panel(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / Panel
+
+# Function: Panel()
+
+```ts
+function Panel(__namedParameters: PanelProps): any;
+```
+
+Defined in: [composites/panel.tsx:27](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/panel.tsx#L27)
+
+Panel (DataSection) — the titled section that carries a chunk of a
+data-dense / technical page (telemetry blocks, API sections, dashboard
+groups). THEME-ADAPTIVE by design: under the cypherpunk skins it is a
+flat full-width `border-t` divider section (terminal voice); under ember
+the `.oc-panel` class promotes it to a discrete soft, warm, rounded card
+(see the data-dense treatments in themes/ember.css). Compose these instead
+of hand-rolling `border-t py-8` sections so subpages re-skin per theme.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`PanelProps`](../interfaces/PanelProps) |
+
+## Returns
+
+`any`

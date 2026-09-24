@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: OcLogoDropdownProps",
+    description: "Auto-generated API reference for Interface: OcLogoDropdownProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcLogoDropdownProps
+
+# Interface: OcLogoDropdownProps
+
+Defined in: [chrome/logo-dropdown.tsx:66](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L66)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-children">&lt;/a> `children` | `ReactNode` | Logo contents · typically `<LogoMark />` + `<span>oc·X</span>`. | [chrome/logo-dropdown.tsx:90](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L90) |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | className for the outer container. | [chrome/logo-dropdown.tsx:92](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L92) |
+| &lt;a id="property-current">&lt;/a> `current` | [`EcosystemSlug`](../type-aliases/EcosystemSlug) | Which property this site IS. Used to highlight the active row, route the active row's link to `homeHref` instead of the cross- domain absolute URL, and pick the category chip rendered next to the wordmark. | [chrome/logo-dropdown.tsx:73](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L73) |
+| &lt;a id="property-homehref">&lt;/a> `homeHref?` | `string` | The site's local home path (for the active row). Default `/`. Always a same-origin path — the logo's "go home" affordance is preserved by clicking the highlighted row. | [chrome/logo-dropdown.tsx:79](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L79) |
+| &lt;a id="property-popoverclassname">&lt;/a> `popoverClassName?` | `string` | className for the popover. | [chrome/logo-dropdown.tsx:96](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L96) |
+| &lt;a id="property-showownerentries">&lt;/a> `showOwnerEntries?` | `boolean` | When true, include the `owner` section (currently just `oc·analytics`) in the family list. Consumers pass this from their session: `useOcSession().account?.isOwner ?? false`. Defaults to false so non-owners never see the entry. Not a security boundary — analytics.ochk.io re-checks the live OWNER_OC_ADDRESSES env on every request. This prop only controls UX visibility. | [chrome/logo-dropdown.tsx:107](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L107) |
+| &lt;a id="property-sitestate">&lt;/a> `siteState?` | [`SiteState`](../type-aliases/SiteState) | Optional lifecycle state for this site. `'live'` (default) renders no chip; `'alpha'` and `'beta'` render a small mono uppercase chip after the category badge. Drive this from your per-site config so one constant change ripples to every surface. | [chrome/logo-dropdown.tsx:86](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L86) |
+| &lt;a id="property-triggerclassname">&lt;/a> `triggerClassName?` | `string` | className for the trigger button. | [chrome/logo-dropdown.tsx:94](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/logo-dropdown.tsx#L94) |

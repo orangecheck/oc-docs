@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: OcErrorPage()",
+    description: "Auto-generated API reference for Function: OcErrorPage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcErrorPage
+
+# Function: OcErrorPage()
+
+```ts
+function OcErrorPage(__namedParameters: OcErrorPageProps): any;
+```
+
+Defined in: [composites/error-page.tsx:84](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L84)
+
+OcErrorPage — the family's 404 / 500 body.
+
+Nine of thirteen family sites had no error page at all and fell through to
+Next's unstyled default: no header, no footer, no theme, none of the chrome
+every other page on the site has. It is the one page a visitor is guaranteed
+to reach eventually, and it was the only one that looked like a different
+product.
+
+Lifted from `oc-attest-web`, which was the only site with a good one. It
+lives here rather than being copied nine times because a copied page drifts —
+that is the lesson of the family's `isFamilyUrl` predicate, where 14 of 15
+hand-copied versions shared a flaw the 15th had already fixed.
+
+`Seo` stays with the consumer: the page's title and `noindex` are site
+concerns and the design package has no business owning them. So a site's
+`404.tsx` is its `<Seo>` plus `<OcErrorPage variant="not-found" />`.
+
+The "go back" button uses `window.history.back()`, which needs a client
+component — the consumer page carries `'use client'`, as Next requires for
+any page with an interactive handler.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`OcErrorPageProps`](../interfaces/OcErrorPageProps) |
+
+## Returns
+
+`any`

@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: OcThemeProviderProps",
+    description: "Auto-generated API reference for Interface: OcThemeProviderProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcThemeProviderProps
+
+# Interface: OcThemeProviderProps
+
+Defined in: [tokens/provider.tsx:167](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L167)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-aurora">&lt;/a> `aurora?` | \| `boolean` \| \&#123; `gl?`: `boolean`; `intensity?`: `number`; \&#125; | The ambient bitcoin-aurora background. `true` (default) renders it behind the app; `false` disables it; `{ intensity }` tunes its strength for this site (e.g. `aurora={{ intensity: 0.5 }}` on a reading-heavy surface). OcAuroraGL (the silk-field upgrade) is ON by default (the CSS blobs remain the permanent floor under every failure path). Reading- and console-heavy surfaces opt OUT with `{ gl: false }`. | [tokens/provider.tsx:179](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L179) |
+| &lt;a id="property-children">&lt;/a> `children` | `ReactNode` | - | [tokens/provider.tsx:168](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L168) |
+| &lt;a id="property-defaultskin">&lt;/a> `defaultSkin?` | `string` | Skin to assume before the cookie is read (defaults to `orangecheck`). | [tokens/provider.tsx:170](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L170) |

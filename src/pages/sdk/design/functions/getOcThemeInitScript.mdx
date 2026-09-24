@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: getOcThemeInitScript()",
+    description: "Auto-generated API reference for Function: getOcThemeInitScript(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / getOcThemeInitScript
+
+# Function: getOcThemeInitScript()
+
+```ts
+function getOcThemeInitScript(defaultSkin?: string): string;
+```
+
+Defined in: [tokens/provider.tsx:290](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L290)
+
+Blocking init script for `_document` (Pages Router) `<Head>`. Applies the
+cookie's skin to `<html>` before first paint so there is no flash of the
+default skin. Inject with:
+
+    &lt;script dangerouslySetInnerHTML=&#123;&#123; __html: getOcThemeInitScript() &#125;&#125; />
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `defaultSkin` | `string` | `DEFAULT_OC_THEME` |
+
+## Returns
+
+`string`

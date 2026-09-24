@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: shortenAddress()",
+    description: "Auto-generated API reference for Function: shortenAddress(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / shortenAddress
+
+# Function: shortenAddress()
+
+```ts
+function shortenAddress(
+   value: string, 
+   head?: number, 
+   tail?: number): string;
+```
+
+Defined in: [format/index.ts:97](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/index.ts#L97)
+
+Truncate a Bitcoin/Lightning address (or any long id) for display:
+"bc1qxy…wxyz". Defaults match the family's most common rule (8 head / 4 tail).
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `value` | `string` | `undefined` |
+| `head` | `number` | `8` |
+| `tail` | `number` | `4` |
+
+## Returns
+
+`string`

@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Function: LayoutSubHeader()",
+    description: "Auto-generated API reference for Function: LayoutSubHeader(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / LayoutSubHeader
+
+# Function: LayoutSubHeader()
+
+```ts
+function LayoutSubHeader(__namedParameters: LayoutSubHeaderProps): any;
+```
+
+Defined in: [chrome/layout-sub-header.tsx:47](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/layout-sub-header.tsx#L47)
+
+LayoutSubHeader — the ecosystem status strip below the header. One line,
+never wraps. Identical shape across every family surface:
+
+  ● live · mainnet   oc · stamp ················· bip-322 · opentimestamps
+
+Left cluster (heartbeat + status + product) is the identity; the right
+cluster is a quiet, low-contrast capability whisper. Below `sm` the strip
+collapses to just the heartbeat + product so it never wraps or crowds a
+phone header — the right cluster and the `status` reappear from `sm` up.
+
+The band carries a faint skin-tinted translucent shade (`.oc-substrip`) so
+it has presence on every skin × mode without bleeding the hero/aurora
+behind it. Pass `product`, optional `status`, and `tags`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`LayoutSubHeaderProps`](../interfaces/LayoutSubHeaderProps) |
+
+## Returns
+
+`any`

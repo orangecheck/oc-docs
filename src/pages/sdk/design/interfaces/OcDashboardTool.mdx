@@ -1,0 +1,50 @@
+export const metadata = {
+    title: "Interface: OcDashboardTool",
+    description: "Auto-generated API reference for Interface: OcDashboardTool. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcDashboardTool
+
+# Interface: OcDashboardTool
+
+Defined in: [chrome/dashboard-shell.tsx:33](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L33)
+
+`<OcDashboardShell>` — the canonical demo-app frame for protocol
+sites. Mirrors the `MeShell` pattern from `me.ochk.io`: persistent
+left-rail tools on desktop, off-canvas drawer on mobile, page
+eyebrow + title + description above the children.
+
+Drives the unified "dashboard pattern" the family rolled out
+2026-05-14: every protocol site's `/dashboard` (and the demo pages
+underneath — `/create`, `/verify`, `/discover`, `/playground`, etc.)
+wraps in this shell, so visitors crossing protocols experience the
+same chrome.
+
+Layout (desktop):
+
+  ┌─────────────┬────────────────────────────────────┐
+  │ § dashboard │  eyebrow                           │
+  │ ── tools ── │  title                             │
+  │   create  ● │  description                       │
+  │   verify    │                                    │
+  │   discover  │  ── children ─────────────────────│
+  │   ...       │                                    │
+  └─────────────┴────────────────────────────────────┘
+
+Mobile (&lt;md): sidebar collapses behind a hamburger button at the
+top of the main column; tapping opens a full-width drawer.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-external">&lt;/a> `external?` | `boolean` | When true, opens in a new tab (e.g. an external explorer). | [chrome/dashboard-shell.tsx:46](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L46) |
+| &lt;a id="property-href">&lt;/a> `href` | `string` | Same-origin path the tool lives at. | [chrome/dashboard-shell.tsx:37](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L37) |
+| &lt;a id="property-icon">&lt;/a> `icon?` | `any` | Optional ascii / unicode glyph rendered before the label. | [chrome/dashboard-shell.tsx:44](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L44) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | Stable identifier · used as `active` key. | [chrome/dashboard-shell.tsx:35](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L35) |
+| &lt;a id="property-label">&lt;/a> `label` | `string` | Visible label · lowercase preferred. | [chrome/dashboard-shell.tsx:39](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L39) |
+| &lt;a id="property-tagline">&lt;/a> `tagline?` | `string` | Optional one-line tagline shown under the label in the rail and on the dashboard hub cards. | [chrome/dashboard-shell.tsx:42](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/dashboard-shell.tsx#L42) |

@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: EcosystemSwitcherProps",
+    description: "Auto-generated API reference for Interface: EcosystemSwitcherProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / EcosystemSwitcherProps
+
+# Interface: EcosystemSwitcherProps
+
+Defined in: [chrome/ecosystem-switcher.tsx:174](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/ecosystem-switcher.tsx#L174)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [chrome/ecosystem-switcher.tsx:176](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/ecosystem-switcher.tsx#L176) |
+| &lt;a id="property-current">&lt;/a> `current` | [`EcosystemSlug`](../type-aliases/EcosystemSlug) | - | [chrome/ecosystem-switcher.tsx:175](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/ecosystem-switcher.tsx#L175) |
+| &lt;a id="property-showownerentries">&lt;/a> `showOwnerEntries?` | `boolean` | When true, append the owner-only entries (currently `oc·analytics`) to the family-switcher dropdown. Consumers pass this from their session: `useOcSession().account?.isOwner`. Defaults to false so non-owners never see owner-only links. Not a security boundary — analytics.ochk.io re-checks the live OWNER_OC_ADDRESSES env on every request. This prop only decides whether the UX hint is visible. | [chrome/ecosystem-switcher.tsx:187](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/ecosystem-switcher.tsx#L187) |

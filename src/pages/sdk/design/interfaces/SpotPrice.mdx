@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Interface: SpotPrice",
+    description: "Auto-generated API reference for Interface: SpotPrice. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / SpotPrice
+
+# Interface: SpotPrice
+
+Defined in: [format/use-spot-price.ts:35](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/use-spot-price.ts#L35)
+
+@orangecheck/design/format — Bitcoin/money display + formatting utilities.
+
+Presentational only. Lifted from the canonical implementations across the
+family (oc-me-web's utils, oc-vault-web's billing) and standardized so every
+site formats sats, prices, addresses, and times identically. NOTE: crypto
+(BIP-322 signing, bech32 validation) deliberately does NOT live here — that
+belongs in a bitcoin/crypto library, not the design system.
+
+Includes the `useSpotPrice` React hook for live BTC/USD display. The hook
+fetches a consumer-hosted endpoint — see `use-spot-price.ts` for the
+one-route-per-consumer contract.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-btcusd">&lt;/a> `btcUsd` | `number` | BTC/USD rate. Falls back to `REFERENCE_BTC_USD` until the first fetch lands so the initial paint never reads NaN. | [format/use-spot-price.ts:38](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/use-spot-price.ts#L38) |
+| &lt;a id="property-fetchedat">&lt;/a> `fetchedAt` | `string` \| `null` | ISO timestamp the rate was fetched upstream. `null` until the first successful fetch. Pair with `asOf()` for "as of HH:MM". | [format/use-spot-price.ts:41](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/use-spot-price.ts#L41) |

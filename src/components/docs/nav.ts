@@ -866,6 +866,16 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Normalize UniSat / Xverse / Leather / Alby / OKX / Phantom behind one getSigner() API.',
             },
             {
+                href: '/sdk/design/README',
+                label: '@orangecheck/design',
+                blurb: 'The family design system — tokens, primitives, family chrome. Storybook at design.ochk.io.',
+            },
+            {
+                href: '/sdk/insights-client/README',
+                label: '@orangecheck/insights-client',
+                blurb: 'Server-side event emit for oc insights, the family first-party analytics.',
+            },
+            {
                 href: '/sdk/react/README',
                 label: '@orangecheck/react',
                 blurb: 'Generic React components — OcBadge, OcGate, OcChallengeButton.',

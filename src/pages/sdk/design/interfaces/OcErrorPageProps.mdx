@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: OcErrorPageProps",
+    description: "Auto-generated API reference for Interface: OcErrorPageProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcErrorPageProps
+
+# Interface: OcErrorPageProps
+
+Defined in: [composites/error-page.tsx:9](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L9)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-actions">&lt;/a> `actions?` | `ReactNode`[] | A short "what can you do" list, rendered as the bordered mono panel. Defaults to the server-error list; pass `[]` to suppress it. Items are nodes, not just strings, so one can carry a link — attest's original 500 ended its list with "persisting? report it on github", and a shared component that could not express that would have been a downgrade for the site it was lifted from. | [composites/error-page.tsx:31](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L31) |
+| &lt;a id="property-children">&lt;/a> `children?` | `any` | Extra content below the buttons — a report link, a status page, a hint. | [composites/error-page.tsx:35](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L35) |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [composites/error-page.tsx:36](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L36) |
+| &lt;a id="property-code">&lt;/a> `code?` | `string` \| `number` | Override the big numeral. Defaults to 404 / 500 from the variant. | [composites/error-page.tsx:17](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L17) |
+| &lt;a id="property-detail">&lt;/a> `detail?` | `string` | Override the `//` prose line under the headline. | [composites/error-page.tsx:21](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L21) |
+| &lt;a id="property-homehref">&lt;/a> `homeHref?` | `string` | Where "go home" points. A site with a app-scoped root can change it. | [composites/error-page.tsx:33](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L33) |
+| &lt;a id="property-title">&lt;/a> `title?` | `string` | Override the headline. Lowercase, per the family voice. | [composites/error-page.tsx:19](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L19) |
+| &lt;a id="property-variant">&lt;/a> `variant?` | [`OcErrorVariant`](../type-aliases/OcErrorVariant) | Picks the defaults. `not-found` is the 404 shape (primary tone, a "go back" affordance); `server-error` is the 500 shape (destructive tone, a retry affordance and a what-to-do list). | [composites/error-page.tsx:15](https://github.com/orangecheck/oc-packages/blob/main/design/src/composites/error-page.tsx#L15) |

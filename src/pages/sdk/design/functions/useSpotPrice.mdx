@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: useSpotPrice()",
+    description: "Auto-generated API reference for Function: useSpotPrice(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / useSpotPrice
+
+# Function: useSpotPrice()
+
+```ts
+function useSpotPrice(opts?: UseSpotPriceOptions): SpotPrice;
+```
+
+Defined in: [format/use-spot-price.ts:73](https://github.com/orangecheck/oc-packages/blob/main/design/src/format/use-spot-price.ts#L73)
+
+Hook · returns the latest BTC/USD spot rate from `endpoint`.
+
+Behaviour:
+  - First mount: synchronous return of `REFERENCE_BTC_USD` (no NaN),
+    then an async fetch updates state.
+  - Every `intervalMs` thereafter, a background fetch keeps the rate
+    fresh while the tab is alive.
+  - Network blips keep the last-good value — no flash to fallback.
+  - Unmount cancels both the in-flight read (`cancelled` flag) and
+    the interval timer.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`UseSpotPriceOptions`](../interfaces/UseSpotPriceOptions) |
+
+## Returns
+
+[`SpotPrice`](../interfaces/SpotPrice)

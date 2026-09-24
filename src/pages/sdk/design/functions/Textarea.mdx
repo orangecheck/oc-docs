@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Function: Textarea()",
+    description: "Auto-generated API reference for Function: Textarea(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / Textarea
+
+# Function: Textarea()
+
+```ts
+function Textarea(__namedParameters: ComponentProps<"textarea">): any;
+```
+
+Defined in: [primitives/textarea.tsx:18](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/textarea.tsx#L18)
+
+Sizing note, and it is load-bearing: `text-base md:text-xs`, not `text-xs`.
+
+iOS Safari zooms the viewport when a form field with text under 16px takes
+focus, and the user is not zoomed back out afterwards — every textarea in
+the family did this. `text-base` (16px) on mobile suppresses it; `md:text-xs`
+keeps the 12px mono look on a pointer device, where the zoom behaviour does
+not exist. Input already used this ladder (`text-base md:text-sm`); Textarea
+was flat 12px with no responsive step.
+
+A consumer passing `text-xs` via className will re-break it — tailwind-merge
+lets the caller win. Pass the ladder, not a single size.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | `ComponentProps`\&lt;`"textarea"`\> |
+
+## Returns
+
+`any`

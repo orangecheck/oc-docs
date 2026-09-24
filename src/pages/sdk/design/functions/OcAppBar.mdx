@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: OcAppBar()",
+    description: "Auto-generated API reference for Function: OcAppBar(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcAppBar
+
+# Function: OcAppBar()
+
+```ts
+function OcAppBar(__namedParameters: OcAppBarProps): any;
+```
+
+Defined in: [chrome/app-bar.tsx:43](https://github.com/orangecheck/oc-packages/blob/main/design/src/chrome/app-bar.tsx#L43)
+
+`OcAppBar` — the sanctioned FULL-BLEED application header for full-screen app
+surfaces (chat `/app`, the analytics cockpit, the forge console, the me
+operator plane …). It is the app-surface counterpart to the constrained
+marketing/content header: the SAME primitives (`OcLogoDropdown` /
+`OcPrimaryNav` / `OcAccountMenu`) mounted in an edge-to-edge `.app-bar` row
+(gutters only, no `max-w-screen-xl`) instead of a centered `.container`, so a
+full-bleed app shell underneath lines up edge-to-edge with the chrome above.
+
+Marketing / content / protocol pages keep the constrained `.container`
+header — never use `OcAppBar` over a `.container`-capped body, or you
+re-introduce the left/right misalignment this composition exists to fix.
+
+Auth-free and brand-free by design: all branding + session chrome arrive
+through the `start` / `center` / `end` slots, so app sites and content sites
+share one primitive layer and can never visually drift. The fixed `h-12`
+(3rem) lets a shell below claim `h-[calc(100dvh-3rem)]`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`OcAppBarProps`](../interfaces/OcAppBarProps) |
+
+## Returns
+
+`any`

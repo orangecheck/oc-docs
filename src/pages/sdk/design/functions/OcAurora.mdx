@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: OcAurora()",
+    description: "Auto-generated API reference for Function: OcAurora(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcAurora
+
+# Function: OcAurora()
+
+```ts
+function OcAurora(__namedParameters: OcAuroraProps): any;
+```
+
+Defined in: [tokens/aurora.tsx:46](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/aurora.tsx#L46)
+
+The ambient "bitcoin aurora" background — soft, theme-reactive colour clouds
+that slowly wander (styling in styles/aurora.css; recolours from --brand /
+--success / --info / --primary across mode + skin). Pure markup, fixed behind
+all content; `OcThemeProvider` mounts it by default. The CSS blobs are the
+permanent SSR / no-JS / reduced-motion / no-WebGL floor; the optional `gl`
+layer only ever renders on top of them.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | [`OcAuroraProps`](../interfaces/OcAuroraProps) |
+
+## Returns
+
+`any`

@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Type Alias: OcGlyphSlug",
+    description: "Auto-generated API reference for Type Alias: OcGlyphSlug. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcGlyphSlug
+
+# Type Alias: OcGlyphSlug
+
+```ts
+type OcGlyphSlug = 
+  | "orangecheck"
+  | "attest"
+  | "docs"
+  | "me"
+  | "vault"
+  | "chat"
+  | "cosign"
+  | "lock"
+  | "vote"
+  | "stamp"
+  | "agent"
+  | "pledge"
+  | "analytics"
+  | "btc"
+  | "globe";
+```
+
+Defined in: [tokens/glyphs.ts:10](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/glyphs.ts#L10)
+
+Inner-SVG markup per brand, normalized to a 0..1024 canvas with the
+ pipeline's centering/flip/scale baked in. Colors are sentinels —
+ substitute __FG__ / __BG__ / __INK__ (fg '__FG__'→'none' flips the
+ outline-capable glyphs to wireframe mode).

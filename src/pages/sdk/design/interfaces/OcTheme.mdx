@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Interface: OcTheme",
+    description: "Auto-generated API reference for Interface: OcTheme. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcTheme
+
+# Interface: OcTheme
+
+Defined in: [tokens/themes.ts:13](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/themes.ts#L13)
+
+The OrangeCheck theme (skin) registry.
+
+A *skin* is the named-theme axis, orthogonal to the light/dark *mode* axis
+(which stays owned by `next-themes` via the `.dark` class). A skin is applied
+as `data-oc-theme="<id>"` on `<html>` and persisted in the `oc_skin` cookie at
+`Domain=.ochk.io` so a choice on one family site carries to every other.
+
+Adding a skin = add a `themes/<id>.css` token block in this package and a
+row here. Every site picks it up on the next `@orangecheck/design` bump; no
+per-site edits.
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-accent">&lt;/a> `accent` | `readonly` | `string` | Accent hex (sRGB of the skin's dark-mode `--brand`). Used to swap the browser chrome — `<meta name="theme-color">` and the favicon (recolored from the family `#f97316`) — when the skin changes. Mirrors the `SKINS` palette in `oc-media-kit/build/brands.py` (same source of truth). | [tokens/themes.ts:26](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/themes.ts#L26) |
+| &lt;a id="property-description">&lt;/a> `description` | `readonly` | `string` | One-line description shown in the picker / Storybook. | [tokens/themes.ts:19](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/themes.ts#L19) |
+| &lt;a id="property-id">&lt;/a> `id` | `readonly` | `string` | Stable id — also the `data-oc-theme` attribute value and the CSS file stem. | [tokens/themes.ts:15](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/themes.ts#L15) |
+| &lt;a id="property-label">&lt;/a> `label` | `readonly` | `string` | Human label for the picker (lowercase, house voice). | [tokens/themes.ts:17](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/themes.ts#L17) |

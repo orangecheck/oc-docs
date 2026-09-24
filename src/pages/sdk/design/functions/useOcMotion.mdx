@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Function: useOcMotion()",
+    description: "Auto-generated API reference for Function: useOcMotion(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / useOcMotion
+
+# Function: useOcMotion()
+
+```ts
+function useOcMotion(): {
+  motion: OcMotion;
+  setMotion: (value: OcMotion) => void;
+};
+```
+
+Defined in: [tokens/provider.tsx:278](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L278)
+
+Read the ambient-motion switch + setter. The WCAG 2.2.2 pause mechanism:
+`'off'` sets `data-oc-motion="off"` on `<html>` (persisted family-wide in the
+`oc_motion` cookie), which pauses the aurora and any `.oc-ambient` element.
+Throws if used outside `OcThemeProvider`.
+
+## Returns
+
+```ts
+{
+  motion: OcMotion;
+  setMotion: (value: OcMotion) => void;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `motion` | [`OcMotion`](../type-aliases/OcMotion) | [tokens/provider.tsx:278](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L278) |
+| `setMotion()` | (`value`: [`OcMotion`](../type-aliases/OcMotion)) => `void` | [tokens/provider.tsx:278](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/provider.tsx#L278) |

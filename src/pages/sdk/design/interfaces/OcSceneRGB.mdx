@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Interface: OcSceneRGB",
+    description: "Auto-generated API reference for Interface: OcSceneRGB. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcSceneRGB
+
+# Interface: OcSceneRGB
+
+Defined in: [tokens/scene-tokens.ts:21](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L21)
+
+scene-tokens — the token→uniform rail for GPU-rendered backdrops.
+
+A WebGL layer cannot read OKLCH custom properties the way CSS can:
+`getComputedStyle(...).getPropertyValue('--brand')` returns the raw
+`oklch(…)` string (or an unresolved `color-mix(…)` expression) that no
+rgb-regex survives. The zero-dependency bridge: a hidden probe element per
+slot styled `color: color-mix(in srgb, var(--slot), var(--slot))` — the
+browser performs the OKLCH→sRGB conversion + gamut mapping natively and
+serializes the computed value as `color(srgb r g b)` (or legacy `rgb(…)`)
+floats, parsed with one regex.
+
+Probes are mounted INSIDE the `.oc-aurora` element so per-skin re-hue hooks
+(ember's `[data-oc-theme='ember'] .oc-aurora { --au-green; --au-blue }`)
+apply for free. Change detection is one MutationObserver on &lt;html>
+(class + data-oc-theme + data-oc-motion) resampling in a double-rAF — it
+catches next-themes mode flips, system scheme changes, cross-tab cookie
+pickup, and skin swaps, framework-free (works in Storybook).
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-b">&lt;/a> `b` | `number` | [tokens/scene-tokens.ts:24](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L24) |
+| &lt;a id="property-g">&lt;/a> `g` | `number` | [tokens/scene-tokens.ts:23](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L23) |
+| &lt;a id="property-r">&lt;/a> `r` | `number` | [tokens/scene-tokens.ts:22](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/scene-tokens.ts#L22) |

@@ -1,0 +1,26 @@
+export const metadata = {
+    title: "Interface: InsightsEvent",
+    description: "Auto-generated API reference for Interface: InsightsEvent. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/insights-client**](../README)
+
+***
+
+[@orangecheck/insights-client](../README) / InsightsEvent
+
+# Interface: InsightsEvent
+
+Defined in: [index.ts:57](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L57)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-actor">&lt;/a> `actor?` | `string` \| `null` | OPTIONAL bare actor id (Bitcoin address / email). The collector salted-hashes it product-scoped and discards the raw value — never stored. Omit for fully anonymous events. | [index.ts:71](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L71) |
+| &lt;a id="property-eventclass">&lt;/a> `eventClass?` | [`EventClass`](../type-aliases/EventClass) | oc-me A/B/C billable-event class, when applicable. | [index.ts:73](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L73) |
+| &lt;a id="property-name">&lt;/a> `name` | `string` | Event name, e.g. 'pageview' (reserved for the beacon lane), 'bip322_success', 'settlement'. | [index.ts:61](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L61) |
+| &lt;a id="property-product">&lt;/a> `product` | `string` | Registry slug of the emitting product: 'me' | 'vault' | 'attest' | … | [index.ts:59](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L59) |
+| &lt;a id="property-props">&lt;/a> `props?` | `Record`\&lt;`string`, [`PropValue`](../type-aliases/PropValue)\> | Small flat bag of custom props (capped at 30 keys; non-primitive values dropped). | [index.ts:65](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L65) |
+| &lt;a id="property-subtype">&lt;/a> `subtype?` | `string` | Finer event subtype, e.g. a SUBTYPE_CLASS key like 'stamp_signing'. | [index.ts:75](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L75) |
+| &lt;a id="property-ts">&lt;/a> `ts?` | `string` | ISO-8601 timestamp. Omit to let the collector stamp receipt time. | [index.ts:63](https://github.com/orangecheck/oc-packages/blob/main/insights-client/src/index.ts#L63) |

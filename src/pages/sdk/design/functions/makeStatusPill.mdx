@@ -1,0 +1,63 @@
+export const metadata = {
+    title: "Function: makeStatusPill()",
+    description: "Auto-generated API reference for Function: makeStatusPill(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / makeStatusPill
+
+# Function: makeStatusPill()
+
+```ts
+function makeStatusPill<S>(map: Record<S, StatusPillSpec>, options?: {
+  fallbackTone?: StatusTone;
+  filled?: boolean;
+  variant?: StatusPillVariant;
+}): (props: {
+  className?: string;
+  status: S;
+}) => ReactNode;
+```
+
+Defined in: [primitives/status-pill.tsx:122](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/status-pill.tsx#L122)
+
+makeStatusPill — build a domain-specific status pill from a status→spec map.
+This is the ergonomic that www
+(StateBadge severity), and me (compliance/severity) each hand-roll. Instead
+of re-deriving tone-class logic per site, declare the map once:
+
+  const AgentStatusPill = makeStatusPill(&#123;
+      online:  &#123; tone: 'success' &#125;,
+      offline: &#123; tone: 'destructive', label: 'down' &#125;,
+      pending: &#123; tone: 'warning' &#125;,
+  &#125;);
+  &lt;AgentStatusPill status=&#123;agent.status&#125; />
+
+Pass `{ variant: 'bordered' }` for the uppercase-badge form (pledge
+states, www state badges, me compliance/severity).
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `S` *extends* `string` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `map` | `Record`\&lt;`S`, [`StatusPillSpec`](../interfaces/StatusPillSpec)\> |
+| `options?` | \&#123; `fallbackTone?`: [`StatusTone`](../type-aliases/StatusTone); `filled?`: `boolean`; `variant?`: [`StatusPillVariant`](../type-aliases/StatusPillVariant); \&#125; |
+| `options.fallbackTone?` | [`StatusTone`](../type-aliases/StatusTone) |
+| `options.filled?` | `boolean` |
+| `options.variant?` | [`StatusPillVariant`](../type-aliases/StatusPillVariant) |
+
+## Returns
+
+(`props`: \&#123;
+  `className?`: `string`;
+  `status`: `S`;
+\&#125;) => `ReactNode`

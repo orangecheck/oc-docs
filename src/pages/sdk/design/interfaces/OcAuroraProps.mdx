@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: OcAuroraProps",
+    description: "Auto-generated API reference for Interface: OcAuroraProps. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/design**](../README)
+
+***
+
+[@orangecheck/design](../README) / OcAuroraProps
+
+# Interface: OcAuroraProps
+
+Defined in: [tokens/aurora.tsx:7](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/aurora.tsx#L7)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [tokens/aurora.tsx:22](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/aurora.tsx#L22) |
+| &lt;a id="property-gl">&lt;/a> `gl?` | `boolean` | Mount the OcAuroraGL silk-field upgrade (aurora depth R2). Default off. When every gate passes (WebGL2 with a real GPU, no reduced-motion, no saveData / low-memory signal, ambient motion on), a ~8 KB chunk lazy-loads after idle and crossfades over the CSS blobs — which then pause. Every failure or opt-out path silently keeps the CSS aurora. Per-site kill switch without a package release: `.oc-aurora { --oc-aurora-gl: off }`. | [tokens/aurora.tsx:21](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/aurora.tsx#L21) |
+| &lt;a id="property-intensity">&lt;/a> `intensity?` | `number` | Master intensity multiplier (default 1, from the theme CSS). Overrides `--oc-aurora-intensity` for this mount — e.g. dial a reading-heavy site down. | [tokens/aurora.tsx:12](https://github.com/orangecheck/oc-packages/blob/main/design/src/tokens/aurora.tsx#L12) |

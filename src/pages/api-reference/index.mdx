@@ -8,11 +8,8 @@ export const metadata = {
 
 Every product and protocol in the OrangeCheck family that ships an HTTP API
 exposes a machine-readable **OpenAPI 3.1** spec at `/api/openapi` on its own
-origin, plus an interactive **`/api-explorer`** page (Swagger UI). Same shape
-across the family — same auth scheme name (`cookieAuth` for session-bound
-endpoints), same error-response convention
-(`{ ok: false, reason: '...', detail: '...' }`), same `429 rate_limited`
-contract.
+origin, plus an interactive **`/api-explorer`** page (Swagger UI). Session-bound
+endpoints use the same auth scheme name (`cookieAuth`) everywhere.
 
 ## Currently shipped
 
@@ -24,6 +21,44 @@ contract.
 
 The narrowed product pages (linked in the sidebar under this group) embed the
 same spec rendered inline + cross-link to the live explorer.
+
+## Errors
+
+Every API signals failure with the HTTP status first. The JSON body is not
+uniform across the three hosts, so branch on the status code and treat the body
+as a machine-readable hint. What each one returns today:
+
+**`attest.ochk.io`**
+
+| Case                           | Status | Body                                                                   |
+| ------------------------------ | ------ | ---------------------------------------------------------------------- |
+| Query or body fails validation | 400    | `{ "error": "bad_request", "issues": [ … ] }` — `issues` is optional   |
+| `/api/check` finds no proof    | 404    | `{ "ok": false, "reasons": ["not_found"] }`                            |
+| Check ran, thresholds not met  | 200    | `{ "ok": false, "reasons": [ … ], … }`                                 |
+| Wrong method                   | 405    | `{ "error": "method_not_allowed" }`                                    |
+| Per-IP limit exceeded          | 429    | `{ "error": "rate_limited" }` — no `Retry-After` header; wait a minute |
+| Unexpected failure             | 500    | `{ "error": "server_error" }`                                          |
+
+`/api/publish-attestation` answers `{ "ok": false, "error": "<code>" }`
+(`missing_envelope`, `invalid_json`, `rate_limited`, …).
+
+**`ochk.io` (auth host)**
+
+| Case                      | Status  | Body                                                                                                                                    |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Most failures             | 4xx/5xx | `{ "ok": false, "reason": "<code>" }`                                                                                                   |
+| No session                | 401     | `{ "ok": false, "reason": "not_authenticated" }`                                                                                        |
+| Request validation (some) | 400     | `{ "error": "bad_request", "issues": [ … ] }`                                                                                           |
+| Per-IP limit exceeded     | 429     | `{ "ok": false, "reason": "rate_limited" }` on most endpoints; `{ "error": "rate_limited" }` on `/api/challenge` and `/api/auth/switch` |
+
+**`me.ochk.io`**
+
+Handlers answer `{ "ok": false, "reason": "<code>" }`,
+`{ "ok": false, "error": "<code>" }` or `{ "error": "<code>" }`, depending on
+the route; some add context fields (`project_key`, …). Rate limits answer 429
+with `{ "error": "rate_limit_exceeded", "retry_after_seconds", "bucket" }`, or
+for per-project event caps `{ "error": "project_rate_limit_exceeded", … }` plus
+a `Retry-After` header.
 
 ## What about the other subdomains?
 

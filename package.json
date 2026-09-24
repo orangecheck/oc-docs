@@ -18,6 +18,7 @@
         "check": "yarn type-check && yarn lint && yarn format:check",
         "check:links": "node scripts/check-doc-links.mjs",
         "check:internal-links": "node scripts/check-internal-links.mjs",
+        "check:sample-imports": "node scripts/check-sample-imports.mjs",
         "pretype-check": "node scripts/ds-guard.mjs"
     },
     "dependencies": {

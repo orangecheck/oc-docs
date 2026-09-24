@@ -28,8 +28,11 @@ controls ≥ X sats unspent for ≥ Y days." The load-bearing primitive is
 
 ## Auth posture
 
-**Every endpoint is public.** No auth, no API keys. Rate-limited per-IP (token
-bucket — `429 rate_limited` with `Retry-After` on overflow).
+**Every endpoint is public.** No auth, no API keys. Rate-limited per IP per
+minute (`/api/check` and `/api/discover` 60, `/api/stats` 30, `/api/verify` 10,
+`/api/publish-attestation` 5). Overflow answers `429` with
+`{ "error": "rate_limited" }` and no `Retry-After` header. Error bodies are
+listed on the [API reference overview](/api-reference#errors).
 
 The session-bound endpoint (`/api/auth/me`) on `attest.ochk.io` is delegated to
 the family auth host via `oc_session` cookie verification — it's documented

@@ -863,12 +863,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/wallet-adapter/README',
                 label: '@orangecheck/wallet-adapter',
-                blurb: 'Normalize UniSat / Xverse / Leather / OKX behind one sign API.',
-            },
-            {
-                href: '/sdk/webhook-verify/README',
-                label: '@orangecheck/webhook-verify',
-                blurb: 'HMAC verification helpers for OC webhook deliveries.',
+                blurb: 'Normalize UniSat / Xverse / Leather / Alby / OKX / Phantom behind one getSigner() API.',
             },
             {
                 href: '/sdk/react/README',
@@ -877,8 +872,13 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/sdk/ui/README',
-                label: '@orangecheck/design',
-                blurb: 'Shared shadcn-style UI primitives across the family.',
+                label: '@orangecheck/ui (deprecated)',
+                blurb: 'Deprecated. Replaced by @orangecheck/design — see design.ochk.io.',
+            },
+            {
+                href: '/sdk/webhook-verify/README',
+                label: '@orangecheck/webhook-verify (deprecated)',
+                blurb: 'Deprecated. Verified deliveries from fleet.ochk.io, which is retired.',
             },
         ],
     },

@@ -53,19 +53,18 @@ each threshold check.
 ## Programmatic mode
 
 ```ts
-import { filterCandidates } from '@orangecheck/airdrop-gate';
+import { filterAllowlist } from '@orangecheck/airdrop-gate';
 
 const candidates = ['bc1qalice...', 'bc1qbob...', 'bc1qcarol...'];
 
-const result = await filterCandidates({
-    addresses: candidates,
+const { ok, rejected } = await filterAllowlist(candidates, {
     minSats: 100_000,
     minDays: 90,
     concurrency: 8,
 });
 
-console.log(result.passed); // array of addresses that met threshold
-console.log(result.failed); // array of { address, reasons } for rejects
+console.log(ok); // addresses that met the thresholds, in input order
+console.log(rejected); // array of { address, ok: false, reasons } for rejects
 ```
 
 `concurrency` tunes parallel request count. Default 4; raise it if you control

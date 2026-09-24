@@ -107,20 +107,17 @@ A verifier with `ots.status === "confirmed"`:
 
 ```ts
 import { verify } from '@orangecheck/stamp-core';
-import {
-    adaptAnchorVerifier,
-    hexDecode,
-    makeAnchorVerifier,
-} from '@orangecheck/stamp-ots';
+import { makeAnchorVerifier } from '@orangecheck/stamp-ots';
 
-const anchor = makeAnchorVerifier({
+// Already shaped as stamp-core's verifyOtsAnchor(proofB64, blockHeight, blockHash, envelopeId).
+const verifyOtsAnchor = makeAnchorVerifier({
     walkProof: myOtsParser,
     headerSource: myHeaderSource, // full node, SPV, or headers snapshot
 });
 
 const r = await verify({
     envelope: env,
-    verifyOtsAnchor: adaptAnchorVerifier(anchor, () => hexDecode(env.id)),
+    verifyOtsAnchor,
     verifyBip322: myBip322Verifier,
 });
 ```
@@ -134,8 +131,10 @@ ones who only need calendar submission — to drag in its transitive deps.
 
 Instead: we ship the calendar client and the anchor-verifier shape, and expose
 `walkProof` as a plug-in point. Consumers who want full offline verification
-bring their own parser (typically `javascript-opentimestamps`). Consumers who
-only need submission get a dep-light package.
+bring their own parser, or install `opentimestamps` next to
+`@orangecheck/stamp-ots` and call `makeDefaultAnchorVerifier({ headerSource })`,
+which loads it lazily. Consumers who only need submission get a dep-light
+package.
 
 ## Aggregators
 

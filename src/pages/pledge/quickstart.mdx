@@ -1,115 +1,184 @@
 export const metadata = {
     title: 'OC Pledge — Quickstart',
     description:
-        'Swear a pledge, publish it, and verify the outcome end-to-end. Five-minute walk-through using the @orangecheck/pledge SDK.',
+        'Swear a pledge, publish it, and classify the outcome end-to-end. Five-minute walk-through using @orangecheck/pledge-core.',
 };
 
 # OC Pledge — Quickstart
 
-End-to-end: construct a pledge, sign it, publish to Nostr, verify the outcome.
-About five minutes if you already have an OrangeCheck attestation; ten if you
-need to mint one first.
+End-to-end: construct and sign a pledge, publish it to Nostr, then record and
+classify its outcome. About five minutes if you already have an OrangeCheck
+attestation; ten if you need to mint one first.
 
 ## 1. Install
 
 ```bash
-yarn add @orangecheck/pledge-core @orangecheck/auth-client
+yarn add @orangecheck/pledge-core @orangecheck/wallet-adapter @orangecheck/nostr-core nostr-tools
 ```
 
-The SDK is at `v1.0.0` and tracks
+`@orangecheck/pledge-core` tracks
 [`oc-pledge-protocol@v1.0`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md).
-28 conformance vectors are public; the cross-impl gate in oc-packages CI ensures
-both this SDK and the Python `orangecheck.pledge` sub-module produce
-byte-identical canonical messages on every PR.
+It runs every public conformance vector, and oc-packages CI checks that it and
+the Python `orangecheck.pledge` sub-module produce byte-identical canonical
+messages on every PR.
 
-## 2. Construct a pledge
+It does no networking and no signing of its own. You hand it a BIP-322 signer, a
+BIP-322 verifier and, for bond checks, a chain lookup; it works the same in a
+browser, Node or a CLI.
+
+## 2. Construct and sign a pledge
 
 ```ts
 import { createPledge } from '@orangecheck/pledge-core';
+import { getSigner } from '@orangecheck/wallet-adapter';
 
-const { envelope, canonical_message, pledge_id } = await createPledge({
-    swearer: 'bc1qexampleaddress…',
-    proposition: 'I will publish my Q3 results by block 920_000.',
+const swearer = 'bc1qexampleaddress…';
+
+const pledge = await createPledge({
+    swearer,
+    proposition: 'I will publish my Q3 results by block 920000.',
     resolution: {
         mechanism: 'stamp_published',
-        query: 'content_hash:sha256:7d…',
+        query: `stamp(content_hash=sha256:${'7d'.repeat(32)}, signer=${swearer})`,
     },
     resolves_at: { block: 920_000 },
-    expires_at: '2026-08-01T00:00:00Z',
+    expires_at: '2026-12-01T00:00:00Z',
     bond: {
-        attestation_id: '<your OrangeCheck attestation id>',
+        attestation_id: '<64-hex id of your OrangeCheck attestation>',
         min_sats: 1_000_000,
         min_days: 90,
     },
+    counterparty: null,
+    dispute: { mechanism: null, params: null },
+    swearerSigner: {
+        address: swearer,
+        signMessage: getSigner('unisat', { address: swearer }),
+    },
 });
+
+pledge.id; // 64 lowercase hex: sha256 of the canonical message
 ```
 
-The SDK refuses any combination that can't resolve to a deterministic boolean —
-for example a `proposition` paired with a non-existent mechanism, a
-`resolves_at` past `expires_at`, or an `attestation_id` the SDK can't verify
-exists.
+`createPledge` builds the canonical message, derives the id, and asks the wallet
+to sign. The wallet signs the **pledge id as a hex string** (SPEC §3.5): the id
+commits to every field, and a hex string is something a wallet can show the user
+before they approve it.
 
-## 3. Sign with the wallet
+It throws a `PledgeError` with code `E_PLEDGE_MALFORMED`, and a message naming
+the rule, for input no verifier could evaluate: a query outside its mechanism's
+grammar, a time-typed `resolves_at` after `expires_at`, a `counterparty_signs`
+pledge with no counterparty. It does not look the bond up — that needs chain
+state, and happens at verification time (step 5).
+
+## 3. Verify it
 
 ```ts
-import { signPledge } from '@orangecheck/pledge';
-import { sign } from '@orangecheck/wallet-adapter';
+import { verifyPledge } from '@orangecheck/pledge-core';
+import { Verifier } from 'bip322-js';
 
-const sig = await sign({ address: swearer, message: canonical_message });
-const signed = signPledge({ envelope, sig });
+const result = await verifyPledge({
+    envelope: pledge,
+    verifyBip322: async (message, signatureB64, address) => {
+        return Verifier.verifySignature(address, message, signatureB64);
+    },
+});
+
+if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
 ```
-
-The wallet shows the signer the **exact canonical message** before signing —
-human-readable, plaintext. The user is committing to bytes they can read.
 
 ## 4. Publish
 
-```ts
-import { publish } from '@orangecheck/pledge';
+A pledge travels as a kind-30078 Nostr event with `d` tag
+`oc-pledge:<pledge_id>` and the envelope as its content
+([NIP](https://github.com/orangecheck/oc-pledge-protocol/blob/main/NIP_ORANGECHECK_PLEDGE.md)).
+The BIP-322 signature inside the envelope is what readers verify; the Nostr
+signature only satisfies the relay, so any key will do.
 
-const { event_id } = await publish(signed);
-// → posted to default Nostr relays as a kind-30078 replaceable event
-//   under d-tag `oc-pledge:<pledge_id>`.
+```ts
+import { publishEvent } from '@orangecheck/nostr-core';
+import { finalizeEvent, generateSecretKey } from 'nostr-tools/pure';
+
+const event = finalizeEvent(
+    {
+        kind: 30078,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [['d', `oc-pledge:${pledge.id}`]],
+        content: JSON.stringify(pledge),
+    },
+    generateSecretKey()
+);
+
+const results = await publishEvent(event); // one { relay, ok } per default relay
 ```
 
-## 5. Verify the outcome
+## 5. Record and classify the outcome
+
+pledge-core does not fetch public state. Once `resolves_at` has passed, you (or
+any observer) evaluate the mechanism — here, look for the named OC Stamp — and
+record what you found as an outcome envelope:
 
 ```ts
-import { getState, resolvePledge, verify } from '@orangecheck/pledge';
+import {
+    classifyState,
+    createOutcome,
+    verifyBond,
+} from '@orangecheck/pledge-core';
 
-// At any time after `resolves_at`:
-const outcome = await resolvePledge({ envelope: signed });
-// → outcome envelope: { outcome: 'kept' | 'broken' | …, evidence: {…} }
+const outcome = await createOutcome({
+    pledge_id: pledge.id,
+    outcome: 'kept',
+    resolved_at: '2026-11-02T00:00:00Z',
+    resolved_by: 'deterministic',
+    evidence: {
+        mechanism: 'stamp_published',
+        result: 'true',
+        witness: 'nostr_event_id=<64-hex id of the stamp event>',
+    },
+    dispute_window_ends_at: '2026-11-09T00:00:00Z',
+});
 
-const result = await verify({ envelope: signed, outcome });
-// → { ok: true, state: 'kept', bond_status: 'satisfied', … }
+const state = classifyState({
+    pledge,
+    outcome,
+    abandonment: null,
+    now: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+    chain: { tip_height: 920_100, tip_time: '2026-11-02T00:00:00Z' },
+});
+// 'pending' | 'resolvable' | 'kept' | 'broken' | 'disputed' | 'expired_unresolved'
 
-const state = getState(signed, outcome, Date.now());
-// → 'kept'
+const bond = await verifyBond({
+    pledge,
+    now: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+    lookup: async (attestationId, nowIso) => {
+        // resolve the attestation against live chain state; null if not found
+        return {
+            address: swearer,
+            sats_bonded: 1_500_000,
+            days_unspent: 95,
+            utxo_spent_at_or_before_now: false,
+        };
+    },
+});
+// { ok: true, sats_bonded, days_unspent } or { ok: false, code: 'E_BOND_…' }
 ```
 
 For deterministic mechanisms (`chain_state`, `nostr_event_exists`,
 `stamp_published`, `http_get_hash`, `dns_record`), every observer with access to
 the same public state produces the byte-identical outcome envelope — **no
-resolver is required**.
+resolver is required**, and `sig` is `null`.
 
-For `counterparty_signs` and `vote_resolves`, the outcome envelope must be
-signed by the designated resolver. Absence of that signature within `expires_at`
-resolves the pledge to `expired_unresolved`.
+For `counterparty_signs` and `vote_resolves`, the outcome must be signed by the
+designated resolver: pass `signer` to `createOutcome`, whose address must equal
+`resolved_by`. With no signed outcome by `expires_at`, the pledge resolves to
+`expired_unresolved`.
 
 ## 6. Show the public history
 
-```ts
-import { bondInFlight, outcomesFor, pledgesSworn } from '@orangecheck/pledge';
-
-const ids = await pledgesSworn('bc1q…');
-const outcomes = await outcomesFor('bc1q…');
-const inFlight = await bondInFlight('bc1q…');
-```
-
-These are **raw metrics**. The protocol ships no aggregated score and no
-reference reputation function — by design. Platforms compute derived policies
-from raw queries; that's the [composition surface](/pledge/composition).
+The protocol ships no aggregated score and no reference reputation function — by
+design. To show an address's record, fetch its pledge and outcome events from
+relays (`oc-pledge:` and `oc-pledge-outcome:` `d` tags), verify each, and run
+`classifyState` over them. Platforms compute derived policies from those raw
+states; that's the [composition surface](/pledge/composition).
 
 ## What's next
 

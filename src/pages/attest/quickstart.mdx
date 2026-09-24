@@ -147,12 +147,14 @@ Everything above is a convenience over a pure function. `/api/check` is
 don't.
 
 ```sh
-npm i @orangecheck/sdk@^1.4.0
+npm i @orangecheck/sdk@^1.7.0
 ```
 
 The version floor matters. In `1.3.0` and earlier, `check()` filtered relays on
 a multi-letter `#address` tag, which NIP-12 relays do not index — so it answered
-`not_found` for every real attestation. Fixed in `1.4.0`.
+`not_found` for every real attestation. Before `1.7.0`, it took the subject from
+relay tags rather than the signed message, and let one bond vouch for several
+identities on the same protocol.
 
 ```ts
 import { check } from '@orangecheck/sdk';

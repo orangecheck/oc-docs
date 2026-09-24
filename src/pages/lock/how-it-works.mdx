@@ -14,12 +14,12 @@ The recipient generates an X25519 keypair, builds a canonical binding statement,
 and signs it with BIP-322 from their Bitcoin address:
 
 ```
-oc-lock-device-binding-v0
+oc-lock:device-bind:v3
 address: bc1qbob...
-device_id: <16 random bytes, hex>
 device_pk: <32-byte X25519 public key, hex>
+nostr_pk: <the device's derived Nostr pubkey, hex>
+device_id: <16 random bytes, hex>
 created_at: 2026-04-24T06:47:29.977Z
-ack: I bind this device key to this Bitcoin address.
 ```
 
 Signature + binding are wrapped as a kind-30078 Nostr event with `d` tag
@@ -31,6 +31,7 @@ Code:
 ```ts
 import {
     buildBindingStatement,
+    deriveNostrKey,
     generateDeviceKey,
 } from '@orangecheck/lock-device';
 
@@ -39,12 +40,13 @@ const { device_sk, device_pk, device_id, created_at } = generateDeviceKey();
 const statement = buildBindingStatement({
     address: 'bc1qbob...',
     device_pk,
+    nostr_pk: deriveNostrKey(device_sk).nostrPk,
     device_id,
     created_at,
 });
 
 const signature = await walletSignBIP322(statement);
-// Publish { statement, signature, ... } as a kind-30078 event
+// Sign and publish as a kind-30078 event: see Device keys
 ```
 
 The device secret (`device_sk`) stays on the recipient's device. Never leaves.
@@ -53,16 +55,42 @@ If it does, that device's envelopes are compromised.
 ## 2. Sender looks up the recipient
 
 ```ts
-import { queryDeviceRecord } from '@orangecheck/lock-device';
+import {
+    authorizedDevices,
+    DEVICE_KIND,
+    parseDeviceEvent,
+} from '@orangecheck/lock-device';
+import { queryEvents } from '@orangecheck/nostr-core';
 
-const record = await queryDeviceRecord('bc1qbob...', relays);
-// record.device_pk is the 32-byte X25519 public key we'll encrypt to.
-// record.signature proves bc1qbob... bound this key.
+const { events } = await queryEvents({
+    kinds: [DEVICE_KIND],
+    '#d': ['oc-lock:device:bc1qbob...'],
+});
+const verified = [];
+for (const event of events) {
+    let record;
+    try {
+        record = parseDeviceEvent(event); // throws if tags disagree with the signed statement
+    } catch {
+        continue;
+    }
+    if (
+        await verifyBip322(
+            record.bindingStatement,
+            record.bindingSigBase64,
+            record.address
+        )
+    ) {
+        verified.push(record);
+    }
+}
+const devices = authorizedDevices(verified); // drops revoked and ambiguous records
+// Each device.device_pk is a 32-byte X25519 public key we'll encrypt to.
 ```
 
-Before encrypting, the sender SHOULD verify the BIP-322 binding. If the
-signature is bad or the address doesn't match, the record is forged — refuse to
-send.
+The sender MUST verify each record's BIP-322 signature before encrypting to it;
+a record whose signature fails is forged. `authorizedDevices` expects records
+that already passed that check.
 
 ## 3. Sender seals
 
@@ -75,13 +103,11 @@ const envelope = await seal({
         address: 'bc1qalice...',
         signMessage: async (msg) => walletSignBIP322(msg),
     },
-    recipients: [
-        {
-            address: record.address,
-            device_id: record.device_id,
-            device_pk: record.device_pk,
-        },
-    ],
+    recipients: devices.map((d) => ({
+        address: d.address,
+        device_id: d.device_id,
+        device_pk: d.device_pk,
+    })),
 });
 ```
 

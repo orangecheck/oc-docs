@@ -9,8 +9,8 @@ export const metadata = {
 Every published package in the OrangeCheck ecosystem, with what it does, which
 protocol it serves, and a link to the full API reference. All packages are
 MIT-licensed and live in the
-[`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo (TypeScript)
-or [`oc-py`](https://github.com/orangecheck/oc-py) (Python).
+[`oc-packages`](https://github.com/orangecheck/oc-packages) monorepo — the
+Python SDK too, under `sdk-py/`.
 
 > **The detailed per-export, per-type, per-signature reference under each
 > TypeScript package is auto-generated from the source via
@@ -40,7 +40,6 @@ Match the job to the package; click through to the reference.
 | Stake-weighted poll tally          | [`@orangecheck/vote-core`](/sdk/vote-core/README)                      |
 | Scoped, bonded delegated signing   | [`@orangecheck/agent-core`](/sdk/agent-core/README)                    |
 | Bonded commitments / future claims | [`@orangecheck/pledge-core`](/sdk/pledge-core/README)                  |
-| Verify HMAC webhook deliveries     | [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)            |
 
 ## Cross-cutting
 
@@ -53,14 +52,15 @@ Serve every sibling protocol.
 | [`@orangecheck/cli`](/sdk/cli)                                    | `oc` shell — check / verify / create / challenge / discover.                                           |
 | [`@orangecheck/gate`](/sdk/gate/README)                           | HTTP middleware for Express / Next / Fastify / Hono / Workers.                                         |
 | [`@orangecheck/react`](/sdk/react/README)                         | `<OcBadge>`, `<OcGate>`, `<OcChallengeButton>`.                                                        |
-| [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README)       | One `sign(message)` API across UniSat / Xverse / Leather / Alby.                                       |
+| [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README)       | One `getSigner(wallet, { address })` API across UniSat / Xverse / Leather / Alby / OKX / Phantom.      |
 | [`@orangecheck/relay-filter`](/sdk/relay-filter/README)           | Sybil-filter policy for Nostr relays. Strfry plugin + framework-agnostic core.                         |
 | [`@orangecheck/airdrop-gate`](/sdk/airdrop-gate/README)           | Sybil-resistant allowlist filter — turn a candidate list into a filtered set.                          |
-| [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)       | HMAC verification helpers for webhook deliveries from me / attest.                                     |
 | [`@orangecheck/auth-core`](/sdk/auth-core/README)                 | Ed25519 JWT verify + cookie helpers — consumer half of the ochk.io auth host.                          |
 | [`@orangecheck/auth-client`](/sdk/auth-client/README)             | React provider + hooks for cross-subdomain auth via the ochk.io host.                                  |
 | [`@orangecheck/nostr-core`](/sdk/nostr-core/README)               | Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).                                      |
-| [`@orangecheck/ui`](/sdk/ui/README)                               | Shared shadcn-style UI primitives across the family.                                                   |
+| [`@orangecheck/design`](https://design.ochk.io)                   | The family design system — tokens, primitives, family chrome. Storybook at design.ochk.io.             |
+| [`@orangecheck/legal`](https://www.npmjs.com/package/@orangecheck/legal) | Family-internal Terms / Privacy / security-disclosure documents rendered by every family site.   |
+| [`@orangecheck/insights-client`](https://www.npmjs.com/package/@orangecheck/insights-client) | Server-side event emit for oc insights, the family's first-party analytics.  |
 
 ## Per-protocol packages
 
@@ -90,8 +90,8 @@ Serve every sibling protocol.
 
 | Package                                                       | Purpose                                                                                            |
 | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| [`@orangecheck/agent-core`](/sdk/agent-core/README)           | Delegation envelope, scope grammar, `delegate()`, `act()`, `verifyAct()`, revocation lookup.       |
-| [`@orangecheck/agent-signer`](/sdk/agent-signer/README)       | Producer-side signer — wraps a wallet to emit agent-action envelopes.                              |
+| [`@orangecheck/agent-core`](/sdk/agent-core/README)           | Envelope formats, scope grammar, `verifyDelegation()`, `verifyAction()`, `verifyRevocation()`.     |
+| [`@orangecheck/agent-signer`](/sdk/agent-signer/README)       | Producer side — `createDelegation()`, `signAsAgent()`, `revoke()` over your wallet.                |
 | [`@orangecheck/agent-mcp`](/sdk/agent-mcp/README)             | Model Context Protocol bindings for agent envelopes.                                               |
 | [`@orangecheck/agent-anthropic`](/sdk/agent-anthropic/README) | Adapter for Anthropic SDK tool-use canonicalization.                                               |
 | [`@orangecheck/agent-openai`](/sdk/agent-openai/README)       | Adapter for OpenAI SDK tool-call canonicalization.                                                 |
@@ -102,13 +102,34 @@ Serve every sibling protocol.
 
 | Package                                                 | Purpose                                                                                                                          |
 | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| [`@orangecheck/pledge-core`](/sdk/pledge-core/README)   | Pledge envelope, claim grammar, outcome canonicalization, `pledge()`, `attest()`, `dispute()`, deterministic state-machine eval. |
+| [`@orangecheck/pledge-core`](/sdk/pledge-core/README)   | Pledge / outcome / abandonment envelopes, resolution grammar, `createPledge()`, `verifyPledge()`, `createOutcome()`, `verifyBond()`, `classifyState()`. |
 
 ### Commercial products
 
 | Package                                                 | Purpose                                                                       |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | [`@orangecheck/me-client`](/sdk/me-client/README)       | me.ochk.io client SDK — auth, accounts, billable events.                      |
+| [`@orangecheck/vault-core`](/sdk/vault-core/README)     | OC Vault crypto, entry model, `ocv://` secret-reference resolver, API client. |
+
+## Command-line tools
+
+| Package                                                                           | Command               | Purpose                                                              |
+| --------------------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------- |
+| [`@orangecheck/cli`](/sdk/cli)                                                    | `oc`                  | OC Attest — check / verify / create / challenge / discover.          |
+| [`@orangecheck/agent-cli`](https://www.npmjs.com/package/@orangecheck/agent-cli) | `oc-agent`            | Verify, inspect and canonicalize delegation / action / revocation envelopes. |
+| [`@orangecheck/stamp-cli`](https://www.npmjs.com/package/@orangecheck/stamp-cli) | `stamp`, `git-stamp`  | Sign files and git tags with your Bitcoin address; anchor to Bitcoin. |
+| [`@orangecheck/vote-cli`](https://www.npmjs.com/package/@orangecheck/vote-cli)   | `oc-vote`             | Tally, verify and inspect polls.                                     |
+| [`@orangecheck/vault-cli`](https://www.npmjs.com/package/@orangecheck/vault-cli) | `oc-vault`            | Resolve `ocv://` secret references and inject secrets into a process. |
+
+## Deprecated — do not install
+
+Still on npm so old lockfiles resolve. Nothing new should depend on them.
+
+| Package                                                           | Status                                                                                                   |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/ui`](/sdk/ui/README)                               | Deprecated. Replaced by [`@orangecheck/design`](https://design.ochk.io).                                 |
+| [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)       | Deprecated. It verified webhook deliveries from fleet.ochk.io, which is retired. No replacement.         |
+| `@orangecheck/agent-console-client`                              | Unmaintained, not marked deprecated on npm. Its only target, console.ochk.io, is retired; the source is no longer in oc-packages. |
 
 ## Semver
 

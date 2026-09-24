@@ -163,11 +163,11 @@ function Header() {
 ```
 
 Most family sites never write this code themselves — the canonical
-[`<OcAccountMenu>`](/sdk/ui/README) from `@orangecheck/ui` already mounts the
-`§ accounts` section in the header popover, with switch rows, the
+[`<OcAccountMenu>`](https://design.ochk.io) from `@orangecheck/design` already
+mounts the `§ accounts` section in the header popover, with switch rows, the
 add-another-account entry point, and per-row "leave this account" all wired up.
 Every `.ochk.io` family site (stamp, vault, vote, agent, lock, attest, pledge,
-me, …) gets it on the next `@orangecheck/ui` bump.
+me, …) gets it on the next `@orangecheck/design` bump.
 
 For sites that mount [`<OcSignIn>`](/sdk/auth-client/functions/OcSignIn)
 directly at `/signin`, the `add` prop controls add-mode rendering — the
@@ -218,5 +218,6 @@ the same as every other multi-account system (Google, GitHub, Slack, …):
   every endpoint mentioned above.
 - [`@orangecheck/auth-client`](/sdk/auth-client/README) · React SDK
   auto-generated reference (`useOcSession`, `OcSignIn`, types).
-- [`@orangecheck/ui`](/sdk/ui/README) · the family-wide `<OcAccountMenu>` that
-  ships the rendered surface.
+- [`@orangecheck/design`](https://design.ochk.io) · the family-wide
+  `<OcAccountMenu>` that ships the rendered surface. (It replaced the deprecated
+  `@orangecheck/ui`.)

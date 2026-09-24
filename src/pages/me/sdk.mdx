@@ -258,8 +258,8 @@ entry rather than rejecting every webhook.
 > Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
 > [agent.ochk.io](https://agent.ochk.io) / [docs.ochk.io/agent](/agent), not on
 > me.ochk.io. me-client doesn't ship a delegation namespace; reach for
-> `@orangecheck/agent-client` if you need to issue or revoke agent delegations
-> from your integration.
+> `@orangecheck/agent-signer` to issue or revoke agent delegations from your
+> integration, and `@orangecheck/agent-core` to verify them.
 
 ## `oc.identity.verifyActivityAttestation` · cross-integrator sybil-resistance gate
 

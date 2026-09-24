@@ -31,43 +31,60 @@ on iOS; AndroidKeystore on Android).
 ## Bind to a Bitcoin address
 
 ```ts
-import { buildBindingStatement } from '@orangecheck/lock-device';
+import {
+    buildBindingStatement,
+    deriveNostrKey,
+} from '@orangecheck/lock-device';
 
 const statement = buildBindingStatement({
     address: 'bc1qbob...',
     device_pk,
+    nostr_pk: deriveNostrKey(device_sk).nostrPk,
     device_id,
     created_at,
 });
 
-const signature = await walletSignBIP322(statement);
+const signature = await walletSignBIP322(statement); // base64
 ```
 
 The statement is a [canonical message](/ecosystem/canonical-message) with header
-`oc-lock-device-binding-v0`. It binds (address, device_id, device_pk) together —
-a verifier who sees the signature and the statement knows that `bc1qbob…` has
-attested that this device_pk is theirs.
+`oc-lock:device-bind:v3`. It binds (address, device_id, device_pk, nostr_pk)
+together — a verifier who sees the signature and the statement knows that
+`bc1qbob…` has attested that this device_pk is theirs, and which Nostr key may
+publish it. Omitting `nostr_pk` produces the older `v2` statement, which does
+not sign the publishing key; readers trust a v2 record's author only while no
+other key carries the same device (`authorizedDevices`).
 
 ## Publish to the Nostr directory
 
 ```ts
-import { buildDirectoryEvent, publishToRelays } from '@orangecheck/lock-device';
+import { finalizeDeviceEvent } from '@orangecheck/lock-device';
+import { DEFAULT_RELAYS, publishEvent } from '@orangecheck/nostr-core';
 
-const event = buildDirectoryEvent({
+const event = finalizeDeviceEvent({
+    deviceSk: device_sk,
     address: 'bc1qbob...',
-    statement,
-    signature,
+    device_id,
+    device_pk,
+    bindingStatement: statement,
+    bindingSigBase64: signature,
 });
 
-await publishToRelays(event, DEFAULT_RELAYS);
+const results = await publishEvent(event, DEFAULT_RELAYS); // one { relay, ok } per relay
 ```
+
+`@orangecheck/lock-device` builds and signs the event; it does no networking.
+Publish it with any Nostr client — `@orangecheck/nostr-core` is the family's.
 
 The event:
 
 - **kind:** 30078 (NIP-78 addressable replaceable)
 - **`d` tag:** `oc-lock:device:<bc1qbob...>` — one device record per Bitcoin
   address per pubkey
-- **content:** JSON-serialized `{ statement, signature }`
+- **content:** the binding statement itself, exactly the bytes the wallet signed
+- **tags:** `addr`, `device_id`, `device_pk`, `alg` (`x25519`) and `binding_sig`
+  (the base64 BIP-322 signature). Tags are an index; a reader trusts only values
+  that match the signed statement, which is what `parseDeviceEvent` checks
 - **author pubkey:** derived deterministically from `device_sk` via HKDF, so the
   same device always publishes under the same Nostr pubkey without needing to
   manage a separate Nostr keypair
@@ -77,11 +94,9 @@ rotating keys or fixing a mistake.
 
 ## Multiple devices per address
 
-Publish one kind-30078 event per device, each with a distinct `d` tag:
-
-- `oc-lock:device:bc1qbob...` — "most recent" device, replaceable
-- Or a content-addressed d-tag per device if you want to keep all historical
-  devices discoverable
+Each device publishes its own kind-30078 event. They share the `d` tag
+`oc-lock:device:bc1qbob...` but not an author: every device signs with its own
+derived Nostr key, so each keeps its own replaceable slot.
 
 The sender queries all events matching `#d:oc-lock:device:bc1qbob…` and wraps
 the envelope for every device it finds. Each device can independently decrypt.
@@ -91,7 +106,11 @@ the envelope for every device it finds. Each device can independently decrypt.
 Publish a revocation event:
 
 ```ts
-import { buildRevocationStatement } from '@orangecheck/lock-device';
+import {
+    buildRevocationStatement,
+    finalizeDeviceEvent,
+} from '@orangecheck/lock-device';
+import { publishEvent } from '@orangecheck/nostr-core';
 
 const revocation = buildRevocationStatement({
     address: 'bc1qbob...',
@@ -100,7 +119,18 @@ const revocation = buildRevocationStatement({
 });
 
 const sig = await walletSignBIP322(revocation);
-// Publish as a kind-30078 event with the same d-tag convention
+
+// Same d tag, signed by the old device's key, so it replaces that device's record.
+await publishEvent(
+    finalizeDeviceEvent({
+        deviceSk: oldDeviceSk,
+        address: 'bc1qbob...',
+        device_id: oldDeviceId,
+        device_pk: 'revoked',
+        bindingStatement: revocation,
+        bindingSigBase64: sig,
+    })
+);
 ```
 
 A recipient finding both a binding and a revocation for the same (address,
@@ -130,9 +160,11 @@ The directory event is authored by a Nostr pubkey derived from the device secret
 via HKDF:
 
 ```
-nostr_sk = HKDF-SHA256(device_sk, salt="oc-lock-nostr-v0", info="", length=32)
-nostr_pk = secp256k1.getPublicKey(nostr_sk)
+nostr_sk = HKDF-SHA256(device_sk, salt="oc-lock/v2/nostr-key", info="nostr-sk", length=32)
+nostr_pk = schnorr.getPublicKey(nostr_sk)   // BIP-340 x-only
 ```
+
+`deriveNostrKey(device_sk)` in `@orangecheck/lock-device` returns both.
 
 This lets the same device publish under the same Nostr pubkey across sessions
 without the user managing a separate Nostr keypair. It also prevents one device

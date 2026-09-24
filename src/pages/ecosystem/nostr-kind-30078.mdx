@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'Nostr publication',
     description:
-        'How every OrangeCheck protocol publishes its artifacts on Nostr — kinds 30078, 30080–30085, d-tag conventions per protocol, multi-relay discovery defaults.',
+        'How every OrangeCheck protocol publishes its artifacts on Nostr — kinds 30078–30115, d-tag conventions per protocol, multi-relay discovery defaults.',
 };
 
 # Nostr publication
@@ -11,32 +11,46 @@ Every OrangeCheck sibling publishes its public artifacts as
 parameterized-replaceable addressable events. The original kind, **30078**, is
 the namespake of this page and still carries Attest attestations, Lock device
 records, and Pledge envelopes. As more siblings shipped, the family expanded
-into the **30078–30099 range** with one kind per artifact type. This page is the
-authoritative roll-up.
+into the **30078–30115 range** with one kind per artifact type. This page is the
+public roll-up.
 
-> **Source of truth:** the kind table here mirrors `oc-agent-protocol/SPEC.md`
-> §4, which is the family's authoritative kind registry. Each protocol's own
-> spec normatively claims the kind(s) it owns.
+> **Source of truth:** the family kind registry (`KINDS.md` in the workspace),
+> mirrored in `oc-agent-protocol/SPEC.md` §4. Each protocol's own spec
+> normatively claims the kind(s) it owns.
 
 ## Kind registry
 
-| Kind    | Owner     | Purpose                                                                                           |
-| ------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `30078` | OC Attest | Attestation envelope (the original family event kind)                                             |
-| `30078` | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                   |
-| `30078` | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                |
-| `30080` | OC Vote   | Poll                                                                                              |
-| `30081` | OC Vote   | Ballot                                                                                            |
-| `30082` | OC Vote   | Reveal (secret-mode tally)                                                                        |
-| `30083` | OC Stamp  | Stamp envelope                                                                                    |
-| `30083` | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)             |
-| `30084` | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind) |
-| `30085` | OC Agent  | Agent revocation                                                                                  |
-| `30086` | OC Agent  | Agent sub-delegation _(v1.1)_ — chained narrowing of authority                                    |
+| Kind            | Owner     | Purpose                                                                                           |
+| --------------- | --------- | ------------------------------------------------------------------------------------------------- |
+| `30078`         | OC Attest | Attestation envelope (the original family event kind)                                             |
+| `30078`         | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                   |
+| `30078`         | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                |
+| `30078`         | OC Chat   | Device record (`oc-chat:device:`)                                                                 |
+| `30079`         | —         | Archived; do not use                                                                              |
+| `30080`         | OC Vote   | Poll                                                                                              |
+| `30081`         | OC Vote   | Ballot                                                                                            |
+| `30082`         | OC Vote   | Reveal (secret-mode tally)                                                                        |
+| `30083`         | OC Stamp  | Stamp envelope                                                                                    |
+| `30083`         | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)             |
+| `30084`         | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind) |
+| `30085`         | OC Agent  | Agent revocation                                                                                  |
+| `30086`         | OC Agent  | Agent sub-delegation _(v1.1)_ — chained narrowing of authority                                    |
+| `30087`         | OC Me     | me.ochk.io billable-event, payment, rebind, payout-binding, distribution and drop envelopes       |
+| `30088`–`30093` | —         | Free                                                                                              |
+| `30094`–`30109` | —         | Reserved, unratified (OC Find, an unbuilt research idea)                                          |
+| `30110`         | OC Chat   | Channel descriptor                                                                                |
+| `30111`         | OC Chat   | Channel post                                                                                      |
+| `30112`         | OC Chat   | Seal / block-height anchor                                                                        |
+| `30113`         | OC Chat   | Reserved (group-key rotation, private channels)                                                   |
+| `30114`         | OC Chat   | Discoverability directory                                                                         |
+| `30115`         | OC Chat   | Reserved (`pay-to-post` postage policy)                                                           |
 
-If you're allocating a new kind for a new sibling, claim the next unused number
-(currently `30086`) and update the registry in `oc-agent-protocol/SPEC.md`.
-Kinds are never reused across sub-protocols.
+OC Chat direct messages travel as NIP-59 gift wraps (kind 1059), a standard
+Nostr kind rather than a family allocation.
+
+If you're allocating a new kind for a new sibling, claim the next free number
+(currently `30088`) and update the family registry and
+`oc-agent-protocol/SPEC.md` §4. Kinds are never reused across sub-protocols.
 
 ## Why NIP-78 / kind 30078
 
@@ -49,11 +63,11 @@ what we need:
   fill it with the JSON envelope each protocol specifies.
 - **First-class in every Nostr client** — no custom relay patches required.
 
-The 30080–30085 kinds claimed by Vote/Stamp/Agent are also in NIP-78's
-parameterized-replaceable range and behave identically; the only reason they
-exist as separate kinds (rather than reusing 30078) is so a relay query like
-`{kinds: [30080]}` returns only polls without the integrator having to
-post-filter on the `d` tag.
+The 30080–30087 and 30110–30115 kinds claimed by Vote, Stamp, Agent, Me and Chat
+are also in NIP-78's parameterized-replaceable range and behave identically; the
+only reason they exist as separate kinds (rather than reusing 30078) is so a
+relay query like `{kinds: [30080]}` returns only polls without the integrator
+having to post-filter on the `d` tag.
 
 ## d-tag conventions
 

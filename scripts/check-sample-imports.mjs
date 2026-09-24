@@ -103,18 +103,26 @@ const pkgs = [...new Set(usable.map((i) => pkgOf(i.spec)))];
 const dir = mkdtempSync(join(tmpdir(), 'oc-docs-samples-'));
 try {
     writeFileSync(join(dir, 'package.json'), '{"private":true}');
-    execFileSync(
-        'npm',
-        [
-            'install',
-            '--no-audit',
-            '--no-fund',
-            '--ignore-scripts',
-            '--legacy-peer-deps',
-            ...pkgs.map((p) => `${p}@${meta.get(p).latest}`),
-        ],
-        { cwd: dir, stdio: ['ignore', 'ignore', 'inherit'] }
-    );
+    const args = [
+        'install',
+        '--no-audit',
+        '--no-fund',
+        '--ignore-scripts',
+        '--legacy-peer-deps',
+        '--prefer-online', // the version comes from a fresh registry read; don't resolve it from a stale cache
+        ...pkgs.map((p) => `${p}@${meta.get(p).latest}`),
+    ];
+    // A version published seconds ago can still be missing from a registry
+    // replica (ETARGET), so a release racing this check retries.
+    for (let attempt = 1; ; attempt++) {
+        try {
+            execFileSync('npm', args, { cwd: dir, stdio: ['ignore', 'ignore', 'inherit'] });
+            break;
+        } catch (err) {
+            if (attempt === 4) throw err;
+            await new Promise((r) => setTimeout(r, 15_000 * attempt));
+        }
+    }
 
     const specs = [...new Set(usable.map((i) => i.spec))];
     const entry = join(dir, 'entry.ts');

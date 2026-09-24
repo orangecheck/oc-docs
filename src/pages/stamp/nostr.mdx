@@ -19,9 +19,9 @@ Nostr is one choice among many — a good one for durable public discovery.
 ## Event kind
 
 **Kind `30083`.** Parameterized-replaceable, in the OrangeCheck family's
-30078–30099 range.
-
-The family's claims so far:
+30078–30115 range. OC Agent delegations share it under the disjoint
+`oc-agent-del:` prefix; agent actions are on 30084, not here. The full family
+table is on [Nostr publication](/ecosystem/nostr-kind-30078).
 
 | Kind      | Claimed by                                        |
 | --------- | ------------------------------------------------- |
@@ -29,7 +29,8 @@ The family's claims so far:
 | 30080     | OC Vote poll                                      |
 | 30081     | OC Vote ballot                                    |
 | 30082     | OC Vote reveal                                    |
-| **30083** | **OC Stamp envelope**                             |
+| **30083** | **OC Stamp envelope** + OC Agent delegation       |
+| 30084     | OC Agent action                                   |
 
 We deliberately did NOT reuse 30078. Relays that index by `(kind, d-tag)` as a
 compound key would see prefix collisions across protocols over time. Clean
@@ -137,4 +138,4 @@ Nostr relays anyone else would.
 - [SPEC §7](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#7-nostr-directory-optional)
   — normative rules.
 - [SPEC §13](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#13-registry-for-extensions)
-  — the 30078–30099 family kind registry.
+  — the 30078–30115 family kind registry.

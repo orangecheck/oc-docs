@@ -59,7 +59,7 @@ const { envelope, pledge_id } = await createPledge({
 });
 ```
 
-At resolution, the verifier looks up the stamp via the Stamp NIP's kind-30078
+At resolution, the verifier looks up the stamp via the Stamp NIP's kind-30083
 directory. If a valid stamp with the declared `content_hash` exists and was
 signed by the swearer, the pledge resolves `kept`. No resolver signature
 required — fully deterministic.

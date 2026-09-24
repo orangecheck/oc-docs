@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Interface: TallyOptions",
+    description: "Auto-generated API reference for Interface: TallyOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / TallyOptions
+
+# Interface: TallyOptions
+
+Defined in: [vote-core/src/tally.ts:25](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L25)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-ballots">&lt;/a> `ballots` | [`Ballot`](Ballot)[] | - | [vote-core/src/tally.ts:27](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L27) |
+| &lt;a id="property-poll">&lt;/a> `poll` | [`Poll`](Poll) | - | [vote-core/src/tally.ts:26](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L26) |
+| &lt;a id="property-revealedoptions">&lt;/a> ~~`revealedOptions?`~~ | `Record`\&lt;`string`, `string`\> | **Deprecated** Use `unseal`. A voter-keyed map cannot say WHICH of a voter's ballots it was unsealed from, so a caller that fills it from every relay ballot lets an unsigned ballot's envelope stand in for the voter's signed one. Ignored when `unseal` is supplied. | [vote-core/src/tally.ts:55](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L55) |
+| &lt;a id="property-skipsignatures">&lt;/a> `skipSignatures?` | `boolean` | Skip BIP-322 checks entirely. Required to be EXPLICIT: tally throws when neither this nor a verifier is supplied, rather than quietly tallying unverified ballots. Intended for the spec-conformance harness, whose fixtures carry deliberately fake signatures. | [vote-core/src/tally.ts:103](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L103) |
+| &lt;a id="property-snapshotblock">&lt;/a> `snapshotBlock?` | `number` | When `poll.snapshot_block === 'deadline'`, the caller must pre-resolve the deadline to a concrete chain block height and pass it here. Important: do NOT mutate `poll.snapshot_block` to inject the resolved height. The poll's canonical bytes (and therefore `pollId(poll)`) include `snapshot_block` verbatim — overwriting `"deadline"` with a number changes the canonical form, changes the computed pollId, and causes the structural filter below (`b.poll_id !== pid`) to drop every ballot. Use this field instead. | [vote-core/src/tally.ts:40](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L40) |
+| &lt;a id="property-tipheight">&lt;/a> `tipHeight?` | `number` | Current chain tip height. When supplied, `tally` throws `VoteError` `E_REORG` unless the snapshot block has at least 6 confirmations (SPEC §10.5), which also refuses a snapshot that has not been mined. | [vote-core/src/tally.ts:61](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L61) |
+| &lt;a id="property-unseal">&lt;/a> `unseal?` | (`ballot`: [`Ballot`](Ballot)) => `string` \| `Promise`\&lt;`string` \| `null`\> \| `null` | Secret mode: recover the plaintext option id from a ballot's `secret.envelope` (SPEC §6.4 step 2). Called once per voter, and only on the ballot that survived signature checks and the tiebreak, so a relay cannot substitute another ballot's envelope for a voter. Return null or throw when the envelope does not open; the voter is then dropped. | [vote-core/src/tally.ts:48](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L48) |
+| &lt;a id="property-utxosat">&lt;/a> `utxosAt` | [`UtxoLookup`](../type-aliases/UtxoLookup) | - | [vote-core/src/tally.ts:28](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L28) |
+| &lt;a id="property-verify">&lt;/a> `verify?` | (`args`: \&#123; `address`: `string`; `message`: `string`; `signature`: `string`; \&#125;) => `boolean` \| `Promise`\&lt;`boolean`\> | Named-argument verifier. Preferred over `verifyBip322` — an object literal cannot silently swap its fields the way three positional strings can. Takes precedence when both are supplied. | [vote-core/src/tally.ts:92](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L92) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`address`: `string`, `message`: `string`, `signatureB64`: `string`) => `boolean` \| `Promise`\&lt;`boolean`\> | POSITIONAL, and this package's order is `(address, message, signature)`. BE CAREFUL. Every other package in the family — agent-core, lock-core, stamp-core, pledge-core, stamp-cli — declares this callback as `(msg, signatureB64, address)`. vote-core is the lone outlier, and TypeScript cannot help you: both are `(string, string, string) => Promise<boolean>`, so passing a verifier written for a sibling package compiles cleanly and then verifies the wrong things. That is not hypothetical — it shipped in oc-vote-web, where every signature check silently passed garbage and the live tally counted forged ballots. Prefer `verify` below, which takes a named-argument object and therefore cannot be got wrong. This positional form is kept because changing its order would be a SILENTLY breaking change for existing callers: they would keep compiling and start verifying incorrectly, which is the worst possible way to break an API. | [vote-core/src/tally.ts:82](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L82) |

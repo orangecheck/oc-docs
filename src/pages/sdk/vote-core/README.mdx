@@ -9,6 +9,10 @@ export const metadata = {
 
 # @orangecheck/vote-core
 
+## Classes
+
+- [VoteError](classes/VoteError)
+
 ## Interfaces
 
 - [AwaitingRevealResult](interfaces/AwaitingRevealResult)
@@ -19,6 +23,7 @@ export const metadata = {
 - [PollOption](interfaces/PollOption)
 - [Reveal](interfaces/Reveal)
 - [TalliedResult](interfaces/TalliedResult)
+- [TallyOptions](interfaces/TallyOptions)
 - [TallyTurnout](interfaces/TallyTurnout)
 - [Utxo](interfaces/Utxo)
 - [WeightParams](interfaces/WeightParams)
@@ -26,9 +31,11 @@ export const metadata = {
 ## Type Aliases
 
 - [PollMode](type-aliases/PollMode)
+- [SignatureVerifier](type-aliases/SignatureVerifier)
 - [TallyResult](type-aliases/TallyResult)
 - [Tiebreak](type-aliases/Tiebreak)
 - [UtxoLookup](type-aliases/UtxoLookup)
+- [VerifyResult](type-aliases/VerifyResult)
 - [VoteErrorCode](type-aliases/VoteErrorCode)
 - [WeightMode](type-aliases/WeightMode)
 
@@ -46,10 +53,13 @@ export const metadata = {
 - [canonicalBytes](functions/canonicalBytes)
 - [canonicalize](functions/canonicalize)
 - [commit](functions/commit)
+- [isMainnetAddress](functions/isMainnetAddress)
 - [isSupportedMode](functions/isSupportedMode)
 - [pollId](functions/pollId)
 - [qualifyingUtxos](functions/qualifyingUtxos)
 - [revealId](functions/revealId)
 - [tally](functions/tally)
 - [totalQualifyingSats](functions/totalQualifyingSats)
+- [verifyPoll](functions/verifyPoll)
+- [verifyReveal](functions/verifyReveal)
 - [voterWeight](functions/voterWeight)

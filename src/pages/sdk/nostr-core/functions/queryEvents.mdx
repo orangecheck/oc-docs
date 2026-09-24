@@ -19,10 +19,15 @@ function queryEvents(
 auth?: AuthSigner): Promise<QueryResult>;
 ```
 
-Defined in: [index.ts:416](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L416)
+Defined in: [index.ts:503](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L503)
 
 Issue a NIP-01 REQ across all `relays` in parallel. Returns deduplicated
 events sorted newest-first plus per-relay status.
+
+Every event a relay returns is checked before it is kept: the id is
+recomputed, the signature verified, and the filter re-applied. Events that
+fail are dropped and counted in that relay's `rejected`; dedupe is keyed on
+the verified id only.
 
 Default timeout 1500ms — short enough that a momentary blip on any one
 relay (including relay.ochk.io) never holds up the racing reads. Pass an

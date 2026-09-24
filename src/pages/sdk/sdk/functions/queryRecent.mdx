@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: queryRecent()",
+    description: "Auto-generated API reference for Function: queryRecent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README)
+
+***
+
+[@orangecheck/sdk](../README) / queryRecent
+
+# Function: queryRecent()
+
+```ts
+function queryRecent(relays?: string[], limit?: number): Promise<AttestationEnvelope[]>;
+```
+
+Defined in: [nostr.ts:582](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/nostr.ts#L582)
+
+Query relays for the most recent attestations across every publisher.
+
+For aggregate views (network stats, a recent-activity feed), not per-subject
+lookups. Filters on the `#t=["oc-attest"]` family marker because kind 30078
+is shared by every NIP-78 app: an unfiltered window fills with other apps'
+data. Returns envelopes whose attestation_id matches their message,
+deduplicated by attestation_id. Signatures are not checked — call verify()
+on anything you act on.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `relays` | `string`[] | `DEFAULT_RELAYS` |
+| `limit` | `number` | `200` |
+
+## Returns
+
+`Promise`\&lt;[`AttestationEnvelope`](../interfaces/AttestationEnvelope)[]\>

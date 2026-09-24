@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: mergeAt()",
+    description: "Auto-generated API reference for Function: mergeAt(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / mergeAt
+
+# Function: mergeAt()
+
+```ts
+function mergeAt(ts: OtsTimestamp, upgrade: OtsTimestamp): boolean;
+```
+
+Defined in: [ots.ts:218](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L218)
+
+Graft `upgrade` (a timestamp rooted at some node's message) onto the node
+with that message, as python-opentimestamps' Timestamp.merge does. Returns
+false when no node carries that message.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ts` | [`OtsTimestamp`](../interfaces/OtsTimestamp) |
+| `upgrade` | [`OtsTimestamp`](../interfaces/OtsTimestamp) |
+
+## Returns
+
+`boolean`

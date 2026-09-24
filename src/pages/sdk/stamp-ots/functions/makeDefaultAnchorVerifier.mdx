@@ -17,25 +17,10 @@ function makeDefaultAnchorVerifier(opts: {
 }): Promise<(proofB64: string, blockHeight: number, blockHash: string, envelopeId: string) => Promise<boolean>>;
 ```
 
-Defined in: [anchor.ts:128](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L128)
+Defined in: [anchor.ts:113](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L113)
 
-Default anchor verifier that dynamically imports the `opentimestamps` npm
-package and wires it into `makeAnchorVerifier`. The import is lazy so
-consumers who only need calendar submission don't pay the dep cost.
-
-Install `opentimestamps` alongside `@orangecheck/stamp-ots` to use this:
-
-  npm i @orangecheck/stamp-ots opentimestamps
-
-Then:
-
-  const verifyOtsAnchor = await makeDefaultAnchorVerifier(&#123; headerSource &#125;);
-  await verify(&#123; envelope, verifyOtsAnchor &#125;);
-
-Throws if `opentimestamps` isn't resolvable. That's intentional — callers
-who haven't installed it should use `makeAnchorVerifier` with their own
-walker instead, so the failure surfaces immediately rather than silently
-reporting every stamp as unverified.
+Anchor verifier using the built-in OTS parser. Kept async for callers of the
+0.1 API, which lazily loaded an optional parser here.
 
 ## Parameters
 

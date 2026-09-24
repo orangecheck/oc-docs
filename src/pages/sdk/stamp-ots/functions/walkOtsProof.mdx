@@ -1,0 +1,47 @@
+export const metadata = {
+    title: "Function: walkOtsProof()",
+    description: "Auto-generated API reference for Function: walkOtsProof(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / walkOtsProof
+
+# Function: walkOtsProof()
+
+```ts
+function walkOtsProof(input: {
+  blockHeight?: number;
+  digest: Uint8Array;
+  proofBytes: Uint8Array;
+}): Promise<
+  | {
+  blockHeight: number;
+  merkleRoot: Uint8Array;
+}
+| null>;
+```
+
+Defined in: [anchor.ts:44](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L44)
+
+Built-in walker: parse the OTS proof and pick the Bitcoin attestation.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | \&#123; `blockHeight?`: `number`; `digest`: `Uint8Array`; `proofBytes`: `Uint8Array`; \&#125; |
+| `input.blockHeight?` | `number` |
+| `input.digest` | `Uint8Array` |
+| `input.proofBytes` | `Uint8Array` |
+
+## Returns
+
+`Promise`\&lt;
+  \| \&#123;
+  `blockHeight`: `number`;
+  `merkleRoot`: `Uint8Array`;
+\&#125;
+  \| `null`\>

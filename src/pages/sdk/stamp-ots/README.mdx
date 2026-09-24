@@ -16,7 +16,9 @@ export const metadata = {
 - [BlockHeaderSource](interfaces/BlockHeaderSource)
 - [CalendarClient](interfaces/CalendarClient)
 - [HttpCalendarOptions](interfaces/HttpCalendarOptions)
+- [MempoolHeaderSourceOptions](interfaces/MempoolHeaderSourceOptions)
 - [OtsProof](interfaces/OtsProof)
+- [OtsTimestamp](interfaces/OtsTimestamp)
 - [SubmitOptions](interfaces/SubmitOptions)
 - [UpgradeOptions](interfaces/UpgradeOptions)
 
@@ -24,6 +26,8 @@ export const metadata = {
 
 - [AnchorVerificationResult](type-aliases/AnchorVerificationResult)
 - [AnchorVerifier](type-aliases/AnchorVerifier)
+- [OtsAttestation](type-aliases/OtsAttestation)
+- [OtsOp](type-aliases/OtsOp)
 - [OtsProofStatus](type-aliases/OtsProofStatus)
 
 ## Variables
@@ -32,14 +36,25 @@ export const metadata = {
 
 ## Functions
 
+- [attestations](functions/attestations)
 - [base64Decode](functions/base64Decode)
 - [base64Encode](functions/base64Encode)
+- [bitcoinAnchors](functions/bitcoinAnchors)
+- [blockHashOf](functions/blockHashOf)
 - [createCalendarClient](functions/createCalendarClient)
 - [fromStampOts](functions/fromStampOts)
 - [hexDecode](functions/hexDecode)
 - [hexEncode](functions/hexEncode)
 - [makeAnchorVerifier](functions/makeAnchorVerifier)
 - [makeDefaultAnchorVerifier](functions/makeDefaultAnchorVerifier)
+- [mempoolHeaderSource](functions/mempoolHeaderSource)
+- [mergeAt](functions/mergeAt)
+- [parseDetached](functions/parseDetached)
+- [parseProof](functions/parseProof)
+- [parseTimestamp](functions/parseTimestamp)
+- [pendingCommitments](functions/pendingCommitments)
+- [serializeTimestamp](functions/serializeTimestamp)
 - [submitToCalendars](functions/submitToCalendars)
 - [toStampOts](functions/toStampOts)
 - [upgradeProof](functions/upgradeProof)
+- [walkOtsProof](functions/walkOtsProof)

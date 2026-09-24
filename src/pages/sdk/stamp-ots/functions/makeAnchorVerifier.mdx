@@ -17,17 +17,6 @@ function makeAnchorVerifier(cfg: AnchorVerifierConfig): (proofB64: string, block
 
 Defined in: [anchor.ts:62](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L62)
 
-Build a concrete anchor verifier from a proof walker plus a header source.
-
-The returned function matches the `verifyOtsAnchor` shape expected by
-`@orangecheck/stamp-core`'s `verify()`:
-
-  (proofB64, blockHeight, blockHash, envelopeId) => Promise&lt;boolean>
-
-Wire it in as:
-
-  verify(&#123; envelope, verifyOtsAnchor: makeAnchorVerifier(&#123;...&#125;) &#125;)
-
 ## Parameters
 
 | Parameter | Type |

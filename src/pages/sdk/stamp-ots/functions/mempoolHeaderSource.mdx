@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: mempoolHeaderSource()",
+    description: "Auto-generated API reference for Function: mempoolHeaderSource(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / mempoolHeaderSource
+
+# Function: mempoolHeaderSource()
+
+```ts
+function mempoolHeaderSource(opts?: MempoolHeaderSourceOptions): BlockHeaderSource;
+```
+
+Defined in: [anchor.ts:132](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L132)
+
+Block headers from an Esplora-compatible API. The verifier checks each
+header against the declared block hash, so this source is trusted only to
+report which block is at a height.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`MempoolHeaderSourceOptions`](../interfaces/MempoolHeaderSourceOptions) |
+
+## Returns
+
+[`BlockHeaderSource`](../interfaces/BlockHeaderSource)

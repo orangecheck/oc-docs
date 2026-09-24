@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: parseDetached()",
+    description: "Auto-generated API reference for Function: parseDetached(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / parseDetached
+
+# Function: parseDetached()
+
+```ts
+function parseDetached(bytes: Uint8Array): {
+  digest: Uint8Array;
+  timestamp: OtsTimestamp;
+};
+```
+
+Defined in: [ots.ts:159](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L159)
+
+Parse a detached `.ots` file. Only sha256 file digests are accepted.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `bytes` | `Uint8Array` |
+
+## Returns
+
+```ts
+{
+  digest: Uint8Array;
+  timestamp: OtsTimestamp;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `digest` | `Uint8Array` | [ots.ts:159](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L159) |
+| `timestamp` | [`OtsTimestamp`](../interfaces/OtsTimestamp) | [ots.ts:159](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L159) |

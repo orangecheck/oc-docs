@@ -15,13 +15,17 @@ export const metadata = {
 function parsePledgeCreateScope(scope: string): Record<string, string> | null;
 ```
 
-Defined in: [pledge-core/src/delegation.ts:90](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/delegation.ts#L90)
+Defined in: [pledge-core/src/delegation.ts:97](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/delegation.ts#L97)
 
 Parse a single scope string. Returns the constraint map iff the scope's
 product:verb is `pledge:create`; null for any other scope (caller skips
-those). Tolerates whitespace inside parens; rejects malformed syntax by
-returning null (the scope is treated as non-matching rather than
-surfacing a parse error — matches OC Agent's permissive scope mode).
+those) and for a malformed one, which is treated as non-matching rather
+than surfacing a parse error.
+
+`max_bond_sats` is a ceiling. SPEC §7.3 writes it `max_bond_sats<=N` (OC
+Agent's range operator); the earlier `max_bond_sats=N` form means the same
+thing here and stays accepted so existing delegations keep verifying. Every
+other key takes `=` only.
 
 ## Parameters
 

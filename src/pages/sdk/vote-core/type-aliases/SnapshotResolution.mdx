@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Type Alias: SnapshotResolution",
+    description: "Auto-generated API reference for Type Alias: SnapshotResolution. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / SnapshotResolution
+
+# Type Alias: SnapshotResolution
+
+```ts
+type SnapshotResolution = 
+  | {
+  confirmations: number;
+  height: number;
+  ok: true;
+}
+  | {
+  code: "E_REORG";
+  ok: false;
+  reason: string;
+}
+  | {
+  code: "E_SNAPSHOT_UNRESOLVED";
+  ok: false;
+  reason: string;
+};
+```
+
+Defined in: [vote-core/src/snapshot.ts:22](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/snapshot.ts#L22)

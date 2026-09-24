@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: resolveDeadlineSnapshot()",
+    description: "Auto-generated API reference for Function: resolveDeadlineSnapshot(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / resolveDeadlineSnapshot
+
+# Function: resolveDeadlineSnapshot()
+
+```ts
+function resolveDeadlineSnapshot(deadlineIso: string, source: BlockTimeSource): Promise<SnapshotResolution>;
+```
+
+Defined in: [vote-core/src/snapshot.ts:40](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/snapshot.ts#L40)
+
+Resolve `snapshot_block: "deadline"` per SPEC §3. Fails closed: an
+unresolvable or under-confirmed snapshot is an error, never a plausible
+height.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `deadlineIso` | `string` |
+| `source` | [`BlockTimeSource`](../interfaces/BlockTimeSource) |
+
+## Returns
+
+`Promise`\&lt;[`SnapshotResolution`](../type-aliases/SnapshotResolution)\>

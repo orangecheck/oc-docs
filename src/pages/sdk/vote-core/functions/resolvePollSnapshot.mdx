@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: resolvePollSnapshot()",
+    description: "Auto-generated API reference for Function: resolvePollSnapshot(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / resolvePollSnapshot
+
+# Function: resolvePollSnapshot()
+
+```ts
+function resolvePollSnapshot(poll: Pick<Poll, "snapshot_block" | "deadline">, source: BlockTimeSource): Promise<SnapshotResolution>;
+```
+
+Defined in: [vote-core/src/snapshot.ts:111](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/snapshot.ts#L111)
+
+The snapshot height for any poll: `snapshot_block` itself when it is a
+number (which must also carry 6 confirmations), otherwise the §3 deadline
+resolution.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `poll` | `Pick`\&lt;[`Poll`](../interfaces/Poll), `"snapshot_block"` \| `"deadline"`\> |
+| `source` | [`BlockTimeSource`](../interfaces/BlockTimeSource) |
+
+## Returns
+
+`Promise`\&lt;[`SnapshotResolution`](../type-aliases/SnapshotResolution)\>

@@ -109,7 +109,10 @@ try {
         '--no-fund',
         '--ignore-scripts',
         '--legacy-peer-deps',
-        '--prefer-online', // the version comes from a fresh registry read; don't resolve it from a stale cache
+        // `yarn run` points npm at the registry.yarnpkg.com mirror, which lags a
+        // fresh publish; resolve from the registry the versions were read from.
+        '--registry=https://registry.npmjs.org/',
+        '--prefer-online',
         ...pkgs.map((p) => `${p}@${meta.get(p).latest}`),
     ];
     // A version published seconds ago can still be missing from a registry

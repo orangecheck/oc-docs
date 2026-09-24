@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: verifyEvent()",
+    description: "Auto-generated API reference for Function: verifyEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / verifyEvent
+
+# Function: verifyEvent()
+
+```ts
+function verifyEvent(event: unknown): event is NostrEvent;
+```
+
+Defined in: [index.ts:239](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L239)
+
+True when `event` is well-formed, its `id` equals the NIP-01 hash of its
+content, and `sig` is a valid BIP-340 signature of that id by `pubkey`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | `unknown` |
+
+## Returns
+
+`event is NostrEvent`

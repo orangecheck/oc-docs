@@ -121,7 +121,9 @@ record what you found as an outcome envelope:
 import {
     classifyState,
     createOutcome,
+    pledgeCanonicalInputFromEnvelope,
     verifyBond,
+    verifyOutcome,
 } from '@orangecheck/pledge-core';
 
 const outcome = await createOutcome({
@@ -136,6 +138,14 @@ const outcome = await createOutcome({
     },
     dispute_window_ends_at: '2026-11-09T00:00:00Z',
 });
+
+// Checks the outcome is well formed and bound to this pledge (mechanism, dates).
+const checked = await verifyOutcome({
+    envelope: outcome,
+    pledge: pledgeCanonicalInputFromEnvelope(pledge),
+});
+// checked.recomputeRequired is true for every deterministic outcome: it is unsigned,
+// so re-evaluate the mechanism yourself before treating it as final.
 
 const state = classifyState({
     pledge,

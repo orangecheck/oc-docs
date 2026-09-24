@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: verifyBallot()",
+    description: "Auto-generated API reference for Function: verifyBallot(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / verifyBallot
+
+# Function: verifyBallot()
+
+```ts
+function verifyBallot(ballot: Ballot, verify: SignatureVerifier): Promise<VerifyResult>;
+```
+
+Defined in: [vote-core/src/verify.ts:95](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/verify.ts#L95)
+
+Structural checks from SPEC §4.3 plus the voter's BIP-322 signature over
+`ballot_id` (§10.1), for a ballot read on its own, without its poll. Whether
+the option belongs to the poll, and whether the ballot is in time, are
+questions for `tally`, which has the poll.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ballot` | [`Ballot`](../interfaces/Ballot) |
+| `verify` | [`SignatureVerifier`](../type-aliases/SignatureVerifier) |
+
+## Returns
+
+`Promise`\&lt;[`VerifyResult`](../type-aliases/VerifyResult)\>

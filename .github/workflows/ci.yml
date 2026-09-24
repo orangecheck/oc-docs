@@ -44,6 +44,9 @@ jobs:
             - name: Internal links
               run: yarn check:internal-links
 
+            - name: Nostr kinds match the registry
+              run: yarn check:kinds
+
             - name: Code-sample imports against published packages
               run: yarn check:sample-imports
 

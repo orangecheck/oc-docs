@@ -11,18 +11,18 @@ export const metadata = {
 
 # Interface: ClassifyStateInput
 
-Defined in: [pledge-core/src/types.ts:438](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L438)
+Defined in: [pledge-core/src/types.ts:463](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L463)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-abandonment">&lt;/a> `abandonment` | [`AbandonmentEnvelope`](AbandonmentEnvelope) \| `null` | - | [pledge-core/src/types.ts:441](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L441) |
-| &lt;a id="property-chain">&lt;/a> `chain?` | \&#123; `blockTimes?`: `Record`\&lt;`number`, `string`\>; `tip_height`: `number`; `tip_time`: `string`; \&#125; | Optional — block-height resolutions need a wall-clock timestamp for the resolves_at.block. If the block isn't yet mined or no chain state is supplied, the SDK treats resolves_at as +infinity. | [pledge-core/src/types.ts:449](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L449) |
-| `chain.blockTimes?` | `Record`\&lt;`number`, `string`\> | Optional override mapping a specific block to its mined-time. | [pledge-core/src/types.ts:455](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L455) |
-| `chain.tip_height` | `number` | Highest seen block height. | [pledge-core/src/types.ts:451](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L451) |
-| `chain.tip_time` | `string` | Wall-clock ISO 8601 UTC of `tip_height`. | [pledge-core/src/types.ts:453](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L453) |
-| &lt;a id="property-contradictoryoutcomes">&lt;/a> `contradictoryOutcomes?` | [`OutcomeEnvelope`](OutcomeEnvelope)[] | Optional list of additional outcome envelopes from authorized resolvers (e.g. swearer + counterparty in a bilateral pledge). Used to detect contradictory outcomes → `disputed`. | [pledge-core/src/types.ts:462](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L462) |
-| &lt;a id="property-now">&lt;/a> `now` | `string` | ISO 8601 UTC. | [pledge-core/src/types.ts:443](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L443) |
-| &lt;a id="property-outcome">&lt;/a> `outcome` | [`OutcomeEnvelope`](OutcomeEnvelope) \| `null` | - | [pledge-core/src/types.ts:440](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L440) |
-| &lt;a id="property-pledge">&lt;/a> `pledge` | [`PledgeEnvelope`](PledgeEnvelope) | - | [pledge-core/src/types.ts:439](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L439) |
+| &lt;a id="property-abandonment">&lt;/a> `abandonment` | [`AbandonmentEnvelope`](AbandonmentEnvelope) \| `null` | - | [pledge-core/src/types.ts:466](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L466) |
+| &lt;a id="property-chain">&lt;/a> `chain?` | \&#123; `blockTimes?`: `Record`\&lt;`number`, `string`\>; `tip_height`: `number`; `tip_time`: `string`; \&#125; | Optional — block-height resolutions need a wall-clock timestamp for the resolves_at.block. If the block isn't yet mined or no chain state is supplied, the SDK treats resolves_at as +infinity. | [pledge-core/src/types.ts:474](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L474) |
+| `chain.blockTimes?` | `Record`\&lt;`number`, `string`\> | Optional override mapping a specific block to its mined-time. | [pledge-core/src/types.ts:480](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L480) |
+| `chain.tip_height` | `number` | Highest seen block height. | [pledge-core/src/types.ts:476](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L476) |
+| `chain.tip_time` | `string` | Wall-clock ISO 8601 UTC of `tip_height`. | [pledge-core/src/types.ts:478](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L478) |
+| &lt;a id="property-contradictoryoutcomes">&lt;/a> `contradictoryOutcomes?` | [`OutcomeEnvelope`](OutcomeEnvelope)[] | Optional list of additional outcome envelopes from authorized resolvers (e.g. swearer + counterparty in a bilateral pledge). Used to detect contradictory outcomes → `disputed`. | [pledge-core/src/types.ts:487](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L487) |
+| &lt;a id="property-now">&lt;/a> `now` | `string` | ISO 8601 UTC. | [pledge-core/src/types.ts:468](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L468) |
+| &lt;a id="property-outcome">&lt;/a> `outcome` | [`OutcomeEnvelope`](OutcomeEnvelope) \| `null` | - | [pledge-core/src/types.ts:465](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L465) |
+| &lt;a id="property-pledge">&lt;/a> `pledge` | [`PledgeEnvelope`](PledgeEnvelope) | - | [pledge-core/src/types.ts:464](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L464) |

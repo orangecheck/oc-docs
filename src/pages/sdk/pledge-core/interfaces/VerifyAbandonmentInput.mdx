@@ -11,12 +11,14 @@ export const metadata = {
 
 # Interface: VerifyAbandonmentInput
 
-Defined in: [pledge-core/src/types.ts:365](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L365)
+Defined in: [pledge-core/src/types.ts:370](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L370)
 
 ## Properties
 
-| Property | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-envelope">&lt;/a> `envelope` | [`AbandonmentEnvelope`](AbandonmentEnvelope) | [pledge-core/src/types.ts:366](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L366) |
-| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | [pledge-core/src/types.ts:368](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L368) |
-| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | [`VerifyBip322`](../type-aliases/VerifyBip322) | [pledge-core/src/types.ts:367](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L367) |
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`AbandonmentEnvelope`](AbandonmentEnvelope) | - | [pledge-core/src/types.ts:371](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L371) |
+| &lt;a id="property-pledge">&lt;/a> `pledge?` | [`PledgeCanonicalInput`](PledgeCanonicalInput) | The pledge this abandonment refers to. Supply it and SPEC §5.3 is enforced: `pledge_id` names it, `sig.pubkey` is its swearer, and `abandoned_at >= sworn_at`. Omit it and you MUST say so with `skipPledgeBinding`. | [pledge-core/src/types.ts:378](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L378) |
+| &lt;a id="property-skippledgebinding">&lt;/a> `skipPledgeBinding?` | `boolean` | Verify the envelope WITHOUT binding it to a pledge. The result then says only that someone signed this abandonment, not that the swearer abandoned the pledge; callers MUST NOT classify a pledge with it. | [pledge-core/src/types.ts:384](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L384) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [pledge-core/src/types.ts:386](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L386) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | [`VerifyBip322`](../type-aliases/VerifyBip322) | - | [pledge-core/src/types.ts:385](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L385) |

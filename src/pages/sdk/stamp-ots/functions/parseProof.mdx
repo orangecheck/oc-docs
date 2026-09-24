@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: parseProof()",
+    description: "Auto-generated API reference for Function: parseProof(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / parseProof
+
+# Function: parseProof()
+
+```ts
+function parseProof(bytes: Uint8Array, digest: Uint8Array): OtsTimestamp;
+```
+
+Defined in: [ots.ts:175](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L175)
+
+Parse either encoding and require that it commits to `digest`. A detached
+file for some other digest is rejected rather than walked.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `bytes` | `Uint8Array` |
+| `digest` | `Uint8Array` |
+
+## Returns
+
+[`OtsTimestamp`](../interfaces/OtsTimestamp)

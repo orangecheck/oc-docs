@@ -11,11 +11,11 @@ export const metadata = {
 
 # Interface: AnchorVerifierConfig
 
-Defined in: [anchor.ts:33](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L33)
+Defined in: [anchor.ts:24](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L24)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-headersource">&lt;/a> `headerSource` | [`BlockHeaderSource`](BlockHeaderSource) | Source of Bitcoin block headers. Can be a full node, SPV, or a pre-computed headers snapshot. | [anchor.ts:47](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L47) |
-| &lt;a id="property-walkproof">&lt;/a> `walkProof` | (`input`: \&#123; `digest`: `Uint8Array`; `proofBytes`: `Uint8Array`; \&#125;) => `Promise`\&lt; \| \&#123; `blockHeight`: `number`; `merkleRoot`: `Uint8Array`; \&#125; \| `null`\> | Parse the proof bytes and return the Merkle root the proof walks to, plus the declared block height. Returns null if parsing failed or the proof isn't anchored. | [anchor.ts:39](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L39) |
+| &lt;a id="property-headersource">&lt;/a> `headerSource` | [`BlockHeaderSource`](BlockHeaderSource) | Source of Bitcoin block headers: a full node, SPV, a headers snapshot, or `mempoolHeaderSource()`. This is the verifier's trust anchor. | [anchor.ts:40](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L40) |
+| &lt;a id="property-walkproof">&lt;/a> `walkProof?` | (`input`: \&#123; `blockHeight?`: `number`; `digest`: `Uint8Array`; `proofBytes`: `Uint8Array`; \&#125;) => `Promise`\&lt; \| \&#123; `blockHeight`: `number`; `merkleRoot`: `Uint8Array`; \&#125; \| `null`\> | Parse the proof bytes and return the Merkle root the proof walks to, plus its block height. Optional: the built-in OTS parser is used when omitted. `blockHeight` is the declared height, for proofs that carry attestations at more than one height. | [anchor.ts:31](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/anchor.ts#L31) |

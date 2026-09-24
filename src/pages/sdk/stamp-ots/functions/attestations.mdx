@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: attestations()",
+    description: "Auto-generated API reference for Function: attestations(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / attestations
+
+# Function: attestations()
+
+```ts
+function attestations(ts: OtsTimestamp): {
+  attestation: OtsAttestation;
+  msg: Uint8Array;
+}[];
+```
+
+Defined in: [ots.ts:183](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/ots.ts#L183)
+
+Every attestation in the tree with the message it attests to.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ts` | [`OtsTimestamp`](../interfaces/OtsTimestamp) |
+
+## Returns
+
+\&#123;
+  `attestation`: [`OtsAttestation`](../type-aliases/OtsAttestation);
+  `msg`: `Uint8Array`;
+\&#125;[]

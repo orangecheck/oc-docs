@@ -24,22 +24,23 @@ Defined in: [types.ts:21](https://github.com/orangecheck/oc-packages/blob/main/s
 ### fetchProof()
 
 ```ts
-fetchProof(digest: Uint8Array, signal?: AbortSignal): Promise<Uint8Array<ArrayBufferLike> | null>;
+fetchProof(commitment: Uint8Array, signal?: AbortSignal): Promise<Uint8Array<ArrayBufferLike> | null>;
 ```
 
-Defined in: [types.ts:42](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/types.ts#L42)
+Defined in: [types.ts:43](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/types.ts#L43)
 
-Fetch the current (possibly upgraded) proof for a previously-submitted
-digest. Returns null if the calendar has no proof for this digest yet.
+Fetch the continuation of a pending proof. `commitment` is the message
+at the calendar's pending attestation (see `pendingCommitments`), not
+the submitted digest. Returns null if the calendar has nothing yet.
 
-OTS calendar HTTP API: GET &lt;url>/timestamp/&lt;hex(digest)>, returns the
-proof bytes or 404.
+OTS calendar HTTP API: GET &lt;url>/timestamp/&lt;hex(commitment)>, returns a
+timestamp rooted at the commitment, or 404.
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `digest` | `Uint8Array` |
+| `commitment` | `Uint8Array` |
 | `signal?` | `AbortSignal` |
 
 #### Returns

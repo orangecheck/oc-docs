@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: FireEventOptions. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/me-client**](../README.mdx)
+[**@orangecheck/me-client**](../README)
 
 ***
 
-[@orangecheck/me-client](../README.mdx) / FireEventOptions
+[@orangecheck/me-client](../README) / FireEventOptions
 
 # Interface: FireEventOptions
 
@@ -25,5 +25,5 @@ Defined in: [me-client/src/event.ts:38](https://github.com/orangecheck/oc-packag
 | &lt;a id="property-payment_amount_sats">&lt;/a> `payment_amount_sats?` | `number` | For percent_of_amount-priced subtypes, the underlying amount the fee is computed against. Required for those subtypes. | [me-client/src/event.ts:50](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L50) |
 | &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | Your project_key (e.g. `pk_live_yourcompany`). Required. | [me-client/src/event.ts:40](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L40) |
 | &lt;a id="property-signingsecret">&lt;/a> `signingSecret?` | `string` | The project's HMAC signing secret. When provided, the SDK signs the request with X-OC-Signature, authenticating the call as the INTEGRATOR. REQUIRED in test mode as well as live — without it the server 401s, because a user session alone proves a user, never the paying project. The one exception is a session that owns the project (the CLI test-fire path), which is not a shape a backend should rely on. SERVER-SIDE ONLY: never ship this secret to a browser. Find/rotate it on the project Keys tab (/me/projects/&lt;id>/keys). | [me-client/src/event.ts:72](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L72) |
-| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventKey`](../type-aliases/EventKey.mdx) | Billable event key · a built-in subtype OR a custom key defined on your project catalog. Class + label are resolved server-side from the catalog. | [me-client/src/event.ts:43](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L43) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | [`EventKey`](../type-aliases/EventKey) | Billable event key · a built-in subtype OR a custom key defined on your project catalog. Class + label are resolved server-side from the catalog. | [me-client/src/event.ts:43](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L43) |
 | &lt;a id="property-useraddress">&lt;/a> `userAddress?` | `string` | Who earns, as their `did:oc` — the value `/api/auth/me` returns as `did_oc`. This is the BACKEND path, and it is the one to prefer. Your server signs the request with `signingSecret`, the signature covers these bytes, and the earner rides inside them — so the signature is your project asserting "this identity did this on my site". No browser, no user cookie, and no reason for your backend to be holding your users' session tokens at all. REQUIRES `signingSecret`. A session alone may never name an earner: it proves a user, not a project, and that would let any signed-in caller credit anybody. | [me-client/src/event.ts:86](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L86) |

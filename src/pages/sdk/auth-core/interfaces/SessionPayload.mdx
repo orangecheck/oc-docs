@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: SessionPayload. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/auth-core**](../README.mdx)
+[**@orangecheck/auth-core**](../README)
 
 ***
 
-[@orangecheck/auth-core](../README.mdx) / SessionPayload
+[@orangecheck/auth-core](../README) / SessionPayload
 
 # Interface: SessionPayload
 
@@ -22,7 +22,7 @@ Defined in: [index.ts:56](https://github.com/orangecheck/oc-packages/blob/main/a
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
 | &lt;a id="property-did_oc">&lt;/a> `did_oc` | `string` | Opaque public-facing identifier · `did:oc:<32-hex>`. The sole canonical user identifier post auth-refactor. Stable across linking events. Per AUTH-REFACTOR-PLAN.md §2.1. | [index.ts:63](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L63) |
-| &lt;a id="property-display_identity">&lt;/a> `display_identity?` | [`DisplayIdentity`](DisplayIdentity.mdx) \| `null` | The identity the user has chosen to show in their account badge — the collapsed label every family site (and any integrator) renders instead of the raw `did:oc`. Baked into the JWT so the choice is consistent across every `.ochk.io` subdomain with no round-trip, the same posture as `name` / `npub`. Re-resolved by the auth host on every mint: an explicit user promotion wins; absent that, it defaults to the account's sign-in identity (BIP-322 accounts → their Bitcoin address, federation accounts → their email). Absent / null on tokens minted before this field shipped — consumers fall back to the `did_oc`. Read it safely with `resolveDisplayIdentity()`. | [index.ts:168](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L168) |
+| &lt;a id="property-display_identity">&lt;/a> `display_identity?` | [`DisplayIdentity`](DisplayIdentity) \| `null` | The identity the user has chosen to show in their account badge — the collapsed label every family site (and any integrator) renders instead of the raw `did:oc`. Baked into the JWT so the choice is consistent across every `.ochk.io` subdomain with no round-trip, the same posture as `name` / `npub`. Re-resolved by the auth host on every mint: an explicit user promotion wins; absent that, it defaults to the account's sign-in identity (BIP-322 accounts → their Bitcoin address, federation accounts → their email). Absent / null on tokens minted before this field shipped — consumers fall back to the `did_oc`. Read it safely with `resolveDisplayIdentity()`. | [index.ts:168](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L168) |
 | &lt;a id="property-home_federation">&lt;/a> `home_federation?` | `string` \| `null` | Slug of the federation this user is bound to (their "home" federation). Multi-federation routing reads this; v1 has one live federation so it's set on first signin and rarely changes. Absent on tokens minted before this field shipped, and on accounts that have never bound to a federation. Consumers fall back to the directory default at /api/federations when absent. | [index.ts:82](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L82) |
 | &lt;a id="property-is_owner">&lt;/a> `is_owner?` | `boolean` | Optional best-effort owner flag · set by the auth host at signin time when the new did_oc matches OWNER_OC_ADDRESSES. Surfaced through to clients via `useOcSession().account.isOwner` so the family-switcher and other low-stakes UX can render owner-only affordances (e.g. an analytics.ochk.io entry). **NOT A SECURITY BOUNDARY.** Sensitive surfaces still re-check the live `OWNER_OC_ADDRESSES` env against `session.did_oc` on every request (analytics.ochk.io's requireOwner does this). If an owner is removed from the env, their JWT may still carry `is_owner: true` for up to 30 days — the UX hint goes stale, but every gated action they attempt re-fails server-side. Treat absence as `false`. Set only on first signin or re-issue; never mutated mid-session. | [index.ts:153](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L153) |
 | &lt;a id="property-jti">&lt;/a> `jti` | `string` | - | [index.ts:64](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L64) |

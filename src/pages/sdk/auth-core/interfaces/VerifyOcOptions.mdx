@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: VerifyOcOptions. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/auth-core**](../README.mdx)
+[**@orangecheck/auth-core**](../README)
 
 ***
 
-[@orangecheck/auth-core](../README.mdx) / VerifyOcOptions
+[@orangecheck/auth-core](../README) / VerifyOcOptions
 
 # Interface: VerifyOcOptions
 
@@ -17,6 +17,6 @@ Defined in: [index.ts:685](https://github.com/orangecheck/oc-packages/blob/main/
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-audience">&lt;/a> `audience?` | [`AudienceRule`](../type-aliases/AudienceRule.mdx) | Accepted `aud` · see AudienceRule. An integrator verifying tokens from the sign-in popup sets this to its own origin, e.g. `"https://example.com"`, so a token issued to another site is refused. | [index.ts:694](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L694) |
+| &lt;a id="property-audience">&lt;/a> `audience?` | [`AudienceRule`](../type-aliases/AudienceRule) | Accepted `aud` · see AudienceRule. An integrator verifying tokens from the sign-in popup sets this to its own origin, e.g. `"https://example.com"`, so a token issued to another site is refused. | [index.ts:694](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L694) |
 | &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Auth host issuer. Defaults to https://ochk.io. | [index.ts:687](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L687) |
 | &lt;a id="property-jwkscachettlms">&lt;/a> `jwksCacheTtlMs?` | `number` | JWKS cache TTL in ms. Defaults to 1 hour. Stale-on-error: if the cache exists, verification still works during a transient outage. | [index.ts:690](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L690) |

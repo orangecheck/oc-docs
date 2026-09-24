@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: VerifySubdelegationInput. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/agent-core**](../README.mdx)
+[**@orangecheck/agent-core**](../README)
 
 ***
 
-[@orangecheck/agent-core](../README.mdx) / VerifySubdelegationInput
+[@orangecheck/agent-core](../README) / VerifySubdelegationInput
 
 # Interface: VerifySubdelegationInput
 
@@ -15,7 +15,7 @@ Defined in: [agent-core/src/verify.ts:850](https://github.com/orangecheck/oc-pac
 
 ## Extends
 
-- [`VerifyBase`](VerifyBase.mdx)
+- [`VerifyBase`](VerifyBase)
 
 ## Properties
 
@@ -24,12 +24,12 @@ Defined in: [agent-core/src/verify.ts:850](https://github.com/orangecheck/oc-pac
 | &lt;a id="property-decryptscopeswith">&lt;/a> `decryptScopesWith?` | \&#123; `device_id`: `string`; `secretKey`: `Uint8Array`; \&#125; | v1.2 private-scope decryption key for the subdelegation envelope itself. Not used for the parent — the caller hydrates the parent. | - | [agent-core/src/verify.ts:867](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L867) |
 | `decryptScopesWith.device_id` | `string` | - | - | [agent-core/src/verify.ts:868](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L868) |
 | `decryptScopesWith.secretKey` | `Uint8Array` | - | - | [agent-core/src/verify.ts:869](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L869) |
-| &lt;a id="property-envelope">&lt;/a> `envelope` | [`SubdelegationEnvelope`](SubdelegationEnvelope.mdx) | - | - | [agent-core/src/verify.ts:851](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L851) |
+| &lt;a id="property-envelope">&lt;/a> `envelope` | [`SubdelegationEnvelope`](SubdelegationEnvelope) | - | - | [agent-core/src/verify.ts:851](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L851) |
 | &lt;a id="property-now">&lt;/a> `now?` | `Date` | Defaults to new Date(). | - | [agent-core/src/verify.ts:862](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L862) |
-| &lt;a id="property-parent">&lt;/a> `parent` | [`ChainLink`](../type-aliases/ChainLink.mdx) | The immediate parent envelope. Required for linkage / containment checks. If the parent is itself v1.2 private-mode (`scopes_encrypted`) the caller MUST pre-hydrate it (e.g., via verifyDelegation's returned envelope) — the chain walker reads `parent.scopes` directly. | - | [agent-core/src/verify.ts:858](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L858) |
-| &lt;a id="property-revocations">&lt;/a> `revocations?` | [`RevocationEnvelope`](RevocationEnvelope.mdx)[] | Revocations to evaluate against the delegation (or, for an action, every link in its chain). Fetch these from kind-30085 by `#delegation`. | [`VerifyBase`](VerifyBase.mdx).[`revocations`](VerifyBase.mdx#property-revocations) | [agent-core/src/verify.ts:68](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L68) |
-| &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase.mdx).[`scopeMode`](VerifyBase.mdx#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L50) |
-| &lt;a id="property-skiprevocationcheck">&lt;/a> `skipRevocationCheck?` | `boolean` | Verify WITHOUT consulting revocation feeds. Required to be explicit. SECURITY §7 item 7: "Query revocation feeds (Nostr kind-30085 by `#delegation`) for the cited delegation id before reporting OK, **unless the caller explicitly opts out**." The default was inverted — revocations were checked only when supplied, and omitting them skipped the check silently, so "checked, clean" was indistinguishable from "never checked". This library has no network by design, so the caller fetches the feed and passes `revocations`. Declining to is a decision they must state. | [`VerifyBase`](VerifyBase.mdx).[`skipRevocationCheck`](VerifyBase.mdx#property-skiprevocationcheck) | [agent-core/src/verify.ts:63](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L63) |
-| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyBase`](VerifyBase.mdx).[`skipSignatureVerification`](VerifyBase.mdx#property-skipsignatureverification) | [agent-core/src/verify.ts:49](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L49) |
+| &lt;a id="property-parent">&lt;/a> `parent` | [`ChainLink`](../type-aliases/ChainLink) | The immediate parent envelope. Required for linkage / containment checks. If the parent is itself v1.2 private-mode (`scopes_encrypted`) the caller MUST pre-hydrate it (e.g., via verifyDelegation's returned envelope) — the chain walker reads `parent.scopes` directly. | - | [agent-core/src/verify.ts:858](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L858) |
+| &lt;a id="property-revocations">&lt;/a> `revocations?` | [`RevocationEnvelope`](RevocationEnvelope)[] | Revocations to evaluate against the delegation (or, for an action, every link in its chain). Fetch these from kind-30085 by `#delegation`. | [`VerifyBase`](VerifyBase).[`revocations`](VerifyBase#property-revocations) | [agent-core/src/verify.ts:68](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L68) |
+| &lt;a id="property-scopemode">&lt;/a> `scopeMode?` | `"strict"` \| `"permissive"` | - | [`VerifyBase`](VerifyBase).[`scopeMode`](VerifyBase#property-scopemode) | [agent-core/src/verify.ts:50](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L50) |
+| &lt;a id="property-skiprevocationcheck">&lt;/a> `skipRevocationCheck?` | `boolean` | Verify WITHOUT consulting revocation feeds. Required to be explicit. SECURITY §7 item 7: "Query revocation feeds (Nostr kind-30085 by `#delegation`) for the cited delegation id before reporting OK, **unless the caller explicitly opts out**." The default was inverted — revocations were checked only when supplied, and omitting them skipped the check silently, so "checked, clean" was indistinguishable from "never checked". This library has no network by design, so the caller fetches the feed and passes `revocations`. Declining to is a decision they must state. | [`VerifyBase`](VerifyBase).[`skipRevocationCheck`](VerifyBase#property-skiprevocationcheck) | [agent-core/src/verify.ts:63](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L63) |
+| &lt;a id="property-skipsignatureverification">&lt;/a> `skipSignatureVerification?` | `boolean` | - | [`VerifyBase`](VerifyBase).[`skipSignatureVerification`](VerifyBase#property-skipsignatureverification) | [agent-core/src/verify.ts:49](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L49) |
 | &lt;a id="property-skiptemporalcheck">&lt;/a> `skipTemporalCheck?` | `boolean` | Skip the "now ∈ [issued, expires)" check. Useful for inspection. | - | [agent-core/src/verify.ts:860](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L860) |
-| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | - | [`VerifyBase`](VerifyBase.mdx).[`verifyBip322`](VerifyBase.mdx#property-verifybip322) | [agent-core/src/verify.ts:48](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L48) |
+| &lt;a id="property-verifybip322">&lt;/a> `verifyBip322?` | (`msg`: `string`, `signatureB64`: `string`, `address`: `string`) => `Promise`\&lt;`boolean`\> | - | [`VerifyBase`](VerifyBase).[`verifyBip322`](VerifyBase#property-verifybip322) | [agent-core/src/verify.ts:48](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L48) |

@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: SubmitOptions. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/stamp-ots**](../README.mdx)
+[**@orangecheck/stamp-ots**](../README)
 
 ***
 
-[@orangecheck/stamp-ots](../README.mdx) / SubmitOptions
+[@orangecheck/stamp-ots](../README) / SubmitOptions
 
 # Interface: SubmitOptions
 
@@ -17,7 +17,7 @@ Defined in: [submit.ts:13](https://github.com/orangecheck/oc-packages/blob/main/
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-calendars">&lt;/a> `calendars?` | readonly (`string` \| [`CalendarClient`](CalendarClient.mdx))[] | Calendars to submit to. Defaults to DEFAULT_CALENDARS. Can be strings (URLs) or pre-built CalendarClient instances. | [submit.ts:18](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L18) |
+| &lt;a id="property-calendars">&lt;/a> `calendars?` | readonly (`string` \| [`CalendarClient`](CalendarClient))[] | Calendars to submit to. Defaults to DEFAULT_CALENDARS. Can be strings (URLs) or pre-built CalendarClient instances. | [submit.ts:18](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L18) |
 | &lt;a id="property-fetch">&lt;/a> `fetch?` | \&#123; (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; (`input`: `string` \| `Request` \| `URL`, `init?`: `RequestInit`): `Promise`\&lt;`Response`\>; \&#125; | Optional custom fetch passed through to calendar clients. | [submit.ts:26](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L26) |
 | &lt;a id="property-minsuccesses">&lt;/a> `minSuccesses?` | `number` | Minimum number of calendars that must succeed. Defaults to 1. If fewer than `minSuccesses` calendars respond with a proof, submit() throws an aggregate error. | [submit.ts:24](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L24) |
 | &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [submit.ts:29](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/submit.ts#L29) |

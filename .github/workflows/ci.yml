@@ -41,6 +41,9 @@ jobs:
             - name: Lint
               run: yarn lint
 
+            - name: Internal links
+              run: yarn check:internal-links
+
     build:
         name: Build
         runs-on: ubuntu-latest

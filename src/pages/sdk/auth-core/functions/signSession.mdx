@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Function: signSession(). Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/auth-core**](../README.mdx)
+[**@orangecheck/auth-core**](../README)
 
 ***
 
-[@orangecheck/auth-core](../README.mdx) / signSession
+[@orangecheck/auth-core](../README) / signSession
 
 # Function: signSession()
 
@@ -43,10 +43,10 @@ revocation semantics — auth-core is deliberately stateless.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `claims` | \&#123; `aud?`: `string`; `did_oc`: `string`; `display_identity?`: [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null`; `home_federation?`: `string` \| `null`; `jti`: `string`; `merged_from?`: `string`[]; `name?`: `string` \| `null`; `npub?`: `string` \| `null`; `signing_method?`: `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null`; `step_up_at?`: `number`; `sub`: `string`; `sudo_at?`: `number`; \&#125; | - |
+| `claims` | \&#123; `aud?`: `string`; `did_oc`: `string`; `display_identity?`: [`DisplayIdentity`](../interfaces/DisplayIdentity) \| `null`; `home_federation?`: `string` \| `null`; `jti`: `string`; `merged_from?`: `string`[]; `name?`: `string` \| `null`; `npub?`: `string` \| `null`; `signing_method?`: `"fedimint_threshold"` \| `"fedimint_client"` \| `"bip322"` \| `null`; `step_up_at?`: `number`; `sub`: `string`; `sudo_at?`: `number`; \&#125; | - |
 | `claims.aud?` | `string` | Bind the token to one relying party (e.g. `https://example.com`). Omit for a family session. A bound token verifies only where that audience is expected — never as a family sign-in. |
 | `claims.did_oc` | `string` | - |
-| `claims.display_identity?` | [`DisplayIdentity`](../interfaces/DisplayIdentity.mdx) \| `null` | - |
+| `claims.display_identity?` | [`DisplayIdentity`](../interfaces/DisplayIdentity) \| `null` | - |
 | `claims.home_federation?` | `string` \| `null` | - |
 | `claims.jti` | `string` | - |
 | `claims.merged_from?` | `string`[] | - |
@@ -56,7 +56,7 @@ revocation semantics — auth-core is deliberately stateless.
 | `claims.step_up_at?` | `number` | - |
 | `claims.sub` | `string` | - |
 | `claims.sudo_at?` | `number` | - |
-| `cfg` | [`SignConfig`](../interfaces/SignConfig.mdx) | - |
+| `cfg` | [`SignConfig`](../interfaces/SignConfig) | - |
 | `ttlSeconds` | `number` | - |
 
 ## Returns

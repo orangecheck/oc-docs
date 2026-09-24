@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Function: resolveSessionFromRequest(). Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/auth-core**](../README.mdx)
+[**@orangecheck/auth-core**](../README)
 
 ***
 
-[@orangecheck/auth-core](../README.mdx) / resolveSessionFromRequest
+[@orangecheck/auth-core](../README) / resolveSessionFromRequest
 
 # Function: resolveSessionFromRequest()
 
@@ -30,16 +30,16 @@ Precedence:
      Clients clear their pin on 401 and re-resolve.
   2. Every `oc_session` cookie in the jar, first one that verifies.
 
-Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken.mdx));
+Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken));
 revocation-aware checks remain the auth host's job. Never throws.
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `headers` | [`IncomingRequestHeaders`](../type-aliases/IncomingRequestHeaders.mdx) |
-| `cfg` | [`VerifyConfig`](../interfaces/VerifyConfig.mdx) |
+| `headers` | [`IncomingRequestHeaders`](../type-aliases/IncomingRequestHeaders) |
+| `cfg` | [`VerifyConfig`](../interfaces/VerifyConfig) |
 
 ## Returns
 
-`Promise`\&lt;[`ResolveSessionResult`](../type-aliases/ResolveSessionResult.mdx)\>
+`Promise`\&lt;[`ResolveSessionResult`](../type-aliases/ResolveSessionResult)\>

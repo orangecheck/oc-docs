@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: FilterOptions. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/relay-filter**](../README.mdx)
+[**@orangecheck/relay-filter**](../README)
 
 ***
 
-[@orangecheck/relay-filter](../README.mdx) / FilterOptions
+[@orangecheck/relay-filter](../README) / FilterOptions
 
 # Interface: FilterOptions
 
@@ -24,5 +24,5 @@ Defined in: [types.ts:14](https://github.com/orangecheck/oc-packages/blob/main/r
 | &lt;a id="property-failopen">&lt;/a> `failOpen?` | `boolean` | If the OrangeCheck lookup throws (relays unreachable, network down), let the event through. Default `false` — we fail closed. | [types.ts:47](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L47) |
 | &lt;a id="property-mindays">&lt;/a> `minDays?` | `number` | Minimum days unspent. Default 0. | [types.ts:18](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L18) |
 | &lt;a id="property-minsats">&lt;/a> `minSats?` | `number` | Minimum sats bonded for the pubkey's attestation. Default 0. | [types.ts:16](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L16) |
-| &lt;a id="property-ondecision">&lt;/a> `onDecision?` | (`event`: [`MinimalNostrEvent`](MinimalNostrEvent.mdx), `decision`: [`FilterDecision`](FilterDecision.mdx)) => `void` | Called with each decision. Use for logging / metrics. | [types.ts:53](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L53) |
+| &lt;a id="property-ondecision">&lt;/a> `onDecision?` | (`event`: [`MinimalNostrEvent`](MinimalNostrEvent), `decision`: [`FilterDecision`](FilterDecision)) => `void` | Called with each decision. Use for logging / metrics. | [types.ts:53](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L53) |
 | &lt;a id="property-relays">&lt;/a> `relays?` | `string`[] | Override the discovery relays used by the SDK's check(). | [types.ts:50](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/types.ts#L50) |

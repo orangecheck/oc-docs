@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Interface: CheckResult. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/sdk**](../README.mdx)
+[**@orangecheck/sdk**](../README)
 
 ***
 
-[@orangecheck/sdk](../README.mdx) / CheckResult
+[@orangecheck/sdk](../README) / CheckResult
 
 # Interface: CheckResult
 
@@ -20,8 +20,8 @@ Defined in: [check.ts:41](https://github.com/orangecheck/oc-packages/blob/main/s
 | &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address of the attestation. | [check.ts:53](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L53) |
 | &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (if one was found). | [check.ts:51](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L51) |
 | &lt;a id="property-days">&lt;/a> `days` | `number` | Days since the youngest UTXO in the bonded set was confirmed. | [check.ts:47](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L47) |
-| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding.mdx)[] | Self-asserted identity bindings. Verify independently. | [check.ts:55](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L55) |
-| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network.mdx) | Network the address belongs to. | [check.ts:57](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L57) |
+| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding)[] | Self-asserted identity bindings. Verify independently. | [check.ts:55](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L55) |
+| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network) | Network the address belongs to. | [check.ts:57](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L57) |
 | &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff signature valid AND thresholds met. | [check.ts:43](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L43) |
 | &lt;a id="property-reasons">&lt;/a> `reasons?` | `string`[] | Present when `ok === false`. Codes explain why. | [check.ts:59](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L59) |
 | &lt;a id="property-sats">&lt;/a> `sats` | `number` | Sats bonded on-chain for the bonded UTXO set. | [check.ts:45](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L45) |

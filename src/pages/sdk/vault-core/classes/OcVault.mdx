@@ -3,11 +3,11 @@ export const metadata = {
     description: "Auto-generated API reference for Class: OcVault. Source: TypeScript types in oc-packages.",
 };
 
-[**@orangecheck/vault-core**](../README.mdx)
+[**@orangecheck/vault-core**](../README)
 
 ***
 
-[@orangecheck/vault-core](../README.mdx) / OcVault
+[@orangecheck/vault-core](../README) / OcVault
 
 # Class: OcVault
 
@@ -17,7 +17,7 @@ Defined in: [vault-core/src/vault.ts:32](https://github.com/orangecheck/oc-packa
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| &lt;a id="property-entries">&lt;/a> `entries` | `readonly` | [`DecryptedEntry`](../interfaces/DecryptedEntry.mdx)[] | Every live (non-trashed) decrypted entry. | [vault-core/src/vault.ts:37](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L37) |
+| &lt;a id="property-entries">&lt;/a> `entries` | `readonly` | [`DecryptedEntry`](../interfaces/DecryptedEntry)[] | Every live (non-trashed) decrypted entry. | [vault-core/src/vault.ts:37](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L37) |
 | &lt;a id="property-identity">&lt;/a> `identity` | `readonly` | `string` \| `null` | The OrangeCheck identity this vault belongs to, when known. | [vault-core/src/vault.ts:39](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L39) |
 | &lt;a id="property-key">&lt;/a> `key` | `readonly` | `Uint8Array` | The unwrapped 32-byte vault key. In-memory only. | [vault-core/src/vault.ts:35](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L35) |
 
@@ -41,7 +41,7 @@ Find one decrypted entry by its id or its name (case-insensitive).
 
 #### Returns
 
-[`DecryptedEntry`](../interfaces/DecryptedEntry.mdx) \| `null`
+[`DecryptedEntry`](../interfaces/DecryptedEntry) \| `null`
 
 ***
 
@@ -57,7 +57,7 @@ Metadata summaries for every entry — no secret values.
 
 #### Returns
 
-[`VaultEntrySummary`](../interfaces/VaultEntrySummary.mdx)[]
+[`VaultEntrySummary`](../interfaces/VaultEntrySummary)[]
 
 ***
 
@@ -75,7 +75,7 @@ Resolve one `ocv://` reference to its value.
 
 | Parameter | Type |
 | ------ | ------ |
-| `ref` | `string` \| [`SecretRef`](../interfaces/SecretRef.mdx) |
+| `ref` | `string` \| [`SecretRef`](../interfaces/SecretRef) |
 
 #### Returns
 
@@ -120,7 +120,7 @@ Open from entries and a raw key you already hold (e.g. the extension).
 
 | Parameter | Type |
 | ------ | ------ |
-| `entries` | [`VaultEntry`](../interfaces/VaultEntry.mdx)[] |
+| `entries` | [`VaultEntry`](../interfaces/VaultEntry)[] |
 | `key` | `Uint8Array` |
 
 #### Returns
@@ -148,8 +148,8 @@ passphrase are still required to derive the key.
 
 | Parameter | Type |
 | ------ | ------ |
-| `exportFile` | `string` \| [`VaultExport`](../interfaces/VaultExport.mdx) |
-| `escrow` | [`WrappedKey`](../interfaces/WrappedKey.mdx) |
+| `exportFile` | `string` \| [`VaultExport`](../interfaces/VaultExport) |
+| `escrow` | [`WrappedKey`](../interfaces/WrappedKey) |
 | `passphrase` | `string` |
 
 #### Returns
@@ -176,8 +176,8 @@ key with the passphrase, pull every blob, decrypt.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \&#123; `client`: [`VaultClient`](VaultClient.mdx); `passphrase`: `string`; \&#125; |
-| `opts.client` | [`VaultClient`](VaultClient.mdx) |
+| `opts` | \&#123; `client`: [`VaultClient`](VaultClient); `passphrase`: `string`; \&#125; |
+| `opts.client` | [`VaultClient`](VaultClient) |
 | `opts.passphrase` | `string` |
 
 #### Returns

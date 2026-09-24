@@ -15,7 +15,7 @@ export const metadata = {
 function verifyEvent(event: unknown): event is NostrEvent;
 ```
 
-Defined in: [index.ts:239](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L239)
+Defined in: [index.ts:245](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L245)
 
 True when `event` is well-formed, its `id` equals the NIP-01 hash of its
 content, and `sig` is a valid BIP-340 signature of that id by `pubkey`.

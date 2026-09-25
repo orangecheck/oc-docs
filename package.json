@@ -28,7 +28,7 @@
         "@next/mdx": "15.5.18",
         "@orangecheck/auth-client": "^2.22.0",
         "@orangecheck/auth-core": "^2.5.0",
-        "@orangecheck/design": "^0.32.2",
+        "@orangecheck/design": "^0.32.3",
         "@orangecheck/wallet-adapter": "^0.4.1",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-separator": "^1.1.7",

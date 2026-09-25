@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: verifyBip322()",
+    description: "Auto-generated API reference for Function: verifyBip322(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / verifyBip322
+
+# Function: verifyBip322()
+
+```ts
+function verifyBip322(__namedParameters: {
+  address: string;
+  message: string;
+  signature: string;
+}): Promise<boolean>;
+```
+
+Defined in: [wallet-adapter/src/sign.ts:34](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L34)
+
+Whether `signature` is a valid BIP-322 (or legacy BIP-137) signature of
+`message` by `address`. Accepts base64 or hex. Never throws.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `__namedParameters` | \&#123; `address`: `string`; `message`: `string`; `signature`: `string`; \&#125; |
+| `__namedParameters.address` | `string` |
+| `__namedParameters.message` | `string` |
+| `__namedParameters.signature` | `string` |
+
+## Returns
+
+`Promise`\&lt;`boolean`\>

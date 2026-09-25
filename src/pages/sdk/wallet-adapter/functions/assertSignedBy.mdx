@@ -12,13 +12,14 @@ export const metadata = {
 # Function: assertSignedBy()
 
 ```ts
-function assertSignedBy(
-   message: string, 
-   signature: string, 
-address: string): Promise<void>;
+function assertSignedBy(args: {
+  address: string;
+  message: string;
+  signature: string;
+}): Promise<void>;
 ```
 
-Defined in: [wallet-adapter/src/sign.ts:34](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L34)
+Defined in: [wallet-adapter/src/sign.ts:60](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L60)
 
 Throw `WrongAccountError` unless `signature` is a valid BIP-322 (or legacy)
 signature of `message` by `address`. Every signer runs this before returning.
@@ -27,9 +28,10 @@ signature of `message` by `address`. Every signer runs this before returning.
 
 | Parameter | Type |
 | ------ | ------ |
-| `message` | `string` |
-| `signature` | `string` |
-| `address` | `string` |
+| `args` | \&#123; `address`: `string`; `message`: `string`; `signature`: `string`; \&#125; |
+| `args.address` | `string` |
+| `args.message` | `string` |
+| `args.signature` | `string` |
 
 ## Returns
 

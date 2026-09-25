@@ -58,7 +58,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
                 </span>
             </div>
 
-            <div className="grid gap-10 lg:grid-cols-[240px_minmax(0,1fr)_220px] lg:gap-12">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_minmax(0,1fr)_220px] lg:gap-12">
                 <aside className="sticky top-20 hidden h-[calc(100vh-6rem)] overflow-y-auto pr-2 lg:block">
                     <DocsNav />
                 </aside>

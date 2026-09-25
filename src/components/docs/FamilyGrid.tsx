@@ -47,7 +47,7 @@ const FAMILY: { name: string; verb: string; href: string; what: string }[] = [
 
 export function FamilyGrid() {
     return (
-        <div className="not-prose my-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {FAMILY.map((p) => (
                 <Surface key={p.href} elevation="sm" pad="md" className="flex h-full flex-col">
                     <div className="flex items-start justify-between gap-3">

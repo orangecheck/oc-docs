@@ -9,7 +9,7 @@ export function DocsPagination({ pathname }: { pathname: string }) {
     if (!prev && !next) return null;
 
     return (
-        <nav className="mt-16 grid gap-4 border-t pt-8 font-mono sm:grid-cols-2">
+        <nav className="mt-16 grid grid-cols-1 gap-4 border-t pt-8 font-mono sm:grid-cols-2">
             {prev ? (
                 <Link
                     href={prev.href}

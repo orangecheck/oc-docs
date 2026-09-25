@@ -134,29 +134,35 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             <hr className="my-8 border-t" {...props} />
         ),
         table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
-            <div className="my-6 w-full overflow-y-auto">
-                <table className={cn('oc-data-table w-full', props.className)} {...props} />
+            <div className="my-6 w-full overflow-x-auto">
+                <table
+                    {...props}
+                    className={cn(
+                        'oc-data-table w-full [&_code]:whitespace-nowrap [&_td]:min-w-32 [&_th]:min-w-32',
+                        props.className
+                    )}
+                />
             </div>
         ),
         tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => (
-            <tr className={cn('even:bg-muted m-0 border-t p-0', props.className)} {...props} />
+            <tr {...props} className={cn('even:bg-muted m-0 border-t p-0', props.className)} />
         ),
         th: (props: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
             <th
+                {...props}
                 className={cn(
                     'border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right',
                     props.className
                 )}
-                {...props}
             />
         ),
         td: (props: React.TdHTMLAttributes<HTMLTableDataCellElement>) => (
             <td
+                {...props}
                 className={cn(
                     'border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right',
                     props.className
                 )}
-                {...props}
             />
         ),
         a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {

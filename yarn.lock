@@ -813,11 +813,11 @@
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
 "@orangecheck/auth-client@^2.22.0":
-  version "2.25.2"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.25.2.tgz#9e442efd7c4c4e915bc46258d8e28360b5fcc8f2"
-  integrity sha512-5FYYkwTYRwTXMdqzsitIJ3zH3FMSDTx8n5Hf3qBhyVp0lV48G6zsukoOmO8nEyjDI0Y3t7iHxIfJ05Mh6mpLjA==
+  version "2.25.3"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.25.3.tgz#6b0433160b522737734b326bf64c5e07a8eea16d"
+  integrity sha512-CNaHrnZF25dx5Lmrx/wlMTbDUZBzphJCNZM91/9o34ezQk9v6fRxYW2OLbQaFtILlAeutlH+mkgbBPREPsulSQ==
   dependencies:
-    "@orangecheck/wallet-adapter" "^0.4.2"
+    "@orangecheck/wallet-adapter" "^0.4.2 || ^0.5.0"
     "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/auth-core@^2.5.0":
@@ -849,10 +849,10 @@
     sonner "^2.0.7"
     tailwind-merge "^3.3.1"
 
-"@orangecheck/wallet-adapter@^0.4.1", "@orangecheck/wallet-adapter@^0.4.2":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.4.3.tgz#54560ae0c3b0fb5e3fbefe66d73a95ab34342848"
-  integrity sha512-C7p0YuOiOqCHbOpFgtajz4BU5rYifHm6xhwiFvOnIejPAJMR65wdoBrCFAyq9Yib3hh70mKZCKfYOJd/qH+WUQ==
+"@orangecheck/wallet-adapter@^0.4.2 || ^0.5.0", "@orangecheck/wallet-adapter@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.5.0.tgz#3af3fbe858ece8e0a6b234785898b195919accee"
+  integrity sha512-v4jrYM7ngo/9XG0a90GkavRVj8egVRU20kOFOENYj2vCAsTCDRlaXYAg4zfXAg6Zr4Gok+dSIis4cCzHLpv0Dw==
   dependencies:
     bip322-js "^3.0.0"
 
@@ -2951,7 +2951,7 @@ call-bind-apply-helpers@^1.0.1, call-bind-apply-helpers@^1.0.2:
 
 call-bind@^1.0.7, call-bind@^1.0.8, call-bind@^1.0.9:
   version "1.0.9"
-  resolved "https://registry.npmjs.org/call-bind/-/call-bind-1.0.9.tgz#39a644700c80bc7d0ca9102fc6d1d43b2fd7eee7"
+  resolved "https://registry.yarnpkg.com/call-bind/-/call-bind-1.0.9.tgz#39a644700c80bc7d0ca9102fc6d1d43b2fd7eee7"
   integrity sha512-a/hy+pNsFUTR+Iz8TCJvXudKVLAnz/DyeSUo10I5yvFDQJBFU2s9uqQpoSrJlroHUKoKqzg+epxyP9lqFdzfBQ==
   dependencies:
     call-bind-apply-helpers "^1.0.2"

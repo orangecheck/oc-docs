@@ -512,8 +512,13 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Every me.ochk.io endpoint · auth, rate limits, response shapes.',
             },
             {
-                href: '/me/custody',
+                href: '/me/federation',
                 label: 'Federation custody',
+                blurb: 'Who holds the sats today, the federation design that replaces it, and how graduation works.',
+            },
+            {
+                href: '/me/custody',
+                label: 'Custody contract',
                 blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
             },
             {
@@ -562,6 +567,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/vault/protocol',
                 label: 'Protocol',
                 blurb: 'Flow 4, the entry envelope, the double-encrypted cloud blob, the portable export format.',
+            },
+            {
+                href: '/vault/teams',
+                label: 'Teams',
+                blurb: 'Family Circle team vaults: the team key, invite fragments, roles and seats.',
             },
             {
                 href: '/vault/security',

@@ -133,8 +133,8 @@ valid — for the wrong address.
 
 Before signing, call the wallet's `requestAccounts()` or `getAddresses()` and
 compare to the address you issued the challenge for. Bail out with a clear error
-if they differ. [`@orangecheck/wallet-adapter`](/sdks/wallet-adapter) does this
-automatically.
+if they differ. [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README) does
+this automatically.
 
 ## Session hygiene
 
@@ -153,7 +153,7 @@ automatically.
 
 - [**HTTP API — `/api/challenge`**](/attest/api) — the public primitive this
   guide wraps
-- [**`@orangecheck/wallet-adapter`**](/sdks/wallet-adapter) — cross-wallet
+- [**`@orangecheck/wallet-adapter`**](/sdk/wallet-adapter/README) — cross-wallet
   signing + active-account checks
 - [**Security model**](/ecosystem/security) — CSRF, cookie, and replay
   considerations

@@ -65,17 +65,19 @@ substrate.
 ## Commercial products on top
 
 The protocol family is open and free to self-host. On top of it OrangeCheck
-ships a managed commercial product. It uses the same envelopes, the same BIP-322
-signing, the same anchor pipeline — a consumer of the protocol, not an extension
-to it.
+ships managed products. They use the same envelopes, the same BIP-322 signing,
+the same anchor pipeline — consumers of the protocols, not extensions to them.
 
-| Product          | What it is                                                                                                                                                                                                                        | Audience                                         |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| **[OC Me](/me)** | Consumer-side Bitcoin-backed identity. Sign in with your address; integrators pay you sats per billable event. OrangeCheck holds the balance during bring-up; federation custody and self-custody graduation are the destination. | end users + sites that want sat-paying user auth |
+| Product                  | What it is                                                                                                                                           |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[OC Me](/me)**         | Bitcoin-backed identity. Integrators pay you sats per billable event. OrangeCheck holds the balance during bring-up; federation custody is the goal. |
+| **[OC Vault](/vault)**   | A password manager that cannot read your data. Secrets are sealed on your device; OrangeCheck stores ciphertext only.                                |
+| **[OC Chat](/chat)**     | End-to-end-encrypted messaging where your Bitcoin address is the inbox and Lightning postage goes to the recipient.                                  |
+| **[OC Cosign](/cosign)** | Get behind a builder: join as a co-founder, or back them with sats that settle peer-to-peer.                                                         |
 
-OC Me operates under the [charter](/charter) — eight commitments that bind every
-OrangeCheck surface (no token, custody you can graduate out of, the protocol
-stays open, audit verifies without us, and so on).
+Every product operates under the [charter](/charter) — eight commitments that
+bind every OrangeCheck surface (no token, custody you can graduate out of, the
+protocol stays open, audit verifies without us, and so on).
 
 ## How these docs are organized
 
@@ -88,10 +90,10 @@ stays open, audit verifies without us, and so on).
 - **Per-protocol sections** — one each for Attest, Lock, Stamp, Vote, Agent,
   Pledge. Each follows the same shape: overview → how it works → concepts → API
   → guides. Pattern-match once; navigate them all.
-- **[OC Me](/me)** — the commercial product. The section follows: overview →
-  quickstart → SDK reference → integrations → webhooks → API →
-  custody/operations.
-- **[SDKs](/sdks)** — every published `@orangecheck/*` package, mapped to which
+- **Per-product sections** — one each for [OC Me](/me), [OC Vault](/vault),
+  [OC Chat](/chat) and [OC Cosign](/cosign): what it is, how to use it, and what
+  it trusts.
+- **[SDKs](/sdk)** — every published `@orangecheck/*` package, mapped to which
   protocol or product it serves.
 - **[Charter](/charter)** — single source of truth for the eight company
   commitments. Every product subdomain links here.

@@ -15,32 +15,25 @@ const COLUMNS: FooterColumn[] = [
         ],
     },
     {
+        label: '§ products',
+        links: [
+            { href: '/me', label: 'oc·me' },
+            { href: '/vault', label: 'oc·vault' },
+            { href: '/chat', label: 'oc·chat' },
+            { href: '/cosign', label: 'oc·cosign' },
+        ],
+    },
+    {
         label: '§ docs',
         links: [
             { href: '/', label: 'overview' },
             { href: '/getting-started/quickstart', label: 'quickstart' },
             { href: '/getting-started/which-protocol', label: 'which protocol?' },
             { href: '/ecosystem', label: 'ecosystem (shared)' },
-            { href: '/sdks', label: 'sdks' },
+            { href: '/sdk', label: 'sdks' },
             { href: '/reference/faq', label: 'faq' },
             { href: '/reference/glossary', label: 'glossary' },
-        ],
-    },
-    {
-        label: '§ ecosystem',
-        links: [
-            { href: 'https://ochk.io', label: 'ochk.io — umbrella', external: true },
-            { href: 'https://attest.ochk.io', label: 'attest.ochk.io', external: true },
-            { href: 'https://lock.ochk.io', label: 'lock.ochk.io', external: true },
-            { href: 'https://vote.ochk.io', label: 'vote.ochk.io', external: true },
-            { href: 'https://stamp.ochk.io', label: 'stamp.ochk.io', external: true },
-            { href: 'https://agent.ochk.io', label: 'agent.ochk.io', external: true },
-            { href: 'https://pledge.ochk.io', label: 'pledge.ochk.io', external: true },
-            {
-                href: 'https://github.com/orangecheck',
-                label: 'github org',
-                external: true,
-            },
+            { href: 'https://github.com/orangecheck', label: 'github', external: true },
         ],
     },
 ];
@@ -57,8 +50,8 @@ export function LayoutFooter() {
                 ),
                 tagline: (
                     <>
-                        Unified documentation for the OrangeCheck ecosystem — Attest, Lock, Vote,
-                        Stamp, Agent, Pledge. Shared concepts written once, cross-linked everywhere.
+                        One reference for the six protocols and the products built on them. Shared
+                        concepts written once, cross-linked everywhere.
                     </>
                 ),
                 meta: (

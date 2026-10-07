@@ -1,20 +1,26 @@
 export const metadata = {
     title: 'OC-Me Federation v1 — Charter',
     description:
-        'The published charter for the OC-Me Federation v1 — the Fedimint federation that backs me.ochk.io email-OTP wallets. Every guardian operator signs this document; the SHA-256 of its canonical bytes is the federation hash users verify against /custody.',
+        'The charter text for OC-Me Federation v1 — the Fedimint federation designed to back me.ochk.io wallets. No federation runs under it today. Guardians would sign the SHA-256 of its canonical bytes; users would verify that hash against /custody.',
 };
 
 # OC-Me Federation v1 — Charter
 
-**Ratified v1.0.0 · 2026-05-12.**
+> **Status: no federation runs under this charter today.**
+> [`/api/federations`](https://me.ochk.io/api/federations) lists no `oc-me-v1`,
+> and during bring-up OrangeCheck holds every user's accrued balance. Read this
+> page as the text a v1 guardian set would sign, not as a description of today.
+> [Federation custody](/me/federation) has the present tense.
 
-This is the published charter for the Fedimint federation that backs
-[`me.ochk.io`](https://me.ochk.io) email-OTP wallets. Every guardian operator
-signs the SHA-256 of this document's canonical bytes (the
-[Canonical bytes](#canonical-bytes) section below) using their hardware-backed
-Ed25519 operator key. The signature appears on
+**Charter text v1.0.0 · 2026-05-12.**
+
+This is the charter for the Fedimint federation designed to back
+[`me.ochk.io`](https://me.ochk.io) wallets. Each guardian operator would sign
+the SHA-256 of this document's canonical bytes (the
+[Canonical bytes](#canonical-bytes) section below) with a hardware-backed
+Ed25519 operator key. Those signatures would appear on
 [me.ochk.io/me/operator/ceremonies](https://me.ochk.io/me/operator/ceremonies)
-and the per-federation deep-view at
+and the per-federation view at
 [me.ochk.io/federations/oc-me-v1](https://me.ochk.io/federations/oc-me-v1).
 
 This charter binds the **federation**, not OrangeCheck the company. OC operates

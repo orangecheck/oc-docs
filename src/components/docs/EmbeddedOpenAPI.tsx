@@ -40,23 +40,17 @@ interface EmbeddedOpenAPIProps {
 export function EmbeddedOpenAPI({ url, caption }: EmbeddedOpenAPIProps) {
     return (
         <div className="border-muted-foreground/20 bg-background my-8 border">
-            <div className="bg-card/40 border-b px-4 py-2 font-mono text-[10.5px] tracking-widest uppercase">
+            <div className="bg-card/40 flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2 font-mono text-[10.5px] tracking-widest uppercase">
                 <span className="text-muted-foreground">openapi 3.1 · live spec</span>
-                <span className="text-muted-foreground/60 mx-2">·</span>
                 <a
                     href={url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-primary hover:underline"
+                    className="text-primary inline-flex min-h-11 items-center break-all normal-case hover:underline sm:min-h-0"
                 >
                     {url}
                 </a>
-                {caption && (
-                    <>
-                        <span className="text-muted-foreground/60 mx-2">·</span>
-                        <span className="text-muted-foreground">{caption}</span>
-                    </>
-                )}
+                {caption && <span className="text-muted-foreground">{caption}</span>}
             </div>
             <style>{`
                 .swagger-ui .topbar { display: none; }

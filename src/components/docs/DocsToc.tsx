@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils/utils';
 
-interface TocItem {
+export interface TocItem {
     id: string;
     text: string;
     level: 2 | 3;
@@ -33,26 +33,24 @@ function collectHeadings(): TocItem[] {
     });
 }
 
-export function DocsToc() {
+/** Headings of the page on screen plus the one being read. Shared by the desktop rail and the phone sheet. */
+export function useDocsToc(): { items: TocItem[]; activeId: string } {
     const router = useRouter();
     // Strip the hash so clicking an in-page anchor doesn't re-collect.
     const path = router.asPath.split('#')[0] ?? '';
     const [items, setItems] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
 
-    // Re-collect headings on EVERY route change. DocsToc is mounted once inside
-    // DocsLayout (which is mounted once in _app), so an empty-deps effect froze
-    // the list on the first page visited — every client-side navigation then
-    // showed the wrong page's headings. Keying on `path` (and resetting first)
-    // rebuilds the list for the page actually on screen. By the time this effect
-    // runs the new page's DOM has committed; a rAF adds a safety margin for any
-    // late layout before we read #docs-content.
+    // Re-collect headings on EVERY route change. DocsLayout is mounted once in
+    // _app, so an empty-deps effect froze the list on the first page visited —
+    // every client-side navigation then showed the wrong page's headings.
+    // Keying on `path` (and resetting first) rebuilds the list for the page
+    // actually on screen. A rAF plus a short timeout covers late layout.
     useEffect(() => {
         setActiveId('');
         let raf = 0;
         const run = () => setItems(collectHeadings());
         raf = requestAnimationFrame(run);
-        // Belt-and-suspenders for content that settles a tick later.
         const t = setTimeout(run, 60);
         return () => {
             cancelAnimationFrame(raf);
@@ -78,29 +76,50 @@ export function DocsToc() {
         return () => observer.disconnect();
     }, [items]);
 
+    return { items, activeId };
+}
+
+export function TocList({
+    items,
+    activeId,
+    onNavigate,
+    className,
+}: {
+    items: TocItem[];
+    activeId: string;
+    onNavigate?: () => void;
+    className?: string;
+}) {
+    return (
+        <ul className={cn('space-y-0.5', className)}>
+            {items.map((i) => (
+                <li key={i.id}>
+                    <a
+                        href={`#${i.id}`}
+                        onClick={onNavigate}
+                        className={cn(
+                            'block border-l-2 py-1 leading-relaxed transition-colors',
+                            i.level === 3 ? 'pl-6' : 'pl-3',
+                            activeId === i.id
+                                ? 'border-primary text-foreground'
+                                : 'text-muted-foreground hover:text-foreground hover:border-muted-foreground/30 border-transparent'
+                        )}
+                    >
+                        {i.text}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+export function DocsToc({ items, activeId }: { items: TocItem[]; activeId: string }) {
     if (items.length === 0) return null;
 
     return (
         <aside className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto font-mono text-[11.5px]">
             <div className="label-mono text-primary mb-3">§ on this page</div>
-            <ul className="space-y-0.5">
-                {items.map((i) => (
-                    <li key={i.id}>
-                        <a
-                            href={`#${i.id}`}
-                            className={cn(
-                                'block border-l-2 py-1 leading-relaxed transition-colors',
-                                i.level === 3 ? 'pl-6' : 'pl-3',
-                                activeId === i.id
-                                    ? 'border-primary text-foreground'
-                                    : 'text-muted-foreground hover:text-foreground hover:border-muted-foreground/30 border-transparent'
-                            )}
-                        >
-                            {i.text}
-                        </a>
-                    </li>
-                ))}
-            </ul>
+            <TocList items={items} activeId={activeId} />
         </aside>
     );
 }

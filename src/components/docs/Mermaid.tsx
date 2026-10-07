@@ -133,6 +133,14 @@ export function Mermaid({ chart, className }: MermaidProps) {
         };
     }, [chart, id]);
 
+    // Mermaid scales the SVG down to the column, which leaves 5px labels on a
+    // phone. Hold it at its natural width (capped) and let the figure scroll.
+    useEffect(() => {
+        const el = ref.current?.querySelector('svg');
+        const w = el?.viewBox.baseVal?.width;
+        if (el && w) el.style.minWidth = `${Math.min(w, 640)}px`;
+    }, [svg]);
+
     if (err) {
         return (
             <div className="border-destructive/40 bg-destructive/5 my-6 border p-4 font-mono text-xs">
@@ -149,19 +157,15 @@ export function Mermaid({ chart, className }: MermaidProps) {
     }
 
     return (
-        <figure
-            className={cn('my-6 overflow-x-auto rounded-lg border bg-zinc-950/40 p-4', className)}
-        >
+        <figure className={cn('my-6 overflow-x-auto rounded-lg border bg-zinc-950 p-4', className)}>
             {svg ? (
                 <div
                     ref={ref}
-                    className="mermaid-host flex justify-center"
+                    className="mermaid-host [&>svg]:mx-auto [&>svg]:block"
                     dangerouslySetInnerHTML={{ __html: svg }}
                 />
             ) : (
-                <pre className="text-muted-foreground overflow-x-auto font-mono text-xs">
-                    {chart}
-                </pre>
+                <pre className="overflow-x-auto font-mono text-xs text-zinc-400">{chart}</pre>
             )}
         </figure>
     );

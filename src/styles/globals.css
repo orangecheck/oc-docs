@@ -23,6 +23,11 @@
    the mobile sub-header), otherwise the target heading lands hidden underneath. */
 @layer utilities {
     .docs-prose :is(h1, h2, h3, h4) {
-        scroll-margin-top: 5rem;
+        scroll-margin-top: 7rem;
+    }
+    @media (min-width: 64rem) {
+        .docs-prose :is(h1, h2, h3, h4) {
+            scroll-margin-top: 5rem;
+        }
     }
 }

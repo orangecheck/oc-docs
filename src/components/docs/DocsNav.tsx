@@ -76,7 +76,7 @@ export function DocsNav({ onNavigate }: { onNavigate?: () => void }) {
                                 'label-mono group flex w-full items-center gap-2 rounded-none border-l-2 px-2 py-1.5 text-left transition-colors',
                                 isActive
                                     ? 'border-primary text-primary'
-                                    : 'text-primary/80 hover:text-primary border-transparent'
+                                    : 'text-muted-foreground hover:text-foreground border-transparent'
                             )}
                         >
                             <ChevronRight

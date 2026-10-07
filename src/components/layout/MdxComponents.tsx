@@ -17,8 +17,8 @@ import { SpecRef } from '@/components/docs/SpecRef';
 const Mermaid = dynamic(() => import('@/components/docs/Mermaid').then((m) => m.Mermaid), {
     ssr: false,
     loading: () => (
-        <figure className="my-6 overflow-x-auto rounded-lg border bg-zinc-950/40 p-4">
-            <pre className="text-muted-foreground overflow-x-auto font-mono text-xs">
+        <figure className="my-6 overflow-x-auto rounded-lg border bg-zinc-950 p-4">
+            <pre className="overflow-x-auto font-mono text-xs text-zinc-400">
                 rendering diagram…
             </pre>
         </figure>
@@ -94,7 +94,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         ),
         code: (props: React.HTMLAttributes<HTMLElement>) => (
             <code
-                className={cn('bg-muted rounded px-2 py-1 font-mono text-sm', props.className)}
+                className={cn(
+                    'bg-muted rounded px-2 py-1 font-mono text-sm break-words',
+                    props.className
+                )}
                 {...props}
             />
         ),

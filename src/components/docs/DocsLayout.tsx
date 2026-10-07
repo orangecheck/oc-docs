@@ -1,61 +1,85 @@
 'use client';
 
-import { Button, Sheet, SheetContent, SheetTrigger } from '@orangecheck/design';
-import { Menu, X } from 'lucide-react';
+import { Button, Sheet, SheetContent, SheetTitle, SheetTrigger } from '@orangecheck/design';
+import { ListTree, Menu } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import { DocsBreadcrumb } from './DocsBreadcrumb';
 import { DocsNav } from './DocsNav';
 import { DocsPagination } from './DocsPagination';
-import { DocsToc } from './DocsToc';
+import { DocsToc, TocList, useDocsToc } from './DocsToc';
 import { findDocsPage } from './nav';
 
 /**
  * Three-column docs shell: left sidebar (nav), center content, right toc.
- * Mobile: content only, nav in a drawer.
+ * Mobile: content only, nav and toc each in a sheet.
  */
 export function DocsLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = router.asPath.split('?')[0]!.split('#')[0]!;
     const page = findDocsPage(pathname);
     const pageLabel = page?.label ?? 'Documentation';
+    const toc = useDocsToc();
 
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [tocOpen, setTocOpen] = useState(false);
     useEffect(() => {
         setDrawerOpen(false);
+        setTocOpen(false);
     }, [pathname]);
 
     return (
         <div className="container">
-            {/* Mobile sidebar trigger */}
-            <div className="bg-background/90 sticky top-12 z-30 -mx-4 mb-6 flex items-center justify-between gap-2 border-b px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:hidden lg:px-8">
+            {/* Mobile bar: site nav on the left, this page's sections on the right */}
+            <div className="bg-background/90 sticky top-12 z-30 -mx-4 mb-6 flex items-center justify-between gap-2 border-b px-4 py-1 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:hidden lg:px-8">
                 <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
                     <SheetTrigger asChild>
-                        <Button size="sm" variant="outline" className="gap-2 font-mono">
+                        <Button size="sm" variant="outline" className="h-11 gap-2 font-mono">
                             <Menu className="h-3 w-3" />
                             <span className="text-[11px] tracking-widest uppercase">menu</span>
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-80 p-0">
-                        <div className="flex items-center justify-between border-b px-4 py-3">
-                            <span className="label-mono text-primary">§ docs</span>
-                            <button
-                                onClick={() => setDrawerOpen(false)}
-                                aria-label="Close"
-                                className="text-muted-foreground hover:text-foreground"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
+                    <SheetContent side="left" className="w-80 gap-0 p-0">
+                        <div className="border-b px-4 py-3 pr-12">
+                            <SheetTitle className="label-mono text-primary">§ docs</SheetTitle>
                         </div>
                         <div className="overflow-y-auto p-4">
                             <DocsNav onNavigate={() => setDrawerOpen(false)} />
                         </div>
                     </SheetContent>
                 </Sheet>
-                <span className="text-muted-foreground truncate font-mono text-[11px]">
-                    docs / <span className="text-foreground">{pageLabel.toLowerCase()}</span>
-                </span>
+                {toc.items.length > 1 ? (
+                    <Sheet open={tocOpen} onOpenChange={setTocOpen}>
+                        <SheetTrigger asChild>
+                            <Button size="sm" variant="ghost" className="h-11 gap-2 font-mono">
+                                <ListTree className="h-3 w-3" />
+                                <span className="text-[11px] tracking-widest uppercase">
+                                    on this page
+                                </span>
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right" className="w-80 gap-0 p-0">
+                            <div className="border-b px-4 py-3 pr-12">
+                                <SheetTitle className="label-mono text-primary">
+                                    § {pageLabel.toLowerCase()}
+                                </SheetTitle>
+                            </div>
+                            <div className="overflow-y-auto p-4 font-mono text-[13px]">
+                                <TocList
+                                    items={toc.items}
+                                    activeId={toc.activeId}
+                                    onNavigate={() => setTocOpen(false)}
+                                    className="[&_a]:py-2"
+                                />
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                ) : (
+                    <span className="text-muted-foreground truncate font-mono text-[11px]">
+                        {pageLabel.toLowerCase()}
+                    </span>
+                )}
             </div>
 
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[240px_minmax(0,1fr)_220px] lg:gap-12">
@@ -72,7 +96,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
                 </article>
 
                 <div className="hidden lg:block">
-                    <DocsToc />
+                    <DocsToc items={toc.items} activeId={toc.activeId} />
                 </div>
             </div>
         </div>

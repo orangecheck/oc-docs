@@ -15,10 +15,12 @@ export const metadata = {
 function Toaster(__namedParameters: ToasterProps): any;
 ```
 
-Defined in: [primitives/toaster.tsx:10](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/toaster.tsx#L10)
+Defined in: [primitives/toaster.tsx:12](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/toaster.tsx#L12)
 
 Toast host in the house design language. Mount once at the app root, then
 call `toast()` from `sonner` anywhere. Re-exported here for convenience.
+Toasts stay 6s with a close button; pass `{ duration: Infinity }` to an error
+the user must act on.
 
 ## Parameters
 

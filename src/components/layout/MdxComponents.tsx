@@ -148,7 +148,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </div>
         ),
         tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => (
-            <tr {...props} className={cn('even:bg-muted m-0 border-t p-0', props.className)} />
+            <tr {...props} className={cn('even:bg-muted/40 m-0 border-t p-0', props.className)} />
         ),
         th: (props: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
             <th

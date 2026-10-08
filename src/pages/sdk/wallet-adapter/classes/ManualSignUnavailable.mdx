@@ -1,0 +1,50 @@
+export const metadata = {
+    title: "Class: ManualSignUnavailable",
+    description: "Auto-generated API reference for Class: ManualSignUnavailable. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / ManualSignUnavailable
+
+# Class: ManualSignUnavailable
+
+Defined in: [wallet-adapter/src/sign.ts:351](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L351)
+
+`getSigner('manual')` was asked to sign with no way to collect a signature:
+no `onManualSign`, and no browser prompt to fall back on.
+
+## Extends
+
+- `Error`
+
+## Constructors
+
+### Constructor
+
+```ts
+new ManualSignUnavailable(): ManualSignUnavailable;
+```
+
+Defined in: [wallet-adapter/src/sign.ts:353](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L353)
+
+#### Returns
+
+`ManualSignUnavailable`
+
+#### Overrides
+
+```ts
+Error.constructor
+```
+
+## Properties
+
+| Property | Modifier | Type | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-code">&lt;/a> `code` | `readonly` | `"E_MANUAL_SIGN_UNAVAILABLE"` | - | [wallet-adapter/src/sign.ts:352](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L352) |
+| &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
+| &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
+| &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

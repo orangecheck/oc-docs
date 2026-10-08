@@ -11,14 +11,14 @@ export const metadata = {
 
 # Interface: GateDecision
 
-Defined in: [types.ts:113](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L113)
+Defined in: [types.ts:117](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L117)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-check">&lt;/a> `check?` | `any` | Underlying SDK result, present when a lookup happened. | [types.ts:126](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L126) |
-| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff the request should be allowed through. | [types.ts:115](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L115) |
-| &lt;a id="property-reason">&lt;/a> `reason` | \| `"ok"` \| `"no_subject"` \| `"below_threshold"` \| `"invalid_proof"` \| `"not_found"` \| `"lookup_error"` \| `"fail_open"` | Why the gate blocked (or allowed). | [types.ts:117](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L117) |
-| &lt;a id="property-subject">&lt;/a> `subject?` | `string` | The subject value the gate resolved from the request. | [types.ts:128](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L128) |
-| &lt;a id="property-subjectkind">&lt;/a> `subjectKind?` | `"address"` \| `"attestation_id"` \| `"identity"` | The kind of subject: 'address' | 'attestation_id' | 'identity'. | [types.ts:130](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L130) |
+| &lt;a id="property-check">&lt;/a> `check?` | `any` | Underlying SDK result, present when a lookup happened. | [types.ts:131](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L131) |
+| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff the request should be allowed through. | [types.ts:119](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L119) |
+| &lt;a id="property-reason">&lt;/a> `reason` | \| `"ok"` \| `"no_subject"` \| `"below_threshold"` \| `"invalid_proof"` \| `"not_found"` \| `"lookup_error"` \| `"lookup_timeout"` \| `"fail_open"` | Why the gate blocked (or allowed). | [types.ts:121](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L121) |
+| &lt;a id="property-subject">&lt;/a> `subject?` | `string` | The subject value the gate resolved from the request. | [types.ts:133](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L133) |
+| &lt;a id="property-subjectkind">&lt;/a> `subjectKind?` | `"address"` \| `"attestation_id"` \| `"identity"` | The kind of subject: 'address' | 'attestation_id' | 'identity'. | [types.ts:135](https://github.com/orangecheck/oc-packages/blob/main/gate/src/types.ts#L135) |

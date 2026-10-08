@@ -3,6 +3,8 @@ import type { NextConfig } from 'next';
 import createMDX from '@next/mdx';
 import rehypeSlug from 'rehype-slug';
 
+import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
+
 // Surface the running build in the OcAccountMenu BuildFooter.
 // VERCEL_GIT_COMMIT_SHA is populated automatically on every Vercel deploy;
 // `dev` is the safe sentinel for local builds.
@@ -144,7 +146,8 @@ const withMDX = createMDX({
         // rehype-slug bakes `id="…"` onto every heading at build time so
         // anchor links (DocsToc + direct deep links like /foo#bar) work
         // immediately, with no client-side race against collectHeadings().
-        rehypePlugins: [rehypeSlug],
+        // rehype-keep-ids keeps BIP-322, kind-30085 and the like on one line.
+        rehypePlugins: [rehypeSlug, rehypeKeepIds],
     },
 });
 

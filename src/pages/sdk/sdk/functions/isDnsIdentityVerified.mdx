@@ -14,21 +14,22 @@ export const metadata = {
 ```ts
 function isDnsIdentityVerified(
    attestationId: string, 
-   _domain: string, 
+   domain: string, 
    cachedContent?: string): boolean;
 ```
 
-Defined in: [identity/dns.ts:217](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/identity/dns.ts#L217)
+Defined in: [identity/dns.ts:218](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/identity/dns.ts#L218)
 
 Check if a DNS identity is already verified
-This is a quick check using cached data
+This is a quick check using cached data: the TXT value or the well-known file
+fetched from `domain`. A well-known file names its domain, and must name this one.
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `attestationId` | `string` |
-| `_domain` | `string` |
+| `domain` | `string` |
 | `cachedContent?` | `string` |
 
 ## Returns

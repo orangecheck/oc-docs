@@ -15,10 +15,11 @@ Defined in: [primitives/pagination.tsx:7](https://github.com/orangecheck/oc-pack
 
 ## Properties
 
-| Property | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-classname">&lt;/a> `className?` | `string` | [primitives/pagination.tsx:12](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L12) |
-| &lt;a id="property-onpage">&lt;/a> `onPage` | (`page`: `number`) => `void` | [primitives/pagination.tsx:11](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L11) |
-| &lt;a id="property-page">&lt;/a> `page` | `number` | [primitives/pagination.tsx:8](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L8) |
-| &lt;a id="property-pagesize">&lt;/a> `pageSize` | `number` | [primitives/pagination.tsx:9](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L9) |
-| &lt;a id="property-total">&lt;/a> `total` | `number` | [primitives/pagination.tsx:10](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L10) |
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-classname">&lt;/a> `className?` | `string` | - | [primitives/pagination.tsx:19](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L19) |
+| &lt;a id="property-onpage">&lt;/a> `onPage` | (`pageIndex`: `number`) => `void` | Called with the zero-based index of the page to show. | [primitives/pagination.tsx:18](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L18) |
+| &lt;a id="property-page">&lt;/a> ~~`page?`~~ | `number` | **Deprecated** Use `pageIndex`. Same zero-based value; the name hid the base, and four of six call sites passed 1-based numbers, which skipped the first page. | [primitives/pagination.tsx:14](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L14) |
+| &lt;a id="property-pageindex">&lt;/a> `pageIndex?` | `number` | Zero-based page index: the first page is 0. | [primitives/pagination.tsx:9](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L9) |
+| &lt;a id="property-pagesize">&lt;/a> `pageSize` | `number` | - | [primitives/pagination.tsx:15](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L15) |
+| &lt;a id="property-total">&lt;/a> `total` | `number` | - | [primitives/pagination.tsx:16](https://github.com/orangecheck/oc-packages/blob/main/design/src/primitives/pagination.tsx#L16) |

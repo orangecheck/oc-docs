@@ -827,10 +827,10 @@
   dependencies:
     jose "^6.2.2"
 
-"@orangecheck/design@^0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/design/-/design-0.34.0.tgz#9c60264bd38f71e492aa041dc8749bb8e9c2c27e"
-  integrity sha512-JHTgx3srHxA7bk/xXf+F2eeZZxIduMYP+ZLnD804GEEF1zmRqHPA3kWUhPARNtqbWZlumk1mlRdISvEneMEw5w==
+"@orangecheck/design@^0.34.1":
+  version "0.34.1"
+  resolved "https://registry.yarnpkg.com/@orangecheck/design/-/design-0.34.1.tgz#6aaffca5584a2c680fd1ba6f0cd9d6786ffd4c56"
+  integrity sha512-b+hDlCtLA0+X0ZpcOX8GPocGe9D9+6j4Io0F0SEDe2I/R9fhveStEmGkPC7yw4VoEeMUcQABeL7rrUP7JlzOPg==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"

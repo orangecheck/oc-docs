@@ -106,20 +106,38 @@ test-fire path). Anything else gets `401 project_auth_required`.
 
 ## Authenticated · integrator project lifecycle
 
-| Method   | Path                              | Purpose                                                                                                              |
-| -------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `GET`    | `/api/me/projects`                | list every project owned by your identity                                                                            |
-| `POST`   | `/api/me/projects`                | create a project, rate-limited 5/min                                                                                 |
-| `GET`    | `/api/me/projects/[id]`           | per-project state · owner-gated                                                                                      |
-| `POST`   | `/api/me/projects/[id]`           | update IntegratorPriceConfig · owner-gated, validates                                                                |
-| `DELETE` | `/api/me/projects/[id]`           | delete project · owner-gated                                                                                         |
-| `POST`   | `/api/me/projects/[id]/verify`    | run a domain-ownership check (DNS TXT, falls back to meta tag) · owner-gated, rate-limited 5/min                     |
-| `DELETE` | `/api/me/projects/[id]/verify`    | reissue the verification token (rotate / retry from scratch) · owner-gated                                           |
-| `POST`   | `/api/me/projects/[id]/test-fire` | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox |
-| `GET`    | `/api/me/projects/[id]/events`    | live event stream for this project · owner-gated                                                                     |
-| `GET`    | `/api/me/projects/[id]/webhooks`  | list registered webhooks · owner-gated                                                                               |
-| `POST`   | `/api/me/projects/[id]/webhooks`  | register a webhook URL · owner-gated                                                                                 |
-| `POST`   | `/api/developer/webhook-test`     | test-fire a synthetic envelope at a registered webhook                                                               |
+| Method   | Path                              | Purpose                                                                                                                   |
+| -------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/api/me/projects`                | list every project owned by your identity                                                                                 |
+| `POST`   | `/api/me/projects`                | create a project, rate-limited 5/min                                                                                      |
+| `GET`    | `/api/me/projects/[id]`           | per-project state · owner-gated                                                                                           |
+| `POST`   | `/api/me/projects/[id]`           | update IntegratorPriceConfig (prices only; a name or domain in the body is ignored) · owner-gated, validates              |
+| `PATCH`  | `/api/me/projects/[id]`           | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
+| `POST`   | `/api/me/projects/[id]/domain`    | change the domain: `{ domain }`. Never verified: replaced at once. Verified: opens a move (see below)                     |
+| `DELETE` | `/api/me/projects/[id]/domain`    | cancel an open move · owner-gated                                                                                         |
+| `DELETE` | `/api/me/projects/[id]`           | delete project · owner-gated                                                                                              |
+| `POST`   | `/api/me/projects/[id]/verify`    | run a domain-ownership check (DNS TXT, falls back to meta tag); during a move, checks the new domain · rate-limited 5/min |
+| `DELETE` | `/api/me/projects/[id]/verify`    | reissue the verification token; a verified domain stays verified until its next check · owner-gated                       |
+| `POST`   | `/api/me/projects/[id]/test-fire` | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox      |
+| `GET`    | `/api/me/projects/[id]/events`    | live event stream for this project · owner-gated                                                                          |
+| `GET`    | `/api/me/projects/[id]/webhooks`  | list registered webhooks · owner-gated                                                                                    |
+| `POST`   | `/api/me/projects/[id]/webhooks`  | register a webhook URL · owner-gated                                                                                      |
+| `POST`   | `/api/developer/webhook-test`     | test-fire a synthetic envelope at a registered webhook                                                                    |
+
+### Moving a verified domain
+
+A verified domain is what consent screens name and what every receipt records,
+so it never changes in one step. `POST /api/me/projects/[id]/domain` on a
+verified project opens a move: the project gets a `pending_domain` with its own
+token, and keeps running on its current domain. Publish that token at the new
+domain, exactly as for a first verification, then call `/verify`. When the check
+passes, the new domain becomes the project's domain and the old one is kept in
+`previous_domains`, so receipts recorded under it still belong to the project. A
+failed check changes nothing.
+
+Opening a move needs a fresh identity check, as revealing the signing secret
+does: without one the call answers 401 `identity_reproof_required`. A frozen
+project answers 409 `project_frozen`.
 
 ## Response shapes
 

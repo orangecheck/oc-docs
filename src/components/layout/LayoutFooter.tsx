@@ -17,7 +17,7 @@ const COLUMNS: FooterColumn[] = [
     {
         label: '§ products',
         links: [
-            { href: '/me', label: 'oc·me' },
+            { href: '/me', label: 'ochk.app' },
             { href: '/vault', label: 'oc·vault' },
             { href: '/chat', label: 'oc·chat' },
             { href: '/cosign', label: 'oc·cosign' },

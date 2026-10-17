@@ -1,5 +1,5 @@
 export const metadata = {
-    title: 'OC Me · SDK reference',
+    title: 'orangecheck · SDK reference',
     description:
         '@orangecheck/me-client SDK reference. Three entry points: main (oc.* calls + OcSignInButton), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
 };
@@ -69,7 +69,7 @@ export default withOcAuth(
             },
         });
     },
-    { audience: 'https://your-site.example' }
+    { audience: 'https://your-site.example', projectKey: 'pk_live_yourapp' }
 );
 ```
 
@@ -80,7 +80,12 @@ import { ocAuthExpress } from '@orangecheck/me-client/server';
 import express from 'express';
 
 const app = express();
-app.use(ocAuthExpress({ audience: 'https://your-site.example' }));
+app.use(
+    ocAuthExpress({
+        audience: 'https://your-site.example',
+        projectKey: 'pk_live_yourapp',
+    })
+);
 
 app.get('/api/profile', (req, res) => {
     if (!req.ocSession) return res.status(401).json({ error: 'sign in' });
@@ -95,7 +100,13 @@ import { ocAuthHono } from '@orangecheck/me-client/server';
 import { Hono } from 'hono';
 
 const app = new Hono();
-app.use('*', ocAuthHono({ audience: 'https://your-site.example' }));
+app.use(
+    '*',
+    ocAuthHono({
+        audience: 'https://your-site.example',
+        projectKey: 'pk_live_yourapp',
+    })
+);
 
 app.get('/api/me', (c) => {
     const session = c.get('ocSession');
@@ -110,7 +121,9 @@ verified `SessionPayload` or `null`. Cookie auth (family) and Bearer auth
 (cross-domain) are handled identically.
 
 The wrappers all take an options bag: `{ required: true }` short-circuits
-unauthenticated requests with a 401 before your handler runs.
+unauthenticated requests with a 401 before your handler runs, and `projectKey`
+enforces who can sign in as set on your project (everyone, or only accounts
+backed by bitcoin; see [Who can sign in](/me/require-bond)).
 
 **`audience` is your own origin.** The sign-in popup issues your site a token
 bound to it, and with `audience` set, a token issued to any other site is
@@ -212,7 +225,7 @@ await oc.session.invalidate(session.id);
 const result = await oc.payment.authorize({
     identity: 'bc1q...',
     amount_sats: 240_000,
-    description: 'breez · march invoice',
+    description: 'march invoice',
 });
 // result.id, result.user_envelope_id, result.verify_url
 ```

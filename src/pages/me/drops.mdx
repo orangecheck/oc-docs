@@ -1,40 +1,45 @@
 export const metadata = {
-    title: 'OC Me · Drop periods',
+    title: 'orangecheck · Release schedule',
     description:
-        'Batch your payouts into scheduled drops: integrator-defined payout windows with block-denominated boundaries, unconditional vesting, signed Merkle manifests, and per-recipient inclusion proofs.',
+        "When your users' shares are theirs: right away (the default), or in batches, weekly, monthly or when you say. Batch boundaries are Bitcoin blocks; every batch publishes a signed manifest and per-person proofs.",
 };
 
-# OC Me · Drop periods
+# orangecheck · Release schedule
 
-**You don't have to pay out continuously.** A drop schedule groups event
-subtypes into recurring payout windows: covered events bill exactly as before —
-your escrow debits per event, the platform fee and your rebate are unchanged —
-but the **user-share matures** inside the open window and **vests as one batch
-at the boundary**. That batch is the drop.
+**When your users' shares are theirs.** By default, each event's share is your
+user's right away. You can release shares **in batches** instead: weekly,
+monthly, or when you say. Events in a batch are priced and paid for exactly as
+before, from your balance; only the moment the share becomes ready to cash out
+moves to the end of the batch. In the API a batch is a **drop** (`drops`,
+`drop.closed`), and its open stretch is a window.
 
-Three things make this safe enough for earners to accept:
+| Release        | When shares are ready                                      |
+| -------------- | ---------------------------------------------------------- |
+| **Right away** | as each event lands (the default)                          |
+| **In batches** | at the end of each batch: weekly, monthly, or when you say |
 
-1. **No clawback, ever.** Vesting is unconditional. Maturing sats are already
-   earned and escrow-backed; a drop only defers _when_ they become takeable,
-   never _whether_.
-2. **Boundaries only move earlier.** Once a window opens, its boundary is
-   immutable upward. "Drop now", disabling, or deleting a schedule vests the
-   open window immediately; nothing can extend it. Cadence and subtype edits
-   apply from the _next_ window.
+Three rules make batches safe for the people who earn:
+
+1. **No clawback, ever.** A share waiting in a batch is already earned and
+   already paid for. A batch only delays _when_ it is ready, never _whether_.
+2. **Ends only move earlier.** Once a batch opens, its end can't be pushed
+   later. "Release now", turning batches off, or deleting a schedule releases
+   the open batch at once. Changes to cadence or events apply from the _next_
+   batch.
 3. **A published ceiling.** No schedule may hold earnings longer than
-   `MAX_DROP_WINDOW_DAYS` (92), published in `ABUSE_LIMITS` and surfaced on
-   me.ochk.io/trust.
+   `MAX_DROP_WINDOW_DAYS` (92), published in `ABUSE_LIMITS` and on the trust
+   page.
 
-## Cadences · rule of three
+## Cadences
 
-| Cadence   | Boundary                             | Use                               |
-| --------- | ------------------------------------ | --------------------------------- |
-| `weekly`  | a fixed weekday + hour, UTC          | "the Friday drop"                 |
-| `monthly` | a fixed day (1–28) + hour, UTC       | payroll-shaped payouts            |
-| `manual`  | when you say (auto-closes ≤ 92 days) | campaign drops, "drop when I say" |
+| Batches      | API cadence | A batch ends                         | Use                    |
+| ------------ | ----------- | ------------------------------------ | ---------------------- |
+| Weekly       | `weekly`    | a fixed weekday + hour, UTC          | "the Friday payout"    |
+| Monthly      | `monthly`   | a fixed day (1–28) + hour, UTC       | payroll-shaped payouts |
+| When you say | `manual`    | when you say (auto-closes ≤ 92 days) | a campaign, a launch   |
 
-Configure schedules on your project's **drops** tab
-(me.ochk.io/me/projects/&lt;key&gt;/drops) or read them publicly:
+Set a schedule on your project, under **Release schedule**, or read schedules
+publicly:
 
 ```ts
 const r = await fetch(
@@ -43,23 +48,23 @@ const r = await fetch(
 // r.drops → [{ schedule_id, label, subtypes, cadence }]
 ```
 
-A subtype belongs to at most one active schedule. Subtypes you don't cover keep
-continuous (instant-vest) payout.
+An event belongs to at most one active schedule. Events you don't cover are
+ready right away.
 
-## The boundary is a Bitcoin block
+## The end of a batch is a Bitcoin block
 
-At window open, the cadence compiles to a **target close height** from the
+When a batch opens, the cadence compiles to a **target close height** from the
 observed chain tip (mempool.space, blockstream.info fallback — the source is
-named in the manifest). The user-share vests when the tip reaches that height.
-If no tip is observable, the window degrades honestly to its wallclock boundary
-— and regardless of everything else, a published **24h safety valve** past the
-scheduled boundary vests unconditionally, so neither an OC outage nor a
-chain-tip-source outage can freeze earners' money.
+named in the manifest). Shares are ready when the tip reaches that height. If no
+tip is observable, the batch falls back honestly to its clock time — and
+regardless of everything else, a published **24h safety valve** past the
+scheduled end releases it unconditionally, so neither an orangecheck outage nor
+a chain-tip-source outage can freeze earners' money.
 
 ## What your code sees
 
-Event-ingest responses carry a `drop` block when the subtype is covered
-(top-level on `/api/integrator/event`, per-result on `/event/batch`):
+Event responses carry a `drop` block when the event is in a batch (top-level on
+`/api/integrator/event`, per-result on `/event/batch`):
 
 ```ts
 import type { DropResponseBlock } from '@orangecheck/me-client';
@@ -74,7 +79,7 @@ import type { DropResponseBlock } from '@orangecheck/me-client';
 ```
 
 The event's signed canonical bytes (schema `v=4`) commit to
-`{ window_id, close_height_target }` — window membership is cryptographic, not a
+`{ window_id, close_height_target }` — being in a batch is cryptographic, not a
 mutable database claim.
 
 When a window closes, subscribed webhooks receive a `drop.closed` system event:
@@ -88,12 +93,12 @@ import type { DropClosedWebhookPayload } from '@orangecheck/me-client';
 // gross_fee_sats, user_share_sats
 ```
 
-Subscribe with `'*'` or the explicit `'drop.closed'` string, same as the escrow
+Subscribe with `'*'` or the explicit `'drop.closed'` string, same as the balance
 alerts.
 
-## The manifest · what anyone can verify
+## The manifest · what anyone can check
 
-Every closed window publishes a signed, content-addressed `oc-me-drop` manifest
+Every finished batch publishes a signed, content-addressed `oc-me-drop` manifest
 (OTS-anchored, republished to Nostr kind 30087):
 
 - the **id is the sha256** of the canonical bytes; the Ed25519 signature
@@ -112,22 +117,23 @@ self-contained record). Signed-in earners fetch their inclusion proof from
 
 Named trust, stated plainly: the _completeness_ of the member set is OC's
 assembly from its event store — inclusion is provable, omission is not. That is
-the same trust boundary every envelope store in the product carries, and it's
+the same trust boundary every receipt store in the product carries, and it's
 written on the verify page rather than hidden.
 
 ## What earners see
 
-The wallet splits **available now** vs **maturing**, lists each upcoming drop
-with its vest time (block + ~wallclock), and names you — the site — as the
-schedule-setter. Vested sats settle through the normal path: the weekly
-distribution to their bound destination, or manual cash-out. Plan copy
-accordingly: a drop is "when earnings unlock", not "when sats hit their wallet".
+Their balance splits **Ready to cash out** from **Waiting (until {date})**,
+lists each upcoming batch with its end (block and approximate time), and names
+your app as the one that set the schedule. Released sats pay out the normal way:
+to where the person set their sats to go, or when they cash out. Word your copy
+accordingly: a batch is "when earnings are ready", not "when sats reach their
+wallet".
 
 ## Why you'd use it
 
-- **Legible payouts** — a hundred dust-level session events become one weekly
-  line the earner actually notices.
-- **The drop moment** — a synchronized, announceable payout your product can
-  build ritual around.
-- **Budget cadence** — your escrow still debits per event, but earner- facing
-  payout activity happens on a schedule you publish.
+- **Legible payouts** — a hundred tiny session events become one weekly line the
+  earner actually notices.
+- **A payout moment** — one announceable release your product can build a ritual
+  around.
+- **Budget cadence** — your balance is still charged per event, but what earners
+  see happens on a schedule you publish.

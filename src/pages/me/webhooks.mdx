@@ -1,15 +1,15 @@
 export const metadata = {
-    title: 'OC Me · Webhooks',
+    title: 'orangecheck · Webhooks',
     description:
         'Webhook signature verification, raw-body warning, retry semantics, headers, and full reception samples in Node + Rust.',
 };
 
-# OC Me · Webhooks
+# orangecheck · Webhooks
 
-**Every billable envelope your project signs is delivered to your registered
-endpoints, signed with OC's federation Ed25519 key.** Verify the signature
-against the **raw** request body — frameworks that re-serialize before your
-handler will produce a different byte sequence and the signature will not
+**Every event your project records is delivered to your registered endpoints as
+its receipt, signed with orangecheck's Ed25519 webhook key.** Verify the
+signature against the **raw** request body — frameworks that re-serialize before
+your handler will produce a different byte sequence and the signature will not
 validate.
 
 ## Reception · Node + Express
@@ -101,14 +101,13 @@ bytes will not match.
 | **Hono**              | `c.req.text()` to get the raw string.                                                                              |
 | **Rust + Axum**       | `body: bytes::Bytes` extractor, never `Json<…>`.                                                                   |
 
-## Test fire from the dashboard
+## Test with a real delivery
 
-[me.ochk.io/developer/webhooks](https://me.ochk.io/developer/webhooks) has a
-"test fire" button per registered endpoint. It POSTs a synthetic envelope with a
-placeholder signature so you can verify wiring before a real event lands.
-Receivers verifying with `@noble/curves` should reject the test signature (the
-placeholder is all zeros) — that's the correct behavior. Production envelopes
-carry valid sigs.
+On your project, **Send a test event** fires a sample event under your project
+key. It is stored with your project's events and delivered to every webhook you
+registered, signed like any other delivery, so your receiver should accept it.
+Deliveries that run out of retries are listed with your webhooks, where you can
+requeue them.
 
 ## Handler patterns we recommend
 

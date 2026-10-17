@@ -1,87 +1,75 @@
 export const metadata = {
-    title: 'OC Me · me.ochk.io',
+    title: 'orangecheck · ochk.app',
     description:
-        'Consumer commercial product of OrangeCheck. One sign-in for the sites you use; the sites that choose to pay their users, always or in promos, pay them in sats. Sign-in is self-custody; earned sats are a balance OrangeCheck holds during bring-up, with federation custody and self-custody graduation next.',
+        'One account, with Bitcoin behind it. People sign in the way they already do and can back their account with a coin that stays in their wallet; apps that choose to pay their users pay them in sats. The product is ochk.app; me.ochk.io is the API host.',
 };
 
-# OC Me
+# orangecheck
 
-**One sign-in, and sats from the sites that pay.**
-[me.ochk.io](https://me.ochk.io) is the consumer surface of OrangeCheck.
-End-users sign up once with email-OTP (default · no wallet required), with a
-Bitcoin wallet via BIP-322, or with an existing OC identity from a sibling site,
-and earn sats where integrating sites choose to pay their users, always or in
-promos, across the canonical billable-event taxonomy (sessions, payments, state
-transitions). Signing in is free; paying users is the site's choice. BIP-322
-users hold their own signing key from day one; email-OTP users hold no key here.
-Both paths sign in **in-place on me.ochk.io** — no redirect to a separate auth
-host.
+**One account, with Bitcoin behind it.** People sign in the way they already do
+(email, Google, GitHub or a Bitcoin wallet) and use the same account in every
+app that uses orangecheck. The product lives at [ochk.app](https://ochk.app).
+The API, the sign-in popup and the SDK talk to **me.ochk.io**, which also serves
+the product alongside ochk.app.
 
-**Custody, stated plainly.** Sign-in self-custody is live and real. Earned sats
-are not: there is no stored balance — it is recomputed from signed envelopes on
-every read — and the party who owes it is OrangeCheck. That is deliberate and
-temporary. OrangeCheck operates every role during bring-up, including custodian,
-because that is how the system gets proved before anyone else will take one.
-Federation custody plus self-custody graduation is the destination; the live
-state is published at [me.ochk.io/custody](https://me.ochk.io/custody) and
-machine-readable at `/api/federations`.
+| Sign in                   | Back it                                                          | Get paid                                                      | Own it                                             |
+| ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
+| Live. Free for every app. | Live. One coin backs an account and stays in its owner's wallet. | Optional for apps, in testing. Each paid event has a receipt. | Not open yet. Moving to your own keys is the path. |
 
-The protocol surface is the same OC Attest + OC Lock + OC Stamp + OC Agent
-primitives documented elsewhere in these docs. me.ochk.io is the commercial
-layer on top: same envelopes, same canonical messages, same offline verification
-— packaged as a hosted product so consumers and integrators get a working stack
-without standing up their own federation.
+**For apps**, sign-in is free and stands on its own. An app can let in every
+account, or only accounts **backed by bitcoin**, so bots and farms cost
+something real without anyone showing an ID. Paying your users is optional:
+always, in promos, or never.
 
-## What me.ochk.io is, and what it isn't
+**Custody, stated plainly.** Backing leaves the coin in its owner's wallet.
+Earned sats are different: today OrangeCheck holds them while payouts are in
+testing. A federation is next, then keys the person holds. The live state is at
+[ochk.app/custody](https://ochk.app/custody) and machine-readable at
+`https://me.ochk.io/api/federations`.
 
-|           |                                                                                                                                                                                                                                                                                                                                                                                    |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Is**    | A **consumer identity layer**. Sign in once at any integrating site; where a site pays its users, sats accrue to your identity as a signed, verifiable balance.                                                                                                                                                                                                                    |
-| **Is**    | A **drop-in OAuth peer**. Integrators add the OC button alongside Google / Apple / magic-link. First-time users need no wallet and no seed phrase.                                                                                                                                                                                                                                 |
-| **Is**    | An **integrator-configurable pricing substrate**. Paying users is optional: always, in promos, or never ([pay periods](/me/paying-users)). While it pays, each integrator declares per-event prices and user-share splits via `IntegratorPriceConfig`. OC takes a fixed 20% platform fee.                                                                                          |
-| **Is**    | A **designed graduation path**. The sweep to self-custody (`bip-322`) or to a fedimint federation of the user's choice preserves the oc identity, history, backing and connected-sites list. It is not live: no federation is bound yet, so there is nothing to sweep from.                                                                                                        |
-| **Isn't** | A _new protocol_. Every envelope me.ochk.io produces is identical to one a user could publish themselves via the canonical OC Attest / Stamp / Agent primitives.                                                                                                                                                                                                                   |
-| **Isn't** | A _permanent custodian_. OrangeCheck holds user balances today; it is not the design. The architecture targets federation guardians collectively holding the threshold key, with OC the company as at most one guardian among several — see [`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md) for the current-state breakdown. |
-| **Isn't** | A _token issuer_. Sats are the unit of account. No me.ochk.io token, no governance token, no airdrop. The platform fee is in sats, settled in sats, displayed in USD alongside for human readability.                                                                                                                                                                              |
+## Start here
 
-## Quickstart paths
+| For…               | Start here                                                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **People**         | Sign in at [ochk.app](https://ochk.app/signin) with email, Google, GitHub or a Bitcoin wallet.                                                               |
+| **Developers**     | The [Quickstart](/me/quickstart): sign-in first, then paying your users if you want it. Create your project at [ochk.app](https://ochk.app/me/projects/new). |
+| **SDK reference**  | [`@orangecheck/me-client`](/me/sdk): `signInWithOc`, `withOcAuth`, `oc.event`, `oc.webhook`, `oc.config`, with `@orangecheck/auth-client` for React.         |
+| **The words**      | The [glossary](/me/glossary): account, backing, receipt, balance, release schedule, and what each is called in the API.                                      |
+| **Under the hood** | The same OC Attest, Lock, Stamp and Agent primitives documented elsewhere here: [Attest](/attest/), [Lock](/lock/), [Stamp](/stamp/), [Agent](/agent/).      |
 
-| For…                         | Start here                                                                                                                                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **End users**                | Sign up at [me.ochk.io/signin](https://me.ochk.io/signin). Email-OTP (default, no key of your own) or BIP-322 (paste address, sign in-page).                                                                 |
-| **Integrators (developers)** | The 5-minute [integrate quickstart](https://me.ochk.io/integrate/quickstart) walks install → drop-in button → configure prices → verify webhook → ship.                                                      |
-| **SDK reference**            | [`@orangecheck/me-client`](/me/sdk) — signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, withOcAuth · paired with `@orangecheck/auth-client` for the React provider + useOcSession hook. |
-| **Protocol grounding**       | [Attest](/attest/), [Lock](/lock/), [Stamp](/stamp/), [Agent](/agent/) — the four protocol verbs me.ochk.io is built on.                                                                                     |
-| **Getting sats out**         | [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — who holds what today, the cash-out that exists now, and the condition that opens graduation.                                                      |
+## Pages in this section
 
-## Sub-pages in this section
-
-- [Quickstart](/me/quickstart) — install → drop-in → configure → verify → ship
-- [SDK reference](/me/sdk) — every export from `@orangecheck/me-client`
-- [Integrations](/me/integrations) — OAuth-peer pattern, sample configs, webhook
-  reception
-- [Paying your users](/me/paying-users) — optional: always, in promos, or never
-- [Webhooks](/me/webhooks) — signature verification, raw-body warning, retry
-  semantics
-- [API reference](/me/api) — every `me.ochk.io/api/*` endpoint, owner-gating,
-  rate limits
-- [Federation custody](/me/federation) — who holds the sats today and what
+- [Quickstart](/me/quickstart): two tracks, sign in (free) and pay your users
+  (optional)
+- [SDK reference](/me/sdk): every export from `@orangecheck/me-client`
+- [Integrations](/me/integrations): the sign-in button beside your other
+  providers, example prices, errors
+- [Who can sign in](/me/require-bond): every account, or only accounts backed by
+  bitcoin
+- [Paying your users](/me/paying-users): optional, always, in promos, or never
+- [Webhooks](/me/webhooks): receiving events, signatures, retries
+- [Release schedule](/me/drops): pay shares out right away, or in batches
+- [HTTP API](/me/api): every `me.ochk.io/api/*` endpoint, auth, rate limits
+- [Federation custody](/me/federation): who holds earned sats today, and what
   replaces it
-- [Custody contract](/me/custody) — descriptor schema, graduation envelope,
-  guardian rotation
+- [Custody contract](/me/custody): the federation descriptor, the move to your
+  own keys, guardian rotation
+- [Operator](/me/operator): run a federation; with the
+  [charter](/me/operator/charter), the [runbook](/me/operator/runbook) and the
+  [in-browser flow](/me/operator/in-browser)
+- [Glossary](/me/glossary): the product's words, and their API names
 
 ## Where the source of truth lives
 
 - **Protocol contracts**: `oc-attest-protocol`, `oc-lock-protocol`,
   `oc-stamp-protocol`, `oc-agent-protocol`. The v1.2-draft-1 federation custody
   extension is at `oc-attest-protocol/FEDERATION-CUSTODY.md`.
-- **Web app**: `oc-me-web` — the me.ochk.io marketing + authenticated app
-  surface.
-- **SDK**: `oc-packages/me-client` — published to npm at
+- **Apps**: `oc-app-web` (ochk.app) and `oc-me-web` (me.ochk.io, which also
+  serves the API).
+- **SDK**: `oc-packages/me-client`, published to npm as
   `@orangecheck/me-client`.
-- **Docs**: this section, in `oc-docs`. Cross-referenced from /sdk and
-  /developer/docs on me.ochk.io.
+- **Docs**: this section, in `oc-docs`.
 
-The contract is the protocol; me.ochk.io is one implementation. Anyone can run
-their own me-equivalent against the same envelopes — that's the product
-strategy.
+The contract is the protocol; orangecheck is one implementation. Anyone can run
+their own against the same receipts. No token, no airdrop: sats are the unit of
+account.

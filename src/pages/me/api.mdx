@@ -1,10 +1,10 @@
 export const metadata = {
-    title: 'OC Me · HTTP API',
+    title: 'orangecheck · HTTP API',
     description:
         'Every me.ochk.io HTTP endpoint · authentication, rate limits, response shapes, error codes.',
 };
 
-# OC Me · HTTP API
+# orangecheck · HTTP API
 
 **The hosted me.ochk.io substrate exposes the contracts the SDK calls into.**
 The SDK is the canonical integration path; this page is the raw HTTP surface for
@@ -51,7 +51,6 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 | `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
 | `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)        |
-| `POST` | `/api/checkout/stripe`                 | generate a Stripe checkout URL                          |
 | `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
 ## Authenticated endpoints (oc_session required)

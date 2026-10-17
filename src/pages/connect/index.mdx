@@ -1,15 +1,15 @@
 export const metadata = {
     title: 'OrangeCheck Connect',
     description:
-        'Keep your existing login. Drop in one server-side call and your users get a Bitcoin-backed OrangeCheck identity — no matter how they signed in.',
+        'Keep your existing login. Drop in one server-side call and your users get an orangecheck account — no matter how they signed in.',
 };
 
 # OrangeCheck Connect
 
 **Add OrangeCheck to your existing login.** Keep Auth0, Clerk, NextAuth, Google,
 email/password — whatever you already run. It works exactly as it does today.
-Drop in one server-side call so that when your user signs in, an OrangeCheck
-identity (`did:oc`) is created for them at the same time.
+Drop in one server-side call so that when your user signs in, an orangecheck
+account is created for them at the same time.
 
 There is no new SDK. A Connect integration is one HTTPS `POST`.
 
@@ -26,7 +26,7 @@ There is no new SDK. A Connect integration is one HTTPS `POST`.
 2. Your user signs in however they already do. Nothing changes.
 3. Right after, your backend calls `POST https://ochk.io/api/connect/provision`
    with your API key and your own id for that user.
-4. OrangeCheck returns a `did:oc`. Store it on your user record.
+4. OrangeCheck returns the account id (`did_oc`). Store it on your user record.
 
 ## The whole integration
 
@@ -60,12 +60,12 @@ created it).
 ```
 
 The provisioned account is **OrangeCheck-issued**: the user holds no signing key
-of their own on this path, so OrangeCheck holds the identity and anything that
+of their own on this path, so OrangeCheck holds the account and anything that
 accrues to it. Federation custody, and the user's graduation to self-custody, is
 where that goes — it is the design and it is not live. The machine-readable
 state is [`/api/federations`](https://me.ochk.io/api/federations); the long form
 is [federation custody](/me/federation). You now know "my user ↔ this
-OrangeCheck identity" and can show it, or call other OrangeCheck APIs on their
+orangecheck account" and can show it, or call other OrangeCheck APIs on their
 behalf.
 
 ## Notes
@@ -76,10 +76,10 @@ behalf.
   _regenerate key_ in the console — the old key stops working immediately.
 - **Optional `email`.** You may also pass the user's email
   (`{ user_id, email }`). It is recorded as a hint so the same person can be
-  unified to one identity across integrators later. The base call does not need
-  it, and it is never treated as a verified identity.
+  unified to one account across apps later. The base call does not need it, and
+  it is never treated as verified.
 - An integrator can only ever create and manage **its own** users' OrangeCheck
-  accounts — a Connect key can never reach into anyone else's identity.
+  accounts — a Connect key can never reach into anyone else's account.
 
 Register your first app at
 [me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect).

@@ -3,7 +3,7 @@ import { FamilyGrid } from '@/components/docs/FamilyGrid';
 export const metadata = {
     title: 'OrangeCheck documentation',
     description:
-        'Unified docs for the OrangeCheck ecosystem — six open protocols (Attest, Lock, Stamp, Vote, Agent, Pledge), the Me commercial product, and the company-wide charter. Shared concepts up top, protocol and product sections below.',
+        'Unified docs for the OrangeCheck ecosystem — six open protocols (Attest, Lock, Stamp, Vote, Agent, Pledge), the orangecheck account and its developer API, and the company-wide charter. Shared concepts up top, protocol and product sections below.',
 };
 
 # Overview
@@ -68,12 +68,12 @@ The protocol family is open and free to self-host. On top of it OrangeCheck
 ships managed products. They use the same envelopes, the same BIP-322 signing,
 the same anchor pipeline — consumers of the protocols, not extensions to them.
 
-| Product                  | What it is                                                                                                                                           |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **[OC Me](/me)**         | Bitcoin-backed identity. Integrators pay you sats per billable event. OrangeCheck holds the balance during bring-up; federation custody is the goal. |
-| **[OC Vault](/vault)**   | A password manager that cannot read your data. Secrets are sealed on your device; OrangeCheck stores ciphertext only.                                |
-| **[OC Chat](/chat)**     | End-to-end-encrypted messaging where your Bitcoin address is the inbox and Lightning postage goes to the recipient.                                  |
-| **[OC Cosign](/cosign)** | Get behind a builder: join as a co-founder, or back them with sats that settle peer-to-peer.                                                         |
+| Product                  | What it is                                                                                                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **[orangecheck](/me)**   | One account, with Bitcoin behind it, at [ochk.app](https://ochk.app). Apps that choose to pay their users pay them in sats. OrangeCheck holds earned sats while paying is in testing. |
+| **[OC Vault](/vault)**   | A password manager that cannot read your data. Secrets are sealed on your device; OrangeCheck stores ciphertext only.                                                                 |
+| **[OC Chat](/chat)**     | End-to-end-encrypted messaging where your Bitcoin address is the inbox and Lightning postage goes to the recipient.                                                                   |
+| **[OC Cosign](/cosign)** | Get behind a builder: join as a co-founder, or back them with sats that settle peer-to-peer.                                                                                          |
 
 Every product operates under the [charter](/charter) — eight commitments that
 bind every OrangeCheck surface (no token, custody you can graduate out of, the
@@ -90,9 +90,9 @@ protocol stays open, audit verifies without us, and so on).
 - **Per-protocol sections** — one each for Attest, Lock, Stamp, Vote, Agent,
   Pledge. Each follows the same shape: overview → how it works → concepts → API
   → guides. Pattern-match once; navigate them all.
-- **Per-product sections** — one each for [OC Me](/me), [OC Vault](/vault),
-  [OC Chat](/chat) and [OC Cosign](/cosign): what it is, how to use it, and what
-  it trusts.
+- **Per-product sections** — one each for [orangecheck](/me),
+  [OC Vault](/vault), [OC Chat](/chat) and [OC Cosign](/cosign): what it is, how
+  to use it, and what it trusts.
 - **[SDKs](/sdk)** — every published `@orangecheck/*` package, mapped to which
   protocol or product it serves.
 - **[Charter](/charter)** — single source of truth for the eight company
@@ -131,5 +131,5 @@ protocol stays open, audit verifies without us, and so on).
   minutes
 - [**Ecosystem concepts**](/ecosystem) — learn the shared layer once
 - [**OC Attest overview**](/attest) — the base-layer protocol
-- [**OC Me overview**](/me) — sat-paying identity for consumer apps
+- [**orangecheck overview**](/me) — one account, with Bitcoin behind it
 - [**Charter**](/charter) — what OrangeCheck commits to, in writing

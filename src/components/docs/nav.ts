@@ -65,7 +65,7 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'integration',
         label: 'Integration',
-        blurb: 'Bring OrangeCheck identity into your app.',
+        blurb: 'Give your users an orangecheck account.',
         items: [
             {
                 href: '/integration',
@@ -75,7 +75,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/connect',
                 label: 'OrangeCheck Connect',
-                blurb: 'Layer a Bitcoin-backed did:oc on top of Google, Auth0, email/password — any login.',
+                blurb: 'Give each user an orangecheck account on top of Google, Auth0, email/password — any login.',
             },
         ],
     },
@@ -478,33 +478,33 @@ export const DOCS_NAV: DocsSection[] = [
     },
     {
         slug: 'me',
-        label: 'OC Me',
-        blurb: 'Consumer commercial product · bitcoin-backed identity that pays users in sats.',
+        label: 'orangecheck · ochk.app',
+        blurb: 'One account, with Bitcoin behind it. Free sign-in for apps; paying users in sats is optional.',
         items: [
             {
                 href: '/me',
                 label: 'Overview',
-                blurb: "What me.ochk.io is, what it isn't, and where it fits.",
+                blurb: 'What orangecheck is, what is live today, and every page in this section.',
             },
             {
                 href: '/me/quickstart',
                 label: 'Quickstart',
-                blurb: 'Five minutes from npm install to first envelope.',
+                blurb: 'Two tracks: sign in (free), then pay your users (optional).',
             },
             {
                 href: '/me/sdk',
                 label: 'SDK reference',
-                blurb: '@orangecheck/me-client v0.5.0 — every export, every type, every code sample.',
+                blurb: '@orangecheck/me-client v0.29 — every export, every type, every code sample.',
             },
             {
                 href: '/me/integrations',
                 label: 'Integrations',
-                blurb: 'OAuth-peer pattern, sample integrator archetypes, cross-product flows.',
+                blurb: 'The sign-in button beside your other providers, example prices, errors.',
             },
             {
                 href: '/me/require-bond',
                 label: 'Who can sign in',
-                blurb: 'Every orangecheck account, or only accounts backed by bitcoin. Set the floor; withOcAuth enforces it.',
+                blurb: 'Every orangecheck account, or only accounts backed by bitcoin. Set the bar; withOcAuth enforces it.',
             },
             {
                 href: '/me/paying-users',
@@ -518,13 +518,18 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/me/drops',
-                label: 'Drop periods',
-                blurb: 'Batch payouts into scheduled windows — vesting, block boundaries, signed manifests, proofs.',
+                label: 'Release schedule',
+                blurb: 'Shares ready right away, or in batches: weekly, monthly, or when you say. Signed manifests, proofs.',
             },
             {
                 href: '/me/api',
                 label: 'HTTP API',
                 blurb: 'Every me.ochk.io endpoint · auth, rate limits, response shapes.',
+            },
+            {
+                href: '/me/glossary',
+                label: 'Glossary',
+                blurb: 'The words the product uses — account, backing, receipt, balance — and their API names.',
             },
             {
                 href: '/me/federation',
@@ -867,7 +872,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/me-client/README',
                 label: '@orangecheck/me-client',
-                blurb: 'me.ochk.io client SDK — auth, accounts, billable events.',
+                blurb: 'orangecheck client SDK (API at me.ochk.io) — sign-in, accounts, events.',
             },
             // ── integrations + UI ──────────────────────────────────────
             {

@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Interface: PayPeriod",
+    description: "Auto-generated API reference for Interface: PayPeriod. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README)
+
+***
+
+[@orangecheck/me-client](../README) / PayPeriod
+
+# Interface: PayPeriod
+
+Defined in: [me-client/src/pay-periods.ts:13](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L13)
+
+When a project pays its users. Paying is optional: a project may pay
+always, only in promos, or never. A pay period is a stretch of time in
+which its events earn its users sats; outside every period an event earns
+and costs nothing, and me.ochk.io records nothing.
+
+GET /api/integrator/config returns a project's `pay_periods`, past ones
+included. Periods that have started never change, so any earning can be
+checked against the period that paid it. Mirrors me.ochk.io's
+lib/events/pay-periods.ts.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-ends_at">&lt;/a> `ends_at` | `string` \| `null` | When it stops, or null: until the project turns it off. | [me-client/src/pay-periods.ts:20](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L20) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | - | [me-client/src/pay-periods.ts:14](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L14) |
+| &lt;a id="property-name">&lt;/a> `name` | `string` | A promo's name ("Launch week"); empty for plain paying. | [me-client/src/pay-periods.ts:16](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L16) |
+| &lt;a id="property-starts_at">&lt;/a> `starts_at` | `string` | When paying starts, ISO-8601 UTC. | [me-client/src/pay-periods.ts:18](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L18) |

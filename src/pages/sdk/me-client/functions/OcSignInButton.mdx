@@ -1,6 +1,6 @@
 export const metadata = {
-    title: "Function: OcSignInButton()",
-    description: "Auto-generated API reference for Function: OcSignInButton(). Source: TypeScript types in oc-packages.",
+    title: "~~Function: OcSignInButton()~~",
+    description: "Auto-generated API reference for ~~Function: OcSignInButton()~~. Source: TypeScript types in oc-packages.",
 };
 
 [**@orangecheck/me-client**](../README)
@@ -9,23 +9,13 @@ export const metadata = {
 
 [@orangecheck/me-client](../README) / OcSignInButton
 
-# Function: OcSignInButton()
+# ~~Function: OcSignInButton()~~
 
 ```ts
 function OcSignInButton(__namedParameters: OcSignInButtonProps): any;
 ```
 
-Defined in: [me-client/src/SignInButton.tsx:30](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/SignInButton.tsx#L30)
-
-Opens (or refreshes) a me.ochk.io session for an account already signed
-in on *.ochk.io, and calls onSignin(session). It rides the family cookie,
-so it works only on orangecheck's own sites: a third-party site signs
-people in with `signInWithOc()` from `@orangecheck/me-client/popup` and
-verifies the token with `withOcAuth` from `/server`.
-
-Mounting requires &lt;OcSessionProvider> from @orangecheck/auth-client
-somewhere up the React tree so the resulting session can be read by
-useOcSession() across the rest of the app.
+Defined in: [me-client/src/SignInButton.tsx:36](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/SignInButton.tsx#L36)
 
 ## Parameters
 
@@ -36,3 +26,21 @@ useOcSession() across the rest of the app.
 ## Returns
 
 `any`
+
+## Deprecated
+
+Sign people in with `signInWithOc()` from
+`@orangecheck/me-client/popup` on your own site, or `<OcSignIn>` from
+`@orangecheck/auth-client` on orangecheck's. Two components named
+`OcSignInButton` that do different things is one too many; this one goes in
+a later minor.
+
+Opens (or refreshes) a me.ochk.io session for an account already signed
+in on *.ochk.io, and calls onSignin(session). It rides the family cookie,
+so it works only on orangecheck's own sites: a third-party site signs
+people in with `signInWithOc()` from `@orangecheck/me-client/popup` and
+verifies the token with `withOcAuth` from `/server`.
+
+Mounting requires &lt;OcSessionProvider> from @orangecheck/auth-client
+somewhere up the React tree so the resulting session can be read by
+useOcSession() across the rest of the app.

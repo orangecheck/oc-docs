@@ -14,7 +14,7 @@ export const metadata = {
 ```ts
 const webhook: {
   fetchJwks: (issuer: string) => Promise<void>;
-  verify: (rawBody: string | Uint8Array<ArrayBufferLike>, sigHex: string, kid: string, options: VerifyOptions) => Promise<VerifyResult>;
+  verify: (rawBody: string | Uint8Array<ArrayBufferLike>, sigHex: string | null | undefined, kid: string | null | undefined, options: VerifyOptions) => Promise<VerifyResult>;
 };
 ```
 
@@ -25,4 +25,4 @@ Defined in: [me-client/src/webhook.ts:230](https://github.com/orangecheck/oc-pac
 | Name | Type | Default value | Defined in |
 | ------ | ------ | ------ | ------ |
 | &lt;a id="property-fetchjwks">&lt;/a> `fetchJwks()` | (`issuer`: `string`) => `Promise`\&lt;`void`\> | `fetchJwksForce` | [me-client/src/webhook.ts:230](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/webhook.ts#L230) |
-| &lt;a id="property-verify">&lt;/a> `verify()` | (`rawBody`: `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\>, `sigHex`: `string`, `kid`: `string`, `options`: [`VerifyOptions`](../interfaces/VerifyOptions)) => `Promise`\&lt;[`VerifyResult`](../interfaces/VerifyResult)\> | - | [me-client/src/webhook.ts:230](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/webhook.ts#L230) |
+| &lt;a id="property-verify">&lt;/a> `verify()` | (`rawBody`: `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\>, `sigHex`: `string` \| `null` \| `undefined`, `kid`: `string` \| `null` \| `undefined`, `options`: [`VerifyOptions`](../interfaces/VerifyOptions)) => `Promise`\&lt;[`VerifyResult`](../interfaces/VerifyResult)\> | - | [me-client/src/webhook.ts:230](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/webhook.ts#L230) |

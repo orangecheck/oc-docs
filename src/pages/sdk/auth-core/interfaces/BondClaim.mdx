@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Interface: BondClaim",
+    description: "Auto-generated API reference for Interface: BondClaim. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / BondClaim
+
+# Interface: BondClaim
+
+Defined in: [index.ts:62](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L62)
+
+A bond (oc-attest-protocol BOND.md): one unspent coin the account pledged.
+The token carries floors, never the coin, so an app learns that a coin of
+at least `sats_floor` sats, unspent at least `days_floor` days, backs this
+account, and nothing about which coin it is.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-checked_at">&lt;/a> `checked_at` | `number` | Unix seconds of that check. | [index.ts:71](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L71) |
+| &lt;a id="property-days_floor">&lt;/a> `days_floor` | `number` | Largest of 7, 30, 90, 365 days the coin has been unspent; 0 for none. | [index.ts:67](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L67) |
+| &lt;a id="property-height">&lt;/a> `height` | `number` | Block height at which the issuer last found the coin unspent. | [index.ts:69](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L69) |
+| &lt;a id="property-nullifier">&lt;/a> `nullifier` | `string` | Same for the same coin at your site, unrelated anywhere else. Ban it to ban the coin. | [index.ts:73](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L73) |
+| &lt;a id="property-sats_floor">&lt;/a> `sats_floor` | `number` | Largest of 1000, 10000, 100000, 1000000, 10000000 the coin meets; 0 for none. | [index.ts:65](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L65) |
+| &lt;a id="property-v">&lt;/a> `v` | `1` | - | [index.ts:63](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L63) |

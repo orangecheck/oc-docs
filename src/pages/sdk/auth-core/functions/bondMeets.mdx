@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Function: bondMeets()",
+    description: "Auto-generated API reference for Function: bondMeets(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / bondMeets
+
+# Function: bondMeets()
+
+```ts
+function bondMeets(payload: SessionPayload, need: {
+  maxAgeSecs?: number;
+  minDays?: number;
+  minSats?: number;
+}): boolean;
+```
+
+Defined in: [index.ts:212](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L212)
+
+True when the account is backed by a coin worth at least `minSats`,
+unspent at least `minDays` days, and the issuer checked it within
+`maxAgeSecs` (default: no limit). Compare against the floor ladder: a
+`minSats` of 50000 is met by a `sats_floor` of 100000, not 10000.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | [`SessionPayload`](../interfaces/SessionPayload) |
+| `need` | \&#123; `maxAgeSecs?`: `number`; `minDays?`: `number`; `minSats?`: `number`; \&#125; |
+| `need.maxAgeSecs?` | `number` |
+| `need.minDays?` | `number` |
+| `need.minSats?` | `number` |
+
+## Returns
+
+`boolean`

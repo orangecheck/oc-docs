@@ -31,11 +31,18 @@ import { signInWithOc } from '@orangecheck/me-client/popup';
 
 const result = await signInWithOc();
 if (result) {
-    await fetch('/api/auth/me', {
-        headers: { Authorization: `Bearer ${result.token}` },
+    await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: result.token }),
     });
 }
 ```
+
+`/api/auth/session` is a ten-line route of your own: it verifies the token and
+keeps it in an httpOnly `oc_session` cookie
+([the Quickstart has it](/me/quickstart#2--add-the-sign-in-popup)). Every route
+after that reads the cookie:
 
 ```ts
 // On your server · Next.js Pages, pages/api/auth/me.ts
@@ -46,7 +53,10 @@ export default withOcAuth(
         if (!req.ocSession) return res.status(401).json({ ok: false });
         res.status(200).json({ ok: true, did_oc: req.ocSession.did_oc });
     },
-    { audience: 'https://yourapp.example', projectKey: 'pk_test_a4f9k2x' }
+    {
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
+    }
 );
 ```
 

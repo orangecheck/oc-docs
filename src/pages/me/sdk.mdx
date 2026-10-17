@@ -1,58 +1,114 @@
 export const metadata = {
     title: 'orangecheck · SDK reference',
     description:
-        '@orangecheck/me-client SDK reference. Three entry points: main (oc.* calls + OcSignInButton), /server (framework adapters — Next.js, Express, Hono), /popup (browser-only signin orchestrator). signInWithOc, oc.session, oc.payment, oc.event, oc.webhook, oc.config, oc.identity (cross-integrator sybil-resistance verifier) — plus every type the SDK exports.',
+        '@orangecheck/me-client SDK reference. Three entry points: the main one (oc.* calls and types, no React), /server (withOcAuth for Next.js, ocAuthExpress, ocAuthHono, verifyOcToken) and /popup (signInWithOc, browser only). Sign-in, events, webhooks, price configs, what users share, and other signals.',
 };
 
 # `@orangecheck/me-client` · SDK reference
 
-> **Full reference:** [docs.ochk.io/sdk/me-client](/sdk/me-client/README) —
-> auto-generated from the TypeScript source on every release. The narrative
-> below is the curated overview; the SDK reference page is the source of truth
-> for every export, type, and signature.
+> **Full reference:** [docs.ochk.io/sdk/me-client](/sdk/me-client/README),
+> generated from the TypeScript source on every release. This page is the
+> curated overview; the generated reference is the source of truth for every
+> export, type and signature.
 
-**MIT.** Version-pinned reference: see
-[docs.ochk.io/sdk/me-client](/sdk/me-client/README), auto-generated per release.
+**MIT.** One package for signing people in with orangecheck and, if you choose,
+paying them. Three entry points:
 
-This is the canonical TypeScript SDK for integrating me.ochk.io. Three entry
-points, three audiences:
-
-- **`@orangecheck/me-client`** — React + JS surface: the `oc.*` namespaces
-  (session, payment, event, webhook, config, identity) plus the `OcSignInButton`
-  component, which rides the family cookie and so works only on orangecheck's
-  own sites. The `<OcSessionProvider>` + `useOcSession()` React bindings ship in
-  the companion package `@orangecheck/auth-client` — install both.
-- **`@orangecheck/me-client/server`** — server-side verification. `withOcAuth`
-  (Next.js Pages), `ocAuthExpress`, `ocAuthHono`, `getOcSession(headers)`,
-  `verifyOcToken(token)`. **No env vars, no JWK handling, no
-  `/.well-known/jwks.json` fetching by you** — the SDK does that internally and
-  caches.
-- **`@orangecheck/me-client/popup`** — browser-only. `signInWithOc()` opens the
-  OC popup, listens for postMessage, returns the verified session result. The
-  same shape Google / GitHub use.
+- **`@orangecheck/me-client`**: the `oc.*` namespaces (event, webhook, config,
+  scope, session, payment, identity) and every type. No React, so a Node backend
+  imports it as it is.
+- **`@orangecheck/me-client/server`**: checks the session on your server.
+  `withOcAuth` (Next.js Pages), `ocAuthExpress`, `ocAuthHono`,
+  `getOcSession(headers)`, `verifyOcToken(token)`. You never fetch or handle a
+  JWK: the SDK does that and caches it.
+- **`@orangecheck/me-client/popup`**: browser only. `signInWithOc()` opens the
+  orangecheck sign-in popup and resolves with a token bound to your origin, the
+  way Google's and GitHub's popups do.
 
 ## install
 
 ```bash
-yarn add @orangecheck/me-client @orangecheck/auth-client
+yarn add @orangecheck/me-client
 ```
 
-`@orangecheck/auth-client` carries the React provider + hook
-(`<OcSessionProvider>`, `useOcSession()`); `@orangecheck/me-client` carries the
-data SDK (`oc.*` namespaces), the server adapters, the `/popup` helper, and the
-`OcSignInButton` component. The button works only on orangecheck's own sites; a
-third-party site signs people in with `signInWithOc()` from `/popup` and
-verifies the token with `withOcAuth`. They are **separate packages** —
-`me-client` does not re-export the provider or hook, so React code imports the
-provider/hook from `auth-client` and everything else from `me-client`. Install
-both. Server-side code reaches for `@orangecheck/me-client/server` and never
-touches React.
+That is all sign-in needs. `@orangecheck/auth-client` is only for a React app,
+once your server keeps the session in its own cookie: see
+[React](#react-with-auth-client) below.
 
-## server-side verification (zero JWK handling)
+## What changed in 0.32
+
+- **`OcSignInButton` is gone.** It was the only React code in the main entry, so
+  a Node backend that imported `oc` crashed looking for `react`. Sign in with
+  `signInWithOc()` from `/popup`. `react`, `react-dom` and
+  `@orangecheck/auth-client` are no longer peer dependencies.
+- **A `projectKey` that names no project answers `500 unknown_project_key`**,
+  and logs which key, once. It used to read as an outage
+  (`503 bond_policy_unavailable`) on every request.
+- **Typed sessions.** `req.ocSession` is typed on Express's own `Request`, and
+  `new Hono<OcHonoEnv>()` types `c.get('ocSession')`. No casts.
+- **`oc.webhook.verify` takes a missing header** (as `req.header()` returns it)
+  and answers `ok: false`.
+
+The first published 0.32 is 0.32.1.
+
+## sign-in in the browser
+
+```ts
+import { signInWithOc } from '@orangecheck/me-client/popup';
+
+button.addEventListener('click', async () => {
+    const result = await signInWithOc();
+    if (!result) return; // closed, blocked, or aborted
+    const r = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: result.token }),
+    });
+    if (r.ok) location.assign('/dashboard');
+});
+```
+
+Call `signInWithOc()` inside a user gesture: browsers block `window.open`
+anywhere else. It resolves to `{ account, token }`, or `null` when the person
+closes the popup, the browser blocks it, or your `signal` aborts. Trust only the
+token; `account` is unsigned.
+
+## the session cookie
+
+Post the token to a route of your own that verifies it and keeps it in an
+httpOnly cookie. Every route after that reads the cookie, so no script keeps the
+token and nothing sends a Bearer header.
+
+```ts
+// Next.js Pages · pages/api/auth/session.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { verifyOcToken } from '@orangecheck/me-client/server';
+
+export default async function session(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    if (req.method !== 'POST') return res.status(405).end();
+    const token = String(req.body?.token ?? '');
+    const s = await verifyOcToken(token, {
+        audience: 'https://yourapp.example',
+    });
+    if (!s) return res.status(401).json({ ok: false });
+    const maxAge = (s.exp ?? 0) - Math.floor(Date.now() / 1000);
+    res.setHeader(
+        'Set-Cookie',
+        `oc_session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`
+    );
+    res.status(200).json({ ok: true });
+}
+```
+
+## checking the session on your server
 
 `withOcAuth` for Next.js Pages Router:
 
-```tsx
+```ts
 // pages/api/auth/me.ts
 import { withOcAuth } from '@orangecheck/me-client/server';
 
@@ -69,7 +125,10 @@ export default withOcAuth(
             },
         });
     },
-    { audience: 'https://your-site.example', projectKey: 'pk_live_yourapp' }
+    {
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
+    }
 );
 ```
 
@@ -82,173 +141,161 @@ import express from 'express';
 const app = express();
 app.use(
     ocAuthExpress({
-        audience: 'https://your-site.example',
-        projectKey: 'pk_live_yourapp',
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
     })
 );
 
 app.get('/api/profile', (req, res) => {
     if (!req.ocSession) return res.status(401).json({ error: 'sign in' });
-    res.json({ address: req.ocSession.did_oc });
+    res.json({ did_oc: req.ocSession.did_oc });
 });
 ```
 
-`ocAuthHono` for Hono / Cloudflare Workers / Bun / Deno:
+`ocAuthHono` for Hono, Bun and Deno:
 
 ```ts
+import type { OcHonoEnv } from '@orangecheck/me-client/server';
+
 import { ocAuthHono } from '@orangecheck/me-client/server';
 import { Hono } from 'hono';
 
-const app = new Hono();
+const app = new Hono<OcHonoEnv>();
 app.use(
     '*',
     ocAuthHono({
-        audience: 'https://your-site.example',
-        projectKey: 'pk_live_yourapp',
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
     })
 );
 
-app.get('/api/me', (c) => {
+app.get('/api/profile', (c) => {
     const session = c.get('ocSession');
     if (!session) return c.json({ ok: false }, 401);
-    return c.json({ address: session.did_oc });
+    return c.json({ did_oc: session.did_oc });
 });
 ```
 
-`getOcSession(headers)` is the framework-agnostic primitive — accepts a Web
-Headers object or a plain `{ cookie, authorization }` object. Returns the
-verified `SessionPayload` or `null`. Cookie auth (family) and Bearer auth
-(cross-domain) are handled identically.
+`getOcSession(headers)` is the framework-agnostic primitive. It takes a Web
+`Headers` object or a plain `{ cookie, authorization }` object, reads the
+`oc_session` cookie (or, failing that, a Bearer token), and returns the verified
+`SessionPayload` or `null`.
 
-The wrappers all take an options bag: `{ required: true }` short-circuits
-unauthenticated requests with a 401 before your handler runs, and `projectKey`
-enforces who can sign in as set on your project (everyone, or only accounts
-backed by bitcoin; see [Who can sign in](/me/require-bond)).
+The wrappers all take one options bag:
 
-**`audience` is your own origin.** The sign-in popup issues your site a token
-bound to it, and with `audience` set, a token issued to any other site is
-refused. Leave it out only on a `*.ochk.io` site that reads the family cookie —
-with an audience set, a plain family session is refused. Requires
-`@orangecheck/me-client` 0.27 or later.
+| Option        | What it does                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `audience`    | Your own origin. A token issued to any other site is refused. Leave it out only on a `*.ochk.io` site that reads the family cookie.                                            |
+| `projectKey`  | Enforces [who can sign in](/me/require-bond) as set on your project: everyone, or only accounts backed by bitcoin. A key that names no project gets `500 unknown_project_key`. |
+| `required`    | `true` answers `401` before your handler runs when nobody is signed in.                                                                                                        |
+| `requireBond` | `{ minSats, minDays, maxAgeSecs }` in code. Wins over `projectKey`.                                                                                                            |
 
-## browser popup signin
+## React, with auth-client
 
-```ts
-import { signInWithOc } from '@orangecheck/me-client/popup';
+Only for a React app whose server keeps the session in its own cookie, as above.
+`<OcSessionProvider>` from `@orangecheck/auth-client` reads your own
+`/api/auth/me`, so answer it with an account `id` and its `did_oc`, as the
+`withOcAuth` sample does.
 
-button.addEventListener('click', async () => {
-    const result = await signInWithOc();
-    if (!result) return; // user cancelled or popup blocked
-    // Outside *.ochk.io, send the token to your backend as a Bearer; it
-    // verifies it with the server adapters above.
-    const me = await fetch('/api/auth/me', {
-        headers: { Authorization: `Bearer ${result.token}` },
-    });
-    if (me.ok) location.assign('/dashboard');
-});
+```bash
+yarn add @orangecheck/auth-client
 ```
 
-`signInWithOc()` MUST be called inside a user-gesture handler (browsers block
-`window.open` outside of gestures). Returns `{ account, token }` on success,
-`null` on cancel / popup block / abort.
-
-## React surface
-
-The provider and hook below are exported by **`@orangecheck/auth-client`**, the
-companion package — `me-client` carries the `oc.*` data namespaces and the
-`OcSignInButton` (orangecheck's own sites only), `auth-client` carries the
-cross-subdomain session bindings. Install both.
-
-### `<OcSessionProvider>`
-
-Wrap your app once at the root. Default `authOrigin` is `https://ochk.io`.
-
 ```tsx
-import { OcSessionProvider } from '@orangecheck/auth-client';
+import type { ReactNode } from 'react';
 
-<OcSessionProvider>{/* … */}</OcSessionProvider>;
-```
+import { OcSessionProvider, useOcSession } from '@orangecheck/auth-client';
 
-### `useOcSession()` and `useOptionalOcSession()`
-
-Returns `{ status, account, signInUrl, signOut, refresh, error }`. Status is
-`loading | authenticated | anonymous | error`. Account is `null` when not
-authenticated.
-
-```tsx
-import { useOcSession } from '@orangecheck/auth-client';
-
-function Header() {
-    const { status, account, signInUrl, signOut } = useOcSession();
-    if (status === 'loading') return <Skeleton />;
-    if (status !== 'authenticated') return <a href={signInUrl}>sign in</a>;
+export function Providers({ children }: { children: ReactNode }) {
+    // Your own cookie, one account: no tab pinning against ochk.io.
     return (
-        <div>
-            signed in as {account.didOc.slice(0, 8)}…
-            <button onClick={() => signOut()}>sign out</button>
-        </div>
+        <OcSessionProvider config={{ multiAccount: false }}>
+            {children}
+        </OcSessionProvider>
     );
+}
+
+export function Header({ signIn }: { signIn: () => void }) {
+    const { status, account } = useOcSession();
+    if (status === 'loading') return null;
+    if (!account) return <button onClick={signIn}>Sign in</button>; // signInWithOc(), as above
+    return <span>signed in as {account.didOc.slice(0, 16)}…</span>;
 }
 ```
 
-`useOptionalOcSession()` returns null instead of throwing — useful for libraries
-that want to read the session if it exists but shouldn't crash on apps that
-haven't mounted the provider.
+`useOcSession()` returns `{ status, account, refresh, error, … }`, with status
+`loading | authenticated | anonymous | error`. `useOptionalOcSession()` returns
+`null` instead of throwing when no provider is mounted. Sign people out with
+your own route that clears the cookie, then call `refresh()`.
 
-## `oc.session.*` · session lifecycle (Class C billable atom)
+`@orangecheck/me-client` does not re-export any of this: import `OcAccount`,
+`OcSessionState`, `OcSessionStatus` and `OcAuthConfig` from
+`@orangecheck/auth-client`.
 
-Sites pay per session, not per click. The charge is the `session_creation`
-event, which your server fires with `oc.event.fire` (below) once per real
-session. `create()` opens a session and records no charge; `refresh()` and
-`invalidate()` are free, telemetry-only.
+## `oc.event.fire` · send an event
 
-```ts
-import { oc } from '@orangecheck/me-client';
+How your app pays its users, one event at a time: `account_creation`,
+`session_creation`, `stamp_signing`, `payment_authorization`, or a key of your
+own. Each event is One-time, Per action or Per session, as the catalog
+(`EVENT_SUBTYPES`) says; what your user earns comes from your price config via
+`computeFees()`. The receipt is recorded under your `project_key` and shows on
+your project's **Receipts** tab at ochk.app.
 
-const session = await oc.session.create({
-    scope: ['identity', 'payment'],
-    sessionPolicy: { duration_seconds: 7 * 86400, refresh: 'sliding' },
-});
-await oc.session.refresh(session.id);
-await oc.session.invalidate(session.id);
-```
+Call it from your backend. `signingSecret` signs the request as your project
+(the SDK signs the exact bytes it sends), and `accountId` names who earns: the
+person's account id (`did_oc`), stored beside your own user row. Before
+me-client 0.30 this option was called `userAddress`; that name still works. No
+user session token is forwarded.
 
-| Function                    | Signature                             | Note       |
-| --------------------------- | ------------------------------------- | ---------- |
-| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | No charge. |
-| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.      |
-| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.      |
-
-## `oc.payment.authorize` · Class B billable atom
+Paying your users is optional. An event earns only inside your project's
+[pay periods](/me/paying-users) (always, in promos, or never); outside them the
+call succeeds with `earned: false` and nothing is recorded or charged.
 
 ```ts
-const result = await oc.payment.authorize({
-    identity: 'bc1q...',
-    amount_sats: 240_000,
-    description: 'march invoice',
+// server-side only · the secret never reaches a browser
+const stamp = await oc.event.fire({
+    project_key: process.env.OC_PROJECT_KEY!,
+    subtype: 'stamp_signing',
+    action_label: 'review · march invoice',
+    signingSecret: process.env.OC_SIGNING_SECRET,
+    accountId: user.did_oc,
 });
-// result.id, result.user_envelope_id, result.verify_url
+if (stamp.earned) {
+    // stamp.event.id, .gross_fee_sats, .user_earned_sats, .verify_url
+} else {
+    // stamp.reason === 'not_paying'; stamp.next_pay_period, or null
+}
+
+// An event priced as a share of a payment carries the payment amount:
+const paid = await oc.event.fire({
+    project_key: process.env.OC_PROJECT_KEY!,
+    subtype: 'payment_authorization',
+    payment_amount_sats: 50_000,
+    signingSecret: process.env.OC_SIGNING_SECRET,
+    accountId: user.did_oc,
+});
 ```
 
-The user is prompted by me.ochk.io to consent before this resolves.
+| Function              | Signature                                        | Note                                                                                                              |
+| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<FireEventResult>` | `{ earned: true, event }` with the recorded event, or `{ earned: false, reason: 'not_paying', next_pay_period }`. |
 
-## `oc.config.validate` · local IntegratorPriceConfig validator
+## `oc.config.validate` · check a price config locally
 
-Pre-flight your config against the same rules the server enforces — no network
-call, no round-trip. Per-project read/write is owner-gated and lives at
-`/api/me/projects/[id]` (or
-[me.ochk.io/me/projects/`<key>`](https://me.ochk.io/me/projects) in the UI); the
-SDK intentionally doesn't include a global `oc.config.update()` because configs
-are per-project, not per-account.
+Check your config against the same rules the server enforces, with no network
+call. You edit a project's prices on its **Paying** tab at
+[ochk.app](https://ochk.app/me/projects); the SDK has no `oc.config.update()`,
+because configs belong to projects, not accounts.
+
+For each event you set what your user earns. You pay that ÷ 0.8, the 20% fee
+included: earns 100, you pay 125. The smallest earning is 1 sat, and you pay 2.
 
 ```ts
 import type { IntegratorPriceConfig } from '@orangecheck/me-client';
 
 import { oc } from '@orangecheck/me-client';
 
-const cfg: IntegratorPriceConfig = {
-    /* … */
-};
+declare const cfg: IntegratorPriceConfig; // your project's config
 const result = oc.config.validate(cfg);
 if (!result.ok) console.error(result.errors);
 ```
@@ -268,15 +315,17 @@ signature will not validate.
 ```ts
 const result = await oc.webhook.verify(
     rawBody, // string | Uint8Array
-    sigHex, // OC-Signature header
-    kid // OC-Key-Id header
+    req.header('OC-Signature'),
+    req.header('OC-Key-Id')
 );
 if (!result.ok) return res.status(401).end(result.reason);
 ```
 
-Auto-fetches and caches `ochk.io/.well-known/jwks.json` for 1h when no `jwk` is
-passed. Stale-on-error: a transient JWKS outage returns the previous cached
-entry rather than rejecting every webhook.
+A missing header answers `ok: false`, so pass `req.header(...)` straight in. The
+key set at `ochk.io/.well-known/jwks.json` is fetched and cached for an hour
+when you pass no `jwk`. Stale-on-error: a brief outage of that key set uses the
+cached copy rather than rejecting every webhook. [Webhooks](/me/webhooks) has a
+full receiver.
 
 > Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
 > [agent.ochk.io](https://agent.ochk.io) / [docs.ochk.io/agent](/agent), not on
@@ -284,156 +333,55 @@ entry rather than rejecting every webhook.
 > `@orangecheck/agent-signer` to issue or revoke agent delegations from your
 > integration, and `@orangecheck/agent-core` to verify them.
 
-## `oc.identity.verifyActivityAttestation` · cross-integrator sybil-resistance gate
+## `oc.scope.*` · what people share with your app
 
-Verify a signed activity attestation bundle the user forwarded to you. The
-bundle wraps six cross-integrator activity values (event_count,
-human_event_count, lifetime_sats, distinct_integrator_count, oldest_event_at,
-active_days) plus a 24h expiry, signed with the me.ochk.io envelope key — the
-same key that signs every billable event, rebind, and trust attestation.
-
-```ts
-import { oc } from '@orangecheck/me-client';
-
-const result = await oc.identity.verifyActivityAttestation(bundle);
-if (!result.ok) return res.status(401).send(result.reason);
-
-const a = result.attestation!;
-if (a.lifetime_sats < 10_000) return res.status(403).send('low signal');
-if (a.distinct_integrator_count < 3) return res.status(403).send('low breadth');
-if (Date.parse(a.oldest_event_at!) > Date.now() - 90 * 86_400_000) {
-    return res.status(403).send('too new');
-}
-// passed all four axes (depth × breadth × duration × habituality)
-```
-
-Runs five checks: bundle shape, canonical-bytes hash matches the content-
-addressed `id`, JWK with matching `kid` present in the envelope JWKS, ed25519
-signature, and `now < expires_at`. Every check surfaces as a typed row in
-`result.checks` for logging.
-
-Auto-fetches and caches `me.ochk.io/.well-known/oc-envelope-jwks.json` for 1h
-when no `jwk` is passed. The envelope JWKS is **distinct** from the auth-host
-JWKS that signs webhook deliveries — same Ed25519 curve, different URL, cached
-separately. Pass `{ jwk }` to skip the network fetch for edge runtimes or
-air-gapped deployments.
-
-Why this is the right primitive for sybil-resistance gating: the values are
-**costly to fake** (sats accrue from real integrator outflow, distinct count
-requires onboarding through N separate integrators, oldest_event_at can't be
-back-dated, active_days requires habitual presence over time) and **trivial to
-verify** (one function call, one signature check, identical posture on Node 20+,
-Vercel Edge, browser).
-
-The verifier displaces the adjacent category of spend integrators currently pay
-for separately — fraud detection, anti-spam, account-takeover monitoring — with
-a single primitive that ships as a side effect of using OC for auth.
-
-> Same five checks run in-browser at
-> [me.ochk.io/verify-activity](https://me.ochk.io/verify-activity) for any third
-> party who receives a forwarded attestation but doesn't want to write the
-> verifier themselves. The SDK and the browser page produce identical verdicts
-> on the same input.
-
-## `oc.event.fire` · arbitrary billable subtypes
-
-How you bill any subtype: `session_creation` (`oc.session.create` records no
-charge), `stamp_signing`, `attest_verification_at_gate`,
-`scoped_action_authorization`, `kyc_tier_upgrade`, etc. Class is determined by
-`SUBTYPE_CLASS`; what your user earns is computed via `computeFees()`; the
-receipt is recorded under your `project_key` and shows up on your project's
-Receipts tab at ochk.app.
-
-Call it from your backend. `signingSecret` signs the request as your project
-(the SDK signs the exact bytes it sends), and `accountId` names who earns — the
-person's account id (`did_oc`), stored beside your own user row. Before
-me-client 0.30 this option was called `userAddress`; that name still works. No
-user session token is forwarded.
-
-Paying your users is optional. An event earns only inside your project's
-[pay periods](/me/paying-users) (always, in promos, or never); outside them the
-call succeeds with `earned: false` and nothing is recorded or charged.
-
-```ts
-// server-side only · the secret never reaches a browser
-const stamp = await oc.event.fire({
-    project_key: 'pk_live_yourcompany',
-    subtype: 'stamp_signing',
-    action_label: 'review · march invoice',
-    signingSecret: process.env.OC_SIGNING_SECRET,
-    accountId: user.did_oc,
-});
-if (stamp.earned) {
-    // stamp.event.id, .gross_fee_sats, .user_earned_sats, .verify_url
-} else {
-    // stamp.reason === 'not_paying'; stamp.next_pay_period, or null
-}
-
-// For percent_of_amount-priced subtypes, include the underlying amount:
-const verify = await oc.event.fire({
-    project_key: 'pk_live_yourcompany',
-    subtype: 'attest_verification_at_gate',
-    payment_amount_sats: 50_000,
-    signingSecret: process.env.OC_SIGNING_SECRET,
-    accountId: user.did_oc,
-});
-```
-
-| Function              | Signature                                        | Note                                                                                                              |
-| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<FireEventResult>` | `{ earned: true, event }` with the recorded event, or `{ earned: false, reason: 'not_paying', next_pay_period }`. |
-
-## `oc.scope.*` · privacy-preserving scope grants
-
-OC's privacy default: signing into your site reveals the account's `sub` and
-`did_oc`, and nothing about its email or Bitcoin address. Both ids are the same
-at every site, so sites that compare notes can match a user. Scope reads below
-carry a per-integrator subject instead. To read additional fields (their email,
-attest tier, bitcoin address, display name) you must explicitly request a scope
-and the user must explicitly consent.
+Signing in tells your app the account's `sub` and `did_oc`, and nothing about
+its email or Bitcoin address. Both ids are the same at every site, so sites that
+compare notes can match a user. Scope reads below carry a per-app subject
+instead. To read more (an email, a Bitcoin address, a display name) you ask, and
+the person decides.
 
 Full design at
 [PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).
 
 ### `oc.scope.granted`
 
-Read what scopes the currently-signed-in user has already granted to your
-project. Returns the per-integrator `sub` plus any granted field values.
+Read what the signed-in person shares with your project now. Returns the per-app
+`sub` plus the values they share.
 
 ```ts
 import { oc } from '@orangecheck/me-client';
 
 const { sub, scopes_granted, scopes } = await oc.scope.granted({
-    project_key: 'pk_live_yourcompany',
+    project_key: 'pk_live_yourapp',
 });
 
-// `sub` here is per-integrator: different at every project. It is NOT
-// the token's `sub` (req.ocSession.sub), which is the same at every site.
+// `sub` here is per-app: different at every project. It is NOT the
+// token's `sub` (req.ocSession.sub), which is the same at every site.
 // Event payloads carry this scoped `sub` too, so don't join the two.
 console.log(sub); // "sub_3K7xQ2mN1pYwB8tRvE…"
 
-// `scopes` is a partial map · only fields whose scope the user has
-// granted are present.
+// `scopes` holds only what the person shares.
 console.log(scopes.email); // "user@example.com" · or undefined
 ```
 
 ### `oc.scope.request`
 
-Redirect the user to me.ochk.io's consent prompt. After they decide, browser
-returns to `return_to`. Subsequent `oc.scope.granted()` calls reflect their
-decisions.
+Send the person to orangecheck's page that asks them. After they decide, the
+browser returns to `return_to`, and later `oc.scope.granted()` calls reflect
+what they chose.
 
 ```ts
 oc.scope.request(['email', 'display_name'], {
-    project_key: 'pk_live_yourcompany',
+    project_key: 'pk_live_yourapp',
     return_to: window.location.href,
 });
 // ↑ this navigates · the line after never runs
 ```
 
-The user picks **grant once** (1h expiry), **grant always** (until revoked), or
-**deny** per scope. Every grant is revocable any time on
-`me.ochk.io/me/identity`.
+For each item the person picks **Share for an hour**, **Share**, or **Don't
+share**. They can stop sharing any time at
+[ochk.app/me/apps](https://ochk.app/me/apps).
 
 ### Valid scopes
 
@@ -452,9 +400,9 @@ in only accounts backed by bitcoin, read the token's `oc_bond` claim: see
 ### Migration from `user_address` (≤ 0.9.0)
 
 Pre-0.10.0 webhook payloads delivered the user's master address as
-`user_address`. From 0.10.0 onward, payloads use the per-integrator `sub` (the
-same scoped id `oc.scope.granted()` returns, not the token's `sub`) plus
-optional `scopes` (granted fields). To migrate:
+`user_address`. From 0.10.0 onward, payloads use the per-app `sub` (the same
+scoped id `oc.scope.granted()` returns, not the token's `sub`) plus optional
+`scopes` (shared fields). To migrate:
 
 1. Update SDK to `^0.10.0`.
 2. Switch from `event.user_address` → `event.sub` for user records in your
@@ -467,38 +415,128 @@ The `user_address` field is retired from outgoing payloads in the matching
 me.ochk.io deploy. Existing rows in your database keyed on old `user_address`
 values stay valid; just expect new events to use `sub`.
 
-| Function                         | Signature                                    | Note                                                  |
-| -------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
-| `oc.scope.granted(opts)`         | `(GrantedOptions) => Promise<GrantedResult>` | Read currently-granted scopes for the signed-in user. |
-| `oc.scope.request(scopes, opts)` | `(Scope[], RequestOptions) => never`         | Redirect to consent prompt · throws after navigation. |
+| Function                         | Signature                                    | Note                                                    |
+| -------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
+| `oc.scope.granted(opts)`         | `(GrantedOptions) => Promise<GrantedResult>` | What the signed-in person shares with your project now. |
+| `oc.scope.request(scopes, opts)` | `(Scope[], RequestOptions) => never`         | Navigates to the page that asks · throws after.         |
+
+## `oc.session.*` · sessions (Per session)
+
+Apps that pay per session pay for the `session_creation` event, which your
+server sends with `oc.event.fire` (above) once per real session. `create()`
+opens a session and records no charge; `refresh()` and `invalidate()` are free,
+telemetry only.
+
+```ts
+import { oc } from '@orangecheck/me-client';
+
+const session = await oc.session.create({
+    scope: ['identity', 'payment'],
+    sessionPolicy: { duration_seconds: 7 * 86400, refresh: 'sliding' },
+});
+await oc.session.refresh(session.id);
+await oc.session.invalidate(session.id);
+```
+
+| Function                    | Signature                             | Note       |
+| --------------------------- | ------------------------------------- | ---------- |
+| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | No charge. |
+| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.      |
+| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.      |
+
+## `oc.payment.authorize` · a payment (Per action)
+
+```ts
+const result = await oc.payment.authorize({
+    identity: account.did_oc, // the signed-in account's id
+    amount_sats: 240_000,
+    description: 'march invoice',
+});
+// result.id, result.user_envelope_id, result.verify_url
+```
+
+The signed-in session decides whose payment it is: me.ochk.io uses that
+account's `did_oc` and ignores any other `identity`. Today the call records the
+authorization and moves no sats, because paying is in testing.
+
+## Other signals
+
+[Who can sign in](/me/require-bond) is the signal to reach for first: an account
+backed by a coin, one account per coin at your app. These are others.
+
+### `oc.identity.verifyActivityAttestation` · activity across apps
+
+Verify a signed activity attestation the person forwarded to you. It carries six
+values about their activity across every app (event_count, human_event_count,
+lifetime_sats, distinct_integrator_count, oldest_event_at, active_days) and a
+24h expiry, signed with the me.ochk.io receipt key, the same key that signs
+every receipt.
+
+```ts
+import { oc } from '@orangecheck/me-client';
+
+const result = await oc.identity.verifyActivityAttestation(bundle);
+if (!result.ok) return res.status(401).send(result.reason);
+
+const a = result.attestation!;
+if (a.lifetime_sats < 10_000) return res.status(403).send('low signal');
+if (a.distinct_integrator_count < 3) return res.status(403).send('low breadth');
+if (Date.parse(a.oldest_event_at!) > Date.now() - 90 * 86_400_000) {
+    return res.status(403).send('too new');
+}
+```
+
+It runs five checks: bundle shape, the canonical-bytes hash matches the
+content-addressed `id`, a key with the matching `kid` is in the receipt key set,
+the Ed25519 signature, and `now < expires_at`. Each check is a row in
+`result.checks` for logging.
+
+The receipt key set at `me.ochk.io/.well-known/oc-envelope-jwks.json` is fetched
+and cached for an hour when you pass no `jwk`. It is **distinct** from the key
+set that signs webhook deliveries: same Ed25519 curve, different URL, cached
+separately. Pass `{ jwk }` to skip the fetch on edge runtimes or air-gapped
+deployments.
+
+The values are costly to fake (sats come from what apps really paid, breadth
+needs separate apps, `oldest_event_at` can't be back-dated, active days need
+time) and cheap to check: one call, one signature, the same on Node 20+, Vercel
+Edge and the browser.
+
+> The same five checks run in the browser at
+> [me.ochk.io/verify-activity](https://me.ochk.io/verify-activity), for anyone
+> who receives a forwarded attestation and doesn't want to write the verifier.
+> The SDK and the page give the same verdict on the same input.
 
 ## Types
 
-Every type the SDK exports:
+Every type comes from the main entry, `@orangecheck/me-client`:
 
 ```
 EventClass · EventSubtype · ClassASubtype · ClassBSubtype · ClassCSubtype
 AttestTier · SiteFeeShape · IntegratorEventConfig · IntegratorPriceConfig
 ComputedFees · ValidationResult · BillableEvent · Session · SessionPolicy
 SignInOptions · PaymentAuthorizeOptions · PaymentResult · TelemetryEvent
-FireEventOptions · OcPublicJwk · VerifyOptions · VerifyResult
+FireEventOptions · FireEventResult · OcPublicJwk · VerifyOptions · VerifyResult
 Scope · GrantedOptions · GrantedResult · RequestOptions
 ```
 
-`@orangecheck/me-client` does not re-export the React surface: import
-`OcAccount`, `OcSessionState`, `OcSessionStatus` and `OcAuthConfig` from
-`@orangecheck/auth-client`.
+`/server` adds `SessionPayload`, `BondClaim`, `VerifyOcOptions`,
+`WithOcAuthOptions` and `OcHonoEnv`. The class names (`ClassASubtype` and so on)
+are the API's names for the three groups: One-time, Per action and Per session.
 
 ## Constants and helpers
 
-| Export                                    | Signature                                           |
-| ----------------------------------------- | --------------------------------------------------- |
-| `PLATFORM_FEE_POLICY`                     | `{ pct: 0.2; min_floor_sats: 1; ratified: string }` |
-| `MIN_INTEGRATOR_PRICE_SATS`               | `5`                                                 |
-| `computeFees(cfg, payment_amount_sats?)`  | `(IntegratorEventConfig, number?) => ComputedFees`  |
-| `validateIntegratorConfig(cfg)`           | `(IntegratorPriceConfig) => ValidationResult`       |
-| `setBearerToken(token)`                   | `(string \| null) => void` · cross-domain auth      |
-| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`               |
+| Export                                    | Signature                                            |
+| ----------------------------------------- | ---------------------------------------------------- |
+| `PLATFORM_FEE_POLICY`                     | `{ pct: 0.2; min_floor_sats: 1; ratified: string }`  |
+| `MIN_INTEGRATOR_PRICE_SATS`               | `1`                                                  |
+| `computeFees(cfg, payment_amount_sats?)`  | `(IntegratorEventConfig, number?) => ComputedFees`   |
+| `validateIntegratorConfig(cfg)`           | `(IntegratorPriceConfig) => ValidationResult`        |
+| `setBearerToken(token)`                   | `(string \| null) => void` · a token for later calls |
+| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`                |
+
+`MIN_INTEGRATOR_PRICE_SATS` is the smallest price the server takes. At 1 sat the
+whole price is the fee, so the smallest earning is 1 sat, and you pay 2.
 
 ## Where it lives
 
@@ -506,5 +544,5 @@ Scope · GrantedOptions · GrantedResult · RequestOptions
   [@orangecheck/me-client](https://www.npmjs.com/package/@orangecheck/me-client)
 - **source**:
   [oc-packages/me-client](https://github.com/orangecheck/oc-packages/tree/main/me-client)
-- **canonical type module**: `@orangecheck/me-client/types` (mirror of
-  `oc-me-web/src/lib/events/types.ts`)
+- **types**: the main entry, `@orangecheck/me-client`, mirrors
+  `oc-me-web/src/lib/events/types.ts`. There is no `/types` subpath.

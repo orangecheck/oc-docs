@@ -73,19 +73,19 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 | `POST` | `/api/me/notifications`  | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
 | `GET`  | `/api/me/export`         | GDPR-style account dump · downloadable JSON                      |
 
-## Authenticated · session lifecycle (Class C)
+## Authenticated · sessions (Per session)
 
 | Method | Path                      | Purpose                                 |
 | ------ | ------------------------- | --------------------------------------- |
-| `POST` | `/api/session/create`     | open a Class C session — billable atom  |
+| `POST` | `/api/session/create`     | open a session — records no charge      |
 | `POST` | `/api/session/refresh`    | refresh inside the policy window — free |
 | `POST` | `/api/session/invalidate` | tear down — free, telemetry-only        |
 
-## Authenticated · payment authorization (Class B)
+## Authenticated · payment authorization (Per action)
 
-| Method | Path                     | Purpose                                                     |
-| ------ | ------------------------ | ----------------------------------------------------------- |
-| `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · Class B billable |
+| Method | Path                     | Purpose                                                      |
+| ------ | ------------------------ | ------------------------------------------------------------ |
+| `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · moves no sats yet |
 
 ## Authenticated · integrator event ingestion
 

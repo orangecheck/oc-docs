@@ -9,7 +9,7 @@ export const metadata = {
 **orangecheck sits next to the sign-in providers you already offer.** A
 first-time user who picks it needs no wallet, no seed phrase and no "what is a
 sat" conversation. If your app pays its users, what they earn shows up in their
-account with a receipt for each event. OrangeCheck holds earned sats while
+account with a receipt for each event. orangecheck holds earned sats while
 payouts are in testing; see [custody](/me/federation) for who holds what and
 what replaces it.
 
@@ -38,10 +38,11 @@ export function SignInOptions() {
         const result = await signInWithOc();
         setBusy(false);
         if (!result) return;
-        // Your backend verifies the token and starts your own session.
+        // Your server verifies the token and keeps it in its own cookie.
         const r = await fetch('/api/auth/session', {
             method: 'POST',
-            headers: { Authorization: `Bearer ${result.token}` },
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: result.token }),
         });
         if (r.ok) location.assign('/dashboard');
     }
@@ -75,29 +76,42 @@ this is in the sign-in path, and none of it shows unless the person visits.
 ## Example prices
 
 Prices are yours to set, and only matter if you pay your users. For each event,
-set what your user earns; you pay that divided by 0.8, the 20% fee included.
-Some starting points, for made-up apps:
+set what your user earns. You pay that ÷ 0.8, the 20% fee included: earns 100,
+you pay 125. Some starting points, for made-up apps:
 
 | Example app    | Event                                | Your user earns     | You pay             |
 | -------------- | ------------------------------------ | ------------------- | ------------------- |
 | a wallet app   | `account_creation` (One-time)        | 1,600 sats          | 2,000 sats          |
 | a wallet app   | `payment_authorization` (Per action) | 0.4% of the payment | 0.5% of the payment |
-| a social app   | `session_creation` (Per session)     | 32 sats             | 40 sats             |
+| a social app   | `session_creation` (Per session)     | 40 sats             | 50 sats             |
 | a creator site | `stamp_signing` (Per action)         | 80 sats             | 100 sats            |
 
 There's no "right" price; try numbers in the
-[sandbox](https://ochk.app/integrate/sandbox) first. The config schema is open —
-see [/me/sdk](/me/sdk#oc-config--integratorpriceconfig-crud) for the full shape.
-You edit prices on your project, under what each event earns.
+[sandbox](https://ochk.app/integrate/sandbox) first. The config schema is open:
+see [the SDK reference](/me/sdk#occonfigvalidate--check-a-price-config-locally)
+for the full shape. You edit prices on your project's **Paying** tab, under
+**What each event earns**.
 
 ## Errors and edge cases
 
-| Error                                               | Meaning                                                                               | Fix                                                                                                   |
+Signing in:
+
+| What you see                    | Meaning                                                                                                                                                                                            | Fix                                                                                                     |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `signInWithOc()` returns `null` | The person closed the popup, the browser blocked it, or your `signal` aborted.                                                                                                                     | Call it inside the click handler, so the browser allows the popup. Leave the button there to try again. |
+| `401` right after a sign-in     | The token is bound to your origin, and your server's `audience` is missing or a different origin (`http` for `https`, `www`, a port). me-client logs a warning naming `audience` when it can tell. | Pass your exact origin as `audience`, in the session route and in `withOcAuth`.                         |
+| `403 bond_required`             | The account isn't backed above the bar you set under **Who can sign in**. The body has `need`, `have` and a `back_url`.                                                                            | Send the person to `back_url`, where they can back their account.                                       |
+| `500 unknown_project_key`       | `projectKey` names no project. me-client logs which key, once. (Before 0.32 this read as a `503`.)                                                                                                 | Copy the key from your project at [ochk.app/me/projects](https://ochk.app/me/projects).                 |
+| `503 bond_policy_unavailable`   | Your project's sign-in requirement couldn't be read from me.ochk.io, and none had been read before, so the request is refused, not let through.                                                    | Retry; the wrapper asks again after ten seconds. Check your server can reach me.ochk.io.                |
+
+Paying your users:
+
+| What you see                                        | Meaning                                                                               | Fix                                                                                                   |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                        | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
 | `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`.                                       |
 | `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                         | Honor `Retry-After`; back off exponentially.                                                          |
-| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Verify your domain on your project (DNS TXT or meta tag), then retry.                                 |
+| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.         |
 
 ## Self-host considerations
 

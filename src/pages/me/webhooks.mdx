@@ -71,7 +71,7 @@ async fn webhook(
 | `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                |
 | `OC-Envelope-Id`      | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
 | `OC-Subtype`          | Event subtype, copied for routing convenience                                   |
-| `OC-Class`            | A · B · C                                                                       |
+| `OC-Class`            | A · B · C: One-time, Per action, Per session                                    |
 | `OC-Delivery-Attempt` | 1-based retry counter                                                           |
 | `Content-Type`        | `application/json`                                                              |
 

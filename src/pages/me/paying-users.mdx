@@ -20,10 +20,11 @@ nothing, and leaves no record.
 | Pay on every event      | one period from now, until you turn it off      |
 | A launch week, a Friday | a named period with a start and an end: a promo |
 
-Set them on the project's overview at ochk.app or me.ochk.io, under **Pay your
-users**: turn paying on, stop it, schedule a promo, move a promo's end, or
+Set them on your project's **Paying** tab at ochk.app (on me.ochk.io, the
+project's overview), under **Pay your users**: **Off**, **Always** or
+**Promos**. Turn paying on, stop it, schedule a promo, move a promo's end, or
 remove one that hasn't started. A new project asks once, at creation, and
-answers "not now" unless you say otherwise.
+answers **Off** unless you say otherwise.
 
 ## The rules
 
@@ -67,7 +68,7 @@ dashboard record either way and say whether you are paying now.
 import { oc } from '@orangecheck/me-client';
 
 const res = await oc.event.fire({
-    project_key: 'pk_live_yourcompany',
+    project_key: process.env.OC_PROJECT_KEY!,
     subtype: 'account_creation',
     signingSecret: process.env.OC_SIGNING_SECRET,
     accountId: didOc,

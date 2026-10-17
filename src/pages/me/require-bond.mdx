@@ -17,11 +17,11 @@ and a nullifier for your app.
 
 Open your project on [ochk.app](https://ochk.app/me/projects) or
 [me.ochk.io](https://me.ochk.io/me/projects) and choose **Use orangecheck
-sign-in**. On ochk.app the setting is under **Choose how people sign in → Who
-can sign in**; on me.ochk.io, under **how your users sign in → who can sign
-in**. Pick a minimum amount and age, for example 100,000 sats unspent 30 days.
-The lowest floor is 1,000 sats: ochk.io won't take a smaller coin. The floor is
-saved in the project and served, uncached, at
+sign-in**. On ochk.app that is the project's **Sign-in** tab: **How people sign
+in**, then **Who can sign in** below it. On me.ochk.io it is under **how your
+users sign in → who can sign in**. Pick a minimum amount and age, for example
+100,000 sats unspent 30 days. The lowest floor is 1,000 sats: ochk.io won't take
+a smaller coin. The floor is saved in the project and served, uncached, at
 `GET https://me.ochk.io/api/integrator/<project_key>/sign-in`.
 
 ## 2. Enforce it on your server
@@ -29,10 +29,16 @@ saved in the project and served, uncached, at
 ```ts
 import { withOcAuth } from '@orangecheck/me-client/server';
 
-export default withOcAuth(handler, {
-    audience: 'https://your-site.example',
-    projectKey: 'pk_live_yourapp',
-});
+export default withOcAuth(
+    async (req, res) => {
+        if (!req.ocSession) return res.status(401).json({ ok: false });
+        res.status(200).json({ ok: true, did_oc: req.ocSession.did_oc });
+    },
+    {
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
+    }
+);
 ```
 
 A change in your settings is enforced within a minute. An account below the
@@ -51,7 +57,8 @@ floor gets:
 Link that person to `back_url`, where they can back their account. `have` is
 `null` when no coin backs it. If your requirement has never been readable, the
 request gets `503 bond_policy_unavailable` rather than being let through
-unchecked.
+unchecked. A `projectKey` that names no project gets `500 unknown_project_key`
+(me-client 0.32 and later).
 
 ochk.io re-checks the coin when its last check is over ten minutes old, and
 every claim says when that was (`oc_bond.checked_at`). You can't ask for a fresh

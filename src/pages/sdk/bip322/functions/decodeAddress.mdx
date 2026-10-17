@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: decodeAddress()",
+    description: "Auto-generated API reference for Function: decodeAddress(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/bip322**](../README)
+
+***
+
+[@orangecheck/bip322](../README) / decodeAddress
+
+# Function: decodeAddress()
+
+```ts
+function decodeAddress(address: string): DecodedAddress | null;
+```
+
+Defined in: [index.ts:74](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L74)
+
+Decode a mainnet, testnet/signet or regtest address. Null for anything else,
+including uppercase bech32 and witness versions other than 0 and 1.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `address` | `string` |
+
+## Returns
+
+[`DecodedAddress`](../interfaces/DecodedAddress) \| `null`

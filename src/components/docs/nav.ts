@@ -507,6 +507,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Every orangecheck account, or only accounts backed by bitcoin. Set the floor; withOcAuth enforces it.',
             },
             {
+                href: '/me/paying-users',
+                label: 'Paying your users',
+                blurb: 'Optional: always, in promos you schedule, or never. What events answer outside a pay period.',
+            },
+            {
                 href: '/me/webhooks',
                 label: 'Webhooks',
                 blurb: 'Reception in Node + Rust, raw-body warning, retry semantics.',

@@ -336,6 +336,10 @@ Call it from your backend. `signingSecret` signs the request as your project
 the user's `did_oc`, stored beside your own user row. No user session token is
 forwarded.
 
+Paying your users is optional. An event earns only inside your project's
+[pay periods](/me/paying-users) (always, in promos, or never); outside them the
+call succeeds with `earned: false` and nothing is recorded or charged.
+
 ```ts
 // server-side only · the secret never reaches a browser
 const stamp = await oc.event.fire({
@@ -345,7 +349,11 @@ const stamp = await oc.event.fire({
     signingSecret: process.env.OC_SIGNING_SECRET,
     userAddress: user.did_oc,
 });
-// stamp.id, stamp.gross_fee_sats, stamp.user_earned_sats, stamp.verify_url
+if (stamp.earned) {
+    // stamp.event.id, .gross_fee_sats, .user_earned_sats, .verify_url
+} else {
+    // stamp.reason === 'not_paying'; stamp.next_pay_period, or null
+}
 
 // For percent_of_amount-priced subtypes, include the underlying amount:
 const verify = await oc.event.fire({
@@ -357,9 +365,9 @@ const verify = await oc.event.fire({
 });
 ```
 
-| Function              | Signature                                      | Note                                                       |
-| --------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
-| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<BillableEvent>` | Returns the canonical `BillableEvent` the server recorded. |
+| Function              | Signature                                        | Note                                                                                                              |
+| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<FireEventResult>` | `{ earned: true, event }` with the recorded event, or `{ earned: false, reason: 'not_paying', next_pay_period }`. |
 
 ## `oc.scope.*` · privacy-preserving scope grants
 

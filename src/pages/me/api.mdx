@@ -104,25 +104,30 @@ test-fire path). Anything else gets `401 project_auth_required`.
 | `POST` | `/api/integrator/event`       | fire a billable event under a project_key (live mode requires domain verification) |
 | `POST` | `/api/integrator/event/batch` | fire 1–100 billable events in one call · per-event idempotency keys                |
 
+Outside the project's [pay periods](/me/paying-users) both answer `200` with
+`earned: false` (`not_paying` per event in a batch) and record nothing. Paying
+users is optional.
+
 ## Authenticated · integrator project lifecycle
 
-| Method   | Path                              | Purpose                                                                                                                   |
-| -------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `GET`    | `/api/me/projects`                | list every project owned by your identity                                                                                 |
-| `POST`   | `/api/me/projects`                | create a project, rate-limited 5/min                                                                                      |
-| `GET`    | `/api/me/projects/[id]`           | per-project state · owner-gated                                                                                           |
-| `POST`   | `/api/me/projects/[id]`           | update IntegratorPriceConfig (prices only; a name or domain in the body is ignored) · owner-gated, validates              |
-| `PATCH`  | `/api/me/projects/[id]`           | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
-| `POST`   | `/api/me/projects/[id]/domain`    | change the domain: `{ domain }`. Never verified: replaced at once. Verified: opens a move (see below)                     |
-| `DELETE` | `/api/me/projects/[id]/domain`    | cancel an open move · owner-gated                                                                                         |
-| `DELETE` | `/api/me/projects/[id]`           | delete project · owner-gated                                                                                              |
-| `POST`   | `/api/me/projects/[id]/verify`    | run a domain-ownership check (DNS TXT, falls back to meta tag); during a move, checks the new domain · rate-limited 5/min |
-| `DELETE` | `/api/me/projects/[id]/verify`    | reissue the verification token; a verified domain stays verified until its next check · owner-gated                       |
-| `POST`   | `/api/me/projects/[id]/test-fire` | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox      |
-| `GET`    | `/api/me/projects/[id]/events`    | live event stream for this project · owner-gated                                                                          |
-| `GET`    | `/api/me/projects/[id]/webhooks`  | list registered webhooks · owner-gated                                                                                    |
-| `POST`   | `/api/me/projects/[id]/webhooks`  | register a webhook URL · owner-gated                                                                                      |
-| `POST`   | `/api/developer/webhook-test`     | test-fire a synthetic envelope at a registered webhook                                                                    |
+| Method   | Path                                | Purpose                                                                                                                   |
+| -------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `GET`    | `/api/me/projects`                  | list every project owned by your identity                                                                                 |
+| `POST`   | `/api/me/projects`                  | create a project, rate-limited 5/min. Pays nobody unless `pay: { action: 'add', … }` asks it to                           |
+| `GET`    | `/api/me/projects/[id]`             | per-project state · owner-gated                                                                                           |
+| `POST`   | `/api/me/projects/[id]`             | update IntegratorPriceConfig (prices only; a name or domain in the body is ignored) · owner-gated, validates              |
+| `PATCH`  | `/api/me/projects/[id]`             | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
+| `POST`   | `/api/me/projects/[id]/domain`      | change the domain: `{ domain }`. Never verified: replaced at once. Verified: opens a move (see below)                     |
+| `DELETE` | `/api/me/projects/[id]/domain`      | cancel an open move · owner-gated                                                                                         |
+| `DELETE` | `/api/me/projects/[id]`             | delete project · owner-gated                                                                                              |
+| `POST`   | `/api/me/projects/[id]/pay-periods` | when the project pays its users: `add`, `end`, `set_end`, `cancel` ([details](/me/paying-users)) · owner-gated            |
+| `POST`   | `/api/me/projects/[id]/verify`      | run a domain-ownership check (DNS TXT, falls back to meta tag); during a move, checks the new domain · rate-limited 5/min |
+| `DELETE` | `/api/me/projects/[id]/verify`      | reissue the verification token; a verified domain stays verified until its next check · owner-gated                       |
+| `POST`   | `/api/me/projects/[id]/test-fire`   | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox      |
+| `GET`    | `/api/me/projects/[id]/events`      | live event stream for this project · owner-gated                                                                          |
+| `GET`    | `/api/me/projects/[id]/webhooks`    | list registered webhooks · owner-gated                                                                                    |
+| `POST`   | `/api/me/projects/[id]/webhooks`    | register a webhook URL · owner-gated                                                                                      |
+| `POST`   | `/api/developer/webhook-test`       | test-fire a synthetic envelope at a registered webhook                                                                    |
 
 ### Moving a verified domain
 

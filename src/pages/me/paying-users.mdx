@@ -1,0 +1,112 @@
+export const metadata = {
+    title: 'OC Me · Paying your users',
+    description:
+        'Signing people in is free. Paying your users in sats is optional: always, in promos you schedule, or never. Pay periods, what the event API answers outside them, and how anyone checks an earning against the period that paid it.',
+};
+
+# OC Me · Paying your users
+
+**Signing people in is free. Paying them is your choice.** A project can pay its
+users always, only in promos with a start and an end, or never. Plenty of apps
+use orangecheck only to sign people in and keep bots out, and pay nobody.
+
+What decides it is the project's **pay periods**: stretches of time in which its
+events earn its users sats. Outside every period an event earns nothing, costs
+nothing, and leaves no record.
+
+| You want                | Pay periods                                     |
+| ----------------------- | ----------------------------------------------- |
+| Sign-in only            | none (the default for a new project)            |
+| Pay on every event      | one period from now, until you turn it off      |
+| A launch week, a Friday | a named period with a start and an end: a promo |
+
+Set them on the project's overview at ochk.app or me.ochk.io, under **Pay your
+users**: turn paying on, stop it, schedule a promo, move a promo's end, or
+remove one that hasn't started. A new project asks once, at creation, and
+answers "not now" unless you say otherwise.
+
+## The rules
+
+1. **Periods are history.** One that has started keeps its start forever. You
+   can end it, or move its end, but not move or delete it. So every event that
+   paid sits inside the period that paid it, for as long as the receipt exists.
+2. **Periods don't overlap.** One running "until you turn it off" must be ended
+   before another can be scheduled after it.
+3. **Starts are now or later**, and nothing is scheduled more than 366 days
+   ahead. A promo lasts at least a minute.
+4. **Your balance still decides.** While a period runs, each event takes its fee
+   from the balance you fund. An empty balance stops events as before
+   (`402 escrow_depleted`), so fund it before a promo starts.
+
+## What the event API answers
+
+Firing events from code that runs all the time is safe. Outside a period:
+
+```json
+{
+    "ok": true,
+    "earned": false,
+    "reason": "not_paying",
+    "detail": "Acme pays its users from 2026-10-20T00:00:00Z. Nothing was recorded or charged.",
+    "next_pay_period": {
+        "id": "pp_…",
+        "name": "Launch week",
+        "starts_at": "2026-10-20T00:00:00Z",
+        "ends_at": "2026-10-27T00:00:00Z"
+    }
+}
+```
+
+`next_pay_period` is `null` when nothing is scheduled. Inside a period the
+response is the recorded event with `earned: true`. A batch answers `not_paying`
+per event. An `Idempotency-Key` sent with an event that recorded nothing is
+released, so a retry is judged afresh when it arrives. Test fires from your
+dashboard record either way and say whether you are paying now.
+
+```ts
+import { oc } from '@orangecheck/me-client';
+
+const res = await oc.event.fire({
+    project_key: 'pk_live_yourcompany',
+    subtype: 'account_creation',
+    signingSecret: process.env.OC_SIGNING_SECRET,
+    userAddress: didOc,
+});
+if (!res.earned) {
+    // not paying now; res.next_pay_period says when paying starts, if scheduled
+}
+```
+
+Requires `@orangecheck/me-client` 0.29 or later for the typed result.
+
+## Checking an earning against its period
+
+`GET https://me.ochk.io/api/integrator/config?project_key=…` publishes the
+project's `pay_periods`, past ones included. Because started periods never
+change, anyone can check that a receipt was billed while the project was paying:
+
+```ts
+import { oc, payingAt } from '@orangecheck/me-client';
+
+const { config, pay_periods } = await fetch(
+    `https://me.ochk.io/api/integrator/config?project_key=${PROJECT_KEY}`
+).then((r) => r.json());
+
+payingAt(pay_periods, new Date()); // { paying, period } or { paying: false, next }
+const result = oc.event.verify(envelope, config, undefined, {
+    payPeriods: pay_periods,
+});
+// result.issues includes 'outside_pay_period' for an event billed outside every period
+```
+
+The response is cached for a few minutes, so compare against your own clock
+rather than trusting a "paying now" you read earlier. me.ochk.io runs the same
+check in its own audit.
+
+## Where people see it
+
+The earn directory lists an app only while it is paying, and shows a promo's
+name and when it ends. People who use your app see their earnings as before;
+what they earned in a promo stays theirs after it ends. Pay periods decide
+_whether_ an event pays; [drop periods](/me/drops) decide _when_ a paid share
+becomes takeable. They work together.

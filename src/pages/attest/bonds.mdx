@@ -1,0 +1,104 @@
+export const metadata = {
+    title: 'Bonds: back an account with a coin nobody sees',
+    description:
+        'One unspent coin pledged to one account. Apps see floors and a per-site nullifier, never the coin. Spec: oc-attest-protocol BOND.md.',
+};
+
+# Bonds
+
+An attestation publishes an address, and with it a balance and a history. A
+**bond** keeps the coin private. The holder signs once to pledge one unspent
+coin to one account. Apps the person signs in to learn only that a coin of at
+least N sats, unspent at least D days, backs them. They also get a number that's
+the same for that coin at their site and different everywhere else.
+
+The coin never moves. Nobody holds it. Spending it ends the bond. Nobody needs a
+bond to sign in: an account made with email, Google, GitHub or a wallet signs in
+everywhere without one. Normative spec:
+[`BOND.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/BOND.md).
+
+## The message
+
+```
+orangecheck-bond
+address: bc1q…
+outpoint: <txid>:<vout>
+subject: did:oc:…
+nonce: <32 hex>
+issued_at: 2026-10-16T12:00:00Z
+expires_at: 2026-10-16T12:10:00Z
+ack: I pledge this coin to back this subject. It stays in my wallet.
+```
+
+The coin's own address signs it with BIP-322. `bond_id` is the SHA-256 of those
+bytes. The header differs from `orangecheck` and `orangecheck-auth`, so no
+signature for one can be replayed as another.
+
+## Verifying
+
+```ts
+import { esploraSource, verifyBond } from '@orangecheck/sdk';
+
+const r = await verifyBond({
+    message,
+    signature,
+    subject: didOc,
+    source: esploraSource(),
+});
+// r.ok → { bond_id, outpoint, sats, confirmed_height, tip }
+// else r.reason: sig_invalid | coin_spent | coin_too_recent | coin_address_mismatch | …
+```
+
+The coin must be confirmed, at least 6 blocks deep, unspent, and an output of
+the signing address. A registry re-checks it before vouching again, because a
+bond lasts exactly as long as its coin. `checkBondCoin` does that re-check.
+Python: `orangecheck` ≥ 2.1 has the same message, id, nullifier and floors.
+
+## What an app sees
+
+```json
+"oc_bond": {
+  "v": 1,
+  "sats_floor": 100000,
+  "days_floor": 30,
+  "height": 921044,
+  "checked_at": 1792200000,
+  "nullifier": "5b1d…"
+}
+```
+
+- **Floors, not amounts:** `1000 · 10000 · 100000 · 1000000 · 10000000` sats and
+  `7 · 30 · 90 · 365` days, `0` below the lowest.
+- **`nullifier`** is
+  `sha256("orangecheck-bond-nullifier\n" + audience + "\n" + outpoint)`. It's
+  the same for the same coin at your site, across accounts and re-bonds, and
+  unrelated at any other site.
+- **`checked_at` and `height`** say when the coin was last found unspent. Ask
+  for a fresh check if you need one.
+
+## Slashing without custody
+
+Ban a nullifier and you've banned the coin. Making a new account or rebonding
+won't get past it. Moving the coin will, but a moved coin is new and starts
+aging from zero, so it falls below every age floor again. Nothing is
+confiscated, nobody holds anything, and abuse costs time.
+
+## Privacy
+
+| Who                    | Learns                                    |
+| ---------------------- | ----------------------------------------- |
+| The registry (ochk.io) | the address, coin, amount and age         |
+| An app                 | floors, freshness and its own nullifier   |
+| The chain              | nothing; the signature is never published |
+
+Use a coin that holds nothing else of yours. A zero-knowledge method that
+removes the registry from the picture is future work in the spec (§10).
+
+## Where people make one
+
+- **ochk.app:** Settings → Back your account with bitcoin.
+- **ochk.io:** Dashboard → Identity.
+- **me.ochk.io:** Settings → Account.
+- **Any family site:** `<OcBond />` from `@orangecheck/auth-client` ≥ 2.30.
+
+To require one at your app, see [Who can sign in](/me/require-bond).

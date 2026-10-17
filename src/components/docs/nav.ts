@@ -137,6 +137,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Sign → publish → verify. The whole protocol on one page.',
             },
             {
+                href: '/attest/bonds',
+                label: 'Bonds',
+                blurb: 'One coin backs one account. Apps see floors and a per-site nullifier, never the coin.',
+            },
+            {
                 href: '/attest/scoring',
                 label: 'Scoring',
                 blurb: 'sats_bonded, days_unspent, score_v0. Advisory only.',
@@ -495,6 +500,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/me/integrations',
                 label: 'Integrations',
                 blurb: 'OAuth-peer pattern, sample integrator archetypes, cross-product flows.',
+            },
+            {
+                href: '/me/require-bond',
+                label: 'Who can sign in',
+                blurb: 'Every orangecheck account, or only accounts backed by bitcoin. Set the floor; withOcAuth enforces it.',
             },
             {
                 href: '/me/webhooks',

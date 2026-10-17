@@ -357,11 +357,12 @@ const verify = await oc.event.fire({
 
 ## `oc.scope.*` · privacy-preserving scope grants
 
-OC's privacy default: signing into your site reveals only an anonymous
-**per-integrator subject** (`sub`). The user's master identity (BIP-322 address
-or email) stays private; you cannot correlate users across sites. To read
-additional fields (their email, attest tier, bitcoin address, display name) you
-must explicitly request a scope and the user must explicitly consent.
+OC's privacy default: signing into your site reveals the account's `sub` and
+`did_oc`, and nothing about its email or Bitcoin address. Both ids are the same
+at every site, so sites that compare notes can match a user. Scope reads below
+carry a per-integrator subject instead. To read additional fields (their email,
+attest tier, bitcoin address, display name) you must explicitly request a scope
+and the user must explicitly consent.
 
 Full design at
 [PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).

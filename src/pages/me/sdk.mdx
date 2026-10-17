@@ -17,10 +17,11 @@ export const metadata = {
 This is the canonical TypeScript SDK for integrating me.ochk.io. Three entry
 points, three audiences:
 
-- **`@orangecheck/me-client`** — React + JS surface: the `OcSignInButton`
-  component plus the `oc.*` namespaces (session, payment, event, webhook,
-  config, identity). The `<OcSessionProvider>` + `useOcSession()` React bindings
-  ship in the companion package `@orangecheck/auth-client` — install both.
+- **`@orangecheck/me-client`** — React + JS surface: the `oc.*` namespaces
+  (session, payment, event, webhook, config, identity) plus the `OcSignInButton`
+  component, which rides the family cookie and so works only on orangecheck's
+  own sites. The `<OcSessionProvider>` + `useOcSession()` React bindings ship in
+  the companion package `@orangecheck/auth-client` — install both.
 - **`@orangecheck/me-client/server`** — server-side verification. `withOcAuth`
   (Next.js Pages), `ocAuthExpress`, `ocAuthHono`, `getOcSession(headers)`,
   `verifyOcToken(token)`. **No env vars, no JWK handling, no
@@ -39,10 +40,13 @@ yarn add @orangecheck/me-client @orangecheck/auth-client
 `@orangecheck/auth-client` carries the React provider + hook
 (`<OcSessionProvider>`, `useOcSession()`); `@orangecheck/me-client` carries the
 data SDK (`oc.*` namespaces), the server adapters, the `/popup` helper, and the
-`OcSignInButton` component. They are **separate packages** — `me-client` does
-not re-export the provider or hook, so React code imports the provider/hook from
-`auth-client` and everything else from `me-client`. Install both. Server-side
-code reaches for `@orangecheck/me-client/server` and never touches React.
+`OcSignInButton` component. The button works only on orangecheck's own sites; a
+third-party site signs people in with `signInWithOc()` from `/popup` and
+verifies the token with `withOcAuth`. They are **separate packages** —
+`me-client` does not re-export the provider or hook, so React code imports the
+provider/hook from `auth-client` and everything else from `me-client`. Install
+both. Server-side code reaches for `@orangecheck/me-client/server` and never
+touches React.
 
 ## server-side verification (zero JWK handling)
 
@@ -139,8 +143,8 @@ button.addEventListener('click', async () => {
 
 The provider and hook below are exported by **`@orangecheck/auth-client`**, the
 companion package — `me-client` carries the `oc.*` data namespaces and the
-`OcSignInButton`, `auth-client` carries the cross-subdomain session bindings.
-Install both.
+`OcSignInButton` (orangecheck's own sites only), `auth-client` carries the
+cross-subdomain session bindings. Install both.
 
 ### `<OcSessionProvider>`
 
@@ -180,8 +184,10 @@ haven't mounted the provider.
 
 ## `oc.session.*` · session lifecycle (Class C billable atom)
 
-Sites pay per session, not per click. `create()` opens a new session;
-`refresh()` and `invalidate()` are free, telemetry-only.
+Sites pay per session, not per click. The charge is the `session_creation`
+event, which your server fires with `oc.event.fire` (below) once per real
+session. `create()` opens a session and records no charge; `refresh()` and
+`invalidate()` are free, telemetry-only.
 
 ```ts
 import { oc } from '@orangecheck/me-client';
@@ -194,11 +200,11 @@ await oc.session.refresh(session.id);
 await oc.session.invalidate(session.id);
 ```
 
-| Function                    | Signature                             | Note              |
-| --------------------------- | ------------------------------------- | ----------------- |
-| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | Class C billable. |
-| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.             |
-| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.             |
+| Function                    | Signature                             | Note       |
+| --------------------------- | ------------------------------------- | ---------- |
+| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | No charge. |
+| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.      |
+| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.      |
 
 ## `oc.payment.authorize` · Class B billable atom
 
@@ -318,12 +324,12 @@ a single primitive that ships as a side effect of using OC for auth.
 
 ## `oc.event.fire` · arbitrary billable subtypes
 
-The escape hatch when you want to bill a subtype that isn't covered by
-`oc.session.create` or `oc.payment.authorize` — `stamp_signing`,
-`attest_verification_at_gate`, `scoped_action_authorization`,
-`kyc_tier_upgrade`, etc. Class is determined by `SUBTYPE_CLASS`; cashback is
-computed via `computeFees()`; the envelope is recorded under your `project_key`
-and shows up in `/developer/projects/[id]/events`.
+How you bill any subtype: `session_creation` (`oc.session.create` records no
+charge), `stamp_signing`, `attest_verification_at_gate`,
+`scoped_action_authorization`, `kyc_tier_upgrade`, etc. Class is determined by
+`SUBTYPE_CLASS`; cashback is computed via `computeFees()`; the envelope is
+recorded under your `project_key` and shows up in
+`/developer/projects/[id]/events`.
 
 Call it from your backend. `signingSecret` signs the request as your project
 (the SDK signs the exact bytes it sends), and `userAddress` names who earns —
@@ -379,14 +385,14 @@ const { sub, scopes_granted, scopes } = await oc.scope.granted({
     project_key: 'pk_live_yourcompany',
 });
 
-// `sub` is the per-integrator anonymous id you should key user
-// records on (NOT the master addr · OC doesn't reveal it).
+// `sub` here is per-integrator: different at every project. It is NOT
+// the token's `sub` (req.ocSession.sub), which is the same at every site.
+// Event payloads carry this scoped `sub` too, so don't join the two.
 console.log(sub); // "sub_3K7xQ2mN1pYwB8tRvE…"
 
 // `scopes` is a partial map · only fields whose scope the user has
 // granted are present.
 console.log(scopes.email); // "user@example.com" · or undefined
-console.log(scopes.attest_tier); // "bonded" · or undefined
 ```
 
 ### `oc.scope.request`
@@ -396,7 +402,7 @@ returns to `return_to`. Subsequent `oc.scope.granted()` calls reflect their
 decisions.
 
 ```ts
-oc.scope.request(['email', 'attest_tier'], {
+oc.scope.request(['email', 'display_name'], {
     project_key: 'pk_live_yourcompany',
     return_to: window.location.href,
 });
@@ -409,19 +415,24 @@ The user picks **grant once** (1h expiry), **grant always** (until revoked), or
 
 ### Valid scopes
 
-| Scope             | Reveals                                                                    | Use case                                                   |
-| ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)                             | On-chain holdings verification, payment-channel co-signing |
-| `email`           | Email address (email-OTP users only)                                       | Transactional email · receipts, password reset             |
-| `attest_tier`     | Current `AttestTier` (`anonymous` / `bonded` / `kyc_light` / `kyc_strong`) | Sybil-resistance gating, regulated KYC flows               |
-| `display_name`    | A user-chosen handle (separate from real identity)                         | Forum / social integrations where some name is needed      |
+| Scope             | Reveals                                            | Use case                                                   |
+| ----------------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)     | On-chain holdings verification, payment-channel co-signing |
+| `email`           | Email address (email-OTP users only)               | Transactional email · receipts, password reset             |
+| `attest_tier`     | Deprecated: `anonymous` / `bonded`                 | None; see below                                            |
+| `display_name`    | A user-chosen handle (separate from real identity) | Forum / social integrations where some name is needed      |
+
+Don't gate on `attest_tier` to keep bots out. It is deprecated, and `bonded`
+only ever meant one signature over an address, with no amount behind it. To let
+in only accounts backed by bitcoin, read the token's `oc_bond` claim: see
+[Who can sign in](/me/require-bond).
 
 ### Migration from `user_address` (≤ 0.9.0)
 
 Pre-0.10.0 webhook payloads delivered the user's master address as
-`user_address`. From 0.10.0 onward, payloads use `sub` (per-integrator)
-
-- optional `scopes` (granted fields). To migrate:
+`user_address`. From 0.10.0 onward, payloads use the per-integrator `sub` (the
+same scoped id `oc.scope.granted()` returns, not the token's `sub`) plus
+optional `scopes` (granted fields). To migrate:
 
 1. Update SDK to `^0.10.0`.
 2. Switch from `event.user_address` → `event.sub` for user records in your

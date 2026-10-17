@@ -58,10 +58,10 @@ npx -y @orangecheck/vote-cli tally <poll_id> --json
 ```
 
 The CLI pulls the poll + ballots from Nostr, verifies every BIP-322 signature
-with `bip322-js`, fetches UTXO state at the snapshot block from your configured
-explorer (or self-host), and runs the pure tally function. If the JSON output
-matches vote.ochk.io's `/api/tally`, both implementations agree. If it doesn't —
-trust the CLI.
+with `@orangecheck/bip322`, fetches UTXO state at the snapshot block from your
+configured explorer (or self-host), and runs the pure tally function. If the
+JSON output matches vote.ochk.io's `/api/tally`, both implementations agree. If
+it doesn't — trust the CLI.
 
 Pipe it into anything:
 

@@ -104,8 +104,8 @@ chain state**, never from the signed message itself. The `check()` and
 Incorrect hashing, signature-format mishandling, or incomplete script-type
 coverage can silently accept invalid signatures.
 
-**Mitigation**: use well-tested primitives — `bip322-js` in TypeScript, the
-Rust-backed `bip322` crate in Python. Run the
+**Mitigation**: use well-tested primitives — `@orangecheck/bip322` in
+TypeScript, the Rust-backed `bip322` crate in Python. Run the
 [conformance vectors](/ecosystem/conformance) before any release.
 
 ### Self-asserted handle spoofing

@@ -128,10 +128,11 @@ Narrow surface:
 | `@noble/hashes`                           | SHA-256                   |
 | `@noble/curves`                           | secp256k1 Schnorr / ECDSA |
 | `javascript-opentimestamps` _(pluggable)_ | OTS proof parsing         |
-| `bip322-js`                               | BIP-322 verification      |
+| `@orangecheck/bip322`                     | BIP-322 verification      |
 
-`bip322-js` transitively depends on `elliptic`, which has known low-severity
-timing channels in ECDSA (npm advisory 1112030). Our use is verification-only
-and signatures are bound to the BIP-322 message domain, so the risk is limited
-to signature-check timing. A migration to a `@noble`-based BIP-322 verifier is
-planned.
+`@orangecheck/bip322` is built only on `@noble/curves`, `@noble/hashes` and
+`@scure/base`: no bitcoinjs-lib, no `elliptic`. `@orangecheck/stamp-cli` ≥ 0.2.1
+verifies with it. stamp.ochk.io still verifies through `bip322-js` until it
+picks up `@orangecheck/wallet-adapter` 0.5.2. `bip322-js` depends on `elliptic`,
+which has known low-severity timing channels in ECDSA (npm advisory 1112030);
+that use is verification-only, so the risk is limited to signature-check timing.

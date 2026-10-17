@@ -93,8 +93,8 @@ On failure, `ok: false` with `reasons` (for `/api/check`) or just a fuller
 ## Offline vs. online
 
 Steps 1–3 are **pure cryptographic work**: parsing, hashing, signature
-verification. An air-gapped machine with `bip322-js` (or the Python equivalent)
-and nothing else can perform them.
+verification. An air-gapped machine with `@orangecheck/bip322` (or the Python
+equivalent) and nothing else can perform them.
 
 Steps 4–6 need **live chain state**. A verifier that can reach any
 Esplora-compatible endpoint (public or private) can do them. Steps 4–6 produce

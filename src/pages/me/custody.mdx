@@ -123,12 +123,12 @@ The descriptor id is `fed:` + lowercase hex
 
 ## What stays the same when you graduate
 
-| Stays the same                                                         | Changes                                                           |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Your bitcoin address (the canonical identifier)                        | The signing method (`fedimint_threshold` → `bip-322`)             |
-| Your attest tier (`anonymous` / `bonded` / `kyc-light` / `kyc-strong`) | Who holds the private key (you, instead of the federation)        |
-| Your /me/earn history, connected sites, agent delegations              | How recovery works (you own backup; lose the key, lose the funds) |
-| Your sat-earning rate                                                  | The shape of `signing_method` in attestation envelopes            |
+| Stays the same                                            | Changes                                                           |
+| --------------------------------------------------------- | ----------------------------------------------------------------- |
+| Your bitcoin address (the canonical identifier)           | The signing method (`fedimint_threshold` → `bip-322`)             |
+| Your backing, if you backed your account with a coin      | Who holds the private key (you, instead of the federation)        |
+| Your /me/earn history, connected sites, agent delegations | How recovery works (you own backup; lose the key, lose the funds) |
+| Your sat-earning rate                                     | The shape of `signing_method` in attestation envelopes            |
 
 ## Guardian rotation
 

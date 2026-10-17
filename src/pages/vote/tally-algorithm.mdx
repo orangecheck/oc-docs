@@ -19,10 +19,25 @@ function tally(opts: {
     ballots: Ballot[];
     utxosAt: (address: string, blockHeight: number) => Promise<Utxo[]>;
     revealedOptions?: Record<BallotId, OptionIndex>; // for secret-mode polls
-    verifyBip322?: (msg: string, sig: string, addr: string) => Promise<boolean>;
+    // Preferred: named arguments can't be swapped.
+    verify?: (a: {
+        address: string;
+        message: string;
+        signature: string;
+    }) => Promise<boolean> | boolean;
+    // Positional, and vote-core's order is (address, message, signature), unlike
+    // every sibling package. A sibling's verifier compiles here and checks nothing.
+    verifyBip322?: (
+        address: string,
+        message: string,
+        signatureB64: string
+    ) => Promise<boolean> | boolean;
     skipSignatures?: boolean; // for offline / cached-signature re-tallies
 }): Promise<TallyResult>;
 ```
+
+`tally` throws unless it gets `verify`, `verifyBip322` or an explicit
+`skipSignatures`, so it never counts unverified ballots by accident.
 
 The function is async only because `utxosAt` is async. Everything else is
 deterministic synchronous computation.

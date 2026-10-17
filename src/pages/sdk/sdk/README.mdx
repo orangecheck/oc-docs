@@ -12,7 +12,11 @@ export const metadata = {
 ## Interfaces
 
 - [AttestationEnvelope](interfaces/AttestationEnvelope)
+- [BondChainSource](interfaces/BondChainSource)
+- [BondCoin](interfaces/BondCoin)
+- [BondFields](interfaces/BondFields)
 - [BuildOptions](interfaces/BuildOptions)
+- [ChainTip](interfaces/ChainTip)
 - [Challenge](interfaces/Challenge)
 - [CheckParams](interfaces/CheckParams)
 - [CheckResult](interfaces/CheckResult)
@@ -25,6 +29,7 @@ export const metadata = {
 - [NostrVerificationResult](interfaces/NostrVerificationResult)
 - [StatusMeta](interfaces/StatusMeta)
 - [TwitterVerificationResult](interfaces/TwitterVerificationResult)
+- [VerifiedBond](interfaces/VerifiedBond)
 - [VerifyChallengeOptions](interfaces/VerifyChallengeOptions)
 - [VerifyChallengeResult](interfaces/VerifyChallengeResult)
 - [VerifyIdentityOptions](interfaces/VerifyIdentityOptions)
@@ -34,6 +39,8 @@ export const metadata = {
 
 ## Type Aliases
 
+- [BondReason](type-aliases/BondReason)
+- [BondResult](type-aliases/BondResult)
 - [Extensions](type-aliases/Extensions)
 - [IdentityProtocol](type-aliases/IdentityProtocol)
 - [Network](type-aliases/Network)
@@ -46,20 +53,29 @@ export const metadata = {
 
 ## Variables
 
+- [BOND\_DAYS\_FLOORS](variables/BOND_DAYS_FLOORS)
+- [BOND\_MIN\_CONFIRMATIONS](variables/BOND_MIN_CONFIRMATIONS)
+- [BOND\_SATS\_FLOORS](variables/BOND_SATS_FLOORS)
 - [DEFAULT\_RELAYS](variables/DEFAULT_RELAYS)
 - [FANOUT\_DEADLINE\_MS](variables/FANOUT_DEADLINE_MS)
 - [STATUS\_META](variables/STATUS_META)
 
 ## Functions
 
+- [bondFloors](functions/bondFloors)
+- [bondId](functions/bondId)
+- [bondNullifier](functions/bondNullifier)
+- [buildBondMessage](functions/buildBondMessage)
 - [buildCanonicalMessage](functions/buildCanonicalMessage)
 - [check](functions/check)
+- [checkBondCoin](functions/checkBondCoin)
 - [computeAllScores](functions/computeAllScores)
 - [computeScore](functions/computeScore)
 - [createAttestation](functions/createAttestation)
 - [createAttestationEnvelope](functions/createAttestationEnvelope)
 - [createAttestationEvent](functions/createAttestationEvent)
 - [discoverAttestations](functions/discoverAttestations)
+- [esploraSource](functions/esploraSource)
 - [extractAttestationIdFromUrl](functions/extractAttestationIdFromUrl)
 - [formatIdentities](functions/formatIdentities)
 - [formatIdentitiesForDisplay](functions/formatIdentitiesForDisplay)
@@ -87,12 +103,14 @@ export const metadata = {
 - [isGitHubIdentityVerified](functions/isGitHubIdentityVerified)
 - [isNip07Available](functions/isNip07Available)
 - [isNostrIdentityVerified](functions/isNostrIdentityVerified)
+- [issueBondMessage](functions/issueBondMessage)
 - [issueChallenge](functions/issueChallenge)
 - [isValidDomain](functions/isValidDomain)
 - [isValidTweetUrl](functions/isValidTweetUrl)
 - [nostrIdentifierForms](functions/nostrIdentifierForms)
 - [nostrPubkeyToHex](functions/nostrPubkeyToHex)
 - [parseAttestationFromEvent](functions/parseAttestationFromEvent)
+- [parseBondMessage](functions/parseBondMessage)
 - [parseIdentities](functions/parseIdentities)
 - [publishAttestation](functions/publishAttestation)
 - [publishToRelays](functions/publishToRelays)
@@ -106,6 +124,8 @@ export const metadata = {
 - [verify](functions/verify)
 - [verifyAllIdentities](functions/verifyAllIdentities)
 - [verifyAttestationById](functions/verifyAttestationById)
+- [verifyBond](functions/verifyBond)
+- [verifyBondSignature](functions/verifyBondSignature)
 - [verifyChallenge](functions/verifyChallenge)
 - [verifyDnsIdentity](functions/verifyDnsIdentity)
 - [verifyGitHubIdentity](functions/verifyGitHubIdentity)

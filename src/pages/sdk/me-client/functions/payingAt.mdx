@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: payingAt()",
+    description: "Auto-generated API reference for Function: payingAt(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README)
+
+***
+
+[@orangecheck/me-client](../README) / payingAt
+
+# Function: payingAt()
+
+```ts
+function payingAt(periods: readonly PayPeriod[], at?: Date): PayingState;
+```
+
+Defined in: [me-client/src/pay-periods.ts:31](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/pay-periods.ts#L31)
+
+Paying at `at`, and in which period; or not, and the next period if any.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `periods` | readonly [`PayPeriod`](../interfaces/PayPeriod)[] |
+| `at` | `Date` |
+
+## Returns
+
+[`PayingState`](../type-aliases/PayingState)

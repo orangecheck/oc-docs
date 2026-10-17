@@ -20,9 +20,8 @@ There is no new SDK. A Connect integration is one HTTPS `POST`.
 
 ## How it works
 
-1. Register a Connect app at
-   [me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect) —
-   you get an **API key**.
+1. Open your project at [ochk.app/me/projects](https://ochk.app/me/projects) and
+   choose **Your own login** under **Sign-in**: you get an **API key**.
 2. Your user signs in however they already do. Nothing changes.
 3. Right after, your backend calls `POST https://ochk.io/api/connect/provision`
    with your API key and your own id for that user.
@@ -81,5 +80,5 @@ behalf.
 - An integrator can only ever create and manage **its own** users' OrangeCheck
   accounts — a Connect key can never reach into anyone else's account.
 
-Register your first app at
-[me.ochk.io/me/developer/connect](https://me.ochk.io/me/developer/connect).
+Choose **Your own login** under **Sign-in** on your first project at
+[ochk.app/me/projects](https://ochk.app/me/projects).

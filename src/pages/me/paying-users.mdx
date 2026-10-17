@@ -70,7 +70,7 @@ const res = await oc.event.fire({
     project_key: 'pk_live_yourcompany',
     subtype: 'account_creation',
     signingSecret: process.env.OC_SIGNING_SECRET,
-    userAddress: didOc,
+    accountId: didOc,
 });
 if (!res.earned) {
     // not paying now; res.next_pay_period says when paying starts, if scheduled

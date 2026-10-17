@@ -340,14 +340,15 @@ a single primitive that ships as a side effect of using OC for auth.
 How you bill any subtype: `session_creation` (`oc.session.create` records no
 charge), `stamp_signing`, `attest_verification_at_gate`,
 `scoped_action_authorization`, `kyc_tier_upgrade`, etc. Class is determined by
-`SUBTYPE_CLASS`; cashback is computed via `computeFees()`; the envelope is
-recorded under your `project_key` and shows up in
-`/developer/projects/[id]/events`.
+`SUBTYPE_CLASS`; what your user earns is computed via `computeFees()`; the
+receipt is recorded under your `project_key` and shows up on your project's
+Receipts tab at ochk.app.
 
 Call it from your backend. `signingSecret` signs the request as your project
-(the SDK signs the exact bytes it sends), and `userAddress` names who earns —
-the user's `did_oc`, stored beside your own user row. No user session token is
-forwarded.
+(the SDK signs the exact bytes it sends), and `accountId` names who earns — the
+person's account id (`did_oc`), stored beside your own user row. Before
+me-client 0.30 this option was called `userAddress`; that name still works. No
+user session token is forwarded.
 
 Paying your users is optional. An event earns only inside your project's
 [pay periods](/me/paying-users) (always, in promos, or never); outside them the
@@ -360,7 +361,7 @@ const stamp = await oc.event.fire({
     subtype: 'stamp_signing',
     action_label: 'review · march invoice',
     signingSecret: process.env.OC_SIGNING_SECRET,
-    userAddress: user.did_oc,
+    accountId: user.did_oc,
 });
 if (stamp.earned) {
     // stamp.event.id, .gross_fee_sats, .user_earned_sats, .verify_url
@@ -374,7 +375,7 @@ const verify = await oc.event.fire({
     subtype: 'attest_verification_at_gate',
     payment_amount_sats: 50_000,
     signingSecret: process.env.OC_SIGNING_SECRET,
-    userAddress: user.did_oc,
+    accountId: user.did_oc,
 });
 ```
 

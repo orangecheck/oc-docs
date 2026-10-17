@@ -494,7 +494,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/sdk',
                 label: 'SDK reference',
-                blurb: '@orangecheck/me-client v0.29 — every export, every type, every code sample.',
+                blurb: '@orangecheck/me-client v0.30 — every export, every type, every code sample.',
             },
             {
                 href: '/me/integrations',

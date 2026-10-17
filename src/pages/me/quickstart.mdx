@@ -168,7 +168,7 @@ const res = await oc.event.fire({
     project_key: 'pk_test_a4f9k2x',
     subtype: 'account_creation',
     signingSecret: process.env.OC_SIGNING_SECRET,
-    userAddress: didOc, // who earns: req.ocSession.did_oc from step 3 above
+    accountId: didOc, // who earns: req.ocSession.did_oc from step 3 above
 });
 if (!res.earned) {
     // not paying now: nothing recorded or charged

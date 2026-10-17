@@ -1,0 +1,57 @@
+export const metadata = {
+    title: "Function: issueBondMessage()",
+    description: "Auto-generated API reference for Function: issueBondMessage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README)
+
+***
+
+[@orangecheck/sdk](../README) / issueBondMessage
+
+# Function: issueBondMessage()
+
+```ts
+function issueBondMessage(opts: {
+  address: string;
+  now?: Date;
+  outpoint: string;
+  subject: string;
+  ttlSeconds?: number;
+}): {
+  expiresAt: number;
+  message: string;
+  nonce: string;
+};
+```
+
+Defined in: [bond.ts:113](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/bond.ts#L113)
+
+A fresh bond message with a random nonce and a short signing window.
+
+## Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts` | \&#123; `address`: `string`; `now?`: `Date`; `outpoint`: `string`; `subject`: `string`; `ttlSeconds?`: `number`; \&#125; | - |
+| `opts.address` | `string` | - |
+| `opts.now?` | `Date` | - |
+| `opts.outpoint` | `string` | - |
+| `opts.subject` | `string` | - |
+| `opts.ttlSeconds?` | `number` | Signing window in seconds. Default 600. |
+
+## Returns
+
+```ts
+{
+  expiresAt: number;
+  message: string;
+  nonce: string;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `expiresAt` | `number` | [bond.ts:120](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/bond.ts#L120) |
+| `message` | `string` | [bond.ts:120](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/bond.ts#L120) |
+| `nonce` | `string` | [bond.ts:120](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/bond.ts#L120) |

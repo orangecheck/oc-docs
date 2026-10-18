@@ -806,11 +806,11 @@
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
 "@orangecheck/auth-client@^2.26.0":
-  version "2.29.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.29.0.tgz#aa746fd0cbaaf6fc30acf7a1994cca4bcb4e2538"
-  integrity sha512-i2UzM/PWkp+lV0bkqhmayZ7+GJ5c5ggL7XYcl3fhZZ/KxvwvIHhLAhxOpcT4QNIieiHn/dy8Vjto+BUNVbQq4w==
+  version "2.32.1"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.32.1.tgz#6c1a5b83e087b4acd85553c5a7bcb69f38d53055"
+  integrity sha512-YanbHRQoXsX/l4h12/9k6AwCzT6+9tBIdSs/r35JQrSTvhgwr3DNjkztAsd7IhlqPDP11/LPywNBcFtFNRPqPQ==
   dependencies:
-    "@orangecheck/wallet-adapter" "^0.4.2 || ^0.5.0"
+    "@orangecheck/wallet-adapter" "^0.5.2"
     "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/auth-core@^2.5.0":
@@ -851,7 +851,7 @@
     sonner "^2.0.7"
     tailwind-merge "^3.3.1"
 
-"@orangecheck/wallet-adapter@^0.4.2 || ^0.5.0", "@orangecheck/wallet-adapter@^0.5.0":
+"@orangecheck/wallet-adapter@^0.5.0", "@orangecheck/wallet-adapter@^0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.5.2.tgz#880f715d96ec8963386aaabf793779ee0eb83ea8"
   integrity sha512-N5utXDkfWv0cjYZSSWltLDnUvfYdXiqU1YNYCwyNKTB97EHjr2J2eXU6NSdqx0YgE30HhVW2zzvF8g8lzK8TSg==

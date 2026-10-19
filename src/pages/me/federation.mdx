@@ -9,8 +9,8 @@ export const metadata = {
 > **Status: this is the design, not today.** No federation is bound.
 > [`/api/federations`](https://me.ochk.io/api/federations) is the
 > machine-readable answer and it currently serves a single entry with no invite,
-> so no client can join one. **During bring-up OrangeCheck holds every user's
-> accrued balance and is the party that moves it.** That is a stage,
+> so no client can join one. **While it is in testing, OrangeCheck holds every
+> user's accrued balance and is the party that moves it.** That is a stage,
 > deliberately: OrangeCheck operates every role until independent operators take
 > them. Read the rest of this page as the destination, and
 > [ochk.app/custody](https://ochk.app/custody) as the present tense.
@@ -124,7 +124,7 @@ Per the charter's exit clause:
 - If you'd rather pick a different federation, any Fedimint client can join it;
   your sats migrate via standard Fedimint cross-federation flow.
 
-## Graduating to self-custody
+## Moving to your own keys
 
 Not live — there is no federation balance to sweep. When one is bound,
 [`/me/balance`](https://ochk.app/me/balance#own-keys) walks you through:

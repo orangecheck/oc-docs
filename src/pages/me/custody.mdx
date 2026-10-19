@@ -9,16 +9,16 @@ export const metadata = {
 > **Status: this is the design, not today.** No federation is bound.
 > [`/api/federations`](https://me.ochk.io/api/federations) is the
 > machine-readable answer and it currently serves a single entry with no invite,
-> so no client can join one. **During bring-up OrangeCheck holds every user's
-> accrued balance and is the party that moves it.** That is a stage,
+> so no client can join one. **While it is in testing, OrangeCheck holds every
+> user's accrued balance and is the party that moves it.** That is a stage,
 > deliberately: OrangeCheck operates every role until independent operators take
 > them. Read the descriptor schema, graduation envelope and rotation rules below
 > as the contract that comes into force when a federation binds, and
 > [ochk.app/custody](https://ochk.app/custody) as the present tense.
 
-**ochk.app is designed to be federation-custodied by default, with a
-self-custody graduation flow on demand.** This page is the user-facing
-explanation; the protocol-level contract is at
+**ochk.app is designed to be federation-custodied by default, with a move to
+your own keys on demand.** This page is the user-facing explanation; the
+protocol-level contract is at
 [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
 (v1.2-draft-1, additive extension).
 
@@ -121,7 +121,7 @@ same shape as oc-agent-protocol's federation principal, re-purposed for custody:
 The descriptor id is `fed:` + lowercase hex
 `SHA-256(canonical_descriptor_bytes)`.
 
-## What stays the same when you graduate
+## What stays the same when you move to your own keys
 
 | Stays the same                                            | Changes                                                           |
 | --------------------------------------------------------- | ----------------------------------------------------------------- |

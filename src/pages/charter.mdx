@@ -30,17 +30,17 @@ Anyone proposing otherwise is not OrangeCheck.
 ### 02 · No custody you didn't choose.
 
 OrangeCheck does not hold customer Bitcoin private keys and does not operate a
-custodial wallet you cannot graduate out of. On the protocol siblings, no
-custody — period. Bonded reputation is attestation-of-unspent: sats stay in the
-customer's own wallet, enforcement is by exposure, never by slashing.
+custodial wallet you cannot move out of. On the protocol siblings, no custody —
+period. Bonded reputation is attestation-of-unspent: sats stay in the customer's
+own wallet, enforcement is by exposure, never by slashing.
 
 `ochk.app` is the one place this commitment has a stated exception, and it is a
-stage rather than a design. **During bring-up OrangeCheck holds what a user
-accrues there and is the party that moves it**, because it is operating every
-role in the system until independent operators take them. The design is
-federation custody — an M-of-N guardian set, OC holding no share — with
-self-custody graduation as a one-click path that keeps the same address and the
-same history. Neither is in force yet: no federation is bound, which is
+stage rather than a design. **While it is in testing, OrangeCheck holds what a
+user accrues there and is the party that moves it**, because it is operating
+every role in the system until independent operators take them. The design is
+federation custody — an M-of-N guardian set, OC holding no share — with a
+one-click move to your own keys that keeps the same address and the same
+history. Neither is in force yet: no federation is bound, which is
 machine-readable at [`/api/federations`](https://me.ochk.io/api/federations) and
 stated in the present tense at [ochk.app/custody](https://ochk.app/custody). We
 say that here rather than in a footnote, because a charter that overstates is
@@ -65,7 +65,7 @@ first.
 
 ### 05 · Audit verifies without us.
 
-Every audit bundle, every receipt, every billable envelope OrangeCheck issues is
+Every audit bundle and every receipt OrangeCheck issues, billable or not, is
 verifiable offline, against Bitcoin headers, by anyone, forever. If OrangeCheck
 disappeared tomorrow, every receipt continues to verify. We sell operations, not
 lock-in. The protocol is the API.
@@ -81,9 +81,9 @@ real authority — which is human work being elevated, not erased.
 Lightning customers and sat-paid users are not a footnote. Every USD price is
 published with its sat equivalent on the same row. We do not surcharge
 Lightning, do not require fiat onramp, and do not treat sat-paid customers as a
-niche segment. On `ochk.app` specifically, every billable event has its gross
-fee, OC platform fee, user cashback, and integrator rebate published in sats —
-USD shown alongside, never as the canonical unit.
+niche segment. On `ochk.app` specifically, every billable event has its price,
+OC's platform fee and what the user earns published in sats — USD shown
+alongside, never as the canonical unit.
 
 ### 08 · Spec stewardship is public.
 
@@ -96,12 +96,12 @@ review window, and a versioned re-ratification.
 ## How this applies per product
 
 - **`ochk.app`** — consumer commercial product (its API is `me.ochk.io`).
-  OrangeCheck-held during bring-up; federation custody with self-custody
-  graduation is the destination (commitment 02). Three-class billable event
-  taxonomy (A/B/C). Integrators set every per-event price; OC retains a fixed
-  20% platform fee. Commitments **02** (custody you can graduate out of), **05**
-  (every billable envelope verifies offline), and **07** (sats first-class) bind
-  this product specifically.
+  OrangeCheck-held while in testing; federation custody, then your own keys, is
+  the destination (commitment 02). Three kinds of billable event: one-time, per
+  action and per session. Integrators set what each event pays the user; OC's
+  fee is a fixed 20% of the price. Commitments **02** (custody you can move out
+  of), **05** (every receipt verifies offline), and **07** (sats first-class)
+  bind this product specifically.
 - **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
   secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
   name, type, or payload is ever readable server-side, and there is no recovery

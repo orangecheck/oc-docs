@@ -805,10 +805,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/auth-client@^2.26.0":
-  version "2.32.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.32.1.tgz#6c1a5b83e087b4acd85553c5a7bcb69f38d53055"
-  integrity sha512-YanbHRQoXsX/l4h12/9k6AwCzT6+9tBIdSs/r35JQrSTvhgwr3DNjkztAsd7IhlqPDP11/LPywNBcFtFNRPqPQ==
+"@orangecheck/auth-client@^2.32.2":
+  version "2.32.2"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.32.2.tgz#1ef1b19d500b220db157bbf2e3b7e6c0fbd1a69e"
+  integrity sha512-Vue53WjDj1bnn04w/C3K7k2Whu4G95QEdw2gcZZHK0reTHLtvm7bYOftR22tLvMHQAfFOYU1wRe6LNKqv41ZfA==
   dependencies:
     "@orangecheck/wallet-adapter" "^0.5.2"
     "@simplewebauthn/browser" "^13.3.0"
@@ -829,10 +829,10 @@
     "@noble/hashes" "^1.8.0"
     "@scure/base" "^1.2.6"
 
-"@orangecheck/design@^0.34.1":
-  version "0.34.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/design/-/design-0.34.1.tgz#6aaffca5584a2c680fd1ba6f0cd9d6786ffd4c56"
-  integrity sha512-b+hDlCtLA0+X0ZpcOX8GPocGe9D9+6j4Io0F0SEDe2I/R9fhveStEmGkPC7yw4VoEeMUcQABeL7rrUP7JlzOPg==
+"@orangecheck/design@^0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/design/-/design-0.35.0.tgz#93f262b8f57e9831c0b937b299bde6c9dc7c2b12"
+  integrity sha512-QUAapjJxrHtbbj8GBHxptUbaIhZ5icI8MC20qcTPxf4IzUIRWAoFJXV7vn6Zth2rdVHtUaCLMFlYd5YaTnI19Q==
   dependencies:
     "@radix-ui/react-accordion" "^1.2.12"
     "@radix-ui/react-checkbox" "^1"

@@ -159,8 +159,10 @@ const state = classifyState({
 const bond = await verifyBond({
     pledge,
     now: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
-    lookup: async (attestationId, nowIso) => {
-        // resolve the attestation against live chain state; null if not found
+    lookup: async (attestationId, nowIso, coverSats) => {
+        // resolve the attestation against live chain state; null if not found.
+        // days_unspent is the age of the coins covering coverSats (the pledge's
+        // min_sats), e.g. @orangecheck/sdk check({ id: attestationId, minSats: coverSats })
         return {
             address: swearer,
             sats_bonded: 1_500_000,

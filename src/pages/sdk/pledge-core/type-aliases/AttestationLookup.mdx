@@ -12,12 +12,12 @@ export const metadata = {
 # Type Alias: AttestationLookup
 
 ```ts
-type AttestationLookup = (attestationId: string, nowIso: string) => Promise<
+type AttestationLookup = (attestationId: string, nowIso: string, coverSats: number) => Promise<
   | AttestationLookupResult
 | null>;
 ```
 
-Defined in: [pledge-core/src/types.ts:520](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L520)
+Defined in: [pledge-core/src/types.ts:524](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L524)
 
 Caller-supplied lookup that resolves an OrangeCheck attestation id against
 live Bitcoin chain state. Returns null if the attestation can't be found.
@@ -32,6 +32,7 @@ bitcoind RPC, oc-attest sdk).
 | ------ | ------ |
 | `attestationId` | `string` |
 | `nowIso` | `string` |
+| `coverSats` | `number` |
 
 ## Returns
 

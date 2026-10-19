@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck Charter',
     description:
-        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — me.ochk.io, vault.ochk.io, and every protocol sibling.',
+        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — ochk.app, vault.ochk.io, and every protocol sibling.',
 };
 
 # Charter
@@ -14,10 +14,10 @@ publicly. The full text is committed to git so the diff is auditable; this page
 is the canonical published version.
 
 The charter binds the **whole company**. Every product that ships under the
-OrangeCheck name — `me.ochk.io`, `vault.ochk.io`, and every sibling protocol
-site (`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) — operates under
-these eight commitments. There is one charter, in one place, on docs.ochk.io.
-Product subdomains link here.
+OrangeCheck name — `ochk.app`, `vault.ochk.io`, and every sibling protocol site
+(`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) — operates under these
+eight commitments. There is one charter, in one place, on docs.ochk.io. Product
+subdomains link here.
 
 ## The eight commitments
 
@@ -34,16 +34,16 @@ custodial wallet you cannot graduate out of. On the protocol siblings, no
 custody — period. Bonded reputation is attestation-of-unspent: sats stay in the
 customer's own wallet, enforcement is by exposure, never by slashing.
 
-`me.ochk.io` is the one place this commitment has a stated exception, and it is
-a stage rather than a design. **During bring-up OrangeCheck holds what a user
+`ochk.app` is the one place this commitment has a stated exception, and it is a
+stage rather than a design. **During bring-up OrangeCheck holds what a user
 accrues there and is the party that moves it**, because it is operating every
 role in the system until independent operators take them. The design is
 federation custody — an M-of-N guardian set, OC holding no share — with
 self-custody graduation as a one-click path that keeps the same address and the
 same history. Neither is in force yet: no federation is bound, which is
 machine-readable at [`/api/federations`](https://me.ochk.io/api/federations) and
-stated in the present tense at [me.ochk.io/custody](https://me.ochk.io/custody).
-We say that here rather than in a footnote, because a charter that overstates is
+stated in the present tense at [ochk.app/custody](https://ochk.app/custody). We
+say that here rather than in a footnote, because a charter that overstates is
 worth less than one that names its own exception.
 
 ### 03 · The protocol stays open.
@@ -59,9 +59,9 @@ through an open PR. No private extensions, no closed conformance vectors.
 `attest.ochk.io`, `lock.ochk.io`, `vote.ochk.io`, `stamp.ochk.io`,
 `agent.ochk.io`, `pledge.ochk.io` — every sibling protocol site remains free,
 self-hostable, no-account public goods forever. The consumer commercial products
-(`me.ochk.io`, `vault.ochk.io`) are optional layers, never the only path to
-using the protocols. If we ever change this, the spec stewardship governance
-ratifies first.
+(`ochk.app`, `vault.ochk.io`) are optional layers, never the only path to using
+the protocols. If we ever change this, the spec stewardship governance ratifies
+first.
 
 ### 05 · Audit verifies without us.
 
@@ -81,7 +81,7 @@ real authority — which is human work being elevated, not erased.
 Lightning customers and sat-paid users are not a footnote. Every USD price is
 published with its sat equivalent on the same row. We do not surcharge
 Lightning, do not require fiat onramp, and do not treat sat-paid customers as a
-niche segment. On `me.ochk.io` specifically, every billable event has its gross
+niche segment. On `ochk.app` specifically, every billable event has its gross
 fee, OC platform fee, user cashback, and integrator rebate published in sats —
 USD shown alongside, never as the canonical unit.
 
@@ -95,12 +95,13 @@ review window, and a versioned re-ratification.
 
 ## How this applies per product
 
-- **`me.ochk.io`** — consumer commercial product. OrangeCheck-held during
-  bring-up; federation custody with self-custody graduation is the destination
-  (commitment 02). Three-class billable event taxonomy (A/B/C). Integrators set
-  every per-event price; OC retains a fixed 20% platform fee. Commitments **02**
-  (custody you can graduate out of), **05** (every billable envelope verifies
-  offline), and **07** (sats first-class) bind this product specifically.
+- **`ochk.app`** — consumer commercial product (its API is `me.ochk.io`).
+  OrangeCheck-held during bring-up; federation custody with self-custody
+  graduation is the destination (commitment 02). Three-class billable event
+  taxonomy (A/B/C). Integrators set every per-event price; OC retains a fixed
+  20% platform fee. Commitments **02** (custody you can graduate out of), **05**
+  (every billable envelope verifies offline), and **07** (sats first-class) bind
+  this product specifically.
 - **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
   secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
   name, type, or payload is ever readable server-side, and there is no recovery

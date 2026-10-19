@@ -868,7 +868,7 @@ export const DOCS_NAV: DocsSection[] = [
                 label: '@orangecheck/pledge-core',
                 blurb: 'OC Pledge canonical messages, envelope formats, state machine, bond verification.',
             },
-            // ── me (me.ochk.io consumer product) ───────────────────────
+            // ── me (orangecheck · ochk.app; API at me.ochk.io) ─────────
             {
                 href: '/sdk/me-client/README',
                 label: '@orangecheck/me-client',

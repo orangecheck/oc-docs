@@ -110,8 +110,8 @@ Every finished batch publishes a signed, content-addressed `oc-me-drop` manifest
   enumerable;
 - the sealed block height and its source are named.
 
-Render + live-verify at `me.ochk.io/verify/<manifest_id>`; raw canonical bytes
-at `me.ochk.io/api/envelope/<manifest_id>` (add `?format=wrapped` for a
+Render + live-verify at `ochk.app/verify/<manifest_id>`; raw canonical bytes at
+`me.ochk.io/api/envelope/<manifest_id>` (add `?format=wrapped` for a
 self-contained record). Signed-in earners fetch their inclusion proof from
 `GET /api/me/drops/proof?window_id=…`.
 

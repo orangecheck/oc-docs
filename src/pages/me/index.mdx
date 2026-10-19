@@ -9,8 +9,7 @@ export const metadata = {
 **One account, with Bitcoin behind it.** People sign in the way they already do
 (email, Google, GitHub or a Bitcoin wallet) and use the same account in every
 app that uses orangecheck. The product lives at [ochk.app](https://ochk.app).
-The API, the sign-in popup and the SDK talk to **me.ochk.io**, which also serves
-the product alongside ochk.app.
+The API, the sign-in popup and the SDK talk to **me.ochk.io**, the API host.
 
 | Sign in                   | Back it                                                          | Get paid                                                      | Own it                                             |
 | ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
@@ -64,8 +63,8 @@ testing. A federation is next, then keys the person holds. The live state is at
 - **Protocol contracts**: `oc-attest-protocol`, `oc-lock-protocol`,
   `oc-stamp-protocol`, `oc-agent-protocol`. The v1.2-draft-1 federation custody
   extension is at `oc-attest-protocol/FEDERATION-CUSTODY.md`.
-- **Apps**: `oc-app-web` (ochk.app) and `oc-me-web` (me.ochk.io, which also
-  serves the API).
+- **App**: `oc-app-web` (ochk.app). **API**: `oc-me-web` (me.ochk.io), which
+  also serves the sign-in popup.
 - **SDK**: `oc-packages/me-client`, published to npm as
   `@orangecheck/me-client`.
 - **Docs**: this section, in `oc-docs`.

@@ -20,8 +20,10 @@ rate-limited per IP per bucket; limits are returned in `X-RateLimit-*` headers.
 ## Sign-in endpoints (auth host · `https://ochk.io`)
 
 The session cookie is issued by the family auth host, not by me.ochk.io
-directly. me.ochk.io's `/signin` page calls these endpoints cross-origin with
-credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
+directly. The sign-in popup at `me.ochk.io/popup/signin` calls these endpoints
+cross-origin with credentials — they are CORS-allowed for any `*.ochk.io`
+browser origin. ochk.app, on its own domain, calls them without credentials and
+keeps the token they return in its own cookie.
 
 | Method | Path                         | Purpose                                                                |
 | ------ | ---------------------------- | ---------------------------------------------------------------------- |
@@ -33,7 +35,7 @@ credentials — they are CORS-allowed for any `*.ochk.io` browser origin.
 | `GET`  | `/api/auth/me`               | crypto-only identity lookup; 401 otherwise                             |
 
 > See
-> [`oc-me-web/src/pages/signin.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/pages/signin.tsx)
+> [`oc-me-web/src/pages/popup/signin.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/pages/popup/signin.tsx)
 > for the canonical client implementation against these endpoints.
 
 ## Public endpoints

@@ -1,14 +1,14 @@
 export const metadata = {
     title: 'orangecheck · Operator Program',
     description:
-        'How to apply, get accepted, and run a guardian for the me.ochk.io federation pool. Lifecycle in-browser via me.ochk.io/me/operator; bypass parity via the oc-guardian-kit CLI.',
+        'How to apply, get accepted, and run a guardian for the orangecheck federation pool. Lifecycle in-browser via ochk.app/me/operator; bypass parity via the oc-guardian-kit CLI.',
 };
 
 # orangecheck · Operator Program
 
 **Run a guardian. Earn sats. Hold the key.**
 
-The me.ochk.io federation pool is operated by independent **guardians** — one
+The orangecheck federation pool is operated by independent **guardians** — one
 keypair per operator, threshold-signing federation actions in concert with
 peers. OC the company is not a guardian; we recruit, vet, and pay guardians, but
 every signing key is operator-held and every commitment is operator- signed. The
@@ -18,11 +18,11 @@ the hostname.
 
 This page is the program overview. Two paths into it:
 
-- **[Apply via me.ochk.io](https://me.ochk.io/me/operator)** — sign in, generate
-  or import an operator key, fill the application form, sign + submit
-  in-browser. The whole lifecycle (key custody, application, charter
-  ratification, ceremonies, incident publishing) runs in the portal without ever
-  touching a CLI.
+- **[Apply via ochk.app](https://ochk.app/me/operator)** — sign in, generate or
+  import an operator key, fill the application form, sign + submit in-browser.
+  The whole lifecycle (key custody, application, charter ratification,
+  ceremonies, incident publishing) runs in the portal without ever touching a
+  CLI.
 - **[Apply via the kit](https://github.com/orangecheck/oc-guardian-kit)** —
   `oc-guardian init` on a server you control, fill the questionnaire, run
   `oc-guardian apply prepare`, email `application.json` to apply@ochk.io. Bypass
@@ -30,13 +30,13 @@ This page is the program overview. Two paths into it:
 
 ## Lifecycle
 
-| Stage           | What happens                                                                                                                                                                                                     | Where                                                                            |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| **identity**    | Generate (or import) an Ed25519 operator keypair. Browser stores it in IndexedDB; kit stores it in OS keychain. Backup is a 24-word BIP-39 mnemonic.                                                             | [me.ochk.io/me/operator](https://me.ochk.io/me/operator)                         |
-| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). Browser hashes the answers, signs a `program-apply` envelope, posts to `/api/operator/applications`.                                 | Portal or kit                                                                    |
-| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                     | Reviewer side                                                                    |
-| **federation**  | Pick a federation slot from the directory and ratify its charter. Charter ratification is a `charter-sign` envelope under your operator key.                                                                     | [me.ochk.io/me/operator/federations](https://me.ochk.io/me/operator/federations) |
-| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`). | Portal + binary                                                                  |
+| Stage           | What happens                                                                                                                                                                                                     | Where                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **identity**    | Generate (or import) an Ed25519 operator keypair. Browser stores it in IndexedDB; kit stores it in OS keychain. Backup is a 24-word BIP-39 mnemonic.                                                             | [ochk.app/me/operator](https://ochk.app/me/operator)                         |
+| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). Browser hashes the answers, signs a `program-apply` envelope, posts to `/api/operator/applications`.                                 | Portal or kit                                                                |
+| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                     | Reviewer side                                                                |
+| **federation**  | Pick a federation slot from the directory and ratify its charter. Charter ratification is a `charter-sign` envelope under your operator key.                                                                     | [ochk.app/me/operator/federations](https://ochk.app/me/operator/federations) |
+| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`). | Portal + binary                                                              |
 
 ## Two ways to run the guardian binary
 
@@ -94,5 +94,4 @@ These are non-negotiable. Anything that violates them is a bug.
 - Operational questions: apply@ochk.io
 - Technical bugs: file an issue on
   [oc-guardian-kit](https://github.com/orangecheck/oc-guardian-kit)
-- Open chat: the OC public Telegram (link in the footer of
-  [me.ochk.io](https://me.ochk.io))
+- Anything else: [ochk.app/contact](https://ochk.app/contact)

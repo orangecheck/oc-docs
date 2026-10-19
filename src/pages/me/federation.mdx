@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'orangecheck · Federation custody',
     description:
-        'The design for Fedimint federation-held wallets on me.ochk.io · the charter · how to verify guardians · how graduation works. Not live yet: OrangeCheck holds user balances during bring-up.',
+        'The design for Fedimint federation-held wallets on ochk.app · the charter · how to verify guardians · how graduation works. Not live yet: OrangeCheck holds user balances during bring-up.',
 };
 
 # orangecheck · Federation custody
@@ -13,10 +13,10 @@ export const metadata = {
 > accrued balance and is the party that moves it.** That is a stage,
 > deliberately: OrangeCheck operates every role until independent operators take
 > them. Read the rest of this page as the destination, and
-> [me.ochk.io/custody](https://me.ochk.io/custody) as the present tense.
+> [ochk.app/custody](https://ochk.app/custody) as the present tense.
 
 **OC the company is not designed to be your custodian.** The design is that when
-you sign up to me.ochk.io with email-OTP, the wallet attached to your account is
+you sign up to ochk.app with email-OTP, the wallet attached to your account is
 held by a **Fedimint federation** — an M-of-N set of operationally-independent
 guardians that threshold-sign withdrawals together. OC integrates as a _client_
 of that federation, never as a guardian: zero key shares, no way to reach the
@@ -68,22 +68,22 @@ Once a federation is bound, the charter (with all of the above disclosed) is
 published in three places:
 
 1. The federation's own site / status page.
-2. me.ochk.io's [`/custody`](https://me.ochk.io/custody) page, including the
-   SHA-256 hash of the charter so you can verify the copy you read against the
-   one OC bound.
+2. ochk.app's [`/custody`](https://ochk.app/custody) page, including the SHA-256
+   hash of the charter so you can verify the copy you read against the one OC
+   bound.
 3. The operator runbook deploy log (so the bind operation is auditable after the
    fact).
 
 Hash mismatch between any of those three is a red flag. If the federation amends
-its charter without re-publishing the new hash on me.ochk.io, file an issue at
+its charter without re-publishing the new hash on ochk.app, file an issue at
 [github.com/orangecheck/oc-me-web/issues](https://github.com/orangecheck/oc-me-web/issues).
 
 ## Provisioning ceremony (what your browser does)
 
 When you sign up via email-OTP:
 
-1. me.ochk.io reads `NEXT_PUBLIC_FEDIMINT_FEDERATION_INVITE` and renders the
-   wallet ceremony at [`/me/wallet`](https://me.ochk.io/me/wallet).
+1. The app reads the federation's public invite and renders the wallet ceremony
+   on [`/me/balance`](https://ochk.app/me/balance).
 2. Your browser lazy-loads `@fedimint/core` (a WASM module) and
    `@fedimint/transport-web`. Code arrives via the standard Vercel CDN over
    HTTPS.
@@ -108,7 +108,7 @@ indefinitely without affecting your ability to withdraw or send.
 If `(N - threshold + 1)` guardians go down at once, the federation itself can't
 reach threshold and withdrawals pause until guardians are restored. This is the
 federation's responsibility to communicate; OC mirrors the federation's status
-page on [`/custody`](https://me.ochk.io/custody).
+page on [`/custody`](https://ochk.app/custody).
 
 ## What if OC sunsets?
 
@@ -118,16 +118,16 @@ Per the charter's exit clause:
   Fedimint-compatible client. OC's UI is convenience, not custody.
 - On-chain withdrawal does not require OC's services to be online — the
   federation's threshold-signing flow is independent of OC.
-- You will be able to graduate to a self-custody Bitcoin wallet from
-  [`/me/graduate`](https://me.ochk.io/me/graduate). That page states today what
-  it can and cannot do; the sweep opens when a federation binds.
+- You will be able to move to a self-custody Bitcoin wallet from
+  [`/me/balance`](https://ochk.app/me/balance#own-keys). That page states today
+  what it can and cannot do; the sweep opens when a federation binds.
 - If you'd rather pick a different federation, any Fedimint client can join it;
   your sats migrate via standard Fedimint cross-federation flow.
 
 ## Graduating to self-custody
 
 Not live — there is no federation balance to sweep. When one is bound,
-[`/me/graduate`](https://me.ochk.io/me/graduate) walks you through:
+[`/me/balance`](https://ochk.app/me/balance#own-keys) walks you through:
 
 1. Choose a destination — your own BIP-322-compatible Bitcoin wallet, or a
    different Fedimint federation.

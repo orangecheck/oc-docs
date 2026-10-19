@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC-Me Federation v1 — Charter',
     description:
-        'The charter text for OC-Me Federation v1 — the Fedimint federation designed to back me.ochk.io wallets. No federation runs under it today. Guardians would sign the SHA-256 of its canonical bytes; users would verify that hash against /custody.',
+        'The charter text for OC-Me Federation v1 — the Fedimint federation designed to hold ochk.app balances. No federation runs under it today. Guardians would sign the SHA-256 of its canonical bytes; users would verify that hash against /custody.',
 };
 
 # OC-Me Federation v1 — Charter
@@ -14,14 +14,14 @@ export const metadata = {
 
 **Charter text v1.0.0 · 2026-05-12.**
 
-This is the charter for the Fedimint federation designed to back
-[`me.ochk.io`](https://me.ochk.io) wallets. Each guardian operator would sign
-the SHA-256 of this document's canonical bytes (the
+This is the charter for the Fedimint federation designed to hold
+[`ochk.app`](https://ochk.app) balances. Each guardian operator would sign the
+SHA-256 of this document's canonical bytes (the
 [Canonical bytes](#canonical-bytes) section below) with a hardware-backed
 Ed25519 operator key. Those signatures would appear on
-[me.ochk.io/me/operator/ceremonies](https://me.ochk.io/me/operator/ceremonies)
-and the per-federation view at
-[me.ochk.io/federations/oc-me-v1](https://me.ochk.io/federations/oc-me-v1).
+[ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) and
+the per-federation view at
+[ochk.app/federations/oc-me-v1](https://ochk.app/federations/oc-me-v1).
 
 This charter binds the **federation**, not OrangeCheck the company. OC operates
 under the [company-wide charter](/charter); this document is downstream of it
@@ -67,9 +67,8 @@ Each guardian operator publishes:
 - a public security-disclosure contact
 - any conflicts of interest
 
-These disclosures appear on
-[me.ochk.io/transparency](https://me.ochk.io/transparency) (the marketplace) and
-on the per-federation deep-view.
+These disclosures appear on [ochk.app/trust](https://ochk.app/trust#numbers)
+(the marketplace) and on the per-federation deep-view.
 
 ## 4. OrangeCheck's role
 
@@ -77,9 +76,9 @@ OrangeCheck the company is a **client** of this federation, not a guardian. OC
 holds zero key shares and cannot reach the threshold by itself, alone or with
 any subset of guardians the company has not formally accepted into the operator
 program. The company never asks operators to sign envelopes on its behalf, and
-the operator portal (`me.ochk.io/me/operator`) is incapable of producing
-operator signatures — every state-changing action requires the operator's
-hardware-key signature, which the portal cannot forge.
+the operator portal (`ochk.app/me/operator`) is incapable of producing operator
+signatures — every state-changing action requires the operator's hardware-key
+signature, which the portal cannot forge.
 
 ## 5. Lightning gateway disclosure
 
@@ -123,10 +122,10 @@ version with their hardware-backed operator keys. The new SHA-256 hash replaces
 the prior version at this URL and on the federation registry. Users are notified
 via:
 
-- the [me.ochk.io/changelog](https://me.ochk.io/changelog) entry
-- per-user [me.ochk.io/me/notifications](https://me.ochk.io/me/notifications) if
+- the [ochk.app/changelog](https://ochk.app/changelog) entry
+- per-user [alerts on ochk.app](https://ochk.app/me/activity?alerts=open) if
   they have a wallet provisioned against this federation
-- the operator [incidents feed](https://me.ochk.io/me/operator/incidents)
+- the operator [incidents feed](https://ochk.app/me/operator/incidents)
 
 Amendments that materially change the federation's operational posture
 (threshold, target guardian count, fee structure, exit clause) require the

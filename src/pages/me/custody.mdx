@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'orangecheck · Custody contract',
     description:
-        'Federation custody descriptor schema, M-of-N graduation envelopes, guardian rotation. Maps the v1.2-draft-1 oc-attest extension to the me.ochk.io product surface. Not live yet: no federation is bound and OrangeCheck holds user balances during bring-up.',
+        'Federation custody descriptor schema, M-of-N graduation envelopes, guardian rotation. Maps the v1.2-draft-1 oc-attest extension to the ochk.app product surface. Not live yet: no federation is bound and OrangeCheck holds user balances during bring-up.',
 };
 
 # orangecheck · Custody contract
@@ -14,9 +14,9 @@ export const metadata = {
 > deliberately: OrangeCheck operates every role until independent operators take
 > them. Read the descriptor schema, graduation envelope and rotation rules below
 > as the contract that comes into force when a federation binds, and
-> [me.ochk.io/custody](https://me.ochk.io/custody) as the present tense.
+> [ochk.app/custody](https://ochk.app/custody) as the present tense.
 
-**me.ochk.io is designed to be federation-custodied by default, with a
+**ochk.app is designed to be federation-custodied by default, with a
 self-custody graduation flow on demand.** This page is the user-facing
 explanation; the protocol-level contract is at
 [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
@@ -31,7 +31,7 @@ walks the gap with file paths.
 
 ## What "federation-custodied" will mean
 
-Once a federation is bound, your me.ochk.io identity is backed by a Bitcoin
+Once a federation is bound, your orangecheck account is backed by a Bitcoin
 address (BIP-322 path) or a federation-issued ecash note set (email-OTP path).
 For the federation path, the private key that controls the underlying on-chain
 UTXOs is held collectively by an M-of-N guardian set — no single guardian (and
@@ -88,9 +88,9 @@ at a specific time.
 | `graduated_at`    | ISO-8601 timestamp; the OTS proof anchors this to a Bitcoin block.                         |
 
 The envelope contract is finalized at the spec level and reflected in the
-[`/me/graduate`](https://me.ochk.io/me/graduate) UI, which states today what it
-can and cannot do. The producing path — collecting a quorum signature from a
-real federation — opens when a federation binds.
+[`/me/balance`](https://ochk.app/me/balance#own-keys) UI, which states today
+what it can and cannot do. The producing path — collecting a quorum signature
+from a real federation — opens when a federation binds.
 
 ## Guardian descriptor
 
@@ -146,8 +146,9 @@ descriptor at any historical instant.
   — sibling federation principal extension for delegations
 - [`oc-me-web/NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
   — the in-tree audit · what's actually wired today vs the contract above
-- [me.ochk.io/custody](https://me.ochk.io/custody) — product expression of this
+- [ochk.app/custody](https://ochk.app/custody) — product expression of this
   contract with live status pills per state
-- [me.ochk.io/security](https://me.ochk.io/security) — the OC_STORES table,
+- [ochk.app/security](https://ochk.app/security) — the OC_STORES table,
   disappearance scenarios, recovery matrix per signin path
-- [me.ochk.io/me/graduate](https://me.ochk.io/me/graduate) — the graduation flow
+- [ochk.app/me/balance](https://ochk.app/me/balance#own-keys) — the move to your
+  own keys

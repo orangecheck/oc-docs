@@ -13,11 +13,11 @@ endpoints use the same auth scheme name (`cookieAuth`) everywhere.
 
 ## Currently shipped
 
-| Product       | Subdomain                                  | OpenAPI spec                                       | Interactive explorer                                 |
-| ------------- | ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
-| **Auth host** | [`ochk.io`](https://ochk.io)               | [/api/openapi](https://ochk.io/api/openapi)        | [/api-explorer](https://ochk.io/api-explorer)        |
-| **OC Attest** | [`attest.ochk.io`](https://attest.ochk.io) | [/api/openapi](https://attest.ochk.io/api/openapi) | [/api-explorer](https://attest.ochk.io/api-explorer) |
-| **Me**        | [`me.ochk.io`](https://me.ochk.io)         | [/api/openapi](https://me.ochk.io/api/openapi)     | inline at [/me](/me)                                 |
+| Product                    | Subdomain                                  | OpenAPI spec                                       | Interactive explorer                                 |
+| -------------------------- | ------------------------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
+| **Auth host**              | [`ochk.io`](https://ochk.io)               | [/api/openapi](https://ochk.io/api/openapi)        | [/api-explorer](https://ochk.io/api-explorer)        |
+| **OC Attest**              | [`attest.ochk.io`](https://attest.ochk.io) | [/api/openapi](https://attest.ochk.io/api/openapi) | [/api-explorer](https://attest.ochk.io/api-explorer) |
+| **orangecheck** (ochk.app) | `me.ochk.io`                               | [/api/openapi](https://me.ochk.io/api/openapi)     | [HTTP API page](/me/api)                             |
 
 The narrowed product pages (linked in the sidebar under this group) embed the
 same spec rendered inline + cross-link to the live explorer.
@@ -72,7 +72,7 @@ a `Retry-After` header.
 ## Generating clients
 
 Each spec is canonical OpenAPI 3.1 — works with every standard generator.
-Example: a Python client for the Me API:
+Example: a Python client for the orangecheck API:
 
 ```bash
 openapi-generator-cli generate \

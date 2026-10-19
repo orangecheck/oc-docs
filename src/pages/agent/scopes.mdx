@@ -36,16 +36,21 @@ takes no value.
 
 Implementations MUST accept these products and verbs.
 
-| Scope           | Registered keys                                |
-| --------------- | ---------------------------------------------- |
-| `lock:seal`     | `recipient`, `mime`, `max_bytes`               |
-| `lock:chat`     | `recipient`, `max_bytes_per_msg`, `max_msgs`   |
-| `stamp:sign`    | `mime`, `max_bytes`, `content_hash_prefix`     |
-| `vote:cast`     | `poll_id`, `choice`                            |
-| `nostr:publish` | `kind`, `relay`, `max_bytes`                   |
-| `http:request`  | `origin`, `method`, `max_rps`, `max_bytes_out` |
-| `ln:send`       | `max_sats`, `node`, `max_fee_sats`             |
-| `mcp:invoke`    | `server`, `tool`, `max_invocations`            |
+| Scope             | Registered keys                                 |
+| ----------------- | ----------------------------------------------- |
+| `lock:seal`       | `recipient`, `mime`, `max_bytes`                |
+| `lock:chat`       | `recipient`, `max_bytes_per_msg`, `max_msgs`    |
+| `stamp:sign`      | `mime`, `max_bytes`, `content_hash_prefix`      |
+| `vote:cast`       | `poll_id`, `choice`                             |
+| `nostr:publish`   | `kind`, `relay`, `max_bytes`                    |
+| `http:request`    | `origin`, `method`, `max_rps`, `max_bytes_out`  |
+| `ln:send`         | `max_sats`, `node`, `max_fee_sats`              |
+| `mcp:invoke`      | `server`, `tool`, `max_invocations`             |
+| `pledge:create`   | `max_bond_sats`, `mechanism`, `counterparty`    |
+| `anthropic:tool`  | `name` (case-sensitive), from `agent-anthropic` |
+| `openai:function` | `name` (case-sensitive), from `agent-openai`    |
+| `vercel:tool`     | `verb` (case-sensitive), from `agent-vercel`    |
+| `langgraph:tool`  | `verb` (case-sensitive), from `agent-langgraph` |
 
 In **strict mode** (default), verifiers reject unknown products / verbs /
 constraint keys. In **permissive mode**, verifiers accept unknowns but never

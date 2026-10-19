@@ -86,8 +86,10 @@ constraint    := key op value
 op            := "=" | "!=" | "<" | "<=" | ">" | ">=" | "*"
 ```
 
-MVP registry: `lock:seal`, `lock:chat`, `stamp:sign`, `vote:cast`,
-`nostr:publish`, `http:request`, `ln:send`, `mcp:invoke`.
+Registry: `lock:seal`, `lock:chat`, `stamp:sign`, `vote:cast`, `nostr:publish`,
+`http:request`, `ln:send`, `mcp:invoke`, `pledge:create`, and the adapter scopes
+`anthropic:tool`, `openai:function`, `vercel:tool` and `langgraph:tool`. Keys
+per scope are on [Scopes](/agent/scopes).
 
 ## Verification algorithm (§SPEC 8)
 

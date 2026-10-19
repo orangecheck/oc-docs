@@ -46,13 +46,11 @@ keeps the token they return in its own cookie.
 | `GET`  | `/api/health/deep`                     | dependency probe                                        |
 | `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event            |
 | `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
-| `GET`  | `/api/checkout/lightning/[hash]`       | invoice status by `payment_hash`                        |
 | `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
 | `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
 | `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                   |
 | `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
-| `POST` | `/api/checkout/lightning`              | generate a BOLT-11 invoice (rate-limited 60/min)        |
 | `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
 ## Authenticated endpoints (oc_session required)
@@ -64,16 +62,13 @@ keeps the token they return in its own cookie.
 > `oc_session` cookie, so it forwards the popup-issued JWT instead. The
 > remaining endpoints in this section require the cookie.
 
-| Method | Path                     | Purpose                                                          |
-| ------ | ------------------------ | ---------------------------------------------------------------- |
-| `GET`  | `/api/auth/me`           | crypto-only identity lookup; 401 otherwise                       |
-| `GET`  | `/api/me/profile`        | profile + onboarding state                                       |
-| `GET`  | `/api/me/balance`        | sat balance + last-7d aggregate + by-class breakdown             |
-| `GET`  | `/api/me/sites`          | list of sites the identity has signed in to                      |
-| `GET`  | `/api/me/sites/[domain]` | per-site activity + IntegratorPriceConfig                        |
-| `GET`  | `/api/me/notifications`  | notifications feed                                               |
-| `POST` | `/api/me/notifications`  | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
-| `GET`  | `/api/me/export`         | GDPR-style account dump · downloadable JSON                      |
+| Method | Path                    | Purpose                                                          |
+| ------ | ----------------------- | ---------------------------------------------------------------- |
+| `GET`  | `/api/auth/me`          | crypto-only identity lookup; 401 otherwise                       |
+| `GET`  | `/api/me/balance`       | sat balance + last-7d aggregate + by-class breakdown             |
+| `GET`  | `/api/me/notifications` | notifications feed                                               |
+| `POST` | `/api/me/notifications` | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
+| `GET`  | `/api/me/export`        | GDPR-style account dump · downloadable JSON                      |
 
 ## Authenticated · sessions (Per session)
 
@@ -160,8 +155,6 @@ rate-limit responses include a `Retry-After` header in seconds.
 | `integrator.event`          | 120   | 60s    |
 | `payment.authorize`         | 30    | 60s    |
 | `wallet.send`               | 30    | 60s    |
-| `checkout.lightning`        | 60    | 60s    |
-| `me.attest-tier`            | 5     | 60s    |
 | `webhooks.register`         | 10    | 60s    |
 | `projects.test-fire`        | 20    | 60s    |
 | `developer.projects.create` | 5     | 60s    |

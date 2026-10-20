@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Function: returnToHere()",
+    description: "Auto-generated API reference for Function: returnToHere(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / returnToHere
+
+# Function: returnToHere()
+
+```ts
+function returnToHere(): string;
+```
+
+Defined in: [return-to.ts:73](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/return-to.ts#L73)
+
+This page as a return address: its path and query, never its fragment,
+which is kept and restored on return. For a site that builds
+`/signin?return_to=` itself:
+
+  `/signin?return_to=${encodeURIComponent(returnToHere())}`
+
+## Returns
+
+`string`

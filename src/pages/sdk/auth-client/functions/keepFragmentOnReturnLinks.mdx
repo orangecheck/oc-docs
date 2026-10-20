@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Function: keepFragmentOnReturnLinks()",
+    description: "Auto-generated API reference for Function: keepFragmentOnReturnLinks(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / keepFragmentOnReturnLinks
+
+# Function: keepFragmentOnReturnLinks()
+
+```ts
+function keepFragmentOnReturnLinks(): () => void;
+```
+
+Defined in: [return-to.ts:85](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/return-to.ts#L85)
+
+Keep this page's fragment when a link that names this page as its
+`return_to` is followed: the session's signInUrl, an add-account link, a
+site's own `/signin?return_to=` link. Installed by OcSessionProvider;
+returns the uninstaller.
+
+## Returns
+
+() => `void`

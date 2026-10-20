@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: withoutFragment()",
+    description: "Auto-generated API reference for Function: withoutFragment(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / withoutFragment
+
+# Function: withoutFragment()
+
+```ts
+function withoutFragment(target: string): string;
+```
+
+Defined in: [return-to.ts:54](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/return-to.ts#L54)
+
+`target` without its fragment, for a browser about to leave for it. A
+fragment on a same-origin target is kept for [restoreReturnFragment](restoreReturnFragment).
+Safe on the server, where it only cuts the fragment off.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `target` | `string` |
+
+## Returns
+
+`string`

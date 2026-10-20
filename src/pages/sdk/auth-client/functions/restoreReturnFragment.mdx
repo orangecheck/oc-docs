@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Function: restoreReturnFragment()",
+    description: "Auto-generated API reference for Function: restoreReturnFragment(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / restoreReturnFragment
+
+# Function: restoreReturnFragment()
+
+```ts
+function restoreReturnFragment(): boolean;
+```
+
+Defined in: [return-to.ts:118](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/return-to.ts#L118)
+
+Put back the fragment a return address left behind, if the browser has
+just landed on its path with no fragment of its own. Used once, then gone.
+OcSessionProvider calls this before its children render; returns whether a
+fragment was restored.
+
+## Returns
+
+`boolean`

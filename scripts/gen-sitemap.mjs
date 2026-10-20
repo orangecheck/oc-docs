@@ -6,7 +6,7 @@
 //     always-today lastmod gets the whole site's freshness signal discounted.
 //     We derive it from the git commit that last touched each page's source,
 //     and OMIT lastmod when git can't tell us (omit > a fabricated date).
-//   - same-host URLs only. No cross-domain <loc> (docs lives on docs.ochk.io).
+//   - same-host URLs only. No cross-domain <loc> (docs lives at ochk.io/docs).
 //
 // Routes are auto-enumerated from src/pages so the sitemap can never drift out
 // of sync with the actual page tree. A route is included iff it is a static
@@ -22,7 +22,7 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 // ── Per-site config (the ONLY part that differs across the family) ──────────
-const SITE_URL = 'https://docs.ochk.io';
+const SITE_URL = 'https://ochk.io/docs'; // basePath site: the root is /docs, no slash
 const EXCLUDE = []; // docs is fully public; only 404 (excluded by name) is noindexed
 // ───────────────────────────────────────────────────────────────────────────
 
@@ -109,7 +109,7 @@ function main() {
 
     const body = urls
         .map(({ route, lastmod }) => {
-            const loc = `${SITE_URL}${route === '/' ? '/' : route}`;
+            const loc = `${SITE_URL}${route === '/' ? '' : route}`;
             const lm = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : '';
             return `  <url>\n    <loc>${loc}</loc>${lm}\n  </url>`;
         })
@@ -134,6 +134,6 @@ try {
     console.warn(`[gen-sitemap] fell back to root-only sitemap: ${err?.message ?? err}`);
     writeFileSync(
         OUT,
-        `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${SITE_URL}/</loc>\n  </url>\n</urlset>\n`
+        `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${SITE_URL}</loc>\n  </url>\n</urlset>\n`
     );
 }

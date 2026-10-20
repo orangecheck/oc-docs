@@ -1,7 +1,8 @@
 /**
- * SEO utilities for docs.ochk.io — mirrors ochk.io's shape so tooling and
+ * SEO utilities for ochk.io/docs — mirrors ochk.io's shape so tooling and
  * social-card tests work identically.
  */
+import { SITE_CONFIG } from '@/lib/site.config';
 
 export interface SEOConfig {
     title?: string;
@@ -13,7 +14,7 @@ export interface SEOConfig {
     keywords?: string[];
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://docs.ochk.io';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.siteUrl;
 const SITE_NAME = 'OrangeCheck docs';
 const DEFAULT_TITLE = 'OrangeCheck documentation';
 const DEFAULT_DESCRIPTION =

@@ -32,7 +32,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const PAGES = 'src/pages';
-const SITE = process.env.OC_DOCS_SITE ?? 'https://docs.ochk.io';
+const SITE = process.env.OC_DOCS_SITE ?? 'https://ochk.io/docs';
 const TIMEOUT_MS = 20_000;
 
 /** URLs that are SUPPOSED to fail — illustrative, not navigational. */

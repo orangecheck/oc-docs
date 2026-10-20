@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { ImageResponse } from 'next/og';
 
 /**
- * Dynamic OG image endpoint for docs.ochk.io. 1200×630 PNG.
+ * Dynamic OG image endpoint for ochk.io/docs. 1200×630 PNG.
  * Engineer-variant tagline — names the technical foundation
  * (BIP-322 + Nostr kind-30078 + OpenTimestamps) since the docs
  * hub's reader is more often a developer than a stranger.
@@ -45,7 +45,7 @@ async function render() {
                 }}
             >
                 <span style={{ opacity: 0.5, marginRight: 12 }}>{'>_'}</span>
-                <span>docs.ochk.io</span>
+                <span>ochk.io/docs</span>
             </div>
 
             {/* book/braces mark */}

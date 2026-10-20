@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://docs.ochk.io/sitemap.xml
+Sitemap: https://ochk.io/docs/sitemap.xml

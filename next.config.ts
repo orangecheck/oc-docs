@@ -4,6 +4,7 @@ import createMDX from '@next/mdx';
 import rehypeSlug from 'rehype-slug';
 
 import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
+import { SITE_CONFIG } from './src/lib/site.config';
 
 // Surface the running build in the OcAccountMenu BuildFooter.
 // VERCEL_GIT_COMMIT_SHA is populated automatically on every Vercel deploy;
@@ -13,8 +14,13 @@ const pkg = require('./package.json') as { version: string };
 const BUILD_SHA = (process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7);
 const isDev = process.env.NODE_ENV !== 'production';
 
+// The old host. Every address on it moves to the same path under ochk.io/docs.
+const OLD_HOST = [{ type: 'host' as const, value: 'docs.ochk.io' }];
+
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+
+    basePath: SITE_CONFIG.basePath,
 
     // @orangecheck/ui + @orangecheck/design ship ESM bundles with `import
     // 'next/link'`; without transpile next's bare-specifier resolution fails
@@ -36,6 +42,31 @@ const nextConfig: NextConfig = {
      */
     async redirects() {
         return [
+            // docs.ochk.io → ochk.io/docs, one hop, query kept. basePath:false
+            // matches the old host's paths as they arrive (no /docs prefix).
+            // The root has its own rule so it lands on /docs, not /docs/.
+            // security.txt belongs at the host root, so it goes to ochk.io's.
+            {
+                source: '/.well-known/security.txt',
+                has: OLD_HOST,
+                destination: 'https://ochk.io/.well-known/security.txt',
+                basePath: false,
+                permanent: true,
+            },
+            {
+                source: '/',
+                has: OLD_HOST,
+                destination: SITE_CONFIG.siteUrl,
+                basePath: false,
+                permanent: true,
+            },
+            {
+                source: '/:path+',
+                has: OLD_HOST,
+                destination: `${SITE_CONFIG.siteUrl}/:path+`,
+                basePath: false,
+                permanent: true,
+            },
             { source: '/sdks', destination: '/sdk', permanent: true },
             {
                 source: '/sdks/javascript',
@@ -78,7 +109,8 @@ const nextConfig: NextConfig = {
     async rewrites() {
         return [
             // Plausible proxied first-party (paths mirror the
-            // NEXT_PUBLIC_PLAUSIBLE_SRC / _API defaults in _document.tsx).
+            // NEXT_PUBLIC_PLAUSIBLE_SRC / _API defaults in _document.tsx;
+            // basePath applies, so they answer under /docs).
             // Loading same-origin keeps the script + events off ad-blocker
             // blocklists, which is what threw ERR_BLOCKED_BY_CLIENT.
             {

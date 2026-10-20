@@ -8,7 +8,10 @@ import type { EcosystemSlug, OcAccountMenuItem, SiteState } from '@orangecheck/d
  */
 export const SITE_CONFIG = {
     slug: 'docs' satisfies EcosystemSlug,
-    hostname: 'docs.ochk.io',
+    hostname: 'ochk.io',
+    // Served at ochk.io/docs: ochk.io rewrites /docs/* to this deployment.
+    basePath: '/docs',
+    siteUrl: 'https://ochk.io/docs',
     state: 'live' satisfies SiteState,
     github: 'orangecheck/oc-docs',
     accountMenuItems: [] satisfies ReadonlyArray<OcAccountMenuItem>,

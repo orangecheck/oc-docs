@@ -5,7 +5,7 @@ import { OcAccountMenu } from '@orangecheck/design';
 import { SITE_CONFIG } from '@/lib/site.config';
 
 /**
- * Family-consistent account slot for docs.ochk.io. There's no local
+ * Family-consistent account slot for ochk.io/docs. There's no local
  * `/signin` on docs — it's pure read-only content — so the sign-in
  * affordance points at the auth host. Everything else is shared via
  * `<OcAccountMenu>`.

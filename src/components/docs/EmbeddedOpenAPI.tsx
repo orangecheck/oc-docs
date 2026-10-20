@@ -9,7 +9,7 @@
  * Why inline instead of "go visit the live explorer":
  *   The MDX pages already explain the surface in prose; the embedded UI
  *   gives readers Try-it-out + per-endpoint deep-link without leaving
- *   docs.ochk.io. The explorer at the product's own /api-explorer is
+ *   ochk.io/docs. The explorer at the product's own /api-explorer is
  *   still the canonical surface (cookie auth flows there); this is a
  *   reading-friendly mirror.
  */

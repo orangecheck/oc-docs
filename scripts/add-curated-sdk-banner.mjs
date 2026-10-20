@@ -54,7 +54,7 @@ for (const { file, pkg } of TARGETS) {
 
     const banner = [
         '',
-        `> **Full reference:** [docs.ochk.io/sdk/${pkg}](/sdk/${pkg}) — auto-generated from the TypeScript source on every release.`,
+        `> **Full reference:** [ochk.io/docs/sdk/${pkg}](/sdk/${pkg}) — auto-generated from the TypeScript source on every release.`,
         '> The narrative below is the curated overview; the SDK reference page is the source of truth for every export, type, and signature.',
         '',
     ];

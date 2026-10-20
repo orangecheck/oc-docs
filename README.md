@@ -1,6 +1,8 @@
 # oc-docs
 
-**`docs.ochk.io`** — unified documentation for the OrangeCheck ecosystem.
+**`ochk.io/docs`** — unified documentation for the OrangeCheck ecosystem.
+This deployment sets `basePath: '/docs'` and ochk.io rewrites `/docs/*` to it.
+Every `docs.ochk.io` address 308s to the same path under `ochk.io/docs`.
 
 One site, every protocol — six verbs of sovereign sociality:
 
@@ -26,7 +28,7 @@ written once and cross-linked everywhere — no per-protocol duplication.
 
 ```bash
 yarn install
-yarn dev      # http://localhost:3000
+yarn dev      # http://localhost:3000/docs
 yarn build    # static production build
 yarn check    # type-check + lint + format
 ```

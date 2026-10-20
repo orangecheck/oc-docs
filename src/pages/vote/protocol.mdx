@@ -12,15 +12,15 @@ realistic addresses and block heights.
 ## mental model
 
 ```mermaid
-flowchart LR
+flowchart TB
     C["Creator"] -->|signs poll · BIP-322<br/>publishes kind 30080| N[("Nostr directory<br/>30080 poll<br/>30081 ballot<br/>30082 reveal")]
-    V["Voters<br/>A · B · C"] -->|signs ballot · BIP-322<br/>publishes kind 30081<br/>(replaceable per voter)| N
+    V["Voters<br/>A · B · C"] -->|"signs ballot · BIP-322<br/>publishes kind 30081<br/>(replaceable per voter)"| N
     N -->|anyone pulls| O["Observer / tallier"]
     U[("UTXO state<br/>at snapshot block")] --> T
     O --> T["Deterministic tally"]
 
-    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
-    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    classDef base stroke:#f66d36,stroke-width:2px;
+    classDef store stroke-width:1px;
     class C,V,O,T base;
     class N,U store;
 ```

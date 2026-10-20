@@ -72,7 +72,7 @@ they do not enter the `id`.
 ### Why this matters — the re-wrap path
 
 ```mermaid
-graph LR
+graph TB
   S["sender seals<br/>content_key → beacon"] -->|"id, sig, tag fixed"| H["holder /<br/>beacon"]
   H -->|"re-wrap recipients[]"| R["recipient<br/>merges detached entry"]
   R -->|"same id, same tag"| V["decrypt ✓"]

@@ -120,9 +120,9 @@ A public post is an addressable kind-30111 event, the `chat-channel` envelope,
 `author_address` via kind-30078. It carries an indexable `["t", channel_id]` tag
 so a reader can fetch one channel's posts relay-side. An optional inline
 `attachment` (same shape as a
-[DM attachment](/chat/threading#attachments-end-to-end-encrypted)) is **public**
-— committed to `post_id`, capped at the same ~100 KiB inline ceiling, not a
-file-hosting layer.
+[DM attachment](/chat/threading#attachments--end-to-end-encrypted)) is
+**public** — committed to `post_id`, capped at the same ~100 KiB inline ceiling,
+not a file-hosting layer.
 
 A conforming reader MUST:
 
@@ -181,7 +181,7 @@ is E2EE.
 > hardenings ride on top: an org-run
 > [NIP-42 AUTH relay](/chat/transport#relay-auth-nip-42) hides the reply's
 > recipient tag from passive observers, and a
-> [named-Fedimint postage last-mile](/chat/postage#named-fedimint-custodial-fallback)
+> [named-Fedimint postage last-mile](/chat/postage#named-fedimint-custodial-fallback-institutional-last-mile)
 > lets a staff recipient with no Lightning node still accept pay-to-reach.
 
 ## Private channels (reserved — not v1)

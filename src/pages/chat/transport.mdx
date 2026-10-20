@@ -107,11 +107,11 @@ queue is established.
 
 Each party advertises **its own** receiving `queue_id` inside the encrypted
 payload (the
-[`recv_queue` field](/chat/threading#recv_queue-the-durable-inbox-handshake)). A
-party that has learned its peer's `recv_queue` MUST deposit subsequent messages
-there and SHOULD stop using the bootstrap queue. Because `recv_queue` travels
-inside the AEAD-sealed payload, the operator never learns the bootstrap ↔
-per-conversation mapping.
+[`recv_queue` field](/chat/threading#recv_queue--the-durable-inbox-handshake)).
+A party that has learned its peer's `recv_queue` MUST deposit subsequent
+messages there and SHOULD stop using the bootstrap queue. Because `recv_queue`
+travels inside the AEAD-sealed payload, the operator never learns the bootstrap
+↔ per-conversation mapping.
 
 ### Operator obligations (NORMATIVE)
 

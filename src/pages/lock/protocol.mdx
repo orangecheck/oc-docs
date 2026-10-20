@@ -40,8 +40,8 @@ flowchart LR
     S -->|ECDH → content key| E["encrypt"]
     E --> L[(".lock envelope")]
 
-    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
-    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    classDef base stroke:#f66d36,stroke-width:2px;
+    classDef store stroke-width:1px;
     class W,B,S,E base;
     class N,K,L store;
 ```

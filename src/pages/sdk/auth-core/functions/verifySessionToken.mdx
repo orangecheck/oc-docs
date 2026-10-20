@@ -15,13 +15,14 @@ export const metadata = {
 function verifySessionToken(token: string, cfg: VerifyConfig): Promise<SessionPayload | null>;
 ```
 
-Defined in: [index.ts:458](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L458)
+Defined in: [index.ts:463](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L463)
 
 Crypto-only JWT verify. Returns the payload on success, `null` on
 any failure (bad signature, expired, wrong issuer, malformed).
 
-Safe for consumer subdomains — they only need the public JWK.
-Revocation-aware checks live on the auth host.
+Safe for consumer subdomains — they only need the public JWK. A signed-out
+token still verifies here; pass the payload to
+[familyRevocationCheck](familyRevocationCheck) to refuse it.
 
 ## Parameters
 

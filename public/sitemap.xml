@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ochk.io/docs</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/private-scope</loc>
@@ -14,11 +14,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/protocol</loc>
-    <lastmod>2026-04-28</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/quickstart</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/scopes</loc>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/security</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/spec</loc>
@@ -34,7 +34,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/sub-delegation</loc>
-    <lastmod>2026-04-28</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/why</loc>
@@ -70,7 +70,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/express</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/nostr-relay</loc>
@@ -78,7 +78,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/self-hosting</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/sign-in-with-bitcoin</loc>
@@ -86,11 +86,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/how-it-works</loc>
-    <lastmod>2026-09-02</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/quickstart</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/scoring</loc>
@@ -102,23 +102,23 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/charter</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/channels</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/directory</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/envelope</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/how-it-works</loc>
@@ -126,7 +126,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/modes</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/postage</loc>
@@ -134,7 +134,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/protocol</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/quickstart</loc>
@@ -146,7 +146,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/security</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/spec</loc>
@@ -158,7 +158,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/transport</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/why</loc>
@@ -202,7 +202,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/nostr-kind-30078</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/security</loc>
@@ -218,7 +218,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/getting-started/which-protocol</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/infrastructure/relay</loc>
@@ -254,15 +254,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/protocol</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/quickstart</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/security</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/spec</loc>
@@ -306,7 +306,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator/charter</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator/in-browser</loc>
@@ -322,7 +322,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/quickstart</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/require-bond</loc>
@@ -330,7 +330,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/sdk</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/webhooks</loc>
@@ -354,11 +354,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/protocol</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/quickstart</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/resolution-grammar</loc>
@@ -370,11 +370,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/spec</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/state-machine</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/why</loc>
@@ -446,7 +446,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/classes/AgentError</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/classes/ScopeNotGrantedError</loc>
@@ -594,11 +594,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/functions/verifyAction</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/functions/verifyDelegation</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/functions/verifyFederationDelegation</loc>
@@ -610,11 +610,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/functions/verifyRevocation</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/functions/verifySubdelegation</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/ActionCanonicalInput</loc>
@@ -730,7 +730,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyActionInput</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyActionOkExtra</loc>
@@ -738,11 +738,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyBase</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyDelegationInput</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyErr</loc>
@@ -754,7 +754,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyFederationDelegationInput</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyFederationRevocationInput</loc>
@@ -766,11 +766,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifyRevocationInput</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/interfaces/VerifySubdelegationInput</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/agent-core/type-aliases/AgentErrorCode</loc>
@@ -1746,11 +1746,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/functions/OcDashboardHub</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/functions/OcDashboardShell</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/functions/OcFamilyFooter</loc>
@@ -2198,7 +2198,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/FamilyProperty</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/FaqItem</loc>
@@ -2282,15 +2282,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcDashboardHubProps</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcDashboardShellProps</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcDashboardTool</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcErrorPageProps</loc>
@@ -2310,7 +2310,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcPrimaryNavLink</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/design/interfaces/OcPrimaryNavProps</loc>
@@ -5166,7 +5166,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/nostr</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/ots</loc>
@@ -5178,11 +5178,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/protocol</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/quickstart</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/security</loc>
@@ -5202,7 +5202,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/vault</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vault/developer</loc>
@@ -5218,35 +5218,35 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/vault/quickstart</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vault/security</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vault/teams</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/api</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/integration</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/protocol</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/quickstart</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/secret-ballot</loc>
@@ -5254,7 +5254,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/security</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/vote/spec</loc>

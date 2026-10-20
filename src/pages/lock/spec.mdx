@@ -66,15 +66,20 @@ MUST NOT leave the device.
 ### §3.2 Binding statement
 
 ```
-oc-lock:device-bind:v2
+oc-lock:device-bind:v3
 address: <btc_address>
 device_pk: <hex(device_pk)>
+nostr_pk: <hex(nostr_pk), x-only, lowercase>
 device_id: <random 16-byte hex>
 created_at: <iso8601 utc>
 ```
 
 Each line terminated with LF (`\n`).
 `binding_sig = BIP322(btc_address, binding_statement)`.
+
+Publishers MUST emit v3. A verifier MUST reject a v3 record whose `event.pubkey`
+differs from the signed `nostr_pk`. Readers still accept v2 records, which lack
+the `nostr_pk` line, for sealing to `device_pk`.
 
 ### §3.3 Publication
 

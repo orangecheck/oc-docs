@@ -65,18 +65,18 @@ Each header is a **literal first-line domain separator**. A signature produced
 under one header cannot be replayed against another protocol's verifier — the
 prefix is part of the bytes the wallet signed.
 
-| Protocol                          | Header literal             |
-| --------------------------------- | -------------------------- |
-| OC Attest (default)               | `orangecheck`              |
-| OC Attest (challenge / auth flow) | `orangecheck-auth`         |
-| OC Lock device binding            | `oc-lock:device-bind:v2`   |
-| OC Stamp envelope                 | `oc-stamp:v1`              |
-| OC Agent delegation               | `oc-agent:delegation:v1`   |
-| OC Agent action                   | `oc-agent:action:v1`       |
-| OC Agent revocation               | `oc-agent:revocation:v1`   |
-| OC Pledge                         | `oc-pledge/v1`             |
-| OC Pledge outcome                 | `oc-pledge-outcome/v1`     |
-| OC Pledge abandonment             | `oc-pledge-abandonment/v1` |
+| Protocol                          | Header literal                           |
+| --------------------------------- | ---------------------------------------- |
+| OC Attest (default)               | `orangecheck`                            |
+| OC Attest (challenge / auth flow) | `orangecheck-auth`                       |
+| OC Lock device binding            | `oc-lock:device-bind:v3` (v2 still read) |
+| OC Stamp envelope                 | `oc-stamp:v1`                            |
+| OC Agent delegation               | `oc-agent:delegation:v1`                 |
+| OC Agent action                   | `oc-agent:action:v1`                     |
+| OC Agent revocation               | `oc-agent:revocation:v1`                 |
+| OC Pledge                         | `oc-pledge/v1`                           |
+| OC Pledge outcome                 | `oc-pledge-outcome/v1`                   |
+| OC Pledge abandonment             | `oc-pledge-abandonment/v1`               |
 
 ### Two sibling protocols don't use the line format
 

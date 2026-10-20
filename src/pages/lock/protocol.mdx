@@ -56,21 +56,24 @@ sending and receiving are one click.
 
 1. Bob visits the app.
 2. He enters his Bitcoin address.
-3. The browser generates an X25519 keypair. The secret stays in IndexedDB.
+3. The browser generates an X25519 keypair and derives the device's Nostr key
+   from it. The secret stays in IndexedDB.
 4. The browser builds the binding statement:
 
     ```
-    oc-lock:device-bind:v2
+    oc-lock:device-bind:v3
     address: bc1qbob…
     device_pk: 7d2f…
+    nostr_pk: 3c9a…
     device_id: a8b4…
     created_at: 2026-04-22T14:03:11Z
     ```
 
 5. Bob's wallet signs it with BIP-322 (one prompt, one click).
-6. The browser publishes a Nostr kind-30078 event containing the statement,
-   pubkey, and signature. The `d` tag is `oc-lock:device:bc1qbob…` — anyone can
-   find it by Bitcoin address.
+6. The browser publishes a Nostr kind-30078 event, signed with that Nostr key,
+   containing the statement, pubkey, and signature. A reader refuses a record
+   whose Nostr author is not the `nostr_pk` it signed. The `d` tag is
+   `oc-lock:device:bc1qbob…` — anyone can find it by Bitcoin address.
 
 Bob is now **addressable**.
 

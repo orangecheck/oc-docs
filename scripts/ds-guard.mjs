@@ -4,15 +4,13 @@
  * mixing systems breaks: app-design's tokens apply under data-oc-app="ochk"
  * on <html>, so a classic component renders in the wrong colours and its
  * dialogs portal outside any wrapper. Fails if:
- *   - @orangecheck/ui (deprecated) is a dependency or imported;
- *   - anything from the classic @orangecheck/design is imported, except its
- *     Swagger UI stylesheet, which app-design does not ship yet.
+ *   - @orangecheck/ui (deprecated) or the classic @orangecheck/design is a
+ *     dependency or imported. Swagger UI's stylesheet is app-design's too.
  * Runs before `type-check` (the pretype-check hook).
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ALLOWED = new Set(['@orangecheck/design/styles/swagger.css']);
 const IMPORT =
     /(?:from\s+|import\s+|import\(\s*|require\(\s*)['"](@orangecheck\/(?:ui|design)(?:\/[^'"]*)?)['"]/g;
 
@@ -31,11 +29,13 @@ const bad = [];
 for (const file of [...walk('src'), 'next.config.ts']) {
     const text = readFileSync(file, 'utf8');
     for (const m of text.matchAll(IMPORT)) {
-        if (!ALLOWED.has(m[1])) bad.push(`    ${file}: ${m[1]}`);
+        bad.push(`    ${file}: ${m[1]}`);
     }
 }
-if (/"@orangecheck\/ui"\s*:/.test(readFileSync('package.json', 'utf8'))) {
-    bad.push('    package.json: @orangecheck/ui is a dependency');
+for (const dep of ['ui', 'design']) {
+    if (new RegExp(`"@orangecheck/${dep}"\\s*:`).test(readFileSync('package.json', 'utf8'))) {
+        bad.push(`    package.json: @orangecheck/${dep} is a dependency`);
+    }
 }
 
 if (bad.length) {
@@ -46,4 +46,4 @@ if (bad.length) {
     );
     process.exit(1);
 }
-console.log('✓ design-system guard: app-design only (classic: swagger.css alone)');
+console.log('✓ design-system guard: app-design only');

@@ -20,9 +20,8 @@ import { TextLink } from '@orangecheck/app-design/components';
 import dynamic from 'next/dynamic';
 
 import 'swagger-ui-react/swagger-ui.css';
-// Swagger UI's dark mode on the shared token names. The classic package stays
-// a dependency for this one stylesheet until app-design ships its own.
-import '@orangecheck/design/styles/swagger.css';
+// Swagger UI's dark mode on the system's tokens.
+import '@orangecheck/app-design/styles/swagger.css';
 
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), {
     ssr: false,

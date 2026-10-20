@@ -2,12 +2,17 @@ import type { DocsNavSection } from '@orangecheck/app-design/chrome';
 import type { Crumb, PagerLink } from '@orangecheck/app-design/components';
 import type { ReactNode } from 'react';
 
-import { DOCS_HEADER_NAV, DocsShell, SiteHeader, SkipLink } from '@orangecheck/app-design/chrome';
+import {
+    DOCS_HEADER_NAV,
+    DocsShell,
+    OchkIoFooter,
+    SiteHeader,
+    SkipLink,
+} from '@orangecheck/app-design/chrome';
 import { Breadcrumbs, DocsPager, TextLink } from '@orangecheck/app-design/components';
 import { OCHK_IO } from '@orangecheck/app-design/family';
 import { SessionAccount } from '@orangecheck/app-design/session';
 
-import { DocsFooter } from '@/components/docs/DocsFooter';
 import { DocsSearch } from '@/components/docs/DocsSearch';
 import { DOCS_NAV, findDocsPage, findSectionFor, prevNextFor } from '@/components/docs/nav';
 import { docSourceUrl } from '@/components/docs/sources';
@@ -40,6 +45,14 @@ function crumbsFor(path: string): Crumb[] | null {
         ];
     }
     return [root, { label: path.split('/').pop()! }];
+}
+
+/** A deep SDK page has no item of its own: its package's README opens the SDKs. */
+function navItemFor(path: string): string | undefined {
+    if (findDocsPage(path)) return undefined;
+    const pkg = path.match(/^\/sdk\/([^/]+)\/.+$/)?.[1];
+    const readme = pkg ? `/sdk/${pkg}/README` : undefined;
+    return readme && findDocsPage(readme) ? readme : undefined;
 }
 
 function pagerFor(path: string): { prev?: PagerLink; next?: PagerLink } {
@@ -85,7 +98,7 @@ export function DocsFrame({
                 <main id="main-content" className="flex-1">
                     {children}
                 </main>
-                <DocsFooter />
+                <OchkIoFooter />
             </div>
         );
     }
@@ -96,6 +109,7 @@ export function DocsFrame({
         <DocsShell
             nav={NAV}
             current={path}
+            navCurrent={navItemFor(path)}
             search={search}
             actions={actions}
             breadcrumbs={
@@ -107,7 +121,6 @@ export function DocsFrame({
                 ) : null
             }
             pager={<DocsPager prev={prev} next={next} />}
-            footer={<DocsFooter />}
         >
             {children}
         </DocsShell>

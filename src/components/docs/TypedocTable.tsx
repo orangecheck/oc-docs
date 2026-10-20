@@ -32,7 +32,7 @@ const plain = (node: ReactNode) => (
     </span>
 );
 
-function rowsOf(children: ReactNode): { rows: ApiRow[]; anchors: string[]; header: string } | null {
+function rowsOf(children: ReactNode): { rows: ApiRow[]; header: string } | null {
     const parts = kids(children);
     const head = parts.find((p) => p.type === 'thead');
     const body = parts.find((p) => p.type === 'tbody');
@@ -52,40 +52,41 @@ function rowsOf(children: ReactNode): { rows: ApiRow[]; anchors: string[]; heade
         .map((h) => [h, col(h)] as const)
         .filter(([, i]) => i >= 0);
     if (type < 0 || (desc < 0 && def < 0 && src < 0)) return null;
-    const anchors: string[] = [];
     const rows = kids(body.props.children).map((tr): ApiRow => {
         const cells = kids(tr.props.children).map((td) => td.props.children);
         const name = Children.toArray(cells[0]);
+        // TypeDoc links to a member as #property-x: the row is the anchor.
         const anchor = name.find((n) => el(n) && n.props.id);
-        if (anchor && el(anchor) && anchor.props.id) anchors.push(anchor.props.id);
-        const extra = [
-            ...notes.map(([h, i]) => (textOf(cells[i]).trim() ? [h, cells[i]] : null)),
-            src >= 0 && textOf(cells[src]).trim() ? ['Defined in', cells[src]] : null,
-        ].filter((x): x is [string, ReactNode] => x !== null);
+        const extra = notes
+            .map(([h, i]) => (textOf(cells[i]).trim() ? [h, cells[i]] : null))
+            .filter((x): x is [string, ReactNode] => x !== null);
         // TypeDoc writes "-" where a member has no description.
         const said = desc >= 0 && textOf(cells[desc]).trim() !== '-';
         return {
             name: textOf(name.filter((n) => n !== anchor)).trim(),
+            id: anchor && el(anchor) ? anchor.props.id : undefined,
             type: plain(cells[type]),
             default: def >= 0 && textOf(cells[def]).trim() ? plain(cells[def]) : undefined,
-            description: (
-                <>
-                    {said ? cells[desc] : null}
-                    {extra.length ? (
-                        <span className="text-muted-foreground mt-1 block text-[0.8125rem] first:mt-0">
-                            {extra.map(([h, v], i) => (
-                                <Fragment key={h}>
-                                    {i > 0 ? ' · ' : null}
-                                    {h} {v}
-                                </Fragment>
-                            ))}
-                        </span>
-                    ) : null}
-                </>
-            ),
+            source: src >= 0 && textOf(cells[src]).trim() ? cells[src] : undefined,
+            description:
+                said || extra.length ? (
+                    <>
+                        {said ? cells[desc] : null}
+                        {extra.length ? (
+                            <span className="text-muted-foreground mt-1 block text-[0.8125rem] first:mt-0">
+                                {extra.map(([h, v], i) => (
+                                    <Fragment key={h}>
+                                        {i > 0 ? ' · ' : null}
+                                        {h} {v}
+                                    </Fragment>
+                                ))}
+                            </span>
+                        ) : null}
+                    </>
+                ) : undefined,
         };
     });
-    return { rows, anchors, header: headers[0]! };
+    return { rows, header: headers[0]! };
 }
 
 /** A markdown table; on a generated SDK page, an ApiTable when it lists members. */
@@ -95,13 +96,5 @@ export function TypedocTable({
 }: TableHTMLAttributes<HTMLTableElement> & { sdk: boolean }) {
     const api = sdk ? rowsOf(props.children) : null;
     if (!api) return <MdxTable {...props} />;
-    return (
-        <>
-            {/* TypeDoc links to a member as #property-x; land on the list. */}
-            {api.anchors.map((id) => (
-                <span key={id} id={id} aria-hidden className="block scroll-mt-28" />
-            ))}
-            <ApiTable rows={api.rows} nameHeader={api.header} />
-        </>
-    );
+    return <ApiTable rows={api.rows} nameHeader={api.header} />;
 }

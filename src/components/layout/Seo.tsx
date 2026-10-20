@@ -2,6 +2,7 @@ import type { SEOConfig } from '@/lib/seo/seo';
 
 import Head from 'next/head';
 
+import { jsonLd } from '@/lib/seo/json-ld';
 import { generateMetaTags } from '@/lib/seo/seo';
 
 interface SEOProps extends SEOConfig {
@@ -68,7 +69,7 @@ export function Seo(props: SEOProps) {
                 <script
                     key="ld-json"
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+                    dangerouslySetInnerHTML={{ __html: jsonLd(structuredData) }}
                 />
             )}
         </Head>

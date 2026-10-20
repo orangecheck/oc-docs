@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
-import { existsSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 import createMDX from '@next/mdx';
 import { rehypeCode } from '@orangecheck/app-design/code';
@@ -20,6 +21,25 @@ const SDK_PACKAGES = readdirSync('src/pages/sdk', { withFileTypes: true })
     .filter((d) => d.isDirectory() && existsSync(`src/pages/sdk/${d.name}/README.mdx`))
     .map((d) => d.name);
 
+// webpack's build cache keys a compiled page on its own source, so a page that
+// did not change kept what an older MDX plugin made of it: app-design 1.4's
+// exact-copy marker reached no unchanged page on Vercel. The cache's version
+// carries the plugins', so a new plugin recompiles every page.
+const MDX_PLUGINS = createHash('sha256')
+    .update(
+        [
+            'node_modules/@orangecheck/app-design/package.json',
+            'node_modules/rehype-slug/package.json',
+            'node_modules/remark-gfm/package.json',
+            'src/lib/rehype-keep-ids.mjs',
+            'src/lib/rehype-typedoc.mjs',
+        ]
+            .map((f) => readFileSync(f, 'utf8'))
+            .join('\0')
+    )
+    .digest('hex')
+    .slice(0, 16);
+
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
 
@@ -30,6 +50,13 @@ const nextConfig: NextConfig = {
     // when it is compiled into the build: left external, every link in the
     // header, sidebar and pages renders without /docs.
     transpilePackages: ['@orangecheck/app-design'],
+
+    webpack(config) {
+        if (config.cache && typeof config.cache === 'object') {
+            config.cache.version = `${config.cache.version ?? ''}|mdx-${MDX_PLUGINS}`;
+        }
+        return config;
+    },
 
     /**
      * The handwritten `/sdks/*` group merged into the auto-gen `/sdk/*`

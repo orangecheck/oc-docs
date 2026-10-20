@@ -41,10 +41,10 @@ namespace per protocol is the rule.
 ```
 event.kind       = 30083
 event.tags       = [
-  ["d",         "oc-stamp:" || id],
-  ["addr",      signer.address],
-  ["hash",      content.hash],
-  ["signed_at", signed_at]
+  ["d", "oc-stamp:" || id],
+  ["t", signer.address],
+  ["t", content.hash],
+  ["t", "oc-stamp"]
 ]
 event.content    = <canonical JSON of envelope>
 event.pubkey     = <ephemeral Nostr pubkey, any key>
@@ -62,20 +62,28 @@ nostr_sk := HKDF(ikm=random(32), salt="oc-stamp/v1/nostr-key", info=id, L=32)
 
 This avoids asking wallets to hold Nostr keys.
 
+Discovery tags are `t` tags because relays index single-letter tag names only. A
+filter on a longer name (`#addr`, `#hash`) is rejected by most relays — they
+close the request, so read that as "no answer", never as "no stamps". Tags are
+unsigned relay metadata: read the address and hash from the envelope.
+
 ## Discovery
 
 ### By content hash
 
 ```
-REQ { "kinds": [30083], "#hash": ["sha256:<hex>"] }
+REQ { "kinds": [30083], "#t": ["sha256:<hex>"] }
 ```
 
 Use case: "has anyone stamped these bytes?"
 
+Stamps published before 2026-09-24 carry no content-hash `t` tag. Find those by
+signer address and match `content.hash` after fetching.
+
 ### By signer address
 
 ```
-REQ { "kinds": [30083], "#addr": ["bc1q…"] }
+REQ { "kinds": [30083], "#t": ["bc1q…"] }
 ```
 
 Use case: "all stamps by this signer."
@@ -87,6 +95,11 @@ REQ { "kinds": [30083], "#d": ["oc-stamp:<id>"] }
 ```
 
 Use case: "fetch this specific stamp."
+
+A relay match only nominates candidates. Kind 30083 also carries OC Agent
+delegations, and anyone can tag an event with any address or hash, so check that
+the envelope's `kind` is `stamp` and its `content.hash` or `signer.address` is
+the one you asked for, then verify it, before using it.
 
 ## Addressability + upgrades
 
@@ -107,12 +120,13 @@ accept the one with `ots.status === "confirmed"` and the latest `upgraded_at`.
 
 ## Recommended relays
 
-The reference clients use this set:
+The reference app uses the `@orangecheck/nostr-core` default set:
 
-- `wss://relay.damus.io`
-- `wss://relay.nostr.band`
 - `wss://nos.lol`
+- `wss://relay.primal.net`
+- `wss://offchain.pub`
 - `wss://relay.snort.social`
+- `wss://relay.ochk.io`
 
 Clients SHOULD publish to at least three diverse relays. A hostile relay set can
 refuse to publish or return your envelope, but cannot forge it — BIP-322

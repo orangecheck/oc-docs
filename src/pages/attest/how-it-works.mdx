@@ -50,8 +50,8 @@ The signed attestation is a self-contained JSON blob:
 ```
 
 This blob is published to [Nostr kind-30078](/ecosystem/nostr-kind-30078) for
-durable public discovery. The `d`-tag is the attestation_id; the `#address` tag
-lets verifiers query by Bitcoin address.
+durable public discovery. The `d`-tag is the attestation_id; a `t` tag carrying
+the Bitcoin address lets verifiers query by address with `#t`.
 
 The signer can also share the blob directly (URL, embedded badge, email, QR
 code). Publishing to Nostr is _optional_ — the blob verifies offline regardless.

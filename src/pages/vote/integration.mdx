@@ -78,8 +78,11 @@ client can subscribe to a poll's ballots without touching vote.ochk.io at all.
 Filter:
 
 ```json
-{ "kinds": [30081], "#poll_id": ["<poll_id>"] }
+{ "kinds": [30081], "#t": ["<poll_id>"] }
 ```
+
+Filter on `#t`: relays index single-letter tags only, and most reject a filter
+on a longer name such as `#poll_id`.
 
 Parse each event's `content` as a canonical Ballot, call `ballotId()` from
 `@orangecheck/vote-core`, verify the BIP-322 signature against `voter`, and feed

@@ -51,8 +51,9 @@ worth less than one that names its own exception.
 The wire format, scope grammar, audit-bundle structure, and Bitcoin-anchoring
 rules are defined by the open `oc-*-protocol` specs (`oc-attest-protocol`,
 `oc-lock-protocol`, `oc-vote-protocol`, `oc-stamp-protocol`,
-`oc-agent-protocol`, `oc-pledge-protocol`). Any change OrangeCheck wants goes
-through an open PR. No private extensions, no closed conformance vectors.
+`oc-agent-protocol`, `oc-pledge-protocol`). Every change OrangeCheck makes lands
+as a public commit in that spec's repository, and each spec keeps a changelog.
+No private extensions, no closed conformance vectors.
 
 ### 04 · The protocol sites stay free.
 
@@ -78,12 +79,13 @@ real authority — which is human work being elevated, not erased.
 
 ### 07 · Sat-denominated economics, first-class.
 
-Lightning customers and sat-paid users are not a footnote. Every USD price is
-published with its sat equivalent on the same row. We do not surcharge
-Lightning, do not require fiat onramp, and do not treat sat-paid customers as a
-niche segment. On `ochk.app` specifically, every billable event has its price,
-OC's platform fee and what the user earns published in sats — USD shown
-alongside, never as the canonical unit.
+Sat-paid customers are not a footnote. Every USD price is published with its sat
+equivalent on the same row. We do not require a fiat onramp and do not treat
+sat-paid customers as a niche segment. Payments to OrangeCheck are made
+on-chain: Lightning has been off across the family since 2026-09-02. On
+`ochk.app` specifically, every billable event has its price, OC's platform fee
+and what the user earns published in sats — USD shown alongside, never as the
+canonical unit.
 
 ### 08 · Spec stewardship is public.
 
@@ -109,7 +111,8 @@ review window, and a versioned re-ratification.
   leaves the user's device, OC cannot decrypt), **03/04** (`oc-lock-protocol` is
   open and free forever), **05** (every entry exports as a portable artifact any
   holder of the key can decrypt offline via `@orangecheck/lock-crypto`), and
-  **07** (paid in sats over Lightning, no fiat) bind this product specifically.
+  **07** (paid in sats on-chain, into a watch-only wallet, no fiat) bind this
+  product specifically.
 - **Protocol siblings** — every `oc-*-protocol` spec repo + the matching
   `*.ochk.io` reference site. Commitments **03** (open spec), **04** (free
   forever), and **05** (offline-verifiable) bind these specifically.
@@ -117,13 +120,15 @@ review window, and a versioned re-ratification.
 ## If we ever break one of these
 
 The protocol layer continues to work without us. Every receipt we ever issued
-continues to verify. The spec repos remain MIT, the npm packages remain
-published. Customers can fork the managed components and run them themselves on
-day one. This is the whole point of the design.
+continues to verify. The spec repos stay public under the license each one's
+`LICENSE` file states (MIT for OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent
+and OC Chat; CC BY 4.0 for OC Pledge), and the npm packages remain published.
+Customers can fork the managed components and run them themselves on day one.
+This is the whole point of the design.
 
 Spec stewardship and family governance live at
-[github.com/orangecheck](https://github.com/orangecheck). The protocol PRs are
-the canonical mechanism by which any of the rules on this page can change.
+[github.com/orangecheck](https://github.com/orangecheck). Every change to a
+spec, and to this page, is a public commit there.
 
 ## Signatures
 
@@ -133,6 +138,7 @@ appended here as public commitments are formalized.
 | Field            | Value                                                    |
 | ---------------- | -------------------------------------------------------- |
 | Ratified         | v1 · 2026-04-28                                          |
+| Corrected        | 2026-10-20 · facts in 03, 07, vault, licenses            |
 | Next review      | 2026-12-01 (or earlier if material change proposed)      |
 | Source of truth  | `oc-docs/src/pages/charter.mdx`                          |
 | Governance forum | [github.com/orangecheck](https://github.com/orangecheck) |

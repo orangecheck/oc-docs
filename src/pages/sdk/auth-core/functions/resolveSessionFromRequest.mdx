@@ -15,7 +15,7 @@ export const metadata = {
 function resolveSessionFromRequest(headers: IncomingRequestHeaders, cfg: VerifyConfig): Promise<ResolveSessionResult>;
 ```
 
-Defined in: [index.ts:608](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L608)
+Defined in: [index.ts:614](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L614)
 
 Resolve the EFFECTIVE session for a request — the per-tab choke
 point every consumer's `readJwtSession` should delegate to.
@@ -30,8 +30,9 @@ Precedence:
      Clients clear their pin on 401 and re-resolve.
   2. Every `oc_session` cookie in the jar, first one that verifies.
 
-Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken));
-revocation-aware checks remain the auth host's job. Never throws.
+Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken)); a
+signed-out token still resolves, so pass the payload to
+[familyRevocationCheck](familyRevocationCheck). Never throws.
 
 ## Parameters
 

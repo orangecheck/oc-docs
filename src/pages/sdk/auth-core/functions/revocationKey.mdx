@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: revocationKey()",
+    description: "Auto-generated API reference for Function: revocationKey(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / revocationKey
+
+# Function: revocationKey()
+
+```ts
+function revocationKey(kind: "jti" | "sub", value: string): Promise<string>;
+```
+
+Defined in: [revocation.ts:83](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L83)
+
+The feed key for a token (`kind: "jti"`) or an account (`kind: "sub"`):
+base64url of the first 16 bytes of sha256(`ocrev1:<kind>:<value>`). The
+auth host derives the same; its tests share these vectors.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `kind` | `"jti"` \| `"sub"` |
+| `value` | `string` |
+
+## Returns
+
+`Promise`\&lt;`string`\>

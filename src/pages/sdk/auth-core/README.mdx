@@ -14,6 +14,9 @@ export const metadata = {
 - [BondClaim](interfaces/BondClaim)
 - [CookieOptions](interfaces/CookieOptions)
 - [DisplayIdentity](interfaces/DisplayIdentity)
+- [RevocableClaims](interfaces/RevocableClaims)
+- [RevocationCheck](interfaces/RevocationCheck)
+- [RevocationCheckOptions](interfaces/RevocationCheckOptions)
 - [SessionPayload](interfaces/SessionPayload)
 - [SessionRequestHeaders](interfaces/SessionRequestHeaders)
 - [SignConfig](interfaces/SignConfig)
@@ -27,6 +30,7 @@ export const metadata = {
 - [DisplayIdentityKind](type-aliases/DisplayIdentityKind)
 - [IncomingRequestHeaders](type-aliases/IncomingRequestHeaders)
 - [ResolveSessionResult](type-aliases/ResolveSessionResult)
+- [RevocationStatus](type-aliases/RevocationStatus)
 
 ## Variables
 
@@ -38,10 +42,13 @@ export const metadata = {
 
 ## Functions
 
+- [\_resetFamilyRevocationCheckForTests](functions/resetFamilyRevocationCheckForTests)
 - [\_resetJwksCachesForTests](functions/resetJwksCachesForTests)
 - [audienceSatisfied](functions/audienceSatisfied)
 - [bondMeets](functions/bondMeets)
 - [clearSessionCookieHeader](functions/clearSessionCookieHeader)
+- [createRevocationCheck](functions/createRevocationCheck)
+- [familyRevocationCheck](functions/familyRevocationCheck)
 - [getOcSession](functions/getOcSession)
 - [loadPrivateKey](functions/loadPrivateKey)
 - [loadPublicKey](functions/loadPublicKey)
@@ -51,6 +58,7 @@ export const metadata = {
 - [readSessionCookie](functions/readSessionCookie)
 - [resolveDisplayIdentity](functions/resolveDisplayIdentity)
 - [resolveSessionFromRequest](functions/resolveSessionFromRequest)
+- [revocationKey](functions/revocationKey)
 - [serializeSessionCookie](functions/serializeSessionCookie)
 - [signSession](functions/signSession)
 - [verifyOcToken](functions/verifyOcToken)

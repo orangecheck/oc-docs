@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Function: familyRevocationCheck()",
+    description: "Auto-generated API reference for Function: familyRevocationCheck(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / familyRevocationCheck
+
+# Function: familyRevocationCheck()
+
+```ts
+function familyRevocationCheck(): RevocationCheck;
+```
+
+Defined in: [revocation.ts:209](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L209)
+
+The process-wide check, configured from the environment
+(`OC_REVOCATION_FEED_TOKEN`, `OC_AUTH_ISSUER`). Every reader in a site
+should use this one, so the site fetches the feed once per minute, not once
+per reader.
+
+## Returns
+
+[`RevocationCheck`](../interfaces/RevocationCheck)

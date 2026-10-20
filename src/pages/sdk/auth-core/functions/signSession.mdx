@@ -31,13 +31,13 @@ function signSession(
 ttlSeconds: number): Promise<string>;
 ```
 
-Defined in: [index.ts:417](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L417)
+Defined in: [index.ts:421](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L421)
 
 Mint a fresh oc_session JWT. Only called on the auth host (the only
 place that holds the private key).
 
-The caller owns persisting `jti` to a revocation list if they want
-revocation semantics — auth-core is deliberately stateless.
+The caller owns recording an ended token's `jti` for the revocation
+feed that [createRevocationCheck](createRevocationCheck) reads.
 
 ## Parameters
 

@@ -1,0 +1,59 @@
+export const metadata = {
+    title: "Interface: RevocationCheck",
+    description: "Auto-generated API reference for Interface: RevocationCheck. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / RevocationCheck
+
+# Interface: RevocationCheck
+
+Defined in: [revocation.ts:29](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L29)
+
+## Methods
+
+### refuses()
+
+```ts
+refuses(claims: RevocableClaims, method?: string): Promise<boolean>;
+```
+
+Defined in: [revocation.ts:36](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L36)
+
+Whether to refuse the session for a request with this method: always when
+revoked, and for an unsafe method (or none given) when unverified. Reads
+keep working through an outage of the auth host; writes stop.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `claims` | [`RevocableClaims`](RevocableClaims) |
+| `method?` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`boolean`\>
+
+***
+
+### status()
+
+```ts
+status(claims: RevocableClaims): Promise<RevocationStatus>;
+```
+
+Defined in: [revocation.ts:30](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L30)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `claims` | [`RevocableClaims`](RevocableClaims) |
+
+#### Returns
+
+`Promise`\&lt;[`RevocationStatus`](../type-aliases/RevocationStatus)\>

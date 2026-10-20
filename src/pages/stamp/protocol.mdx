@@ -17,9 +17,9 @@ read the spec. If you want to understand _why_ and _how_, read this.
 ## The mental model
 
 ```mermaid
-flowchart LR
+flowchart TB
     W["Wallet"] -->|BIP-322 sign| M["canonical message"]
-    M -->|H(bytes) = id| ID["envelope id"]
+    M -->|"H(bytes) = id"| ID["envelope id"]
     ID -->|submit| OTS[("OTS calendar(s)")]
     OTS -->|pending proof| P["pending"]
     P -.~1h later.-> CONF["confirmed<br/>(Merkle path<br/>to block header)"]
@@ -27,8 +27,8 @@ flowchart LR
     CONF -->|upgrade ots.proof| ENV
     ENV --> BC["Bitcoin block<br/>anchor"]
 
-    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
-    classDef store fill:#18181b,stroke:#52525b,color:#fafafa;
+    classDef base stroke:#f66d36,stroke-width:2px;
+    classDef store stroke-width:1px;
     class W,M,ID,P,CONF,BC base;
     class OTS,ENV store;
 ```

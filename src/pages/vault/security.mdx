@@ -35,7 +35,7 @@ Implementers and researchers should also read the protocol's
 - **All entry metadata in the cloud** — entry name, type, tags and timestamps
   are wrapped a second time before upload. OC's blob store sees only a random
   16-byte envelope id and an `updated_at` value. See
-  [Protocol → double-encrypted blob](/vault/protocol#cloud-sync-the-double-encrypted-blob).
+  [Protocol → double-encrypted blob](/vault/protocol#cloud-sync--the-double-encrypted-blob).
 - **The vault key itself** — 32 random bytes that never leave the device. OC has
   no copy and the protocol provides no path to obtain one.
 

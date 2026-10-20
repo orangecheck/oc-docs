@@ -168,7 +168,7 @@ async function render() {
                     }}
                 >
                     <span>DOCS.OCHK.IO</span>
-                    <span>§ MIT · CC-BY-4.0</span>
+                    <span>§ MIT</span>
                 </div>
             </div>
         </div>,

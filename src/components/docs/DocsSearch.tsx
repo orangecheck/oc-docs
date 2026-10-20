@@ -22,7 +22,10 @@ export function DocsSearch() {
             open={open}
             onOpenChange={setOpen}
             onQuery={searchDocs}
-            onSelect={(r) => void router.push(routeOf(r.href))}
+            // Every docs result is a page; a result without one would be an action.
+            onSelect={(r) => {
+                if (r.href) void router.push(routeOf(r.href));
+            }}
             placeholder="Search the docs"
         />
     );

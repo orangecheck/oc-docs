@@ -123,9 +123,9 @@ For the exact normative tag set per protocol, consult that protocol's spec:
 
 - [OC Attest tags](/attest/api) · `oc-attest-protocol` SPEC §3
 - [OC Lock device record tags](/lock) · `oc-lock-protocol` SPEC §3
-- [OC Stamp envelope tags](/stamp) · `oc-stamp-protocol` SPEC §6
+- [OC Stamp envelope tags](/stamp/nostr) · `oc-stamp-protocol` SPEC §7
 - [OC Vote tags](/vote) · `oc-vote-protocol` SPEC §3
-- [OC Agent tags](/agent) · `oc-agent-protocol` SPEC §3
+- [OC Agent tags](/agent) · `oc-agent-protocol` SPEC §9.4 and §10
 - [OC Pledge tags](/pledge) · `oc-pledge-protocol` SPEC §16
 
 ## Author pubkey — real npub vs. ephemeral
@@ -190,6 +190,17 @@ relay.subscribe([{ kinds: [30083], '#t': ['bc1qagent…'] }], {
 relay.subscribe([{ kinds: [30085], '#t': ['<64-hex delegation id>'] }], {
     /*…*/
 });
+
+// Find what cites a delegation: its actions (30084), revocations (30085) and
+// sub-delegations (30086) all carry its id as `t`. On actions and
+// sub-delegations that tag is SHOULD (spec 1.5.0), so this lists only events
+// whose publisher set it. Route on the envelope `kind` and check the id.
+relay.subscribe(
+    [{ kinds: [30084, 30085, 30086], '#t': ['<64-hex delegation id>'] }],
+    {
+        /*…*/
+    }
+);
 ```
 
 A filter on a multi-letter tag name does not quietly return nothing. Most relays

@@ -96,6 +96,18 @@ REQ { "kinds": [30083], "#d": ["oc-stamp:<id>"] }
 
 Use case: "fetch this specific stamp."
 
+### Every stamp
+
+```
+REQ { "kinds": [30083], "#t": ["oc-stamp"] }
+```
+
+Use case: "stamps only, not the OC Agent delegations that share the kind."
+
+There is no prefix query. Relays match tag values whole, so
+`"#d": ["oc-stamp:"]` matches no event, and a relay answers it with an empty
+result rather than an error. Use `#t` or a full `#d`.
+
 A relay match only nominates candidates. Kind 30083 also carries OC Agent
 delegations, and anyone can tag an event with any address or hash, so check that
 the envelope's `kind` is `stamp` and its `content.hash` or `signer.address` is
@@ -150,6 +162,7 @@ Nostr relays anyone else would.
 ## Further reading
 
 - [SPEC §7](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#7-nostr-directory-optional)
-  — normative rules.
+  — normative rules. §7.3 says when a relay has answered: only `EOSE` with
+  on-filter events counts, and not hearing back is never "no stamps".
 - [SPEC §13](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#13-registry-for-extensions)
   — the 30078–30115 family kind registry.

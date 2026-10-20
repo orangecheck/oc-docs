@@ -23,3 +23,6 @@ build/
 # fails. eslint.config.mjs already ignores it for the same reason.
 # The file itself says "should not be edited".
 next-env.d.ts
+
+# The search index: one line of generated JSON, not committed.
+public/search-index.json

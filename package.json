@@ -7,8 +7,8 @@
     "description": "docs.ochk.io — unified documentation for the OrangeCheck ecosystem (OC Attest, OC Lock, OC Stamp, OC Vote, OC Agent).",
     "scripts": {
         "dev": "rm -rf .next && next dev",
-        "predev": "node scripts/gen-doc-sources.mjs",
-        "prebuild": "node scripts/gen-doc-sources.mjs",
+        "predev": "node scripts/gen-doc-sources.mjs && node scripts/gen-search-index.mjs",
+        "prebuild": "node scripts/gen-doc-sources.mjs && node scripts/gen-search-index.mjs",
         "build": "node scripts/gen-sitemap.mjs && next build --webpack",
         "start": "next start",
         "lint": "eslint",
@@ -26,17 +26,13 @@
         "@mdx-js/loader": "^3.1.1",
         "@mdx-js/react": "^3.1.1",
         "@next/mdx": "15.5.18",
+        "@orangecheck/app-design": "1.2.1",
         "@orangecheck/auth-client": "^2.32.2",
         "@orangecheck/auth-core": "^2.5.0",
         "@orangecheck/design": "^0.35.0",
         "@orangecheck/wallet-adapter": "^0.5.0",
-        "@radix-ui/react-dialog": "^1.1.15",
-        "@radix-ui/react-separator": "^1.1.7",
-        "@radix-ui/react-slot": "^1.2.3",
         "@types/mdx": "^2.0.13",
         "@types/swagger-ui-react": "^5.18.0",
-        "class-variance-authority": "^0.7.1",
-        "clsx": "^2.1.1",
         "lucide-react": "^0.544.0",
         "mermaid": "^11.14.0",
         "next": "16.3.8",
@@ -44,8 +40,7 @@
         "react": "19.2.6",
         "react-dom": "19.2.6",
         "rehype-slug": "^6.0.0",
-        "swagger-ui-react": "^5.32.5",
-        "tailwind-merge": "^3.3.1"
+        "swagger-ui-react": "^5.32.5"
     },
     "devDependencies": {
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
@@ -55,12 +50,16 @@
         "@types/react-dom": "^19",
         "eslint": "^9",
         "eslint-config-next": "16.3.8",
+        "github-slugger": "^2.0.0",
+        "mdast-util-to-string": "^4.0.0",
         "prettier": "^3.6.2",
         "prettier-plugin-tailwindcss": "^0.6.14",
         "remark-gfm": "^4.0.1",
+        "remark-mdx": "^3.1.1",
+        "remark-parse": "^11.0.0",
         "tailwindcss": "^4",
-        "tw-animate-css": "^1.4.0",
-        "typescript": "^5"
+        "typescript": "^5",
+        "unified": "^11.0.5"
     },
     "resolutions": {
         "js-yaml": "4.3.2"

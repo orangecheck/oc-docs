@@ -1,46 +1,49 @@
 #!/usr/bin/env node
 /**
- * Design-system drift guard (Phase 4 of the convergence program).
- * Fails if @orangecheck/ui — deprecated, folded into @orangecheck/design —
- * is re-introduced as a dependency or imported anywhere in src.
- * See CLAUDE.md "Design system" + DESIGN-SYSTEM-CONVERGENCE.md.
- * Runs automatically before `type-check` (yarn pretype-check hook).
+ * Design-system guard. The docs are on @orangecheck/app-design, and a page
+ * mixing systems breaks: app-design's tokens apply under data-oc-app="ochk"
+ * on <html>, so a classic component renders in the wrong colours and its
+ * dialogs portal outside any wrapper. Fails if:
+ *   - @orangecheck/ui (deprecated) is a dependency or imported;
+ *   - anything from the classic @orangecheck/design is imported, except its
+ *     Swagger UI stylesheet, which app-design does not ship yet.
+ * Runs before `type-check` (the pretype-check hook).
  */
-import { execSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
-let bad = false;
+const ALLOWED = new Set(['@orangecheck/design/styles/swagger.css']);
+const IMPORT =
+    /(?:from\s+|import\s+|import\(\s*|require\(\s*)['"](@orangecheck\/(?:ui|design)(?:\/[^'"]*)?)['"]/g;
 
-try {
-    const out = execSync(
-        `grep -rIlE "from ['\\"]@orangecheck/ui['\\"]" src --include=*.ts --include=*.tsx 2>/dev/null || true`,
-        { encoding: 'utf8' }
-    ).trim();
-    if (out) {
-        console.error(
-            '✗ design-system drift: `@orangecheck/ui` imported in:\n' +
-                out
-                    .split('\n')
-                    .map((f) => '    ' + f)
-                    .join('\n') +
-                '\n  → import composites/chrome from `@orangecheck/design` (see CLAUDE.md).'
-        );
-        bad = true;
+function walk(dir, out = []) {
+    for (const name of readdirSync(dir)) {
+        const p = join(dir, name);
+        if (statSync(p).isDirectory()) {
+            // Generated SDK pages quote package names in prose and code.
+            if (p !== join('src', 'pages', 'sdk')) walk(p, out);
+        } else if (/\.(ts|tsx|js|jsx|mjs|css)$/.test(name)) out.push(p);
     }
-} catch {}
+    return out;
+}
 
-try {
-    if (
-        existsSync('package.json') &&
-        /"@orangecheck\/ui"\s*:/.test(readFileSync('package.json', 'utf8'))
-    ) {
-        console.error(
-            '✗ design-system drift: `@orangecheck/ui` is a dependency in package.json.\n' +
-                '  → it is folded into `@orangecheck/design`; remove the dep.'
-        );
-        bad = true;
+const bad = [];
+for (const file of [...walk('src'), 'next.config.ts']) {
+    const text = readFileSync(file, 'utf8');
+    for (const m of text.matchAll(IMPORT)) {
+        if (!ALLOWED.has(m[1])) bad.push(`    ${file}: ${m[1]}`);
     }
-} catch {}
+}
+if (/"@orangecheck\/ui"\s*:/.test(readFileSync('package.json', 'utf8'))) {
+    bad.push('    package.json: @orangecheck/ui is a dependency');
+}
 
-if (bad) process.exit(1);
-console.log('✓ design-system drift guard: clean (no @orangecheck/ui)');
+if (bad.length) {
+    console.error(
+        '✗ design-system guard: the docs use @orangecheck/app-design only.\n' +
+            bad.join('\n') +
+            '\n  → import from @orangecheck/app-design; add what it lacks to the package.'
+    );
+    process.exit(1);
+}
+console.log('✓ design-system guard: app-design only (classic: swagger.css alone)');

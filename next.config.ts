@@ -1,17 +1,13 @@
 import type { NextConfig } from 'next';
 
 import createMDX from '@next/mdx';
+import { rehypeCode } from '@orangecheck/app-design/code';
 import rehypeSlug from 'rehype-slug';
 
 import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
+import rehypeTypedoc from './src/lib/rehype-typedoc.mjs';
 import { SITE_CONFIG } from './src/lib/site.config';
 
-// Surface the running build in the OcAccountMenu BuildFooter.
-// VERCEL_GIT_COMMIT_SHA is populated automatically on every Vercel deploy;
-// `dev` is the safe sentinel for local builds.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pkg = require('./package.json') as { version: string };
-const BUILD_SHA = (process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev').slice(0, 7);
 const isDev = process.env.NODE_ENV !== 'production';
 
 // The old host. Every address on it moves to the same path under ochk.io/docs.
@@ -22,15 +18,11 @@ const nextConfig: NextConfig = {
 
     basePath: SITE_CONFIG.basePath,
 
-    // @orangecheck/ui + @orangecheck/design ship ESM bundles with `import
-    // 'next/link'`; without transpile next's bare-specifier resolution fails
-    // (no exports map) and SSR throws `Cannot find module next/link`.
-    transpilePackages: ['@orangecheck/ui', '@orangecheck/design'],
-
-    env: {
-        NEXT_PUBLIC_APP_VERSION: pkg.version,
-        NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
-    },
+    // Bundle app-design rather than load it from node_modules at render time.
+    // Its links come from next/link, and next/link learns the base path only
+    // when it is compiled into the build: left external, every link in the
+    // header, sidebar and pages renders without /docs.
+    transpilePackages: ['@orangecheck/app-design'],
 
     /**
      * The handwritten `/sdks/*` group merged into the auto-gen `/sdk/*`
@@ -176,10 +168,11 @@ const withMDX = createMDX({
         providerImportSource: '@mdx-js/react',
         remarkPlugins: [['remark-gfm']],
         // rehype-slug bakes `id="…"` onto every heading at build time so
-        // anchor links (DocsToc + direct deep links like /foo#bar) work
-        // immediately, with no client-side race against collectHeadings().
-        // rehype-keep-ids keeps BIP-322, kind-30085 and the like on one line.
-        rehypePlugins: [rehypeSlug, rehypeKeepIds],
+        // anchor links ("On this page" + direct deep links like /foo#bar) work
+        // immediately. rehype-keep-ids keeps BIP-322, kind-30085 and the like
+        // on one line. rehype-typedoc reads TypeDoc's escapes in /sdk after the
+        // ids are set, so no anchor moves. rehypeCode highlights every fence.
+        rehypePlugins: [rehypeSlug, rehypeKeepIds, rehypeTypedoc, rehypeCode],
     },
 });
 

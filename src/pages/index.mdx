@@ -1,5 +1,3 @@
-import { FamilyGrid } from '@/components/docs/FamilyGrid';
-
 export const metadata = {
     title: 'OrangeCheck documentation',
     description:
@@ -21,7 +19,7 @@ conventions. Learn that layer once; each protocol adds a small layer on top.
 Six verbs of sovereign sociality: _am, whisper, decide, declare, delegate,
 swear_.
 
-<FamilyGrid />
+<ProtocolGrid link="docs" className="not-prose my-6 lg:grid-cols-2" />
 
 OC Attest is the **base layer** — every other sibling can optionally reference
 an Attest proof as a "stake at signing" signal. The other five siblings are
@@ -50,8 +48,8 @@ flowchart TB
     PLEDGE -.->|dispute mechanism| VOTE
     AGENT -->|every action anchored| STAMP
 
-    classDef base fill:#0a0a0a,stroke:#f97316,stroke-width:2px,color:#fafafa;
-    classDef peer fill:#18181b,stroke:#52525b,color:#fafafa;
+    classDef base stroke:#f66d36,stroke-width:2px;
+    classDef peer stroke-width:1px;
     classDef invisible fill:transparent,stroke:transparent;
     class ATTEST base;
     class LOCK,STAMP,VOTE,AGENT,PLEDGE peer;

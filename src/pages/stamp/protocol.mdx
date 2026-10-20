@@ -44,9 +44,10 @@ Bitcoin headers.
 2. Her browser computes `sha256(bytes)` locally — content never leaves her tab.
 3. Client builds the canonical message (six lines, `oc-stamp:v1`
    domain-separated).
-4. Her wallet signs it via BIP-322. One prompt.
-5. Client derives `id = sha256(canonical_message)`, submits to two OTS
-   calendars.
+4. Client derives `id = sha256(canonical_message)` and shows her the message
+   beside it.
+5. Her wallet signs the hex `id` via BIP-322. One prompt. The client submits the
+   id to two OTS calendars.
 6. Client assembles the envelope: v, kind, id, content (hash + length + mime +
    ref), signer, signed_at, stake (null), ots (pending), sig.
 7. About an hour later, an OTS calendar anchors the root to a Bitcoin block. The

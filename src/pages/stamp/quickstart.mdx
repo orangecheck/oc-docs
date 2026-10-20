@@ -28,8 +28,9 @@ No account. No server. No fees.
 2. Drop the file you want to stamp. Your browser hashes it in-place; the bytes
    never leave your tab.
 3. Connect your wallet. Your Bitcoin address auto-fills.
-4. Click **sign**. Your wallet pops up with a short canonical message (six
-   lines, starting with `oc-stamp:v1`). Approve.
+4. Click **sign**. The page shows the six-line canonical message (starting with
+   `oc-stamp:v1`) and the id computed from it. Your wallet asks you to sign that
+   id, a 64-character hex string. Approve.
 5. The client submits the envelope id to two OpenTimestamps calendars. You get a
    **pending** proof immediately, and a **confirmed** anchor within about an
    hour.

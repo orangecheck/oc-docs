@@ -25,10 +25,11 @@ const env = await stamp({
 });
 ```
 
-`stamp()` builds a [canonical message](/ecosystem/canonical-message) with header
-`oc-stamp`, the SHA-256 of `content`, the MIME type, the signer's address, and —
-if provided — the Attest reference. The wallet signs the canonical bytes via
-[BIP-322](/ecosystem/bip322).
+`stamp()` builds a [canonical message](/ecosystem/canonical-message): the
+`oc-stamp:v1` header, the signer's address, the SHA-256 of `content`, its
+length, its MIME type and the signing time. The envelope id is the SHA-256 of
+those bytes, and the wallet signs the id's hex form via
+[BIP-322](/ecosystem/bip322), so the signature covers every line.
 
 The envelope is a JSON blob:
 

@@ -45,7 +45,7 @@ recomputing the attestation ID, and the whole chain breaks.
 | [UniSat](https://unisat.io)                   | browser extension | ✅ all address types                                              |
 | [Xverse](https://xverse.app)                  | browser + mobile  | ✅ all address types                                              |
 | [Leather](https://leather.io)                 | browser           | ✅ all address types                                              |
-| [Alby](https://getalby.com)                   | browser           | ✅ all address types                                              |
+| [Alby](https://getalby.com)                   | browser           | ❌ WebLN signs with a Lightning node key, not a Bitcoin address   |
 | [Sparrow](https://sparrowwallet.com)          | desktop           | ✅ via "Sign message" (right-click an address)                    |
 | [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | ⚠ BIP-322 for P2WPKH / P2TR via `signmessage` — version-dependent |
 | [Electrum](https://electrum.org)              | desktop           | ❌ legacy scheme only (no BIP-322 for SegWit)                     |
@@ -114,5 +114,5 @@ strict.
 - [OC Attest — verification](/attest/verification) — the full verification
   algorithm
 - [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README) — one
-  `getSigner(wallet, { address })` API across UniSat / Xverse / Leather / Alby /
-  OKX / Phantom
+  `getSigner(wallet, { address })` API across UniSat / Xverse / Leather / OKX /
+  Phantom

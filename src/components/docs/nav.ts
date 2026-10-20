@@ -893,7 +893,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/wallet-adapter/README',
                 label: '@orangecheck/wallet-adapter',
-                blurb: 'Normalize UniSat / Xverse / Leather / Alby / OKX / Phantom behind one getSigner() API.',
+                blurb: 'Normalize UniSat / Xverse / Leather / OKX / Phantom behind one getSigner() API.',
             },
             {
                 href: '/sdk/design/README',

@@ -16,7 +16,7 @@ export const meta = {
 > identity-bearing provenance primitive a normal user can create with a wallet
 > they already own. Every adjacent system falls short on at least one of
 > (authorship, priority, stake, openness, verifiability). OC Stamp exists to
-> close that gap by composing three primitives the OrangeCheck ecosystem already
+> close that gap by composing three primitives the orangecheck ecosystem already
 > ships.
 
 This is the summary page. The long-form rationale — twelve numbered hypotheses,
@@ -44,7 +44,7 @@ No single incumbent answers all four:
 
 - **BIP-322** for authorship — every major Bitcoin wallet supports it.
 - **OpenTimestamps** for priority — we depend on it; we do not rebuild it.
-- **OrangeCheck** for stake — `sats_bonded × days_unspent` as an economic signal
+- **OC Attest** for stake — `sats_bonded × days_unspent` as an economic signal
   baked into the envelope.
 - **Nostr** (kind-30083) for durable public discovery — optional, and no relay
   is load-bearing for verification.
@@ -55,13 +55,13 @@ Every mechanism must pass this test: **if the feature works identically on
 Ed25519 and doesn't require Bitcoin, it doesn't belong here.**
 
 - **Authorship via BIP-322**: requires a Bitcoin address's private key.
-  Substituting Ed25519 loses the identity continuity with OrangeCheck
+  Substituting Ed25519 loses the identity continuity with orangecheck
   attestations and OC Lock device records.
 - **Priority via OpenTimestamps Bitcoin anchor**: Bitcoin's block header is the
   priority oracle. No other chain has its settlement assurance at comparable
   cost.
-- **Stake via OrangeCheck**: sats-bonded × days-unspent is an economic signal
-  that exists only because Bitcoin's UTXO model exists.
+- **Stake via OC Attest**: sats-bonded × days-unspent is an economic signal that
+  exists only because Bitcoin's UTXO model exists.
 
 Strip any one and OC Stamp degrades into a commoditized primitive — PGP
 (authorship alone), OTS alone (priority alone), or an EVM timestamp (wrong

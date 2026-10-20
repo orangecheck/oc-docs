@@ -7,7 +7,7 @@ export const metadata = {
 # OC Pledge — Quickstart
 
 End-to-end: construct and sign a pledge, publish it to Nostr, then record and
-classify its outcome. About five minutes if you already have an OrangeCheck
+classify its outcome. About five minutes if you already have an orangecheck
 attestation; ten if you need to mint one first.
 
 ## 1. Install
@@ -42,7 +42,7 @@ const pledge = await createPledge({
     resolves_at: { block: 920_000 },
     expires_at: '2026-12-01T00:00:00Z',
     bond: {
-        attestation_id: '<64-hex id of your OrangeCheck attestation>',
+        attestation_id: '<64-hex id of your orangecheck attestation>',
         min_sats: 1_000_000,
         min_days: 90,
     },

@@ -1,25 +1,25 @@
 export const metadata = {
     title: 'Why OC Agent',
     description:
-        'The gap in the OrangeCheck stack, why not OAuth or UCAN, why scope strings, why bond the grant, why extend OC Stamp.',
+        'The gap in the orangecheck stack, why not OAuth or UCAN, why scope strings, why bond the grant, why extend OC Stamp.',
 };
 
 # Why OC Agent
 
-The authority primitive, and why it belongs in the OrangeCheck stack.
+The authority primitive, and why it belongs in the orangecheck stack.
 
 ## The gap in the stack
 
-The OrangeCheck family is a set of composable primitives, each binding a verb to
+The orangecheck family is a set of composable primitives, each binding a verb to
 a Bitcoin address:
 
-| Primitive   | Verb                | What it binds                                                                                         |
-| ----------- | ------------------- | ----------------------------------------------------------------------------------------------------- |
-| OrangeCheck | **identity**        | "This address has N sats bonded for M days."                                                          |
-| OC Lock     | **confidentiality** | "This payload is readable only by the device registered under this address."                          |
-| OC Vote     | **legitimacy**      | "This vote was cast by an address carrying a bond, on a poll with transparent rules."                 |
-| OC Stamp    | **provenance**      | "This address signed this content at this time, anchored to Bitcoin block N."                         |
-| OC Agent    | **authority**       | "This address authorized this other address to take actions matching this scope set until this time." |
+| Primitive | Verb                | What it binds                                                                                         |
+| --------- | ------------------- | ----------------------------------------------------------------------------------------------------- |
+| OC Attest | **identity**        | "This address has N sats bonded for M days."                                                          |
+| OC Lock   | **confidentiality** | "This payload is readable only by the device registered under this address."                          |
+| OC Vote   | **legitimacy**      | "This vote was cast by an address carrying a bond, on a poll with transparent rules."                 |
+| OC Stamp  | **provenance**      | "This address signed this content at this time, anchored to Bitcoin block N."                         |
+| OC Agent  | **authority**       | "This address authorized this other address to take actions matching this scope set until this time." |
 
 The first four all describe _what the principal did themselves_. OC Agent is the
 first primitive that concerns _what another party is allowed to do on the
@@ -32,8 +32,8 @@ first-class:
   binding between agent key and stamped content.
 - **OC Lock-wrapped delegation instructions** — confidentiality ≠ authority.
   Readable by the intended agent, but nothing to verify after the fact.
-- **OrangeCheck attestation of a delegation** — attestations describe the
-  signer, not a grant to another party.
+- **OC Attest attestation of a delegation** — attestations describe the signer,
+  not a grant to another party.
 
 OC Agent is the minimal additional protocol that fills the gap without forking
 or replacing any sibling.
@@ -101,7 +101,7 @@ Per-action bond declarations would be more granular but make verification worse:
 
 - Each verification becomes an N-way attestation re-resolution.
 - Principal's total exposure is decoupled from the riskiest actions.
-- The OrangeCheck attestation is a slowly-changing signal. Sats bonded for 180
+- The OC Attest attestation is a slowly-changing signal. Sats bonded for 180
   days doesn't want to be debited per-action.
 
 Binding the bond to the delegation is the right granularity: "I put N sats of
@@ -145,9 +145,9 @@ One `@orangecheck/stamp-core` for the crypto, `@orangecheck/agent-core` on top.
 
 ## Why Nostr kinds 30083 and 30085
 
-The OrangeCheck family operates in 30078–30115. The agent-relevant claims:
+The orangecheck family operates in 30078–30115. The agent-relevant claims:
 
-- 30078 — OrangeCheck / OC Lock device record
+- 30078 — OC Attest attestation / OC Lock device record
 - 30080–30082 — OC Vote poll / ballot / reveal
 - 30083 — **OC Agent delegation** (`oc-agent-del:`) **and** OC Stamp envelope
   (`oc-stamp:`); co-claimed under disjoint `d`-tag prefixes plus distinct
@@ -181,10 +181,10 @@ The first is what exists today by default. The second is what OC Agent proposes
 as a _default_ that isn't tied to any platform, vendor, or account.
 
 Binding agent authority to a Bitcoin address inherits, for free, everything the
-rest of the OrangeCheck stack gives us:
+rest of the orangecheck stack gives us:
 
 - A well-understood identity substrate (BIP-322).
-- A staking signal with real economic cost (OrangeCheck).
+- A staking signal with real economic cost (OC Attest).
 - A confidentiality layer if the authority itself is sensitive (OC Lock).
 - A provenance layer for each action (OC Stamp).
 - A governance primitive if principal-group decisions gate the grant (OC Vote).

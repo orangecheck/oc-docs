@@ -121,7 +121,7 @@ The relay has a long-lived X25519 device key. Its URL and pubkey are public.
 
 1. Opens the link. The app shows price + relay URL.
 2. Bob pays 10k sats to `bc1qalice…`.
-3. Bob authenticates to the relay via OrangeCheck sign-in.
+3. Bob authenticates to the relay via orangecheck sign-in.
 4. App submits `{ envelope_id, tx_id }` to the relay.
 5. Relay verifies the tx (amount, confirmations, recipient), unwraps the content
    key with its own device secret, re-wraps it for Bob's device key fetched from
@@ -151,17 +151,17 @@ Alice can seal a vault to herself. Sender and recipient are both her Bitcoin
 address. The envelope's only `recipients[]` entry is her own device record. She
 can decrypt from any of her devices. The "password" is her Bitcoin wallet.
 
-## Layered with OrangeCheck
+## Layered with orangecheck
 
-OC Lock depends on OrangeCheck in two explicit places:
+OC Lock depends on orangecheck in two explicit places:
 
 1. **Sybil-gated inbox** (optional). Call `@orangecheck/sdk#check` on the
    recipient's address before encrypting. Require minimum sats / minimum days.
-2. **Shared sign-in.** OC Lock's payment-mode relay uses OrangeCheck's
+2. **Shared sign-in.** OC Lock's payment-mode relay uses orangecheck's
    sign-in-with-bitcoin flow verbatim: BIP-322 challenge, signed response, JWT
    session. Same wallet signs binding statements and OC challenges.
 
-Every OC Lock device record is structurally similar to an OrangeCheck
+Every OC Lock device record is structurally similar to an orangecheck
 attestation: a canonical UTF-8 message committing to a Bitcoin address,
 BIP-322-signed. Attestation ids (SHA-256 of canonical message) are computable
 over the binding statement for stable, content-addressable discovery.

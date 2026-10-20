@@ -15,10 +15,10 @@ export interface SEOConfig {
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.siteUrl;
-const SITE_NAME = 'OrangeCheck docs';
-const DEFAULT_TITLE = 'OrangeCheck documentation';
+const SITE_NAME = 'orangecheck docs';
+const DEFAULT_TITLE = 'orangecheck documentation';
 const DEFAULT_DESCRIPTION =
-    'The OrangeCheck handbook. Six verbs — am, whisper, decide, declare, delegate, swear — mapped to identity, confidentiality, legitimacy, provenance, authority, commitment. Six composable protocols on Bitcoin: OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent, OC Pledge. BIP-322 + Nostr kind-30078 + OpenTimestamps. Every artifact verifies offline, forever.';
+    'The orangecheck handbook. Six verbs — am, whisper, decide, declare, delegate, swear — mapped to identity, confidentiality, legitimacy, provenance, authority, commitment. Six composable protocols on Bitcoin: OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent, OC Pledge. BIP-322 + Nostr kind-30078 + OpenTimestamps. Every artifact verifies offline, forever.';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 
 export function generateMetaTags(config: SEOConfig = {}) {

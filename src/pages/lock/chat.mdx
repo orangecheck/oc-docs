@@ -17,7 +17,7 @@ export const metadata = {
 OC Lock's core protocol seals a single envelope from a sender to a recipient.
 Chat is that same primitive _applied repeatedly, over a persistent transport,
 with local thread state._ Nothing new happens cryptographically — the envelope
-format, the device keys, the BIP-322 sender signature, the OrangeCheck gate are
+format, the device keys, the BIP-322 sender signature, the orangecheck gate are
 all unchanged. What changes is:
 
 - messages arrive without the sender having to copy-paste a URL
@@ -34,7 +34,7 @@ Bitcoin address you control**. That address is:
   phish
 - **verifiable** — every message is signed BIP-322 from the sender's address, so
   recipients can prove who sent it without trusting a server
-- **sybil-resistant on demand** — opt into the OrangeCheck filter and only
+- **sybil-resistant on demand** — opt into the orangecheck filter and only
   accept DMs from addresses that hold on-chain stake
 - **portable across devices** — register a new device with the same address and
   your inbox is there, no account migration
@@ -148,7 +148,7 @@ Honest summary:
   land later.
 - **No chain payments gating chat messages.** We deliberately kept payment-mode
   out of chat — Bitcoin transactions per message is absurd. If you want a
-  payment precondition _for starting a thread_, use the OrangeCheck stake gate
+  payment precondition _for starting a thread_, use the orangecheck stake gate
   (sybil filter) instead.
 
 ## Storage model

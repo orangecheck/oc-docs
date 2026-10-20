@@ -1,13 +1,13 @@
 export const metadata = {
     title: 'OC Pledge — Composition with the family',
     description:
-        'How OC Pledge composes with the other five OrangeCheck primitives. Gate predicates, agent-delegated pledges, stamp-resolved pledges, vote-resolved disputes, and confidential counterparty negotiation via Lock.',
+        'How OC Pledge composes with the other five orangecheck primitives. Gate predicates, agent-delegated pledges, stamp-resolved pledges, vote-resolved disputes, and confidential counterparty negotiation via Lock.',
 };
 
 # Composition with the family
 
 OC Pledge is designed to compose with every other primitive. Each pattern below
-is one config block away from any existing OrangeCheck deployment.
+is one config block away from any existing orangecheck deployment.
 
 ## Gate predicates — `ocGate({ pledgeHistory })`
 
@@ -127,6 +127,6 @@ coupling.
 - **No pledge chains in v1.0.** "This pledge's resolution triggers that pledge's
   resolution" is interesting and deferred to post-v1 once we observe what
   real-world demand exists.
-- **No cross-protocol aggregated reputation.** Same discipline OrangeCheck
+- **No cross-protocol aggregated reputation.** Same discipline orangecheck
   applies to `score_v0` — the protocol ships raw metrics; aggregation is the
   platform's call.

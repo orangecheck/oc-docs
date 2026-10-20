@@ -34,7 +34,7 @@ has failed at one or more of those legs:
 - **Snapshot / Helios voting** solves a different verb (group preference, not
   individual commitment).
 
-OC Pledge makes the boring choice: **bond your stake with the OrangeCheck
+OC Pledge makes the boring choice: **bond your stake with the orangecheck
 attestation you already have, sign a canonical proposition with the Bitcoin
 wallet you already own, point the resolution at one of seven mechanisms whose
 outcome is a pure function of public state, and let any verifier classify the
@@ -99,7 +99,7 @@ as an OC Stamp at the deadline.
 ### Alice swears
 
 1. Alice has 750,000 sats sitting in a single UTXO at `bc1qalice…`, attested via
-   OrangeCheck attestation `0x111…111` for 90 days unspent.
+   orangecheck attestation `0x111…111` for 90 days unspent.
 2. Alice has a draft preprint, content_hash `sha256:e3b0c4…`, that she does NOT
    want to release until peer review is done. But she wants to commit publicly
    to the exact bytes she'll publish.
@@ -523,10 +523,10 @@ Pledge is the only row with all six properties.
 - **Custody of swearer keys.** Never. The wallet the swearer already holds is
   the identity.
 
-## How this composes with the rest of the OrangeCheck family
+## How this composes with the rest of the orangecheck family
 
-- **OrangeCheck Attest** is the bond layer. Every pledge has a `bond` block
-  referencing an OC Attest attestation. (SPEC §2, §8)
+- **OC Attest** is the bond layer. Every pledge has a `bond` block referencing
+  an OC Attest attestation. (SPEC §2, §8)
 - **OC Stamp** is the canonical resolution mechanism for content-publication
   pledges (`stamp_published`). (SPEC §3.4.4)
 - **OC Vote** is the canonical dispute-resolution mechanism (`vote_resolves`).
@@ -542,7 +542,7 @@ complete.
 ## Live case studies
 
 The three reference shapes were exercised end-to-end by OC contributors against
-real OrangeCheck bonds before the v1.0 spec cut. The runbook for adding
+real orangecheck bonds before the v1.0 spec cut. The runbook for adding
 subsequent OC-led pledges is in
 [`RUNBOOK.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/RUNBOOK.md).
 

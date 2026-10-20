@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'BIP-322 signing',
     description:
-        'Every OrangeCheck sibling signs the canonical message via BIP-322. Why not legacy signmessage. Which wallets support it.',
+        'Every orangecheck sibling signs the canonical message via BIP-322. Why not legacy signmessage. Which wallets support it.',
 };
 
 # BIP-322 signing
 
-Every OrangeCheck sibling signs the canonical message via
+Every orangecheck sibling signs the canonical message via
 [BIP-322](https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki)
 ("Generic Signed Message Format"). This page explains why that specific scheme,
 what wallets support it, and how to validate a signature in the two reference
@@ -24,7 +24,7 @@ this by building a virtual "to-sign" transaction that spends a virtual
 "to-spend" transaction, and signing the to-sign with the key that controls the
 address.
 
-If BIP-322 hadn't existed, OrangeCheck would have had to invent something like
+If BIP-322 hadn't existed, orangecheck would have had to invent something like
 it. Since it does exist and has real wallet support, we use it.
 
 ## What the wallet signs
@@ -40,16 +40,16 @@ recomputing the attestation ID, and the whole chain breaks.
 
 ## Wallet support matrix
 
-| Wallet                                        | Type              | BIP-322 support                                                   |
-| --------------------------------------------- | ----------------- | ----------------------------------------------------------------- |
-| [UniSat](https://unisat.io)                   | browser extension | ✅ all address types                                              |
-| [Xverse](https://xverse.app)                  | browser + mobile  | ✅ all address types                                              |
-| [Leather](https://leather.io)                 | browser           | ✅ all address types                                              |
-| [Alby](https://getalby.com)                   | browser           | ❌ WebLN signs with a Lightning node key, not a Bitcoin address   |
-| [Sparrow](https://sparrowwallet.com)          | desktop           | ✅ via "Sign message" (right-click an address)                    |
-| [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | ⚠ BIP-322 for P2WPKH / P2TR via `signmessage` — version-dependent |
-| [Electrum](https://electrum.org)              | desktop           | ❌ legacy scheme only (no BIP-322 for SegWit)                     |
-| Hardware wallets (Coldcard / Trezor / Ledger) | HW                | ⚠ via PSBT flow — not a one-click signing experience              |
+| Wallet                                        | Type              | BIP-322 support                                                         |
+| --------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
+| [UniSat](https://unisat.io)                   | browser extension | Yes, all address types                                                  |
+| [Xverse](https://xverse.app)                  | browser + mobile  | Yes, all address types                                                  |
+| [Leather](https://leather.io)                 | browser           | Yes, all address types                                                  |
+| [Alby](https://getalby.com)                   | browser           | No. WebLN signs with a Lightning node key, not a Bitcoin address        |
+| [Sparrow](https://sparrowwallet.com)          | desktop           | Yes, via "Sign message" (right-click an address)                        |
+| [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | Partial. BIP-322 for P2WPKH / P2TR via `signmessage`, version-dependent |
+| [Electrum](https://electrum.org)              | desktop           | No. Legacy scheme only (no BIP-322 for SegWit)                          |
+| Hardware wallets (Coldcard / Trezor / Ledger) | HW                | Partial, via a PSBT flow. Not one-click signing                         |
 
 If your wallet isn't on the list, the canonical test is: does signing a message
 produce an output that

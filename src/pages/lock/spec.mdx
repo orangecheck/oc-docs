@@ -41,7 +41,7 @@ Sender and recipient may be the same person (self-vault).
 An **OC identity** is the pair `(btc_address, attestation_id)` where:
 
 - `btc_address` is a mainnet Bitcoin address (P2WPKH, P2TR, or P2PKH)
-- `attestation_id` is the SHA-256 of a canonical OrangeCheck message signed by
+- `attestation_id` is the SHA-256 of a canonical orangecheck message signed by
   that address
 
 A recipient MUST have an OC identity known to the sender. OC Lock does not
@@ -193,7 +193,7 @@ A sealed vault is a canonical JSON object. File extension `.lock`, MIME
 ### §4.4 Payment mode
 
 Replaces step 4 in §4.2 with a single "recipient" that is the named relay. The
-unseal flow requires the recipient to authenticate to the relay (via OrangeCheck
+unseal flow requires the recipient to authenticate to the relay (via orangecheck
 sign-in) and submit a confirmed payment tx; the relay then unwraps the content
 key and re-wraps for the recipient's device.
 

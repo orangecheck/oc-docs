@@ -48,7 +48,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/',
                 label: 'Overview',
-                blurb: 'What the OrangeCheck ecosystem is and where to go.',
+                blurb: 'What the orangecheck ecosystem is and where to go.',
             },
             {
                 href: '/getting-started/which-protocol',
@@ -74,7 +74,7 @@ export const DOCS_NAV: DocsSection[] = [
             },
             {
                 href: '/connect',
-                label: 'OrangeCheck Connect',
+                label: 'OC Connect',
                 blurb: 'Give each user an orangecheck account on top of Google, Auth0, email/password — any login.',
             },
         ],
@@ -932,7 +932,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/charter',
                 label: 'Charter',
-                blurb: 'The eight commitments OrangeCheck makes — single source of truth, binds every product (me, every protocol sibling).',
+                blurb: 'The eight commitments orangecheck makes — single source of truth, binds every product (me, every protocol sibling).',
             },
             {
                 href: '/reference/faq',
@@ -952,7 +952,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/reference/multi-account',
                 label: 'Multi-account sign-in',
-                blurb: 'Hold multiple OrangeCheck accounts in one browser and switch between them without re-auth. Roster model, wire surface, every family site gets it for free.',
+                blurb: 'Hold multiple orangecheck accounts in one browser and switch between them without re-auth. Roster model, wire surface, every family site gets it for free.',
             },
             {
                 href: '/infrastructure/relay',

@@ -55,7 +55,7 @@ export default function Document() {
                     href={`${BASE}/favicons/apple-touch-icon.png`}
                 />
                 <link rel="manifest" href={`${BASE}/favicons/site.webmanifest`} />
-                <meta name="application-name" content="OrangeCheck docs" />
+                <meta name="application-name" content="orangecheck docs" />
                 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
                 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
                 <meta name="color-scheme" content="light dark" />

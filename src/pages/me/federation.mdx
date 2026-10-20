@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'orangecheck · Federation custody',
     description:
-        'The design for Fedimint federation-held wallets on ochk.app · the charter · how to verify guardians · how graduation works. Not live yet: OrangeCheck holds user balances during bring-up.',
+        'The design for Fedimint federation-held wallets on ochk.app · the charter · how to verify guardians · how graduation works. Not live yet: orangecheck holds user balances during bring-up.',
 };
 
 # orangecheck · Federation custody
@@ -9,9 +9,9 @@ export const metadata = {
 > **Status: this is the design, not today.** No federation is bound.
 > [`/api/federations`](https://me.ochk.io/api/federations) is the
 > machine-readable answer and it currently serves a single entry with no invite,
-> so no client can join one. **While it is in testing, OrangeCheck holds every
+> so no client can join one. **While it is in testing, orangecheck holds every
 > user's accrued balance and is the party that moves it.** That is a stage,
-> deliberately: OrangeCheck operates every role until independent operators take
+> deliberately: orangecheck operates every role until independent operators take
 > them. Read the rest of this page as the destination, and
 > [ochk.app/custody](https://ochk.app/custody) as the present tense.
 
@@ -149,9 +149,9 @@ once ran this were torn down in July 2026. The federation operator decision is
 in active resolution per the criteria in
 [`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md).
 
-So today OrangeCheck holds what you accrue. There is no stored balance to hold,
+So today orangecheck holds what you accrue. There is no stored balance to hold,
 strictly speaking — it is recomputed from your signed billable envelopes on
-every read — but the party who owes it is OrangeCheck, and that is the honest
+every read — but the party who owes it is orangecheck, and that is the honest
 way to say it.
 
 We are not soft-pedaling this. The in-tree audit at

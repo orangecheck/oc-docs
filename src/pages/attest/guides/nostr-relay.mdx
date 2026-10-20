@@ -6,7 +6,7 @@ export const metadata = {
 
 # Sybil-filtered Nostr relay
 
-Reject Nostr events from pubkeys that don't have an OrangeCheck proof meeting
+Reject Nostr events from pubkeys that don't have an orangecheck proof meeting
 your thresholds. Ships as a Strfry write-policy plugin.
 
 ## Install
@@ -78,12 +78,12 @@ services:
 ## Why bypass kinds 0, 3, 10002
 
 - **Kind 0** — profile metadata. Users need this to publish their npub before
-  they can create an OrangeCheck proof.
+  they can create an orangecheck proof.
 - **Kind 3** — contact lists.
 - **Kind 10002** — relay list metadata.
 
 These are bootstrap events. Gating them creates a chicken-and-egg problem.
-Everything else (notes, reactions, DMs, zaps, OrangeCheck attestations
+Everything else (notes, reactions, DMs, zaps, orangecheck attestations
 themselves) goes through the gate.
 
 ## Custom relay — nostr-tools

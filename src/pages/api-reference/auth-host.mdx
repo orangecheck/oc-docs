@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'API · ochk.io · auth host',
     description:
-        'Public API surface for ochk.io — the OrangeCheck family auth host. Sign-in (BIP-322, email-OTP, Google/GitHub OAuth), OrangeCheck Connect provisioning, JWKS, signed-challenge primitive, account ops, contact form.',
+        'Public API surface for ochk.io — the orangecheck family auth host. Sign-in (BIP-322, email-OTP, Google/GitHub OAuth), OC Connect provisioning, JWKS, signed-challenge primitive, account ops, contact form.',
 };
 
 # ochk.io · auth host API
 
-The OrangeCheck family auth host. Issues Ed25519-signed `oc_session` cookies
+The orangecheck family auth host. Issues Ed25519-signed `oc_session` cookies
 (`Domain=.ochk.io`) that every consumer subsite verifies locally via
 [`@orangecheck/auth-core`](/sdk/auth-core/README) +
 [`@orangecheck/auth-client`](/sdk/auth-client/README) — no DB on consumers, no
@@ -27,7 +27,7 @@ per-request fetch to the auth host.
 | `challenge` | `/api/challenge` (GET + POST)                                        | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                |
 | `email-otp` | `/api/auth/email-otp/start`, `/verify`                               | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                              |
 | `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers`     | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers. |
-| `connect`   | `/api/connect/provision`, `/api/connect/apps`                        | OrangeCheck Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).              |
+| `connect`   | `/api/connect/provision`, `/api/connect/apps`                        | OC Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).                       |
 | `public`    | `/api/family-stats`                                                  | Cross-subdomain family-wide stats. No auth.                                                                             |
 | `forms`     | `/api/contact`                                                       | Contact-form relay via Resend. Same-origin only.                                                                        |
 
@@ -75,15 +75,15 @@ consumer code never branches on how the user signed in.
 3. `GET /api/auth/providers` lists which providers are configured — this is what
    [`<OcSignIn>`](/sdk/auth-client/README) reads to render its provider buttons.
 
-A provider sign-in mints the same OrangeCheck-held account that email-OTP does —
+A provider sign-in mints the same orangecheck-held account that email-OTP does —
 neither path gives the user a signing key of their own. Federation custody is
 the design for those accounts and is not live; see
-[federation custody](/me/federation). For layering OrangeCheck onto an
-integrator's _own_ OAuth instead, see [OrangeCheck Connect](/connect).
+[federation custody](/me/federation). For layering orangecheck onto an
+integrator's _own_ OAuth instead, see [OC Connect](/connect).
 
 ## Multi-account sign-in
 
-Hold multiple OrangeCheck accounts in one browser and switch between them
+Hold multiple orangecheck accounts in one browser and switch between them
 without re-authenticating — same pattern as Google or GitHub. Three endpoints
 touch this: `POST /api/auth/signin?add=1` (and the email-OTP equivalent) brings
 a new account into the browser's roster; `POST /api/auth/switch` flips the
@@ -102,8 +102,8 @@ import { EmbeddedOpenAPI } from '@/components/docs/EmbeddedOpenAPI';
 
 > The OAuth-provider (`/api/auth/<provider>/*`) and Connect (`/api/connect/*`)
 > endpoints are newer than the embedded OpenAPI document — their contracts are
-> documented under [Integration](/integration) and
-> [OrangeCheck Connect](/connect) until the spec catches up.
+> documented under [Integration](/integration) and [OC Connect](/connect) until
+> the spec catches up.
 
 ## See also
 

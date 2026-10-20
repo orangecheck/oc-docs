@@ -134,7 +134,7 @@ later vote (via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
 ## What's NOT in the protocol
 
 - **Our own timestamping layer.** OTS works. Peter Todd built it correctly.
-- **A proprietary Nostr kind.** We use 30083 in the OrangeCheck family range
+- **A proprietary Nostr kind.** We use 30083 in the orangecheck family range
   (30078 for attestations and lock device records, 30080–30082 for vote). No
   overloading.
 - **Keyservers we operate.** Envelopes are self-contained; directory is
@@ -144,13 +144,13 @@ later vote (via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
 - **Making OTS non-optional for signing.** A signed-but-unanchored envelope is a
   legitimate artifact; any later client can upgrade it.
 
-## What's layered from OrangeCheck
+## What's layered from orangecheck
 
 - **Optional stake reference** in `stake.attestation_id`. Composes with
   [`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) on the
   consumer side.
 - **Identity continuity** — the same Bitcoin address the user holds an
-  OrangeCheck attestation under, an OC Lock device record under, is the stamp
+  orangecheck attestation under, an OC Lock device record under, is the stamp
   signer.
 
 ## Where to go next

@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'Shared security model',
     description:
-        'The threat model every OrangeCheck protocol inherits. What Bitcoin stake proofs protect against. What they do NOT.',
+        'The threat model every orangecheck protocol inherits. What Bitcoin stake proofs protect against. What they do NOT.',
 };
 
 # Shared security model
 
-Every OrangeCheck sibling inherits the same foundational security properties and
+Every orangecheck sibling inherits the same foundational security properties and
 the same limitations. This page is the shared threat model. Protocol-specific
 concerns (Lock's envelope authentication, Stamp's OTS anchor verification,
 Vote's ballot-commitment mode) are covered in each protocol's own docs.
@@ -26,7 +26,7 @@ the scenarios they were designed for and weak everywhere else.
 
 ## What a stake proof reveals (publicly, forever)
 
-Any OrangeCheck proof that's been published — to Nostr, embedded in a Stamp
+Any orangecheck proof that's been published — to Nostr, embedded in a Stamp
 envelope, attached to a Vote ballot — is a **public cryptographic artifact**
 linking:
 
@@ -125,7 +125,7 @@ Stake raises the cost of sybils; it does not eliminate them.
 **Mitigation**: choose `min_sats` and `min_days` thresholds such that
 `N × min_sats` exceeds the attacker's expected payoff at scale.
 
-## What OrangeCheck does NOT protect against
+## What orangecheck does NOT protect against
 
 | Not protected               | Why                                                                                              |
 | --------------------------- | ------------------------------------------------------------------------------------------------ |

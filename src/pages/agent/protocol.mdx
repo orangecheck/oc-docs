@@ -1,19 +1,19 @@
 export const metadata = {
     title: 'Protocol walkthrough — OC Agent',
     description:
-        'How delegations, agent-actions, and revocations flow through the OrangeCheck stack.',
+        'How delegations, agent-actions, and revocations flow through the orangecheck stack.',
 };
 
 # Protocol walkthrough
 
 A tour of the three envelopes, two typical flows, and how they compose with the
-rest of the OrangeCheck stack. For the normative rules see the
+rest of the orangecheck stack. For the normative rules see the
 [specification](/agent/spec).
 
 ## Three envelopes
 
 OC Agent defines three envelope kinds. All three share the canonical-message /
-BIP-322 / Nostr publication discipline of the rest of the OrangeCheck stack.
+BIP-322 / Nostr publication discipline of the rest of the orangecheck stack.
 
 | Envelope                    | `kind`                | Nostr kind                                                    | `d`-tag prefix  | Purpose                                                                                                                |
 | --------------------------- | --------------------- | ------------------------------------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ Each envelope is independently verifiable:
 A delegation is a statement from a principal's Bitcoin address:
 
 > I, `bc1qprincipal…`, authorize `bc1qagent…` to perform actions matching scope
-> set S, bonded at 500,000 sats × 180 days under my OrangeCheck attestation,
+> set S, bonded at 500,000 sats × 180 days under my orangecheck attestation,
 > until Friday 2026-04-29T12:00Z.
 
 That statement is serialized into a canonical message, hashed to produce an id,
@@ -177,9 +177,9 @@ agent produces an agent-action whose content is an OC Vote envelope. Verifiers
 see the agent cast the vote, backed by a delegation, backed by the principal's
 bond.
 
-### With OrangeCheck
+### With orangecheck
 
-`bond.attestation_id` points to an OrangeCheck canonical message signed by the
+`bond.attestation_id` points to an orangecheck canonical message signed by the
 principal. Verifiers re-resolve it against current chain state — the bond is a
 live signal, not a stored number.
 

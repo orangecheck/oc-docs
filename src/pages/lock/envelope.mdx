@@ -65,7 +65,7 @@ normative rules, see the [specification](/lock/spec).
 | `id`                       | 64-char lowercase hex        | SHA-256 of the canonical envelope with `sig.value` emptied.              |
 | `alg`                      | object                       | Algorithm identifiers. Fixed in v2; reserved for forward-compat.         |
 | `from.address`             | string                       | Sender's mainnet Bitcoin address.                                        |
-| `from.attestation_id`      | hex, optional                | SHA-256 of the sender's OrangeCheck canonical message.                   |
+| `from.attestation_id`      | hex, optional                | SHA-256 of the sender's orangecheck canonical message.                   |
 | `recipients[].device_pk`   | 32-byte hex                  | Recipient's long-lived X25519 pubkey.                                    |
 | `recipients[].eph_pk`      | 32-byte hex                  | Sender's ephemeral X25519 pubkey for this recipient.                     |
 | `recipients[].wrapped_key` | base64url                    | Content key encrypted under the derived KEK.                             |

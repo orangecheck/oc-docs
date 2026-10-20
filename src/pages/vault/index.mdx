@@ -1,14 +1,14 @@
 export const metadata = {
     title: 'OC Vault · vault.ochk.io',
     description:
-        'Commercial encrypted-secrets vault from OrangeCheck. Passwords, TOTP codes, API keys, cards, identities, env-var bundles, and small files sealed client-side as ciphertext. Browser extension, CLI, and SDK on top. No recovery backdoor, zero lock-in.',
+        'Commercial encrypted-secrets vault from orangecheck. Passwords, TOTP codes, API keys, cards, identities, env-var bundles, and small files sealed client-side as ciphertext. Browser extension, CLI, and SDK on top. No recovery backdoor, zero lock-in.',
 };
 
 # OC Vault
 
-**Encrypted secrets storage, sealed by a key OrangeCheck never sees.**
+**Encrypted secrets storage, sealed by a key orangecheck never sees.**
 [vault.ochk.io](https://vault.ochk.io) is a commercial sub-product of
-OrangeCheck, parallel to [ochk.app](/me/). It is the consumer-facing
+orangecheck, parallel to [ochk.app](/me/). It is the consumer-facing
 productization of [OC Lock](/lock/) **Flow 4** — the self-vault ("password
 manager") pattern: one OC identity, many encrypted entries, all sealed under a
 key only your browser, your extension, or your CLI holds.
@@ -21,7 +21,7 @@ there is no entry name, no type, no payload to read.
 
 |                                               |                                                                                                                                                                                                                                                                              |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **No OC account**                             | Your OrangeCheck identity (Bitcoin wallet via BIP-322, or an OrangeCheck-issued identity via email-OTP) is the account. There is no master password to reset, because there is no account to attach a reset to. OC never sees a wallet key and holds no decryption backdoor. |
+| **No OC account**                             | Your orangecheck identity (Bitcoin wallet via BIP-322, or an orangecheck-issued identity via email-OTP) is the account. There is no master password to reset, because there is no account to attach a reset to. OC never sees a wallet key and holds no decryption backdoor. |
 | **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                          |
 | **Zero lock-in by construction**              | Every entry exports as a portable JSON snapshot. [`@orangecheck/vault-core`](/sdk/vault-core/README) from npm decrypts that file from any backup, forever — even if vault.ochk.io disappears.                                                                                |
 

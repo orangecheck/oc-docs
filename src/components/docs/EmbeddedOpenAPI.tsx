@@ -52,8 +52,10 @@ export function EmbeddedOpenAPI({ url, caption }: EmbeddedOpenAPIProps) {
                 </TextLink>
                 {caption && <span>{caption}</span>}
             </div>
+            {/* The page's own h1 names the API; the spec's title would be a second h1. */}
             <style>{`
                 .swagger-ui .topbar { display: none; }
+                .swagger-ui .info .title { display: none; }
                 .swagger-ui { margin: 0; }
                 .swagger-ui .scheme-container { background: transparent; }
             `}</style>

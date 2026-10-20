@@ -1,17 +1,17 @@
 export const metadata = {
     title: 'OC Pledge',
     description:
-        'Pledge your word to Bitcoin. Bond your stake. Anyone verifies the outcome. The sixth and final OrangeCheck primitive — forward-looking, BIP-322-signed, future-verifiable commitments.',
+        'Pledge your word to Bitcoin. Bond your stake. Anyone verifies the outcome. The sixth and final orangecheck primitive — forward-looking, BIP-322-signed, future-verifiable commitments.',
 };
 
 # OC Pledge
 
 **Pledge your word to Bitcoin. Bond your stake. Anyone verifies the outcome.**
 
-OC Pledge is the **commitment primitive** in the OrangeCheck family. A pledge
+OC Pledge is the **commitment primitive** in the orangecheck family. A pledge
 envelope is a canonical JSON object signed via BIP-322 by a Bitcoin address
 naming a future-verifiable proposition, a deterministic resolution mechanism, a
-deadline, and a bond referencing an OrangeCheck attestation. At resolution time
+deadline, and a bond referencing an orangecheck attestation. At resolution time
 a paired **outcome envelope** declares the pledge `kept`, `broken`,
 `expired_unresolved`, or `disputed`. The pair is the complete lifecycle record —
 offline-verifiable from its JSON alone plus Bitcoin chain state.
@@ -29,7 +29,7 @@ A valid `kept` outcome envelope proves three things cryptographically:
    computed deterministically from chain state, a Nostr event set, an HTTP
    response, a DNS record, an OC Stamp, an OC Vote outcome, or a counterparty's
    signed envelope.
-3. **A bond was in place.** The swearer held an OrangeCheck attestation meeting
+3. **A bond was in place.** The swearer held an orangecheck attestation meeting
    the declared `min_sats × min_days` threshold at the time of swearing, and the
    verifier can re-derive its current state.
 

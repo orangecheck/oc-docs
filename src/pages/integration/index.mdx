@@ -15,7 +15,7 @@ already have a login?**
 | If you…                                                                                                     | Pathway                             | What you add                                       |
 | ----------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------- |
 | are building sign-in from scratch, or are happy for orangecheck to _be_ your login                          | **1 · orangecheck as your sign-in** | the sign-in popup, and `withOcAuth` on your server |
-| already run your own login — Google, Auth0, Clerk, NextAuth, email/password, anything — and want to keep it | **2 · OrangeCheck Connect**         | one server-side HTTPS call                         |
+| already run your own login — Google, Auth0, Clerk, NextAuth, email/password, anything — and want to keep it | **2 · OC Connect**                  | one server-side HTTPS call                         |
 
 Both end at the same place: each of your users has an orangecheck account. They
 differ only in who owns the sign-in screen.
@@ -78,7 +78,7 @@ so use the popup.
 → [Quickstart](/me/quickstart) · [`@orangecheck/me-client`](/me/sdk) ·
 [auth host API](/api-reference/auth-host)
 
-## Pathway 2 — OrangeCheck Connect
+## Pathway 2 — OC Connect
 
 You keep the login you already run — it does not change at all. After your user
 authenticates, by _any_ means, your **backend** makes one server-side call to
@@ -86,7 +86,7 @@ authenticates, by _any_ means, your **backend** makes one server-side call to
 user gets an orangecheck account. No new SDK; no change to how anyone signs in;
 nobody sees a second login screen.
 
-→ [OrangeCheck Connect guide](/connect)
+→ [OC Connect guide](/connect)
 
 ## What you get, either way
 

@@ -57,7 +57,7 @@ establishes:
 | T4  | Wrong-agent action           | `agent.address` ↔ `signer.address` equality check                             |
 | T5  | Replay after expiry          | Action `signed_at` must be in `[issued_at, expires_at)`                       |
 | T6  | Replay across delegations    | `delegation_id` is a hash; unique per delegation                              |
-| T7  | Revocation censorship        | Publish to ≥3 diverse Nostr relays; verifier MAY treat absence as still-valid |
+| T7  | Revocation censorship        | Publish to ≥3 diverse relays; absence counts only from the relays that answer |
 | T8  | Revocation forgery           | BIP-322 under principal (or agent-if-authorized)                              |
 | T9  | Priority manipulation        | OTS anchoring of actions and revocations                                      |
 | T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                         |
@@ -91,8 +91,10 @@ Compliant implementations MUST:
 5. Compute the sub-scope relation deterministically.
 6. Cross-reference `A.delegation_id` with `D.id`, `A.signer.address` with
    `D.agent.address`, `A.signed_at` with `D`'s window.
-7. Query revocation feeds for the cited `delegation_id` unless the caller opts
-   out.
+7. Query revocation feeds (kind 30085, `#t` with the cited `delegation_id`)
+   unless the caller opts out. A relay that rejected the query, closed it or
+   timed out has not answered; if none answered, revocation is unchecked, not
+   clean.
 8. Re-resolve `bond.attestation_id` against current chain state when bond policy
    is in effect.
 9. Produce the error codes in §SPEC 11.

@@ -92,8 +92,9 @@ different verb (and a deferred v2 question).
 
 Revoking ANY link in the chain invalidates that link AND every descendant. The
 verifier implements this naturally — it queries Nostr kind-30085 for revocations
-targeting every link in the chain, and any revocation predating the action's
-effective time fires `E_REVOKED`.
+targeting every link in the chain (one filter,
+`{ kinds: [30085], '#t': [<root id>, <link 1 id>, …] }`), and any revocation
+predating the action's effective time fires `E_REVOKED`.
 
 If the root principal wants to nuke an entire sub-tree, they revoke the root
 delegation. If a sub-principal wants to disown one branch they created, they
@@ -136,6 +137,12 @@ delegations).
 Published to Nostr **kind 30086** with `d`-tag prefix `oc-agent-sub:`. Tags
 include `parent` (immediate parent's id), `root` (ultimate root delegation id),
 `principal`, `agent`, `expires`, and one `scope` per granted scope.
+
+Relays index single-letter tags only, so of these only `d` is a query key. Find
+a sub-delegation by id with `{ kinds: [30086], '#d': ['oc-agent-sub:<id>'] }`.
+There is no relay query for "every sub-delegation of D": a verifier gets the
+chain from whoever presents the action, or walks it link by link by id.
+`#parent`, `#root` and `#agent` filters are rejected by most relays.
 
 ## Backwards compatibility
 

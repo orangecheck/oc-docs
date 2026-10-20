@@ -90,14 +90,18 @@ don't collide on overlapping kinds.
 | OC Agent  | `30085` | `oc-agent-rev:<revocation_id>`                                            |
 | OC Agent  | `30086` | `oc-agent-sub:<subdelegation_id>` _(v1.1)_                                |
 
-The relay doesn't enforce any of this — `d` is just a string. The convention
-matters so that discovery queries (`#d: oc-stamp:*`, `#d: oc-vote:poll:*`) can
-narrow by artifact type without enumerating kinds.
+A public relay doesn't enforce any of this — `d` is just a string. Tag filters
+match exactly, so `#d` finds one artifact when you know its full `d` value;
+there is no prefix query. The prefix is what tells you, after fetching, which
+protocol an event on a shared kind belongs to. Check it, and the envelope's
+`kind` field, before you use the event.
 
 ## Required tags per protocol
 
-Each sibling's spec defines which tags MUST appear on its events. These tags
-exist to enable secondary-index discovery without parsing the JSON `content`.
+Each sibling's spec defines which tags MUST appear on its events. Relays index
+**single-letter** tag names only, so the tags a query can use are `d` and `t`.
+Longer tag names (`address`, `agent`, `delegation`) are for people reading the
+event; a filter on one fails (see [Reading events](#reading-events)).
 
 **Common across all protocols:**
 
@@ -109,7 +113,8 @@ exist to enable secondary-index discovery without parsing the JSON `content`.
 
 | Tag       | Purpose                                                          |
 | --------- | ---------------------------------------------------------------- |
-| `address` | Bitcoin address the attestation is for                           |
+| `t`       | The Bitcoin address, and `oc-attest` — the tags a query uses     |
+| `address` | Bitcoin address the attestation is for (not indexed)             |
 | `scheme`  | `bip322` or `legacy`                                             |
 | `i`       | One per identity binding, formatted as `<protocol>:<identifier>` |
 | `expires` | ISO timestamp (optional)                                         |
@@ -151,8 +156,10 @@ import { Relay } from 'nostr-tools/relay';
 
 const relay = await Relay.connect('wss://relay.damus.io');
 
+// Every filter below uses `#t` or `#d`. Relays index single-letter tags only.
+
 // Find an OC Attest attestation by Bitcoin address
-const sub = relay.subscribe([{ kinds: [30078], '#address': ['bc1qalice…'] }], {
+const sub = relay.subscribe([{ kinds: [30078], '#t': ['bc1qalice…'] }], {
     onevent(event) {
         const envelope = JSON.parse(event.content);
         // Verify locally — see /attest/verification
@@ -164,28 +171,19 @@ relay.subscribe([{ kinds: [30080], '#d': ['oc-vote:poll:<poll_id>'] }], {
     /*…*/
 });
 
-// Find every OC Stamp by a specific signer (kind 30083, prefix-filtered to
-// avoid catching co-claimed OC Agent delegations on the same kind)
-relay.subscribe(
-    [
-        {
-            kinds: [30083],
-            '#d': ['oc-stamp:'],
-            '#address': ['bc1qsigner…'],
-        },
-    ],
-    {
-        /*…*/
-    }
-);
+// Find every OC Stamp by a specific signer. Kind 30083 also carries OC Agent
+// delegations: keep events whose `d` starts with `oc-stamp:` and whose
+// envelope `kind` is `stamp`.
+relay.subscribe([{ kinds: [30083], '#t': ['bc1qsigner…'] }], {
+    /*…*/
+});
 
-// Find every OC Agent delegation issued to a given agent
-relay.subscribe(
-    [{ kinds: [30083], '#d': ['oc-agent-del:'], '#agent': ['bc1qagent…'] }],
-    {
-        /*…*/
-    }
-);
+// Find every OC Agent delegation naming an address, as principal or agent.
+// Keep events whose envelope `kind` is `agent-delegation`, then check which
+// side the address is on.
+relay.subscribe([{ kinds: [30083], '#t': ['bc1qagent…'] }], {
+    /*…*/
+});
 
 // Find every revocation of a specific delegation (then keep only events whose
 // content.delegation_id matches, since `t` also carries the signer's address)
@@ -194,18 +192,36 @@ relay.subscribe([{ kinds: [30085], '#t': ['<64-hex delegation id>'] }], {
 });
 ```
 
-Each protocol's reference core wraps these queries with typed helpers
-(`getAttestationsForAddress`, `fetchPoll`, `fetchStamp`, `fetchDelegation`,
-`fetchPledge`) that fan out to multiple relays and deduplicate.
+A filter on a multi-letter tag name does not quietly return nothing. Most relays
+reject the whole request with `CLOSED` or `NOTICE` (`unindexed tag filter`),
+taking any other filter in the same request with it, and some ignore the filter
+and return unrelated events. So:
+
+- **Treat a rejection as "not heard back", never as "nothing there."** A relay
+  has answered only when it sent `EOSE` and every event it returned matches your
+  filter. A `CLOSED`, an error `NOTICE`, a dropped connection or a timeout says
+  nothing about what exists.
+- **Decide absence only from relays that answered.** This matters most for
+  revocations: if no relay answered, you have not checked revocation, so do not
+  report the delegation as unrevoked. See
+  [OC Agent SPEC §10.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#104-reading-relay-replies).
+- **Treat every returned event as a candidate.** Anyone can publish an event
+  tagged with anyone's address. Verify the envelope inside before using it.
+
+`@orangecheck/sdk` wraps the attestation query as `getAttestationsForAddress`.
+`@orangecheck/nostr-core`'s `queryEvents` checks each event's id, signature and
+filter match, and reports per relay whether it reached `EOSE`. OC Agent's core
+has no network by design: fetch with any client and pass the envelopes in.
 
 ## Default relay set
 
-The reference SDKs default to a small set of stable public relays:
+`@orangecheck/nostr-core` defaults to four public relays plus the family's own:
 
-- `wss://relay.damus.io`
-- `wss://relay.nostr.band`
 - `wss://nos.lol`
+- `wss://relay.primal.net`
+- `wss://offchain.pub`
 - `wss://relay.snort.social`
+- `wss://relay.ochk.io`
 
 Override with `relays: [...]` on any SDK call. For production deployments you
 SHOULD query **≥3 distinct relay operators** — a single slow or partitioned

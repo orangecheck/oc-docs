@@ -6,9 +6,17 @@ export const metadata = {
 
 # Self-hosting the verifier
 
-Everything at `ochk.io` is MIT-licensed and runs on any Postgres 14+ database.
-If you don't want to depend on the hosted service — for privacy, latency,
-regulatory, or ideological reasons — here's the full deployment.
+> **Not forkable yet.** The repository behind ochk.io is private today, so you
+> cannot clone it. Everything that decides a verdict is open:
+> [`@orangecheck/sdk`](https://www.npmjs.com/package/@orangecheck/sdk),
+> [`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) and
+> [`@orangecheck/bip322`](https://www.npmjs.com/package/@orangecheck/bip322)
+> (MIT), so you can run the same checks inside your own server now. This page
+> describes the hosted service's shape, for when its code is published.
+
+The hosted service runs on any Postgres 14+ database. If you don't want to
+depend on it — for privacy, latency, regulatory, or ideological reasons — this
+is the deployment it would take.
 
 ## What you're standing up
 

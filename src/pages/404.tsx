@@ -6,7 +6,8 @@ export default function NotFound() {
     return (
         <>
             <Seo title="Not found" noindex />
-            <ErrorPage code={404} />
+            {/* The docs home: the router adds /docs. */}
+            <ErrorPage code={404} home="/" />
         </>
     );
 }

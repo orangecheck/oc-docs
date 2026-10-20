@@ -10,7 +10,8 @@ export default function ServerError() {
                 description="An unexpected error occurred on the server."
                 noindex={true}
             />
-            <ErrorPage code={500} />
+            {/* The docs home: the router adds /docs. */}
+            <ErrorPage code={500} home="/" />
         </>
     );
 }

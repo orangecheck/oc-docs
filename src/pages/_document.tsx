@@ -1,4 +1,3 @@
-import { getOcThemeInitScript } from '@orangecheck/design';
 import { Head, Html, Main, NextScript } from 'next/document';
 
 import { SITE_CONFIG } from '@/lib/site.config';
@@ -29,10 +28,9 @@ const ANALYTICS_ENABLED =
 
 export default function Document() {
     return (
-        // suppressHydrationWarning: getOcThemeInitScript() + next-themes set the
-        // skin/mode class + data-oc-theme on <html> before React hydrates, which
-        // is an intentional client/server attribute divergence.
-        <Html lang="en" suppressHydrationWarning>
+        // data-oc-app scopes every token and base rule of @orangecheck/app-design.
+        // suppressHydrationWarning: next-themes sets the mode class before React hydrates.
+        <Html lang="en" data-oc-app="ochk" suppressHydrationWarning>
             <Head>
                 {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
                     (dist/docs/favicon/*). Regenerate via the kit then
@@ -58,8 +56,9 @@ export default function Document() {
                 />
                 <link rel="manifest" href={`${BASE}/favicons/site.webmanifest`} />
                 <meta name="application-name" content="OrangeCheck docs" />
-                <meta name="theme-color" content="#f97316" />
-                <meta name="color-scheme" content="dark light" />
+                <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
+                <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
+                <meta name="color-scheme" content="light dark" />
 
                 {ANALYTICS_ENABLED && (
                     <script
@@ -83,9 +82,6 @@ export default function Document() {
                 )}
             </Head>
             <body>
-                {/* No-flash skin + mode init from @orangecheck/design — applies
-                    the saved oc_skin / oc_theme before first paint. */}
-                <script dangerouslySetInnerHTML={{ __html: getOcThemeInitScript() }} />
                 <Main />
                 <NextScript />
             </body>

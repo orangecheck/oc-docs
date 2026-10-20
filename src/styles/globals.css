@@ -1,33 +1,7 @@
 @import 'tailwindcss';
 
-/* Scan the published packages so utilities used inside their components emit
-   even when no local file references them. */
-@source '../../node_modules/@orangecheck/design';
-@import 'tw-animate-css';
-
+/* The family design system. Every token and rule is scoped to
+   [data-oc-app='ochk'], which _document sets on <html>. */
+@source '../../node_modules/@orangecheck/app-design/dist';
 @custom-variant dark (&:is(.dark *));
-
-/* The design system: all four skins (light + dark), the @theme token bridge,
-   the base layer, and the full OrangeCheck utility system (container,
-   font-display, label-mono, terminal, bg-grid/dots, docs-prose, oc-working,
-   skip-link, brand). Replaces the tokens + utilities that used to be inlined
-   here — byte-for-byte identical for the default `orangecheck` skin, and the
-   package's `.docs-prose` is a verified superset of the old local block. Fonts
-   are still provided by next/font in _app.tsx
-   (--font-sans-display / --font-mono-display). */
-@import '@orangecheck/design/styles.css';
-
-/* Site-specific utilities live AFTER the package import so they are preserved.
-   Anchored headings (the "on this page" ToC links and deep links like
-   /chat/seal#timing-is-approximate) must clear the sticky top bar (top-12 +
-   the mobile sub-header), otherwise the target heading lands hidden underneath. */
-@layer utilities {
-    .docs-prose :is(h1, h2, h3, h4) {
-        scroll-margin-top: 7rem;
-    }
-    @media (min-width: 64rem) {
-        .docs-prose :is(h1, h2, h3, h4) {
-            scroll-margin-top: 5rem;
-        }
-    }
-}
+@import '@orangecheck/app-design/styles.css';

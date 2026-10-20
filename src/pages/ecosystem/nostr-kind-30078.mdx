@@ -187,13 +187,11 @@ relay.subscribe(
     }
 );
 
-// Find every revocation of a specific delegation
-relay.subscribe(
-    [{ kinds: [30085], '#delegation': ['<64-hex delegation id>'] }],
-    {
-        /*…*/
-    }
-);
+// Find every revocation of a specific delegation (then keep only events whose
+// content.delegation_id matches, since `t` also carries the signer's address)
+relay.subscribe([{ kinds: [30085], '#t': ['<64-hex delegation id>'] }], {
+    /*…*/
+});
 ```
 
 Each protocol's reference core wraps these queries with typed helpers

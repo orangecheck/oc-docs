@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 
+import { existsSync, readdirSync } from 'node:fs';
+
 import createMDX from '@next/mdx';
 import { rehypeCode } from '@orangecheck/app-design/code';
 import rehypeSlug from 'rehype-slug';
@@ -12,6 +14,11 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 // The old host. Every address on it moves to the same path under ochk.io/docs.
 const OLD_HOST = [{ type: 'host' as const, value: 'docs.ochk.io' }];
+
+// Every package README on npm links /sdk/<pkg>; the generated reference starts at /sdk/<pkg>/README.
+const SDK_PACKAGES = readdirSync('src/pages/sdk', { withFileTypes: true })
+    .filter((d) => d.isDirectory() && existsSync(`src/pages/sdk/${d.name}/README.mdx`))
+    .map((d) => d.name);
 
 const nextConfig: NextConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
@@ -59,6 +66,11 @@ const nextConfig: NextConfig = {
                 basePath: false,
                 permanent: true,
             },
+            ...SDK_PACKAGES.map((pkg) => ({
+                source: `/sdk/${pkg}`,
+                destination: `/sdk/${pkg}/README`,
+                permanent: true,
+            })),
             { source: '/sdks', destination: '/sdk', permanent: true },
             {
                 source: '/sdks/javascript',

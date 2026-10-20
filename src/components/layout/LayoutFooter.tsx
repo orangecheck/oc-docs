@@ -57,7 +57,6 @@ export function LayoutFooter() {
                 meta: (
                     <div className="text-muted-foreground flex gap-2 font-mono text-[10px] tracking-widest uppercase">
                         <span className="border px-1.5 py-0.5">mit</span>
-                        <span className="border px-1.5 py-0.5">cc-by-4.0 specs</span>
                     </div>
                 ),
             }}

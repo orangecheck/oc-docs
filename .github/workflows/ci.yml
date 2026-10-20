@@ -41,6 +41,9 @@ jobs:
             - name: Lint
               run: yarn lint
 
+            - name: Test
+              run: yarn test:run
+
             - name: Internal links
               run: yarn check:internal-links
 

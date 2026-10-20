@@ -1,7 +1,7 @@
 import type { SessionPayload } from '@orangecheck/auth-core';
 import type { NextApiRequest } from 'next';
 
-import { resolveSessionFromRequest } from '@orangecheck/auth-core';
+import { familyRevocationCheck, resolveSessionFromRequest } from '@orangecheck/auth-core';
 
 import { refuseCookieSession } from '@/lib/auth/same-origin';
 
@@ -37,5 +37,9 @@ export async function readJwtSession(req: NextApiRequest): Promise<SessionPayloa
     // so the first one that does is covered. See lib/auth/same-origin.ts.
     if (refuseCookieSession(req)) return null;
     const r = await resolveSessionFromRequest(req.headers, verifyConfig());
-    return r.ok ? r.payload : null;
+    if (!r.ok) return null;
+    // Signed out, replaced or cut off on ochk.io: still a valid signature, not a
+    // caller. While ochk.io's list cannot be refreshed, writes are refused.
+    if (await familyRevocationCheck().refuses(r.payload, req.method)) return null;
+    return r.payload;
 }

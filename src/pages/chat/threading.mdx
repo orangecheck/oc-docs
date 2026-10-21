@@ -42,7 +42,7 @@ with `:` — a deterministic 1:1 thread id both sides compute independently.
   minute-rounded, and relay-influenceable.
 - A missing parent is a **detectable gap** (`E_THREAD_GAP`).
 
-```mermaid
+```mermaid size=595x109
 graph LR
   A["msg #1<br/>parent_id: null<br/>id: a1f…"] --> B["msg #2<br/>parent_id: a1f…<br/>id: b2e…"]
   B --> C["msg #3<br/>parent_id: b2e…<br/>id: c3d…"]

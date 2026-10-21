@@ -89,7 +89,7 @@ This is what makes the displayed promise honest. A conforming v0 recipient
 A sealed message therefore opens at the **later** of (the drand round elapsing,
 the chain reaching the height).
 
-```mermaid
+```mermaid size=531x574
 graph TD
   T["drand round elapses<br/>→ R recoverable"] --> G{"hard chain gate:<br/>chain_tip ≥ unlock_block + conf?"}
   C["recipient checks chain tip<br/>(named explorer / own node)"] --> G

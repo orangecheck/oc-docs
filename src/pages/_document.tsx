@@ -1,3 +1,4 @@
+import { FontPreloads } from '@orangecheck/app-design/fonts';
 import { FamilyAnalytics } from '@orangecheck/site-kit/analytics';
 import { Head, Html, Main, NextScript } from 'next/document';
 
@@ -14,6 +15,8 @@ export default function Document() {
         // suppressHydrationWarning: next-themes sets the mode class before React hydrates.
         <Html lang="en" data-oc-app="ochk" suppressHydrationWarning>
             <Head>
+                {/* Inter, requested before the stylesheet names it; base path and all. */}
+                <FontPreloads />
                 {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
                     (dist/docs/favicon/*). Regenerate via the kit then
                     `cp ../oc-media-kit/dist/docs/favicon/* public/favicons/`. */}

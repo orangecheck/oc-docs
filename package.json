@@ -28,7 +28,7 @@
         "@mdx-js/loader": "^3.1.1",
         "@mdx-js/react": "^3.1.1",
         "@next/mdx": "15.5.18",
-        "@orangecheck/app-design": "^1.14.2",
+        "@orangecheck/app-design": "^1.15.2",
         "@orangecheck/auth-client": "^2.35.2",
         "@orangecheck/site-kit": "^0.5.1",
         "@orangecheck/wallet-adapter": "^0.6.5",

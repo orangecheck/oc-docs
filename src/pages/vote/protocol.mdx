@@ -14,7 +14,7 @@ realistic addresses and block heights.
 ```mermaid
 flowchart TB
     C["Creator"] -->|signs poll · BIP-322<br/>publishes kind 30080| N[("Nostr directory<br/>30080 poll<br/>30081 ballot<br/>30082 reveal")]
-    V["Voters<br/>A · B · C"] -->|"signs ballot · BIP-322<br/>publishes kind 30081<br/>(replaceable per voter)"| N
+    V["Voters<br/>A · B · C"] -->|"signs ballot · BIP-322<br/>publishes kind 30081<br/>(a voter may re-vote)"| N
     N -->|anyone pulls| O["Observer / tallier"]
     U[("UTXO state<br/>at snapshot block")] --> T
     O --> T["Deterministic tally"]
@@ -41,7 +41,9 @@ Signs once. URL at `vote.ochk.io/p/<poll_id>`.
 kind 30081 under `d = oc-vote:ballot:<poll_id>:<bob_addr>`.
 
 **Bob changes his mind:** picks `split_c` two days later. Same `d`-tag, higher
-`created_at`, relays replace the previous event.
+`created_at`. Relays keep both ballots, because each is signed with its own
+Nostr key; the tally counts the later one because the poll's `tiebreak` is
+`latest`.
 
 **At deadline:** the client resolves the snapshot block (greatest block with
 `median_time_past ≤ deadline` and ≥ 6 confirmations). Any observer re-runs the

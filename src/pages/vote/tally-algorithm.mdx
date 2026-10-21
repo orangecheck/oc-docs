@@ -72,8 +72,9 @@ important: nobody can block a tally by publishing a bad ballot.
 
 If a voter has several valid ballots, the poll's `tiebreak` picks one: `latest`
 takes the greatest `created_at`, `first` the least. Equal times are broken by
-ballot id, greater for `latest` and lesser for `first`. Conformance vector `v04`
-tests this.
+ballot id, greater for `latest` and lesser for `first`. Relays keep every ballot
+a voter publishes (each is its own Nostr event), so this step, not the relay, is
+what decides. Conformance vectors `v04` and `v06` test it.
 
 ### 3. Reveal (secret polls)
 
@@ -124,7 +125,7 @@ policy. Two independent implementations that disagree on any field have a bug.
 
 ## Conformance
 
-The 5 canonical vectors in `oc-vote-protocol/test-vectors/`:
+The 6 canonical vectors in `oc-vote-protocol/test-vectors/`:
 
 | Vector | What it pins                                                                   |
 | ------ | ------------------------------------------------------------------------------ |
@@ -133,9 +134,10 @@ The 5 canonical vectors in `oc-vote-protocol/test-vectors/`:
 | `v03`  | `sats_days` with a 180-day cap; one voter with two UTXOs, one past the cap     |
 | `v04`  | Vote change — one voter, two ballots, `tiebreak: latest` picks the later       |
 | `v05`  | Secret ballot — option null before the reveal, the commitment binds the choice |
+| `v06`  | `tiebreak: first` — three ballots from one voter, a tie broken by `ballot_id`  |
 
-`@orangecheck/vote-core` passes all 5 on every CI run. A reimplementation in
-another language is conformant iff it also passes all 5.
+`@orangecheck/vote-core` passes all 6 on every CI run. A reimplementation in
+another language is conformant iff it also passes all 6.
 
 ## Edge cases
 

@@ -58,8 +58,9 @@ Publication: Nostr kind `30080`, `d`-tag `oc-vote:poll:<poll_id>`.
 
 **ballot_id** = `SHA256(canonical bytes with sig.value = "")`.
 
-Publication: kind `30081`, `d`-tag `oc-vote:ballot:<poll_id>:<voter>`
-(replaceable per voter per poll).
+Publication: kind `30081`, `d`-tag `oc-vote:ballot:<poll_id>:<voter>`. Each
+ballot event has its own Nostr key, so relays keep a voter's earlier ballots;
+the tiebreak (§5 step 3 below) picks one.
 
 ## 3. reveal object (secret mode)
 
@@ -132,11 +133,11 @@ See [weight modes](/vote/weight-modes) for when to pick which.
 
 ## 8. nostr kinds
 
-| kind  | object                                  | tag namespace        |
-| ----- | --------------------------------------- | -------------------- |
-| 30080 | poll                                    | `oc-vote:poll:*`     |
-| 30081 | ballot (replaceable per voter per poll) | `oc-vote:ballot:*:*` |
-| 30082 | reveal                                  | `oc-vote:reveal:*`   |
+| kind  | object                                        | tag namespace        |
+| ----- | --------------------------------------------- | -------------------- |
+| 30080 | poll                                          | `oc-vote:poll:*`     |
+| 30081 | ballot (one event per ballot; tiebreak picks) | `oc-vote:ballot:*:*` |
+| 30082 | reveal                                        | `oc-vote:reveal:*`   |
 
 ## 9. compliance checklist
 

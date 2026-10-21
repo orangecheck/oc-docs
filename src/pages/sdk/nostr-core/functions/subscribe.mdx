@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Function: subscribe()",
+    description: "Auto-generated API reference for Function: subscribe(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / subscribe
+
+# Function: subscribe()
+
+```ts
+function subscribe(filter: Filter, opts: SubscribeOptions): Subscription;
+```
+
+Defined in: [index.ts:914](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L914)
+
+Keep `filter` subscribed on every relay until `stop()`. Each relay's REQ is
+re-sent whenever its socket comes back, so a `since` filter backfills what
+was missed. Events are verified and filter-matched like `queryEvents`, and
+delivered once per id across all relays.
+
+In a browser the subscription rides the page's pooled socket to each relay
+and holds one of its subscription slots while open.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `filter` | [`Filter`](../interfaces/Filter) |
+| `opts` | [`SubscribeOptions`](../interfaces/SubscribeOptions) |
+
+## Returns
+
+[`Subscription`](../interfaces/Subscription)

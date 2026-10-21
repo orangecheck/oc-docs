@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: toWalletError()",
+    description: "Auto-generated API reference for Function: toWalletError(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / toWalletError
+
+# Function: toWalletError()
+
+```ts
+function toWalletError(err: unknown): Error;
+```
+
+Defined in: [wallet-adapter/src/failure.ts:104](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L104)
+
+What `getSigner` throws for a wallet's own failure: always an Error, with
+the wallet's code kept, and a declined request as `WalletRejectedError`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `err` | `unknown` |
+
+## Returns
+
+`Error`

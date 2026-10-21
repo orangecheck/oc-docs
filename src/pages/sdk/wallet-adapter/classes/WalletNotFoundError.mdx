@@ -1,0 +1,55 @@
+export const metadata = {
+    title: "Class: WalletNotFoundError",
+    description: "Auto-generated API reference for Class: WalletNotFoundError. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / WalletNotFoundError
+
+# Class: WalletNotFoundError
+
+Defined in: [wallet-adapter/src/failure.ts:28](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L28)
+
+The wallet asked for is not in this browser.
+
+## Extends
+
+- `Error`
+
+## Constructors
+
+### Constructor
+
+```ts
+new WalletNotFoundError(message: string): WalletNotFoundError;
+```
+
+Defined in: [wallet-adapter/src/failure.ts:30](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L30)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `message` | `string` |
+
+#### Returns
+
+`WalletNotFoundError`
+
+#### Overrides
+
+```ts
+Error.constructor
+```
+
+## Properties
+
+| Property | Modifier | Type | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-code">&lt;/a> `code` | `readonly` | `"E_WALLET_NOT_FOUND"` | - | [wallet-adapter/src/failure.ts:29](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L29) |
+| &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
+| &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
+| &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

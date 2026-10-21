@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: createReplayGuard()",
+    description: "Auto-generated API reference for Function: createReplayGuard(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README)
+
+***
+
+[@orangecheck/agent-core](../README) / createReplayGuard
+
+# Function: createReplayGuard()
+
+```ts
+function createReplayGuard(maxSkewMs?: number): {
+  firstUse: boolean;
+};
+```
+
+Defined in: [agent-core/src/verify.ts:620](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L620)
+
+Remembers the ids of accepted actions, so one signed action is acted on
+once. An action passes the freshness bound for `maxSkewMs` either side of
+its signed_at, so its id is kept until signed_at + maxSkewMs. In-memory and
+per process: a server on several instances keeps the same record in a
+shared store. Two identical calls signed in the same second share an id.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `maxSkewMs` | `number` | `DEFAULT_MAX_SKEW_MS` |
+
+## Returns
+
+```ts
+{
+  firstUse: boolean;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `firstUse()` | (`action`: `Pick`\&lt;[`ActionEnvelope`](../interfaces/ActionEnvelope), `"id"` \| `"signed_at"`\>, `now?`: `Date`) => `boolean` | [agent-core/src/verify.ts:621](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L621) |

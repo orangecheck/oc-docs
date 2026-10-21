@@ -31,7 +31,7 @@
         "@orangecheck/app-design": "^1.9.0",
         "@orangecheck/auth-client": "^2.33.4",
         "@orangecheck/auth-core": "^2.9.0",
-        "@orangecheck/site-kit": "^0.3.1",
+        "@orangecheck/site-kit": "^0.3.2",
         "@orangecheck/wallet-adapter": "^0.5.0",
         "@types/mdx": "^2.0.13",
         "@types/swagger-ui-react": "^5.18.0",

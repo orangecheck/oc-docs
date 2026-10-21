@@ -10,7 +10,7 @@ import {
     SkipLink,
 } from '@orangecheck/app-design/chrome';
 import { Breadcrumbs, DocsPager, TextLink } from '@orangecheck/app-design/components';
-import { OCHK_IO } from '@orangecheck/app-design/family';
+import { GET_AN_ACCOUNT, OCHK_IO } from '@orangecheck/app-design/family';
 import { SessionAccount } from '@orangecheck/app-design/session';
 
 import { DocsSearch } from '@/components/docs/DocsSearch';
@@ -66,7 +66,11 @@ function pagerFor(path: string): { prev?: PagerLink; next?: PagerLink } {
     return { prev: prev ? link(prev) : undefined, next: next ? link(next) : undefined };
 }
 
-const actions = <SessionAccount />;
+// Signed out, the family's one account phrase and address; signed in, the account menu.
+// app-design types the phrase as a NavItem, whose label could be any node; it is a string.
+const actions = (
+    <SessionAccount signInLabel={GET_AN_ACCOUNT.label as string} signInHref={GET_AN_ACCOUNT.href} />
+);
 const search = <DocsSearch />;
 
 /**

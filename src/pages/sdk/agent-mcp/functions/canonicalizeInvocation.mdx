@@ -15,10 +15,11 @@ export const metadata = {
 function canonicalizeInvocation(inv: McpInvocation): Uint8Array;
 ```
 
-Defined in: [index.ts:53](https://github.com/orangecheck/oc-packages/blob/main/agent-mcp/src/index.ts#L53)
+Defined in: [index.ts:66](https://github.com/orangecheck/oc-packages/blob/main/agent-mcp/src/index.ts#L66)
 
 Produce the canonical bytes for an MCP invocation. The bytes are what the
-action envelope's `content.hash` is a SHA-256 of.
+action envelope's `content.hash` is a SHA-256 of: RFC 8785 JSON of the
+object below, followed by one LF (0x0A).
 
 Shape:
   &#123;

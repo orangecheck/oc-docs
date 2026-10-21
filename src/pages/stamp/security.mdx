@@ -34,8 +34,10 @@ for the full reporting protocol.
   `content.mime`, `signer.address`, or `signed_at` invalidates `id` and
   therefore `sig.value`.
 - **Stake** _(when declared and re-verified)_. At the moment a verifier resolves
-  `stake.attestation_id`, the holder of `signer.address` controls UTXOs matching
-  the declared bond.
+  `stake.attestation_id`, the attestation was signed by `signer.address` and its
+  bond holds against current chain state. `stake` is outside the id and the
+  signature, so anyone relaying the envelope can strip or swap it; the address
+  check is what stops a swap.
 
 ## What OC Stamp does NOT protect
 
@@ -75,7 +77,8 @@ A conformant implementation MUST:
 3. **Verify the OTS anchor** against a real Bitcoin block header when
    `ots.status === "confirmed"` and the caller attaches legal/economic weight.
 4. **Re-resolve any stake claim.** Never trust the declared `sats_bonded` /
-   `days_unspent` — fetch the attestation.
+   `days_unspent` — fetch the attestation, and accept it only if its address is
+   `signer.address` (`checkStake` in `@orangecheck/stamp-core`).
 5. **Reject unknown `envelope.v`** values. Preserve unknown optional fields on
    relay.
 6. **Produce byte-identical canonical messages** for identical inputs across
@@ -90,7 +93,9 @@ The full list of 16 numbered scenarios lives in
 Highlights:
 
 - **Envelope tampering in transit** — _mitigated_. Envelope id is
-  `H(canonical)`, committed to by `sig.value`.
+  `H(canonical)`, committed to by `sig.value`. `stake`, `ots` and `content.ref`
+  are outside it: `ots` is checked against Bitcoin, and `stake` against
+  OrangeCheck and `signer.address`.
 - **Signature replay across canonical messages** — _mitigated_. `oc-stamp:v1`
   domain separator prevents replay against other orangecheck protocols.
 - **Fraudulent OTS proof claiming earlier block** — _mitigated_. Verifiers walk
@@ -117,22 +122,23 @@ An aggregator (e.g., the reference service at stamp.ochk.io) is trusted for
 | Aggregator drops submission                 | Re-submit; OTS is idempotent                                             |
 | Aggregator delays pending proof             | Re-query calendar directly                                               |
 | Aggregator returns fraudulent pending proof | Caught at upgrade; the "pending" proof cannot chain to any Bitcoin block |
-| Aggregator strips / modifies fields         | Invalidates id, fails signature verification on relay                    |
+| Aggregator modifies a signed field          | Invalidates id, fails signature verification on relay                    |
+| Aggregator strips or swaps `stake`          | Not signed; the stake check accepts only the signer's own attestation    |
 
 ## Dependency posture
 
 Narrow surface:
 
-| Package                                   | Purpose                   |
-| ----------------------------------------- | ------------------------- |
-| `@noble/hashes`                           | SHA-256                   |
-| `@noble/curves`                           | secp256k1 Schnorr / ECDSA |
-| `javascript-opentimestamps` _(pluggable)_ | OTS proof parsing         |
-| `@orangecheck/bip322`                     | BIP-322 verification      |
+| Package                  | Purpose                   |
+| ------------------------ | ------------------------- |
+| `@noble/hashes`          | SHA-256                   |
+| `@noble/curves`          | secp256k1 Schnorr / ECDSA |
+| `@orangecheck/stamp-ots` | OTS proof parsing         |
+| `@orangecheck/bip322`    | BIP-322 verification      |
 
 `@orangecheck/bip322` is built only on `@noble/curves`, `@noble/hashes` and
 `@scure/base`: no bitcoinjs-lib, no `elliptic`. `@orangecheck/stamp-cli` ≥ 0.2.1
-verifies with it. stamp.ochk.io still verifies through `bip322-js` until it
-picks up `@orangecheck/wallet-adapter` 0.5.2. `bip322-js` depends on `elliptic`,
-which has known low-severity timing channels in ECDSA (npm advisory 1112030);
-that use is verification-only, so the risk is limited to signature-check timing.
+verifies with it, and so does stamp.ochk.io, through
+`@orangecheck/wallet-adapter` (0.5.2 and later). `bip322-js`, which the family
+used before, stopped verifying on a fresh install once bitcoinjs-lib changed its
+PSBT checks; don't use it as the verifier.

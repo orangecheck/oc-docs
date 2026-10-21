@@ -86,22 +86,25 @@ both `yes`. The tally treats them independently:
 - `bc1qcharlie1`: 100k × min(45, 180) = 4,500,000 sat-days
 - `bc1qcharlie2`: 500k × min(400, 180) = 90,000,000 sat-days
 
-Total contribution to `yes`: 94,500,000 sat-days. Splitting or consolidating
-UTXOs after the snapshot doesn't change this.
+Total contribution to `yes`: 94,500,000 sat-days. Under the spec, splitting or
+consolidating UTXOs after the snapshot doesn't change this. vote.ochk.io and the
+CLI read UTXOs from mempool.space, which lists only coins unspent now, so there
+a coin spent after the snapshot stops counting; `/api/tally` says so in its
+`utxo_source` field.
 
 ## flow 5 — dispute
 
 Dave thinks the poll page is lying. He runs:
 
 ```bash
-npx @orangecheck/vote-cli tally <poll_id>
+npx -y @orangecheck/vote-cli tally <poll_id> --relay wss://my.relay --mempool-base https://my.esplora/api
 ```
 
 The CLI pulls the poll + ballots from his own relay set, verifies every
-signature, fetches UTXO state from his own bitcoind, and prints the tally. If
-his numbers match the web page: Dave was wrong. If they don't: the web page has
-a bug — file an issue with the diff. Correctness is defined by the spec's pure
-tally function, not by any server.
+signature, fetches UTXO state from his own Esplora instance (`--mempool-base`),
+and prints the tally. If his numbers match the web page: Dave was wrong. If they
+don't: the web page has a bug — file an issue with the diff. Correctness is
+defined by the spec's pure tally function, not by any server.
 
 ## anti-patterns we rejected
 
@@ -120,9 +123,9 @@ tally function, not by any server.
   poll's `reveal_pk`. The envelope format is unchanged.
 - **OC Stamp** — a `vote_resolves` envelope can be stamped + OTS-anchored to
   give the resolved tally durable Bitcoin-block priority for archival.
-- **OC Agent** — a principal can grant `vote:cast(poll_id=…)` scope to a
-  delegated agent; the agent's signed ballot counts against the principal's
-  address.
+- **OC Agent** — `vote:cast(poll_id=…)` is a registered agent scope, but a
+  ballot counts only when its `voter` signed it: OC Vote v0 has no delegated
+  ballots (spec §13, future work). An agent votes with its own address.
 - **OC Pledge** — a pledge can defer its dispute resolution to an OC Vote with a
   pre-specified voter set + threshold via the `vote_resolves` mechanism. The
   vote becomes the authoritative resolver.

@@ -13,22 +13,33 @@ Anyone downloading later can verify both authorship (signer's Bitcoin address)
 and priority (Bitcoin block at time of release).
 
 ```bash
-# Pseudocode for a git-stamp plugin
+npm i -g @orangecheck/stamp-cli
 tar czf release.tar.gz ./dist/
-oc-stamp sign --content release.tar.gz --signer bc1qalice... > release.stamp
-oc-stamp anchor release.stamp > release.stamp.anchored
+# Shows the id, asks for your wallet's BIP-322 signature of it, writes
+# release.tar.gz.stamp with a pending anchor.
+stamp file release.tar.gz --addr bc1qalice...
 git tag v1.2.3 -m "v1.2.3 release"
+# An hour or more later, upgrade the pending anchor in place:
+stamp anchor release.tar.gz.stamp
 ```
 
-Distribute `release.tar.gz`, `release.stamp.anchored`, and the git tag together.
-Downstream consumers:
+`git-stamp tag v1.2.3 --addr bc1qalice...` does the same for the tag itself and
+writes `.git/stamps/v1.2.3.stamp`. Distribute `release.tar.gz` and
+`release.tar.gz.stamp` together. Downstream consumers:
 
 ```bash
-oc-stamp verify --content release.tar.gz --envelope release.stamp.anchored
-# ✓ signed by bc1qalice… at 2026-04-24T06:47Z
-# ✓ anchored in Bitcoin block 820472 (depth 6+)
-# ✓ content hash matches
+stamp verify release.tar.gz.stamp release.tar.gz --require-anchor
+# ok: true
+# id: 946fa89b…
+# signer: bc1qalice...
+# signed_at: 2026-04-24T06:47:00Z
+# …
+# content_checked: true
+# anchor: confirmed at block 890123 (checked against the block header)
+# signature_checked: true
 ```
+
+The exit code is `2` if the signature, the bytes or the anchor do not check out.
 
 Better than PGP keysigning because there's no keyserver rot — the Bitcoin
 address is the canonical identifier, checkable forever.
@@ -40,16 +51,34 @@ X happened" without relying on a centralized blog platform or social-media
 timestamp.
 
 ```ts
-const article = await fs.readFile('./post.md');
+import { readFile, writeFile } from 'node:fs/promises';
+
+import { stamp } from '@orangecheck/stamp-core';
+import {
+    fromStampOts,
+    mempoolHeaderSource,
+    submitToCalendars,
+    toStampOts,
+    upgradeProof,
+} from '@orangecheck/stamp-ots';
+
+const article = await readFile('./post.md');
 const env = await stamp({
     content: article,
     mime: 'text/markdown',
     signer: { address: writerAddress, signMessage: walletSign },
 });
-env.ots = await submitToCalendars(env.id);
-// Later:
-env.ots = await upgradeProof(env.ots, env.id);
-await fs.writeFile('./post.stamp', JSON.stringify(env));
+const anchored = { ...env, ots: toStampOts(await submitToCalendars(env.id)) };
+await writeFile('./post.md.stamp', JSON.stringify(anchored));
+
+// An hour or more later:
+const proof = await upgradeProof(fromStampOts(anchored.ots), anchored.id, {
+    headerSource: mempoolHeaderSource(),
+});
+await writeFile(
+    './post.md.stamp',
+    JSON.stringify({ ...anchored, ots: toStampOts(proof) })
+);
 ```
 
 Publish the article wherever (RSS, IPFS, Substack, personal blog). The `.stamp`
@@ -62,6 +91,9 @@ An agreement between two parties. Both sign the same content. Both stamps anchor
 to Bitcoin within the same window. No notary, no centralized service.
 
 ```ts
+import { stamp } from '@orangecheck/stamp-core';
+import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
+
 // Alice signs
 const aliceStamp = await stamp({
     content: agreementBytes,
@@ -77,10 +109,17 @@ const bobStamp = await stamp({
 });
 
 // Both anchor
-aliceStamp.ots = await submitToCalendars(aliceStamp.id);
-bobStamp.ots = await submitToCalendars(bobStamp.id);
+const alice = {
+    ...aliceStamp,
+    ots: toStampOts(await submitToCalendars(aliceStamp.id)),
+};
+const bob = {
+    ...bobStamp,
+    ots: toStampOts(await submitToCalendars(bobStamp.id)),
+};
 
 // Store: agreement.pdf + alice.stamp + bob.stamp
+console.log(alice.content.hash === bob.content.hash); // true: the same bytes
 ```
 
 A third party verifying both stamps knows:
@@ -99,12 +138,13 @@ identity (e.g., a multisig, a delegate wallet). Stamp separates
 proposer-identity from submitter-identity:
 
 ```ts
+import { stamp } from '@orangecheck/stamp-core';
+
 // Proposer signs the proposal content
 const proposalStamp = await stamp({
     content: proposalBytes,
     mime: 'text/markdown',
     signer: { address: proposerAddr, signMessage: proposerWallet.sign },
-    attest_ref: proposerAttestationId, // for "stake at signing"
 });
 
 // Then whoever has submit rights posts the proposal + the stamp on-chain
@@ -119,21 +159,42 @@ Embed an OC Attest reference in every Stamp envelope. Feed aggregators can then
 filter posts by signer stake:
 
 ```ts
+import type { StampEnvelope } from '@orangecheck/stamp-core';
+
+import { verifySignature } from '@orangecheck/bip322';
+import { checkStake, stamp, verify } from '@orangecheck/stamp-core';
+
 const post = await stamp({
     content: postBytes,
     mime: 'text/markdown',
     signer: { address: authorAddr, signMessage: authorWallet.sign },
-    attest_ref: authorAttestationId,
+    // Self-declared and unsigned; the aggregator re-checks it.
+    stake: {
+        attestation_id: authorAttestationId,
+        sats_bonded: 500_000,
+        days_unspent: 180,
+    },
 });
 
 // Aggregator:
 for (const incoming of feed) {
-    const env = JSON.parse(incoming.content);
-    if (!env.attest_ref) continue;
-    const check = await fetch(
-        `/api/check?id=${env.attest_ref}&min_sats=100000&min_days=30`
-    ).then((r) => r.json());
-    if (check.ok) showPost(env, postBytes);
+    const env = JSON.parse(incoming.content) as StampEnvelope;
+    const r = await verify({
+        envelope: env,
+        content: incoming.bytes,
+        verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
+    });
+    if (!r.ok || !env.stake) continue;
+    const att = await fetch(
+        `https://attest.ochk.io/api/check?id=${env.stake.attestation_id}`
+    ).then((res) => res.json());
+    // Only the signer's own attestation counts, at its current bond.
+    if (
+        checkStake(env, att.ok ? att : null, { minSats: 100_000, minDays: 30 })
+            .ok
+    ) {
+        showPost(env, incoming.bytes);
+    }
 }
 ```
 
@@ -154,4 +215,4 @@ sybil-resistance of Attest.
 
 - [**How it works**](/stamp/how-it-works) — the sign + anchor flow
 - [**OpenTimestamps anchor**](/stamp/ots-anchor) — the anchor step in detail
-- [**OC Attest reference**](/attest) — the `attest_ref` field
+- [**OC Attest reference**](/attest) — the attestation a `stake` field points at

@@ -10,68 +10,58 @@ A poll's `weight_mode` determines how each ballot gets weighted in the final
 tally. Three modes ship as canonical; adding a new one requires a protocol
 version bump.
 
+All three start from the same set: a voter's **qualifying UTXOs** are the coins
+the voter's address held at the snapshot block that were at least `min_days` old
+then. Age is `floor((snapshot - confirmed_height) × 10 / 1440)` days, ten
+minutes a block. A voter whose qualifying UTXOs add up to less than `min_sats`
+weighs zero in every mode.
+
+```
+qualifying(voter) = [ u for u in utxos_at(voter, snapshot) if age_days(u) >= min_days ]
+S(voter)          = sum(u.value for u in qualifying(voter))
+```
+
 ## `one_per_address`
 
-One address, one vote. Ignores stake.
+One address, one vote, for every address over the bar.
 
 ```
-weight(voter) = 1 if voter_has_any_confirmed_utxo else 0
+weight(voter) = 1 if S(voter) >= min_sats else 0
 ```
 
-Use when:
-
-- You just want to prevent empty-address spam.
-- Stake isn't relevant to the decision (e.g., "community name change vote" where
-  holdings are a proxy for membership but not weight).
-
-Doesn't use:
-
-- `snapshot.utxos` for weighting (only for the address-liveness check).
-- `min_sats` / `min_days` (they're ignored in this mode).
+Use when holdings are a membership test, not a weight: "community name change
+vote" where a whale should count once. `min_sats` and `min_days` set the bar. No
+`weight_params`.
 
 ## `sats`
 
 One satoshi, one vote.
 
 ```
-weight(voter) = sum(utxo.value for utxo in snapshot.utxos_for(voter)
-                    if utxo.value >= min_sats and utxo.age_days >= min_days)
+weight(voter) = S(voter) if S(voter) >= min_sats else 0
 ```
 
-`min_sats` is a per-UTXO floor — a voter with many dust UTXOs below threshold
-gets zero weight from those. `min_days` likewise.
+`min_sats` is a floor on the voter's total, not on each coin: many small coins
+that are each old enough add up. `min_days` applies per coin.
 
-Use when:
-
-- Capital commitment is the signal.
-- You don't care about time — ownership right now is enough.
-- You're willing to let whales dominate (sats-weighted polls are plutocratic by
-  construction).
+Use when capital commitment is the signal and time does not matter.
+Sats-weighted polls are plutocratic by construction. No `weight_params`.
 
 ## `sats_days`
 
-Sats × days, with an optional per-UTXO cap.
+Sats × days, with each coin's days capped.
 
 ```
-weight(voter) = sum(min(utxo.value, cap_sats)
-                    * min(utxo.age_days, cap_days)
-                    for utxo in snapshot.utxos_for(voter)
-                    if utxo.value >= min_sats and utxo.age_days >= min_days)
+weight(voter) = sum(u.value × min(age_days(u), cap_days) for u in qualifying(voter))
+                if S(voter) >= min_sats else 0
 ```
 
-`cap_sats` and `cap_days` bound per-UTXO weight so a single massive old UTXO
-can't dwarf everyone else. Defaults: no cap.
+`weight_params` MUST be `{ "cap_days": <positive integer> }`. The cap stops one
+ancient coin from drowning out every fresh commitment. There is no cap on sats.
 
-Use when:
-
-- You want time-and-capital commitment to both matter.
-- You want to reward long-term holders over short-term holders of the same
-  capital.
-- You want to prevent someone from buying a giant bag the day before the
-  snapshot and dominating.
-
-This is the mode most applications pick. It's the closest to "who has real skin
-in the game here."
+Use when time and capital should both matter: it rewards long-term holders over
+short-term holders of the same capital, and a bag bought the day before the
+snapshot counts for nothing until it is `min_days` old.
 
 ## Choosing per poll
 
@@ -82,57 +72,72 @@ editing it produces a different poll.
 Poll creation:
 
 ```ts
-import { canonicalize, pollId } from '@orangecheck/vote-core';
+import type { Poll } from '@orangecheck/vote-core';
 
-const poll = {
-    version: 'oc-vote/v0',
-    title: 'Rename the default theme',
-    options: ['Keep current', 'Call it Midnight', 'Abstain'],
+import { pollId } from '@orangecheck/vote-core';
+
+const iso = (ms: number) =>
+    new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
+const creator = 'bc1qcreator...';
+
+const poll: Poll = {
+    v: 0,
+    kind: 'oc-vote/poll',
+    creator,
+    question: 'Rename the default theme?',
+    options: [
+        { id: 'keep', label: 'Keep current' },
+        { id: 'midnight', label: 'Call it Midnight' },
+    ],
+    deadline: iso(Date.now() + 14 * 86_400_000), // MUST be in the future when published
+    snapshot_block: 'deadline', // or a block height
     weight_mode: 'sats_days',
-    params: {
-        min_sats: 100_000,
-        min_days: 30,
-        cap_sats: 10_000_000, // 0.1 BTC max per UTXO
-        cap_days: 365, // 1 year max per UTXO
-    },
-    snapshot_block: 820_000, // voters prove UTXOs as of this height
-    closes_at: '2026-05-01T00:00:00.000Z',
-    creator: {
-        address: 'bc1qcreator...',
-        scheme: 'bip322',
-    },
-    sig: '<BIP-322 signature by creator over canonical bytes>',
+    weight_params: { cap_days: 180 },
+    min_sats: 100_000,
+    min_days: 30,
+    mode: 'public',
+    reveal_pk: null,
+    tiebreak: 'latest',
+    notes: null,
+    created_at: iso(Date.now()),
+    sig: { alg: 'bip322', pubkey: creator, value: '' },
 };
 
-const id = await pollId(poll);
+const id = pollId(poll); // sha256 of the canonical poll with sig.value = ""
+poll.sig.value = await walletSignBIP322(id); // your wallet signs the 64-hex id
 ```
 
 ## Example tally
 
-Poll with `sats_days`, `min_sats = 100_000`, `cap_sats = 1_000_000`, two voters:
+`sats_days` with `cap_days = 180`, `min_sats = 100_000`, `min_days = 30`, four
+voters:
 
-| Voter | UTXOs at snapshot              | Per-UTXO weight                       | Total      |
-| ----- | ------------------------------ | ------------------------------------- | ---------- |
-| Alice | 1× 500,000 sats, 60 days old   | 500,000 × 60 = 30,000,000             | 30,000,000 |
-| Bob   | 1× 5,000,000 sats, 10 days old | capped to 1,000,000 × 10 = 10,000,000 | 10,000,000 |
+| Voter | UTXOs at snapshot         | Weight                                      | Votes      |
+| ----- | ------------------------- | ------------------------------------------- | ---------- |
+| Alice | 500,000 sats, 60 days old | 500,000 × 60 = 30,000,000                   | `midnight` |
+| Bob   | 1,000,000 sats, 400 days  | 1,000,000 × 180 = 180,000,000 (days capped) | `keep`     |
+| Carol | 80,000 sats, 300 days     | 0 — 80,000 is under `min_sats`              | `midnight` |
+| Dave  | 200,000 sats, 10 days     | 0 — under `min_days`, so nothing qualifies  | `keep`     |
 
-If Alice votes "Midnight" and Bob votes "Keep current", `tally()` returns:
+`tally()` returns:
 
 ```json
 {
-    "Keep current": 10000000,
-    "Midnight": 30000000,
-    "Abstain": 0,
-    "winner": "Midnight"
+    "state": "tallied",
+    "snapshot_block": 900000,
+    "turnout": { "voters": 2, "weight": 210000000 },
+    "tallies": { "keep": 180000000, "midnight": 30000000 }
 }
 ```
 
-The cap ensures Bob's single 0.05 BTC UTXO doesn't dwarf Alice's smaller but
-older commitment.
+The same ballots weigh `keep 1,000,000 / midnight 500,000` under `sats` and
+`1 / 1` under `one_per_address`. `turnout` counts only voters whose weight is
+above zero. The result names no winner: reading the tallies is the caller's
+policy.
 
 ## See also
 
 - [**Tally algorithm**](/vote/tally-algorithm) — the deterministic function
 - [**OC Vote overview**](/vote) — when to pick each mode
-- [**Conformance vectors**](/ecosystem/conformance) — `v02` tests sats mode;
-  `v03` tests `sats_days` with cap
+- [**Conformance vectors**](/ecosystem/conformance) — `v02` tests sats mode with
+  a voter under `min_sats`; `v03` tests `sats_days` with a 180-day cap

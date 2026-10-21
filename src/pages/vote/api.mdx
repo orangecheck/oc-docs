@@ -27,16 +27,19 @@ from mempool.space, runs the pure tally function, and returns JSON.
 
 ```json
 {
-    "poll_id": "3054…",
+    "poll_id": "9825268c…",
     "state": "tallied",
-    "snapshot_block": 900412,
-    "turnout": { "voters": 47, "weight": 2814300000 },
-    "tallies": {
-        "split_a": 812300000,
-        "split_b": 1102900000,
-        "split_c": 899100000
-    },
-    "ballot_count": 47
+    "snapshot_block": 947961,
+    "turnout": { "voters": 1, "weight": 12311 },
+    "tallies": { "yes": 12311, "no": 0 },
+    "ballot_count": 1,
+    "reveal_published": false,
+    "relays": [{ "relay": "wss://relay.ochk.io", "answered": true, "events": 1 }, …],
+    "utxo_source": {
+        "explorer": "mempool.space",
+        "counts": "coins unspent now and confirmed at or before snapshot_block",
+        "not_counted": "coins spent after snapshot_block"
+    }
 }
 ```
 
@@ -46,18 +49,23 @@ from mempool.space, runs the pure tally function, and returns JSON.
 { "poll_id": "cc27…", "state": "awaiting_reveal" }
 ```
 
-**4xx:**
+**Errors** (JSON with an `error` string):
 
 - `400` — poll query param missing or not 64 hex.
-- `404` — poll not found on any default relay.
-- `422` — poll event content did not match poll_id (relay corruption).
+- `404` — no relay that answered holds the poll. If the id is a poll's Nostr
+  event id, the body names the `poll_id` to use instead.
+- `409` — `state: "deferred"`: the snapshot block is not yet buried six blocks
+  deep. Retry later.
+- `422` — the poll event's content did not match the poll id.
+- `503` — no relay finished answering the poll, ballot or reveal query. A tally
+  over a ballot set no relay finished sending would be a guess.
 
 Response is cached for 60 seconds at the edge. Live tallies on the poll page
 recompute client-side against the same function.
 
 ## library
 
-<InstallTabs pkg="@orangecheck/vote-core" />
+<InstallTabs pkg="@orangecheck/vote-core @orangecheck/bip322" />
 
 Full API surface:
 
@@ -81,13 +89,20 @@ import {
     // secret-mode commit
     commit,
     isSupportedMode,
+    // the snapshot block for a "deadline" poll
+    mempoolBlockTimeSource,
     // ids (content-addressed, SHA-256 of canonical bytes with sig.value = "")
     pollId,
     qualifyingUtxos,
+    resolvePollSnapshot,
     revealId,
     // the tally
     tally,
     totalQualifyingSats,
+    // signature checks for one poll, ballot or reveal
+    verifyBallot,
+    verifyPoll,
+    verifyReveal,
     // weight computation
     voterWeight,
 } from '@orangecheck/vote-core';
@@ -96,7 +111,12 @@ import {
 ### example: build and sign a poll
 
 ```ts
+import type { Poll } from '@orangecheck/vote-core';
+
 import { pollId } from '@orangecheck/vote-core';
+
+const iso = (ms: number) =>
+    new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
 
 const draft: Poll = {
     v: 0,
@@ -107,7 +127,7 @@ const draft: Poll = {
         { id: 'yes', label: 'Yes' },
         { id: 'no', label: 'No' },
     ],
-    deadline: '2026-05-08T00:00:00Z',
+    deadline: iso(Date.now() + 7 * 86_400_000), // MUST be in the future when published
     snapshot_block: 'deadline',
     weight_mode: 'sats',
     weight_params: null,
@@ -117,25 +137,33 @@ const draft: Poll = {
     reveal_pk: null,
     tiebreak: 'latest',
     notes: null,
-    created_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+    created_at: iso(Date.now()),
     sig: { alg: 'bip322', pubkey: 'bc1q…', value: '' },
 };
 
 const id = pollId(draft);
-// ask wallet to BIP-322 sign `id`, then set draft.sig.value = <signature>
+// ask the wallet to BIP-322 sign `id` (the 64-hex string), then:
+draft.sig.value = await walletSignBIP322(id);
 ```
 
 ### example: tally
 
 ```ts
 import { verifySignature } from '@orangecheck/bip322';
-import { tally } from '@orangecheck/vote-core';
+import {
+    mempoolBlockTimeSource,
+    resolvePollSnapshot,
+    tally,
+} from '@orangecheck/vote-core';
+
+const snap = await resolvePollSnapshot(poll, mempoolBlockTimeSource());
+if (!snap.ok) throw new Error(`${snap.code}: ${snap.reason}`);
 
 const result = await tally({
     poll,
     ballots,
+    snapshotBlock: snap.height, // required when poll.snapshot_block is "deadline"
     utxosAt: (addr, snapshotHeight) => myUtxoSource.fetch(addr, snapshotHeight),
-    skipSignatures: false,
     // Named arguments: vote-core's positional verifyBip322 takes
     // (address, message, signature), unlike every sibling package.
     verify: ({ address, message, signature }) =>
@@ -144,7 +172,7 @@ const result = await tally({
 ```
 
 The library is **pure**. Same inputs → byte-identical output across
-implementations. 28/28 tests pass against the canonical fixtures in
+implementations. It passes the five canonical fixtures in
 [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors).
 
 ## dispute resolution

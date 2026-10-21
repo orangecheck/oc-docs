@@ -93,7 +93,7 @@ claim. Only the OTS anchor proves the id existed _before_ a specific block.
 
 | Field            | Rule                                                                                                        |
 | ---------------- | ----------------------------------------------------------------------------------------------------------- |
-| `attestation_id` | SHA-256 hex of an orangecheck canonical message signed by `signer.address`.                                 |
+| `attestation_id` | SHA-256 hex of an orangecheck canonical message signed by `signer.address`. A verifier MUST check that.     |
 | `sats_bonded`    | Non-negative integer. **Self-declared** — a verifier who cares about stake MUST re-resolve via orangecheck. |
 | `days_unspent`   | Non-negative integer. Same.                                                                                 |
 
@@ -130,10 +130,13 @@ The id commits transitively to every field in the canonical message via
 - `ots` — OTS proofs are appended after signing; upgrade is cryptographically
   independent.
 - `content.ref` — a convenience pointer, not a commitment.
+- `stake` — a self-declared reference. Anyone can strip it, add one or swap in
+  another attestation without breaking the signature. A verifier re-resolves it
+  and accepts only an attestation signed by `signer.address`.
 
 Any modification of a signed-domain field (address, content.hash,
-content.length, content.mime, signed_at, or stake) invalidates the id and the
-signature. Tamper-evidence is transitive via the id.
+content.length, content.mime or signed_at) invalidates the id and the signature.
+Tamper-evidence is transitive via the id.
 
 ## Canonicalization
 

@@ -66,47 +66,73 @@ Current state of tag signing: GPG keys nobody audits, keyservers nobody trusts.
 Developers already have Bitcoin wallets.
 
 ```
-$ git-stamp tag v2.1.0
-> Reading tree… SHA256:e7…
-> Canonical message (sign with your wallet):
->   oc-stamp:v1
->   address: bc1qalice…
->   content_hash: sha256:e7…
->   content_length: 48128
->   content_mime: application/x-git-tree
->   signed_at: 2026-04-24T18:30:00Z
-> [Sparrow] Signed. Submitting to OTS calendars…
-> Stamp written: .git/stamps/v2.1.0.stamp
+$ npm i -g @orangecheck/stamp-cli
+$ git-stamp tag v2.1.0 --addr bc1qalice…
+
+This stamp commits to:
+────────────────────────────────────────────────────────────
+oc-stamp:v1
+address: bc1qalice…
+content_hash: sha256:01b3286f…
+content_length: 128
+content_mime: application/x-git-tag
+signed_at: 2026-04-24T18:30:00Z
+────────────────────────────────────────────────────────────
+
+Sign this id with bc1qalice… (BIP-322):
+
+c62fe0cabadd5e7953c24147e6f895f26c1d483db832801e1661aa7926c735fb
+
+paste signature (base64): …
+ok: true
+tag: v2.1.0
+id: c62fe0ca…
+ots: pending
+written: .git/stamps/v2.1.0.stamp
 ```
 
-Anyone cloning runs `git-stamp verify v2.1.0` — authorship, priority, and
-tree-hash equality all checked, no GPG keyserver involved.
+The content is the tag name, the tag's object id and its tree id, so changing
+any of them breaks the stamp. Anyone with the repository and the stamp file runs
+`git-stamp verify v2.1.0`, or `--require-anchor` once the anchor is confirmed:
+authorship, priority and the tree are all checked, no GPG keyserver involved.
 
 ## Flow 3 — Sybil-gated publishing feed
 
-A platform accepts submissions from anyone but wants a stake signal. With
-stamps, the stake is **time-pinned**: the platform can require that the signer
-held stake _at the moment they wrote the content_, not just right now.
+A platform accepts submissions from anyone but wants a stake signal. The stamp
+names the author; the platform re-checks the author's own attestation against
+the chain when it verifies.
 
 ```ts
-import { ocGate } from '@orangecheck/gate';
-import { verify } from '@orangecheck/stamp-core';
+import type { StampEnvelope } from '@orangecheck/stamp-core';
 
-app.post('/submit', async (req, res) => {
-    const { stamp, bytes } = req.body;
-    const r = await verify({ envelope: stamp, content: bytes });
-    if (!r.ok) return res.status(400).json({ error: r.code });
-    if (!r.envelope.stake) return res.status(403).json({ error: 'no_stake' });
+import { verifySignature } from '@orangecheck/bip322';
+import { checkStake, verify } from '@orangecheck/stamp-core';
 
-    const att = await ocGate.resolve(r.envelope.stake.attestation_id);
-    if (att.sats_bonded < 100_000 || att.days_unspent < 30) {
-        return res.status(403).json({ error: 'below_threshold' });
-    }
-    // accept
-});
+async function acceptSubmission(envelope: StampEnvelope, bytes: Uint8Array) {
+    const r = await verify({
+        envelope,
+        content: bytes,
+        verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
+    });
+    if (!r.ok) return { accepted: false, error: r.code };
+    if (!r.envelope.stake) return { accepted: false, error: 'no_stake' };
+
+    const id = r.envelope.stake.attestation_id;
+    const att = await fetch(`https://attest.ochk.io/api/check?id=${id}`).then(
+        (res) => res.json()
+    );
+    const stake = checkStake(r.envelope, att.ok ? att : null, {
+        minSats: 100_000,
+        minDays: 30,
+    });
+    if (!stake.ok) return { accepted: false, error: stake.message };
+    return { accepted: true };
+}
 ```
 
-Time-pinned stake defeats farmed-stake-in-the-last-week gaming.
+`stake` is not signed, so the address check is what keeps someone else's bond
+from counting. Requiring 30 days unspent means the coins sat for a month, which
+defeats stake farmed in the last week.
 
 ## Flow 4 — Legal self-notarization
 
@@ -128,8 +154,8 @@ anchor is admissible.
 
 A proposal is a Markdown doc. Today it lives in a forum thread whose authorship
 is whoever clicked "post." With OC Stamp, the proposal author includes a
-`.stamp` envelope carrying _who proposed, when, at what stake_ — and the DAO's
-later vote (via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
+`.stamp` envelope carrying _who proposed and when_ — and the DAO's later vote
+(via [OC Vote](https://vote.ochk.io)) can reference the stamp id.
 
 ## What's NOT in the protocol
 

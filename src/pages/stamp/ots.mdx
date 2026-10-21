@@ -31,7 +31,7 @@ Bitcoin-address-bound authorship + optional stake context on top.**
 
 ## Step 1–2: Submission
 
-`@orangecheck/stamp-ots` ships a thin HTTP client:
+`@orangecheck/stamp-ots` ships the calendar client:
 
 ```ts
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
@@ -47,7 +47,8 @@ Defaults to three independently-operated calendars:
 - `https://finney.calendar.eternitywall.com`
 
 Clients SHOULD submit to at least two independent calendars. Submitting to a
-single calendar is a single point of failure for upgrade liveness.
+single calendar is a single point of failure for upgrade liveness. The proof
+keeps the receipt of every calendar that answered, and `calendars` lists them.
 
 ## Step 3: Pending proof
 
@@ -80,14 +81,22 @@ the calendar root up to the Bitcoin block's Merkle root.
 Any client (signer, verifier, archival crawler) can fetch the upgrade:
 
 ```ts
-import { fromStampOts, toStampOts, upgradeProof } from '@orangecheck/stamp-ots';
+import {
+    fromStampOts,
+    mempoolHeaderSource,
+    toStampOts,
+    upgradeProof,
+} from '@orangecheck/stamp-ots';
 
-const current = fromStampOts(envelope.ots);
-const upgraded = await upgradeProof(current, envelope.id, {
-    parseAnchor: myOtsParser, // plug in a real OTS proof parser
+const current = fromStampOts(anchored.ots);
+const upgraded = await upgradeProof(current, anchored.id, {
+    headerSource: mempoolHeaderSource(), // or your own node's headers
 });
-envelope.ots = toStampOts(upgraded);
+const env = { ...anchored, ots: toStampOts(upgraded) };
 ```
+
+While the calendars have not anchored the batch, `upgradeProof()` returns the
+proof still pending; call it again later.
 
 The upgrade rewrites `ots` only. It does not touch `id`, `sig`, or any other
 signed-domain field. The signature domain does not include `ots`, so the upgrade
@@ -98,43 +107,40 @@ is cryptographically independent of the BIP-322 commitment.
 A verifier with `ots.status === "confirmed"`:
 
 1. Parses `ots.proof`.
-2. Walks the Merkle path from id to the declared Bitcoin Merkle root.
-3. Fetches (or is supplied) the Bitcoin block header at `block_height`.
+2. Walks the proof from `id` to a Bitcoin attestation at `block_height`.
+3. Fetches (or is supplied) the Bitcoin block header at `block_height` and
+   checks that it hashes to `block_hash`.
 4. Compares the header's Merkle root to the one derived from the proof.
-5. Accepts iff they match.
+5. Accepts iff both checks hold.
 
-`@orangecheck/stamp-ots` exposes this as a pluggable pattern:
+`@orangecheck/stamp-ots` does all five, given a source of block headers:
 
 ```ts
+import { verifySignature } from '@orangecheck/bip322';
 import { verify } from '@orangecheck/stamp-core';
-import { makeAnchorVerifier } from '@orangecheck/stamp-ots';
+import {
+    makeAnchorVerifier,
+    mempoolHeaderSource,
+} from '@orangecheck/stamp-ots';
 
-// Already shaped as stamp-core's verifyOtsAnchor(proofB64, blockHeight, blockHash, envelopeId).
+// Shaped as stamp-core's verifyOtsAnchor(proofB64, blockHeight, blockHash, envelopeId).
 const verifyOtsAnchor = makeAnchorVerifier({
-    walkProof: myOtsParser,
-    headerSource: myHeaderSource, // full node, SPV, or headers snapshot
+    headerSource: mempoolHeaderSource(), // or a full node, SPV, or headers snapshot
 });
 
 const r = await verify({
     envelope: env,
     verifyOtsAnchor,
-    verifyBip322: myBip322Verifier,
+    verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
 });
 ```
 
-## Why we don't ship a proof parser
+## The proof parser
 
-The binary OTS proof format is well-documented but non-trivial to parse. A
-maintained library (`javascript-opentimestamps`) already handles it. Bundling
-that library into `@orangecheck/stamp-ots` would force every consumer — even
-ones who only need calendar submission — to drag in its transitive deps.
-
-Instead: we ship the calendar client and the anchor-verifier shape, and expose
-`walkProof` as a plug-in point. Consumers who want full offline verification
-bring their own parser, or install `opentimestamps` next to
-`@orangecheck/stamp-ots` and call `makeDefaultAnchorVerifier({ headerSource })`,
-which loads it lazily. Consumers who only need submission get a dep-light
-package.
+`@orangecheck/stamp-ots` parses the OTS proof format itself, with no dependency:
+`parseProof` reads the bare timestamp carried in `ots.proof` and `parseDetached`
+reads a detached `.ots` file. `makeAnchorVerifier` walks proofs with it. To use
+another parser, pass it as `walkProof`.
 
 ## Aggregators
 
@@ -150,7 +156,10 @@ slowly, or lose a submission — but they **cannot**:
 
 - Forge envelopes (no signer key).
 - Backdate (OTS won't let them).
-- Strip stake context (baked into `id` via canonical message).
+
+The `stake` field is outside the `id` and the signature, so an aggregator could
+strip or change it. A verifier that cares about stake re-resolves the
+attestation and checks it was signed by `signer.address`.
 
 The reference aggregator at `stamp.ochk.io` runs this batching for convenience.
 A signer with their own Bitcoin node and OTS calendar has no need of an
@@ -161,6 +170,6 @@ aggregator.
 - [OpenTimestamps website](https://opentimestamps.org)
 - [`@orangecheck/stamp-ots` on npm](https://www.npmjs.com/package/@orangecheck/stamp-ots)
 - [`javascript-opentimestamps`](https://github.com/opentimestamps/javascript-opentimestamps)
-  — the reference parser to plug in.
+  — the reference implementation of the format.
 - [SPEC §6](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#6-opentimestamps-integration)
   — normative rules.

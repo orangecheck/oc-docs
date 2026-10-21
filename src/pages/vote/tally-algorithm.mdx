@@ -17,8 +17,14 @@ check.
 function tally(opts: {
     poll: Poll;
     ballots: Ballot[];
-    utxosAt: (address: string, blockHeight: number) => Promise<Utxo[]>;
-    revealedOptions?: Record<BallotId, OptionIndex>; // for secret-mode polls
+    // UTXOs `address` held at `blockHeight`: each { value, confirmed_height }.
+    utxosAt: (address: string, blockHeight: number) => Utxo[] | Promise<Utxo[]>;
+    // Required when poll.snapshot_block is "deadline"; see resolvePollSnapshot().
+    snapshotBlock?: number;
+    // Current tip: throws E_REORG if the snapshot has fewer than 6 confirmations.
+    tipHeight?: number;
+    // Secret-mode polls: returns a ballot's option once the reveal key is published.
+    unseal?: (ballot: Ballot) => Promise<string | null> | string | null;
     // Preferred: named arguments can't be swapped.
     verify?: (a: {
         address: string;
@@ -37,118 +43,110 @@ function tally(opts: {
 ```
 
 `tally` throws unless it gets `verify`, `verifyBip322` or an explicit
-`skipSignatures`, so it never counts unverified ballots by accident.
+`skipSignatures`, so it never counts unverified ballots by accident. It also
+throws on a `"deadline"` poll without `snapshotBlock`: resolve the block with
+`resolvePollSnapshot(poll, mempoolBlockTimeSource())` (or your own node) and
+pass `snapshotBlock: snap.height`.
 
-The function is async only because `utxosAt` is async. Everything else is
-deterministic synchronous computation.
+The function is async only because `utxosAt` and the verifier may be. Everything
+else is deterministic synchronous computation.
 
 ## Steps
 
-### 1. Verify the poll
+### 1. Verify the poll, then each ballot
 
-- Recompute `poll.id = sha256(canonical_bytes(poll with sig=""))`. Reject if it
-  doesn't match what's claimed.
-- Verify `poll.sig` is a valid BIP-322 signature from `poll.creator.address`
-  over the canonical bytes.
-- Reject if `poll.version !== "oc-vote/v0"`.
-
-### 2. Verify each ballot
-
-For each ballot in the input:
-
-- Reject if the ballot's poll_id doesn't match this poll.
-- Reject if the ballot's signature doesn't verify.
-- Reject if the ballot was issued after `poll.closes_at`.
-- If `weight_mode === 'secret'`, verify the commitment matches the revealed
-  option when available.
+- Verify `poll.sig.value` as a BIP-322 signature by `poll.creator` over the poll
+  id: the SHA-256 of the canonical poll with `sig.value` set to `""`. If it
+  fails, the whole tally fails with `E_BAD_SIG`.
+- Drop a ballot whose `poll_id` is not this poll's, whose `voter` is not a
+  mainnet address, whose `created_at` is after `poll.deadline`, or whose
+  signature over its ballot id does not verify.
+- Public polls: drop a ballot whose `option` is null or is neither `"withdraw"`
+  nor one of the poll's option ids. Secret polls: drop a ballot with no
+  `secret`.
 
 Invalid ballots are **silently dropped** (not failing the whole tally). This is
-important: a tally-operator can't DoS the tally by submitting a bad ballot.
+important: nobody can block a tally by publishing a bad ballot.
 
-### 3. Fetch snapshot UTXOs
+### 2. One ballot per voter
 
-For each unique voter address, call `utxosAt(address, poll.snapshot_block)` to
-get the voter's UTXOs at the declared block height.
+If a voter has several valid ballots, the poll's `tiebreak` picks one: `latest`
+takes the greatest `created_at`, `first` the least. Equal times are broken by
+ballot id, greater for `latest` and lesser for `first`. Conformance vector `v04`
+tests this.
 
-This is the ONLY network-dependent step. A caller with an offline chain snapshot
-(e.g., a compact block-filter database) can supply their own `utxosAt`
-implementation and compute the tally fully offline.
+### 3. Reveal (secret polls)
 
-### 4. Compute per-voter weight
+Without the reveal key the result is `{ "state": "awaiting_reveal" }`. With it,
+each voter's chosen ballot is unsealed and its commitment checked; a voter whose
+ballot does not open to a valid option is dropped.
 
-Applying the selected [weight mode](/vote/weight-modes):
+### 4. Snapshot block
+
+`poll.snapshot_block` if it is a height. If it is `"deadline"`, the block whose
+median time past is the greatest at or before the deadline, with at least six
+confirmations.
+
+### 5. Weigh and sum
+
+For each remaining voter, call `utxosAt(voter, snapshot)` and apply the
+[weight mode](/vote/weight-modes). A voter who chose `"withdraw"` or whose
+weight is zero adds nothing and is not counted in `turnout`.
 
 ```
-for voter in unique_voters_with_valid_ballots:
-    weight[voter] = compute_weight(utxos[voter], poll.weight_mode, poll.params)
+for voter, ballot in chosen:
+    if ballot.option == "withdraw": continue
+    w = weight(poll.weight_mode, utxos_at(voter, snapshot))
+    if w == 0: continue
+    tallies[ballot.option] += w
+    turnout.voters += 1
+    turnout.weight += w
 ```
 
-### 5. Handle vote changes
-
-If a voter has multiple valid ballots for the same poll, only the **latest** (by
-`issued_at`) is counted. Earlier ballots are discarded. This is tested by
-conformance vector `v04`.
-
-### 6. Sum into options
-
-```
-for voter in voters_with_latest_ballot:
-    choice = latest_ballot[voter].option_index
-    option_totals[choice] += weight[voter]
-```
-
-### 7. Declare winner
-
-The option with the highest total wins. Ties are broken deterministically by
-option index (lowest index wins). This makes the result reproducible across
-implementations without a tiebreak convention debate.
+`utxosAt` is the ONLY network-dependent step besides the snapshot height. A
+caller with an offline chain snapshot (e.g., a compact block-filter database)
+can supply their own `utxosAt` and compute the tally fully offline.
 
 ## Output shape
 
 ```json
 {
-    "poll_id": "<content hash>",
-    "option_totals": {
-        "Keep current": 10000000,
-        "Midnight": 30000000,
-        "Abstain": 0
-    },
-    "winner": "Midnight",
-    "total_weight": 40000000,
-    "valid_ballots": 2,
-    "invalid_ballots": 0,
-    "voter_count": 2
+    "state": "tallied",
+    "snapshot_block": 900000,
+    "turnout": { "voters": 2, "weight": 210000000 },
+    "tallies": { "keep": 180000000, "midnight": 30000000 }
 }
 ```
 
-Every field is byte-deterministic given the same inputs. Two independent
-implementations that disagree on any field have a bug.
+Every option appears in `tallies`, with `0` if nobody chose it. There is no
+winner field: which tally wins, and whether turnout is enough, is the caller's
+policy. Two independent implementations that disagree on any field have a bug.
 
 ## Conformance
 
 The 5 canonical vectors in `oc-vote-protocol/test-vectors/`:
 
-| Vector | What it pins                                                                         |
-| ------ | ------------------------------------------------------------------------------------ |
-| `v01`  | Minimal public poll — 3 options, 2 voters, `one_per_address`                         |
-| `v02`  | Sats-weighted with dust floor                                                        |
-| `v03`  | `sats_days` with per-UTXO cap                                                        |
-| `v04`  | Vote-change semantics — voter submits two ballots, only the later counts             |
-| `v05`  | Secret ballot — commit-reveal, partial reveal, correct handling of un-revealed votes |
+| Vector | What it pins                                                                   |
+| ------ | ------------------------------------------------------------------------------ |
+| `v01`  | Minimal public poll — one voter, `sats`                                        |
+| `v02`  | `sats` with three voters, one under `min_sats` and weighing zero               |
+| `v03`  | `sats_days` with a 180-day cap; one voter with two UTXOs, one past the cap     |
+| `v04`  | Vote change — one voter, two ballots, `tiebreak: latest` picks the later       |
+| `v05`  | Secret ballot — option null before the reveal, the commitment binds the choice |
 
 `@orangecheck/vote-core` passes all 5 on every CI run. A reimplementation in
 another language is conformant iff it also passes all 5.
 
 ## Edge cases
 
-- **Voter has no UTXOs at snapshot.** Weight = 0. Ballot is technically valid
-  (signature verifies) but contributes nothing.
-- **Poll closes mid-tally.** Ballots `issued_at > poll.closes_at` are rejected
-  during ballot verification, so by tally time there are no "race" ballots.
-- **Two ballots from same voter with same `issued_at`.** Use `ballot.id`
-  (content hash) as the tiebreaker — lexicographically smaller wins.
-- **Zero valid ballots.** Tally returns zero weights, `winner = null`,
-  `voter_count = 0`.
+- **Voter has no UTXOs at snapshot.** Weight = 0. The ballot is valid but
+  contributes nothing and is not in `turnout`.
+- **Ballot after the deadline.** Dropped in step 1, so a late ballot can't race
+  the tally.
+- **Two ballots from the same voter with the same `created_at`.** The ballot id
+  breaks the tie, per `tiebreak`.
+- **Zero valid ballots.** Every option tallies `0`, and `turnout` is
+  `{ "voters": 0, "weight": 0 }`.
 
 ## See also
 

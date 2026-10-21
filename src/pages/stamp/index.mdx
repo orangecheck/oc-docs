@@ -9,9 +9,9 @@ export const metadata = {
 **Sign anything. Anchor the moment to Bitcoin.** OC Stamp binds three things
 into one envelope: authorship (BIP-322 signature from a Bitcoin address),
 priority (an OpenTimestamps proof chained to a specific Bitcoin block header),
-and optionally stake at signing (an OC Attest attestation reference). The result
-is a self-contained `.stamp` envelope that anyone can verify offline, forever,
-without calling ochk.io.
+and optionally a stake reference (an OC Attest attestation, re-checked when
+verified). The result is a self-contained `.stamp` envelope that anyone can
+verify offline, forever, without calling ochk.io.
 
 ## Who this replaces
 
@@ -36,8 +36,8 @@ nothing else.
   witness).
 - **DAO proposal authorship** (the signer of record is cryptographically bound,
   not just the wallet that submitted the tx).
-- **Sybil-gated content feeds** (combined with an OC Attest reference for
-  stake-at-signing).
+- **Sybil-gated content feeds** (combined with an OC Attest reference, checked
+  against the signer's address).
 
 ## What it proves
 
@@ -48,8 +48,9 @@ A valid Stamp envelope proves:
 2. **Priority.** The envelope's ID was committed to a specific Bitcoin block by
    a specific height — so it could not have been fabricated after that block.
 3. **Optional stake.** If the envelope references an OC Attest attestation,
-   verifiers can resolve the signer's sats-bonded × days-unspent at the moment
-   of signing.
+   verifiers can resolve the signer's sats-bonded × days-unspent as they stand
+   when verifying. The reference is not signed, so a verifier also checks that
+   the attestation belongs to the signer's address.
 
 ## What it does NOT prove
 

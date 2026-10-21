@@ -12,18 +12,22 @@ Two steps. First you sign. Then you anchor.
 ```ts
 import { stamp } from '@orangecheck/stamp-core';
 
+const contentBytes = new TextEncoder().encode(
+    'release: v1.2.3 signed by Alice'
+);
 const env = await stamp({
-    content: new TextEncoder().encode('release: v1.2.3 signed by Alice'),
+    content: contentBytes,
     mime: 'text/plain',
     signer: {
         address: 'bc1qalice...',
-        signMessage: async (m) => walletSignBIP322(m),
+        signMessage: async (m) => walletSignBIP322(m), // your wallet; see Quickstart
     },
-    // Optional — reference an OC Attest attestation for "stake at signing"
-    attest_ref:
-        'a3f5b8c2d1e4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1',
 });
 ```
+
+An optional `stake` field points at an [OC Attest](/attest) attestation. It is
+self-declared and outside the signature, so a verifier that cares re-resolves
+it; see [envelope](/stamp/envelope#stake-optional).
 
 `stamp()` builds a [canonical message](/ecosystem/canonical-message): the
 `oc-stamp:v1` header, the signer's address, the SHA-256 of `content`, its
@@ -31,28 +35,30 @@ length, its MIME type and the signing time. The envelope id is the SHA-256 of
 those bytes, and the wallet signs the id's hex form via
 [BIP-322](/ecosystem/bip322), so the signature covers every line.
 
-The envelope is a JSON blob:
+The envelope is a JSON blob ([every field](/stamp/envelope)):
 
 ```json
 {
-    "id": "<sha256 of canonical message, base64url>",
-    "version": "oc-stamp/v0",
-    "signer": {
-        "address": "bc1qalice...",
-        "scheme": "bip322"
+    "v": 1,
+    "kind": "stamp",
+    "id": "<sha256 of the canonical message, 64 lowercase hex>",
+    "content": {
+        "hash": "sha256:<64 hex>",
+        "length": 31,
+        "mime": "text/plain",
+        "ref": null
     },
-    "content_hash": "<sha256 of content bytes, hex>",
-    "mime": "text/plain",
-    "attest_ref": "a3f5b8c2...",
-    "issued_at": "2026-04-24T06:47:29.977Z",
-    "sig": "<BIP-322 signature, base64>",
-    "ots": null
+    "signer": { "address": "bc1qalice...", "alg": "bip322" },
+    "signed_at": "2026-04-24T06:47:29Z",
+    "stake": null,
+    "ots": null,
+    "sig": { "alg": "bip322", "pubkey": "bc1qalice...", "value": "<base64>" }
 }
 ```
 
 The content itself is NOT included in the envelope — only its hash. You ship the
 envelope alongside the content (archive, filesystem, HTTP, whatever). A verifier
-re-hashes the content and checks against `content_hash` to prove the envelope
+re-hashes the content and checks against `content.hash` to prove the envelope
 commits to the same bytes.
 
 This is intentional: envelopes stay small (~500 bytes) regardless of content
@@ -61,11 +67,11 @@ size. A 4 GB video gets the same envelope a 40-byte string does.
 ## 2. Anchor
 
 ```ts
-import { submitToCalendars, upgradeProof } from '@orangecheck/stamp-ots';
+import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
 
 // Submit the envelope id to OpenTimestamps calendars
-env.ots = await submitToCalendars(env.id);
-// env.ots is now a "pending" OTS proof
+const anchored = { ...env, ots: toStampOts(await submitToCalendars(env.id)) };
+// anchored.ots.status is "pending"
 ```
 
 `submitToCalendars()` POSTs the envelope's `id` bytes to one or more OTS
@@ -78,14 +84,24 @@ the batch hasn't hit the chain yet.
 Once a Bitcoin block confirms, the proof can be **upgraded**:
 
 ```ts
-// Minutes to hours later:
-env.ots = await upgradeProof(env.ots, env.id);
-// env.ots is now a "confirmed" proof chained to a specific Bitcoin block
+import {
+    fromStampOts,
+    mempoolHeaderSource,
+    toStampOts,
+    upgradeProof,
+} from '@orangecheck/stamp-ots';
+
+// An hour or more later. Returns the proof unchanged while it is still pending.
+const proof = await upgradeProof(fromStampOts(anchored.ots!), anchored.id, {
+    headerSource: mempoolHeaderSource(), // checks the block header it lands in
+});
+const upgraded = { ...anchored, ots: toStampOts(proof) };
+// upgraded.ots.status is "confirmed" once the batch is in a block
 ```
 
-The upgraded proof contains the Merkle path from your digest to the batch root,
-and the block header that included the batch root. Anyone holding the envelope +
-the proof + any honest Bitcoin node can verify:
+The upgraded proof contains the Merkle path from your digest to the Merkle root
+of a Bitcoin block. Anyone holding the envelope, the proof and that block's
+header (from any Bitcoin node) can verify:
 
 - The envelope was signed by the holder of the Bitcoin address (via BIP-322).
 - The envelope's `id` was included in a specific Bitcoin block at a specific
@@ -94,27 +110,38 @@ the proof + any honest Bitcoin node can verify:
 ## Verify
 
 ```ts
+import { verifySignature } from '@orangecheck/bip322';
 import { verify } from '@orangecheck/stamp-core';
+import {
+    makeAnchorVerifier,
+    mempoolHeaderSource,
+} from '@orangecheck/stamp-ots';
 
 const result = await verify({
-    envelope: env,
-    content: contentBytes, // the raw bytes the envelope commits to
-    verifyBip322: async (msg, sig, addr) => walletVerifyBIP322(msg, sig, addr),
-    verifyOtsAnchor: myAnchorVerifier, // see /stamp/ots-anchor
+    envelope: upgraded,
+    content: contentBytes, // optional: the raw bytes the envelope commits to
+    verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
+    verifyOtsAnchor: makeAnchorVerifier({
+        headerSource: mempoolHeaderSource(),
+    }),
 });
 
-if (result.ok) {
-    console.log('Author:', result.signer.address);
-    console.log('Content hash matched:', result.content_hash_ok);
-    console.log('Anchored in Bitcoin block:', result.anchor?.block_height);
-    console.log('Attest reference:', result.attest_ref);
+if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
+console.log('Author:', result.envelope.signer.address);
+if (result.anchor.status === 'confirmed') {
+    console.log('Anchored in Bitcoin block:', result.anchor.blockHeight);
+} else {
+    console.log('Anchor:', result.anchor.status); // "pending" or "none"
 }
 ```
 
+`verify()` fails with `E_BAD_CONTENT` if the bytes do not match, and with
+`E_BAD_ANCHOR` if a confirmed proof does not check out against the header.
 `verify()` is pure — it does the crypto and delegates network calls (BIP-322
-verification, OTS anchor resolution) to plug-in functions you provide. This
-keeps the core verifier offline-capable and lets you choose any block-header
-source.
+verification, block headers) to plug-in functions you provide. This keeps the
+core verifier offline-capable and lets you choose any block-header source:
+`mempoolHeaderSource()` asks mempool.space, and your own node removes that
+trust.
 
 ## Without the anchor
 
@@ -124,10 +151,10 @@ it entirely if your use case doesn't need priority.
 
 ## Publishing optional
 
-Envelopes can be published to [Nostr kind-30083](/ecosystem/nostr-kind-30078)
-with `d` tag `oc-stamp:<id>` for durable public discovery, but it's optional. A
-stamp is a self-contained JSON blob; email it, embed it in a git commit message,
-put it in S3 — it verifies the same way.
+Envelopes can be published to [Nostr kind-30083](/stamp/nostr) with `d` tag
+`oc-stamp:<id>` for durable public discovery, but it's optional. A stamp is a
+self-contained JSON blob; email it, embed it in a git commit message, put it in
+S3 — it verifies the same way.
 
 ## See also
 

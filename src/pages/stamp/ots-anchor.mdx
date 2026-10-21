@@ -15,10 +15,10 @@ the thin client-side glue.
 
 OTS calendars batch many arbitrary-digest timestamp requests into a Merkle tree
 and publish the tree root on-chain via an `OP_RETURN` transaction. A calendar
-hands back a **proof** — a Merkle path from your digest to the tree root, plus a
-reference to the on-chain transaction that committed the root. Anyone with an
-honest Bitcoin node can verify the proof chain and conclude "this digest existed
-before this block."
+hands back a **proof** — a path of hash operations from your digest to the tree
+root, then on through the transaction that committed the root to the Merkle root
+of a Bitcoin block. Anyone with that block's header can verify the proof chain
+and conclude "this digest existed before this block."
 
 OTS is calendar-operator-trust-minimized (you can submit to multiple calendars;
 forgery requires block-level collusion), free to use, and widely deployed
@@ -26,7 +26,7 @@ since 2016.
 
 ## What `@orangecheck/stamp-ots` does
 
-Four exports cover the whole flow:
+Five exports cover the whole flow:
 
 - **`submitToCalendars(id, opts)`** — POST an envelope's 32-byte digest to one
   or more OTS calendars. Returns a pending `OtsProof` you fold into the
@@ -36,45 +36,65 @@ Four exports cover the whole flow:
   `OtsProof` when available, or the same pending proof if not yet confirmed.
 - **`createCalendarClient(url)`** — low-level HTTP client implementing the
   minimal OTS calendar API (`POST /digest`, `GET /timestamp/<hex>`).
-- **`makeAnchorVerifier({ walkProof, headerSource })`** — adapter that turns a
-  proof-parser plus a block-header source into the `verifyOtsAnchor` function
-  `stamp-core.verify()` wants.
+- **`makeAnchorVerifier({ headerSource })`** — the `verifyOtsAnchor` function
+  `stamp-core`'s `verify()` takes. It walks the proof with the package's own OTS
+  parser and checks it against the block header at the declared height.
+- **`mempoolHeaderSource()`** — block headers from mempool.space (or any Esplora
+  API via `baseUrl`). Each header is checked against the declared block hash, so
+  it is trusted only to say which block sits at a height.
 
 ## Submit
 
 ```ts
-import { submitToCalendars } from '@orangecheck/stamp-ots';
+import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
 
-env.ots = await submitToCalendars(env.id, {
+const proof = await submitToCalendars(env.id, {
     calendars: [
         'https://alice.btc.calendar.opentimestamps.org',
         'https://bob.btc.calendar.opentimestamps.org',
     ],
 });
+const anchored = { ...env, ots: toStampOts(proof) };
 ```
+
+Leave out `calendars` to use the three defaults (alice, bob and finney).
 
 The returned proof is **pending**: the calendar has accepted your digest but the
 OTS batch for the next hour (or whatever the calendar's cadence is) hasn't yet
 been anchored to Bitcoin. The envelope is still useful at this point — it proves
 authorship — it just doesn't have a time anchor yet.
 
-Submit to **at least two** calendars operated by different parties. If one
-calendar goes dark before anchoring, the second one's receipt still lets you
-upgrade.
+Submit to **at least two** calendars operated by different parties. The proof
+keeps every calendar's receipt, so if one calendar goes dark before anchoring,
+the other's still lets you upgrade.
 
 ## Upgrade
 
 ```ts
-import { upgradeProof } from '@orangecheck/stamp-ots';
+import {
+    fromStampOts,
+    mempoolHeaderSource,
+    toStampOts,
+    upgradeProof,
+} from '@orangecheck/stamp-ots';
 
-// Poll until confirmed. Typically minutes to hours.
-env.ots = await upgradeProof(env.ots, env.id);
+// Call again later while it stays pending. Typically an hour or more.
+const upgradedProof = await upgradeProof(
+    fromStampOts(anchored.ots),
+    anchored.id,
+    {
+        headerSource: mempoolHeaderSource(),
+    }
+);
+const upgraded = { ...anchored, ots: toStampOts(upgradedProof) };
+console.log(upgraded.ots.status); // "pending" until the batch is in a block
 ```
 
-`upgradeProof()` asks each calendar "has the batch containing my digest been
-anchored yet?" When the answer is yes, the calendar returns the Merkle path from
-your digest to the batch root plus the Bitcoin tx that committed the root. At
-this point the proof is **confirmed** and independently verifiable against any
+`upgradeProof()` asks each calendar in the proof "has the batch containing my
+digest been anchored yet?" When the answer is yes, the calendar returns the rest
+of the path, from its commitment to a Bitcoin block's Merkle root, and
+`upgradeProof()` checks that root against the block header before it reports
+**confirmed**. From then on the proof is independently verifiable against any
 Bitcoin node.
 
 Cache the upgraded proof. Once the chain has confirmed, the proof never changes
@@ -82,33 +102,32 @@ Cache the upgraded proof. Once the chain has confirmed, the proof never changes
 
 ## Verify
 
-OTS proofs contain a binary Merkle-walk format that's non-trivial to parse.
-`@orangecheck/stamp-ots` doesn't ship a full parser — it's a lot of code for a
-narrow use case. Instead, it exposes an adapter:
+`@orangecheck/stamp-ots` parses the OTS proof format itself. Give it a source of
+block headers and pass the result to `verify()`:
 
 ```ts
-import { makeAnchorVerifier } from '@orangecheck/stamp-ots';
-import * as ots from 'javascript-opentimestamps'; // full parser, separate lib
+import { verifySignature } from '@orangecheck/bip322';
+import { verify } from '@orangecheck/stamp-core';
+import {
+    makeAnchorVerifier,
+    mempoolHeaderSource,
+} from '@orangecheck/stamp-ots';
 
-const verifyOtsAnchor = makeAnchorVerifier({
-    walkProof: (bytes) => ots.parse(bytes), // your proof parser
-    headerSource: async (blockHeight) => fetchHeader(blockHeight), // your block-header source
-});
-
-// Feed into stamp-core.verify()
 const result = await verify({
-    envelope,
-    content,
-    verifyBip322,
-    verifyOtsAnchor,
+    envelope: upgraded,
+    verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
+    verifyOtsAnchor: makeAnchorVerifier({
+        headerSource: mempoolHeaderSource(),
+    }),
 });
+if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
+console.log(result.anchor); // { status: 'confirmed', blockHeight, blockHash, verified: true }
 ```
 
-This lets consumers pick their own proof parser (we recommend
-[`javascript-opentimestamps`](https://github.com/opentimestamps/javascript-opentimestamps))
-and their own block-header source (a local Bitcoin node, an Esplora mirror, a
-light-client SPV header chain — your call). The result is the same: a verifier
-that's fully offline-capable once it has the block header.
+A header source is any object with `getHeaderAt(height)` returning the 80-byte
+header: a local Bitcoin node, an Esplora mirror, or a bundle of headers on disk.
+With your own headers the check needs no network at all. Without
+`verifyOtsAnchor`, a confirmed proof is reported as `claimed`, not verified.
 
 ## Offline verification
 

@@ -21,7 +21,7 @@ Visit [`/create`](https://vote.ochk.io/create). Enter:
 
 Click **sign & publish**. Your wallet prompts once for a BIP-322 signature over
 the poll's content-addressed id. The client publishes to Nostr kind 30080 across
-four default relays. You land on the poll page at `/p/<poll_id>`.
+five default relays. You land on the poll page at `/p/<poll_id>`.
 
 ## 2. cast a ballot
 
@@ -45,19 +45,34 @@ Disputes are resolvable.
 
 ## the library
 
-<InstallTabs pkg="@orangecheck/vote-core" />
+<InstallTabs pkg="@orangecheck/vote-core @orangecheck/bip322" />
 
 ```ts
-import { pollId, tally } from '@orangecheck/vote-core';
+import { verifySignature } from '@orangecheck/bip322';
+import {
+    mempoolBlockTimeSource,
+    resolvePollSnapshot,
+    tally,
+} from '@orangecheck/vote-core';
+
+// poll, ballots: the event contents from Nostr (see Integration for the query).
+const snap = await resolvePollSnapshot(poll, mempoolBlockTimeSource());
+if (!snap.ok) throw new Error(`${snap.code}: ${snap.reason}`);
 
 const result = await tally({
     poll,
     ballots,
-    utxosAt: (addr, snapshot) => fetchMyUtxos(addr, snapshot),
+    snapshotBlock: snap.height, // required when poll.snapshot_block is "deadline"
+    utxosAt: (addr, height) => fetchMyUtxos(addr, height), // [{ value, confirmed_height }]
+    verify: ({ address, message, signature }) =>
+        verifySignature(address, message, signature),
 });
 ```
 
-Pure function. Same inputs → byte-identical output.
+Pure function. Same inputs → byte-identical output. `tally()` refuses to run
+without a signature verifier. The
+[integration guide](/vote/integration#tally-it-yourself) has a complete version
+that reads the poll and ballots from Nostr and UTXOs from mempool.space.
 
 ## what you'll need
 

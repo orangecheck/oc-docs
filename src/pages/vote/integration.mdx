@@ -39,12 +39,19 @@ executor) to read the tally and act.
 
 ```ts
 // anywhere in Node 20+
+const pollId =
+    '9825268c74a3a15baefe8f9705f774cc7bb97205922fc828df3b377e0e158a18';
 const res = await fetch(`https://vote.ochk.io/api/tally?poll=${pollId}`);
-const tally = await res.json();
+if (!res.ok) throw new Error(`tally: HTTP ${res.status}`); // 400 bad id, 404 not found
+const tally = (await res.json()) as {
+    state: string;
+    tallies?: Record<string, number>;
+};
 
-if (tally.state !== 'tallied') throw new Error('poll not ready');
+if (tally.state !== 'tallied' || !tally.tallies)
+    throw new Error('poll not ready');
 const top = Object.entries(tally.tallies).sort((a, b) => b[1] - a[1])[0];
-// top = [optionId, weight]
+// top = [optionId, weight], e.g. ['yes', 12311]
 ```
 
 The endpoint is cached 60s at the edge and verifies every BIP-322 signature
@@ -57,18 +64,23 @@ CLI — see below.
 npx -y @orangecheck/vote-cli tally <poll_id> --json
 ```
 
-The CLI pulls the poll + ballots from Nostr, verifies every BIP-322 signature
-with `@orangecheck/bip322`, fetches UTXO state at the snapshot block from your
-configured explorer (or self-host), and runs the pure tally function. If the
-JSON output matches vote.ochk.io's `/api/tally`, both implementations agree. If
-it doesn't — trust the CLI.
+The package's command is `oc-vote`: after `npm i -g @orangecheck/vote-cli`,
+`oc-vote tally <poll_id> --json` is the same.
+
+The CLI pulls the poll + ballots from Nostr (`--relay` to pick relays), verifies
+every BIP-322 signature with `@orangecheck/bip322`, reads the UTXOs confirmed by
+the snapshot block from an Esplora API (`--mempool-base`, default
+mempool.space), and runs the pure tally function. Like `/api/tally`, it counts
+coins that are still unspent, so a coin spent after the snapshot drops out. If
+the JSON `snapshot_block`, `turnout` and `tallies` match vote.ochk.io's
+`/api/tally`, both implementations agree. If they don't — trust the CLI.
 
 Pipe it into anything:
 
 ```bash
 # CI-style gate
-RESULT=$(oc-vote tally $POLL_ID --json | jq -r '.tallies.yes > .tallies.no')
-[[ "$RESULT" == "true" ]] && deploy.sh
+RESULT=$(npx -y @orangecheck/vote-cli tally "$POLL_ID" --json | jq -r '.tallies.yes > .tallies.no')
+[[ "$RESULT" == "true" ]] && ./deploy.sh
 ```
 
 ## embed the tally as a Nostr-native signal
@@ -84,22 +96,108 @@ Filter:
 Filter on `#t`: relays index single-letter tags only, and most reject a filter
 on a longer name such as `#poll_id`.
 
-Parse each event's `content` as a canonical Ballot, call `ballotId()` from
-`@orangecheck/vote-core`, verify the BIP-322 signature against `voter`, and feed
-into `tally()`.
+Parse each event's `content` as a Ballot and feed them to `tally()`, which
+checks each ballot's BIP-322 signature over its `ballotId()` against `voter` and
+drops the ones that fail.
+
+## tally it yourself
+
+Everything vote.ochk.io does, in one script: the poll and its ballots from the
+default relays, the snapshot block, UTXOs from mempool.space, and the pure
+function. Run on the poll above, it prints the same `snapshot_block`, `turnout`
+and `tallies` as `/api/tally` and the CLI.
+
+<InstallTabs pkg="@orangecheck/vote-core @orangecheck/nostr-core @orangecheck/bip322" />
+
+```ts
+import type { Ballot, Poll, Utxo } from '@orangecheck/vote-core';
+
+import { verifySignature } from '@orangecheck/bip322';
+import { queryEvents } from '@orangecheck/nostr-core';
+import {
+    mempoolBlockTimeSource,
+    pollId,
+    resolvePollSnapshot,
+    tally,
+} from '@orangecheck/vote-core';
+
+const id = '9825268c74a3a15baefe8f9705f774cc7bb97205922fc828df3b377e0e158a18';
+const parse = <T>(content: string): T | null => {
+    try {
+        return JSON.parse(content) as T;
+    } catch {
+        return null;
+    }
+};
+
+// 1. The poll (the event whose content hashes to the id) and its ballots.
+const { events: pollEvents } = await queryEvents({
+    kinds: [30080],
+    '#t': [id],
+});
+const poll = pollEvents
+    .map((e) => parse<Poll>(e.content))
+    .find((p) => p && pollId(p) === id);
+if (!poll) throw new Error('poll not found on any relay that answered');
+const { events: ballotEvents } = await queryEvents({
+    kinds: [30081],
+    '#t': [id],
+});
+const ballots = ballotEvents
+    .map((e) => parse<Ballot>(e.content))
+    .filter((b): b is Ballot => b !== null);
+
+// 2. The snapshot block: the poll's own height, or the block at its deadline.
+const snap = await resolvePollSnapshot(poll, mempoolBlockTimeSource());
+if (!snap.ok) throw new Error(`${snap.code}: ${snap.reason}`);
+
+// 3. UTXOs from mempool.space: coins unspent now and confirmed by the snapshot.
+//    Coins spent after the snapshot are missed; your own node can count them.
+const utxosAt = async (address: string, height: number): Promise<Utxo[]> => {
+    const res = await fetch(
+        `https://mempool.space/api/address/${address}/utxo`
+    );
+    const utxos = (await res.json()) as {
+        value: number;
+        status: { confirmed: boolean; block_height?: number };
+    }[];
+    return utxos
+        .filter((u) => u.status.confirmed && u.status.block_height! <= height)
+        .map((u) => ({
+            value: u.value,
+            confirmed_height: u.status.block_height!,
+        }));
+};
+
+const result = await tally({
+    poll,
+    ballots,
+    snapshotBlock: snap.height,
+    utxosAt,
+    verify: ({ address, message, signature }) =>
+        verifySignature(address, message, signature),
+});
+console.log(JSON.stringify(result));
+```
+
+`queryEvents` reports which relays answered in `relayStatus`; a relay that did
+not answer is not evidence that a ballot is missing.
 
 ## gate a Discord bot
 
 ```ts
-import { tally } from '@orangecheck/vote-core';
-import { Client } from 'discord.js';
-
-// On command:
-const result = await fetchTally(pollId); // hit /api/tally or run CLI
-if (result.state !== 'tallied') return void reply('poll still open');
-
-const passed = result.tallies.yes > result.tallies.no;
-if (passed) grantRole(user);
+// Called from your bot's command handler; reply and grantRole are your bot's.
+async function onPollCommand(pollId: string, user: string) {
+    const res = await fetch(`https://vote.ochk.io/api/tally?poll=${pollId}`);
+    const result = (await res.json()) as {
+        state: string;
+        tallies?: Record<string, number>;
+    };
+    if (result.state !== 'tallied' || !result.tallies)
+        return reply('poll still open');
+    const passed = (result.tallies.yes ?? 0) > (result.tallies.no ?? 0);
+    if (passed) await grantRole(user);
+}
 ```
 
 For long-running votes, poll `/api/tally` every 5 minutes; for settled

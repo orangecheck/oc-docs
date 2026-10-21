@@ -59,8 +59,8 @@ without anyone deciding what's spam — the policy is shape-only, never content.
   Nostr-published envelopes (offline-verifiable forever).
 - **It does not replace public relays.** `@orangecheck/nostr-core`'s
   `DEFAULT_RELAYS` ships with five entries — four public (`nos.lol`,
-  `relay.primal.net`, `offchain.pub`, `relay.snort.social`) plus relay.ochk.io.
-  A build-time TypeScript invariant in the package fails the build if a future
+  `relay.primal.net`, `relay.damus.io`, `nostr.oxtr.dev`) plus relay.ochk.io. A
+  build-time TypeScript invariant in the package fails the build if a future
   engineer reduces the set to relay.ochk.io alone.
 
 ## Where it sits in the stack
@@ -76,8 +76,8 @@ without anyone deciding what's spam — the policy is shape-only, never content.
        │                                       │
        │  wss://nos.lol            (public)    │
        │  wss://relay.primal.net   (public)    │
-       │  wss://offchain.pub       (public)    │
-       │  wss://relay.snort.social (public)    │
+       │  wss://relay.damus.io     (public)    │
+       │  wss://nostr.oxtr.dev     (public)    │
        │  wss://relay.ochk.io      (OC-curated)│
        └───────────────────────────────────────┘
 ```

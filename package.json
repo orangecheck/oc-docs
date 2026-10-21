@@ -30,7 +30,6 @@
         "@next/mdx": "15.5.18",
         "@orangecheck/app-design": "^1.13.0",
         "@orangecheck/auth-client": "^2.35.2",
-        "@orangecheck/auth-core": "^2.9.0",
         "@orangecheck/site-kit": "^0.5.1",
         "@orangecheck/wallet-adapter": "^0.6.5",
         "@types/mdx": "^2.0.13",

@@ -4,18 +4,14 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Every place that turns a token into a session must ask whether the auth
- * host ended it. A signed-out token still verifies by signature for 30 days,
- * so a reader that skips the check is a way back in for exactly that token.
- *
- * Asserted as a property of the source, not of one reader: any non-test file
- * that verifies a token must call `familyRevocationCheck(` (a call, outside
- * comments), unless it is listed below with the reason it grants nothing.
+ * Every place that turns a token into a session must pass the origin gate and
+ * ask whether the auth host ended the session. The docs have no such place:
+ * their pages ask ochk.io's /api/auth/me. So the property here is that nothing
+ * reads a token itself; a module that does must use site-kit's
+ * `createSessionReader`, which does both.
  */
-const VERIFIES = /\b(verifySessionToken|verifyOcToken|resolveSessionFromRequest|getOcSession)\s*\(/;
-const CHECKS = /\bfamilyRevocationCheck\s*\(/;
-
-const GRANTS_NOTHING: Record<string, string> = {};
+const READS_TOKEN =
+    /\b(verifySessionToken|verifyOcToken|resolveSessionFromRequest|getOcSession|readAllSessionCookies)\s*\(/;
 
 function stripComments(src: string): string {
     return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -24,27 +20,23 @@ function stripComments(src: string): string {
 function walk(dir: string): string[] {
     return readdirSync(dir).flatMap((name) => {
         const path = join(dir, name);
-        if (statSync(path).isDirectory()) return name === '__tests__' ? [] : walk(path);
+        if (statSync(path).isDirectory()) return walk(path);
         return /\.(ts|tsx)$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
     });
 }
 
-describe('every token reader asks whether the auth host ended the session', () => {
+describe('nothing in the docs reads a session token itself', () => {
     const root = process.cwd();
-    const readers = walk(join(root, 'src'))
-        .map((p) => p.slice(root.length + 1))
-        .filter((p) => VERIFIES.test(stripComments(readFileSync(join(root, p), 'utf8'))));
+    const files = walk(join(root, 'src')).map((p) => p.slice(root.length + 1));
 
-    it('finds the readers · the scan is not vacuously passing', () => {
-        expect(readers).toContain('src/lib/auth/session.ts');
+    it('scans the source · the scan is not vacuously passing', () => {
+        expect(files).toContain('src/pages/_app.tsx');
     });
 
-    it.each(readers)('%s', (file) => {
-        if (GRANTS_NOTHING[file]) return;
-        const src = stripComments(readFileSync(join(root, file), 'utf8'));
-        expect(
-            CHECKS.test(src),
-            `${file} verifies a token but never asks familyRevocationCheck`
-        ).toBe(true);
+    it('finds no token reader', () => {
+        const direct = files.filter((f) =>
+            READS_TOKEN.test(stripComments(readFileSync(join(root, f), 'utf8')))
+        );
+        expect(direct).toEqual([]);
     });
 });

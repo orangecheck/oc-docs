@@ -836,13 +836,6 @@
     "@orangecheck/wallet-adapter" "^0.6.0"
     "@simplewebauthn/browser" "^13.3.0"
 
-"@orangecheck/auth-core@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.9.0.tgz#124fe0105dde4c9c6bf64252bad4c941fe56a431"
-  integrity sha512-29c0sU+kDUoZlrNv7uyGphqNmFx2ZpugotnTb7fG6IVXjrW8VSqI52d8qpOavtitTYa4WIORGtLDVMGygAQddA==
-  dependencies:
-    jose "^6.2.2"
-
 "@orangecheck/bip322@^1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.0.1.tgz#9d01f5a0288ffef566c50954ca9c5569e42d1702"
@@ -5003,11 +4996,6 @@ jiti@^2.7.0:
   version "2.7.0"
   resolved "https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz#974228f2f4ca2bc21885a1797b45fea68e950c64"
   integrity sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==
-
-jose@^6.2.2:
-  version "6.2.12"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-6.2.12.tgz#65663e146edd010b98ece83f81737d3aa95fd0d7"
-  integrity sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==
 
 js-file-download@^0.4.12:
   version "0.4.12"

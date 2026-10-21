@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: checkStake()",
+    description: "Auto-generated API reference for Function: checkStake(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-core**](../README)
+
+***
+
+[@orangecheck/stamp-core](../README) / checkStake
+
+# Function: checkStake()
+
+```ts
+function checkStake(
+   envelope: StampEnvelope, 
+   attestation: 
+  | ResolvedAttestation
+  | null
+  | undefined, 
+   policy: StakePolicy): StakeCheck;
+```
+
+Defined in: [stamp-core/src/stake.ts:34](https://github.com/orangecheck/oc-packages/blob/main/stamp-core/src/stake.ts#L34)
+
+Check an envelope's stake against a policy. Pass the attestation as resolved now,
+or null if it did not resolve. The declared `sats_bonded` / `days_unspent` are ignored.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `envelope` | [`StampEnvelope`](../interfaces/StampEnvelope) |
+| `attestation` | \| [`ResolvedAttestation`](../interfaces/ResolvedAttestation) \| `null` \| `undefined` |
+| `policy` | [`StakePolicy`](../interfaces/StakePolicy) |
+
+## Returns
+
+[`StakeCheck`](../type-aliases/StakeCheck)

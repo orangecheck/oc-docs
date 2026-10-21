@@ -7,6 +7,7 @@ import createMDX from '@next/mdx';
 import { rehypeCode } from '@orangecheck/app-design/code';
 import rehypeSlug from 'rehype-slug';
 
+import { recmaToc, rehypeToc } from './src/lib/mdx-toc.mjs';
 import { MOVED_PAGES } from './src/lib/moved-pages';
 import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
 import rehypeTypedoc from './src/lib/rehype-typedoc.mjs';
@@ -34,6 +35,7 @@ const MDX_PLUGINS = createHash('sha256')
             'node_modules/remark-gfm/package.json',
             'src/lib/rehype-keep-ids.mjs',
             'src/lib/rehype-typedoc.mjs',
+            'src/lib/mdx-toc.mjs',
         ]
             .map((f) => readFileSync(f, 'utf8'))
             .join('\0')
@@ -218,7 +220,8 @@ const withMDX = createMDX({
         // immediately. rehype-keep-ids keeps BIP-322, kind-30085 and the like
         // on one line. rehype-typedoc reads TypeDoc's escapes in /sdk after the
         // ids are set, so no anchor moves. rehypeCode highlights every fence.
-        rehypePlugins: [rehypeSlug, rehypeKeepIds, rehypeTypedoc, rehypeCode],
+        rehypePlugins: [rehypeSlug, rehypeKeepIds, rehypeTypedoc, rehypeCode, rehypeToc],
+        recmaPlugins: [recmaToc],
     },
 });
 

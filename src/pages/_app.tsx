@@ -1,3 +1,4 @@
+import type { TocItem } from '@orangecheck/app-design/components';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 
@@ -14,8 +15,11 @@ import { Seo } from '@/components/layout/Seo';
 
 import '@/styles/globals.css';
 
-/** A page outside the docs' sections (404, 500) sets `bare`. */
-type DocsPage = NextPage & { bare?: boolean };
+/**
+ * A page outside the docs' sections (404, 500) sets `bare`. An MDX page
+ * carries its "On this page" list as `toc` (src/lib/mdx-toc.mjs).
+ */
+type DocsPage = NextPage & { bare?: boolean; toc?: TocItem[] };
 
 export default function App({ Component, pageProps, router }: AppProps) {
     // One pageview per page, reported as origin and path only.
@@ -39,7 +43,11 @@ export default function App({ Component, pageProps, router }: AppProps) {
             <OcSessionProvider>
                 <TooltipProvider delayDuration={200}>
                     <MDXProvider components={docsMdxComponents}>
-                        <DocsFrame path={path} bare={(Component as DocsPage).bare}>
+                        <DocsFrame
+                            path={path}
+                            bare={(Component as DocsPage).bare}
+                            toc={(Component as DocsPage).toc}
+                        >
                             <Component {...pageProps} />
                         </DocsFrame>
                     </MDXProvider>

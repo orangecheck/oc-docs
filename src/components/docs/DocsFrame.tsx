@@ -1,5 +1,5 @@
 import type { DocsNavSection } from '@orangecheck/app-design/chrome';
-import type { Crumb, PagerLink } from '@orangecheck/app-design/components';
+import type { Crumb, PagerLink, TocItem } from '@orangecheck/app-design/components';
 import type { ReactNode } from 'react';
 
 import {
@@ -80,11 +80,14 @@ const search = <DocsSearch />;
 export function DocsFrame({
     path,
     bare = false,
+    toc,
     children,
 }: {
     /** The page's path, without the base path, query or hash. */
     path: string;
     bare?: boolean;
+    /** Built with the page, so the list is in the first paint; without it DocsShell reads the headings. */
+    toc?: TocItem[];
     children: ReactNode;
 }) {
     if (bare) {
@@ -123,6 +126,7 @@ export function DocsFrame({
                     />
                 ) : null
             }
+            toc={toc}
             pager={<DocsPager prev={prev} next={next} />}
         >
             {children}

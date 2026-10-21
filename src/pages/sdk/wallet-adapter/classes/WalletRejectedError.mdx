@@ -1,0 +1,57 @@
+export const metadata = {
+    title: "Class: WalletRejectedError",
+    description: "Auto-generated API reference for Class: WalletRejectedError. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / WalletRejectedError
+
+# Class: WalletRejectedError
+
+Defined in: [wallet-adapter/src/failure.ts:16](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L16)
+
+The person declined the request in their wallet.
+
+## Extends
+
+- `Error`
+
+## Constructors
+
+### Constructor
+
+```ts
+new WalletRejectedError(message?: string, cause?: unknown): WalletRejectedError;
+```
+
+Defined in: [wallet-adapter/src/failure.ts:20](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L20)
+
+#### Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `message` | `string` | `"the signature request was declined in the wallet"` |
+| `cause?` | `unknown` | `undefined` |
+
+#### Returns
+
+`WalletRejectedError`
+
+#### Overrides
+
+```ts
+Error.constructor
+```
+
+## Properties
+
+| Property | Modifier | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-cause">&lt;/a> `cause` | `readonly` | `unknown` | What the wallet threw. | - | [wallet-adapter/src/failure.ts:19](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L19) |
+| &lt;a id="property-code">&lt;/a> `code` | `readonly` | `"E_USER_REJECTED"` | - | - | [wallet-adapter/src/failure.ts:17](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L17) |
+| &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | - | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
+| &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | - | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
+| &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | - | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

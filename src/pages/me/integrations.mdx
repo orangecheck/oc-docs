@@ -19,10 +19,10 @@ Before you read another paragraph,
 [**me-demo.ochk.io**](https://me-demo.ochk.io) is a real orangecheck integration
 we built ourselves — a fictional newsletter site (Lumen Notes), styled
 deliberately not-orangecheck. Its sign-in button opens the orangecheck popup.
-Sign in once and you'll see the whole loop end to end. Source at
-[`github.com/orangecheck/oc-me-demo-web`](https://github.com/orangecheck/oc-me-demo-web).
-~280 lines of meaningful integration code, including the `/api/auth/me` wrapper
-and the popup-signin handler.
+Sign in once and you'll see the sign-in loop end to end. It runs on an `ochk.io`
+subdomain, so it gets orangecheck's own session rather than a token bound to its
+origin, and it sends no events; the [quickstart](/me/quickstart) is the path
+your site takes.
 
 ## Beside your other providers
 
@@ -106,12 +106,13 @@ Signing in:
 
 Paying your users:
 
-| What you see                                        | Meaning                                                                               | Fix                                                                                                   |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                        | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`. |
-| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against a stale JWK. | Use raw body bytes; re-fetch JWKS via `oc.webhook.fetchJwks()`.                                       |
-| `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                         | Honor `Retry-After`; back off exponentially.                                                          |
-| `domain not verified` (403)                         | Your project_key fired in `live` mode but `verification.state !== 'verified'`.        | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.         |
+| What you see                                        | Meaning                                                                                                | Fix                                                                                                     |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                                         | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`.   |
+| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against the wrong or a stale key set. | Use raw body bytes; the key set is `me.ochk.io/api/dev-jwks`, re-fetched with `oc.webhook.fetchJwks()`. |
+| `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                                          | Honor `Retry-After`; back off exponentially.                                                            |
+| `domain_unverified` (403)                           | Your project_key fired in `live` mode but `verification.state !== 'verified'`.                         | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.           |
+| `invalid_signature`, `signature_required` (401)     | The event's `X-OC-Signature` is wrong or missing.                                                      | Sign the exact bytes you send: see [signing an event](/me/api#signing-an-event) and every answer there. |
 
 ## Self-host considerations
 

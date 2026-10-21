@@ -1,16 +1,23 @@
 export const metadata = {
     title: 'ochk.app · Webhooks',
     description:
-        'Webhook signature verification, raw-body warning, retry semantics, headers, and full reception samples in Node + Rust.',
+        'Webhook signature verification, the signing key, raw-body warning, retry semantics, headers, the body, and full reception samples in Node, Python and Rust.',
 };
 
 # ochk.app · Webhooks
 
 **Every event your project records is delivered to your registered endpoints as
-its receipt, signed with orangecheck's Ed25519 webhook key.** Verify the
+its receipt, signed with me.ochk.io's Ed25519 webhook key.** Verify the
 signature against the **raw** request body — frameworks that re-serialize before
 your handler will produce a different byte sequence and the signature will not
 validate.
+
+The key set is at
+[`https://me.ochk.io/api/dev-jwks`](https://me.ochk.io/api/dev-jwks) (the path
+is historical; it is the production key). It is **not** the sign-in key set at
+`ochk.io/.well-known/jwks.json`: that one signs session tokens, and a webhook
+checked against it always fails with an unknown `kid`. Both SDKs fetch the right
+one and cache it for an hour.
 
 ## Reception · Node + Express
 
@@ -37,6 +44,36 @@ app.post('/api/oc/webhook', async (req, res) => {
     res.status(200).end();
 });
 ```
+
+## Reception · Python
+
+`orangecheck` 2.3 or later (`pip install orangecheck`). `verify_webhook` takes
+the request headers and the raw body, and returns the parsed event or raises
+`InvalidWebhook` with a one-word `reason`.
+
+```python
+from fastapi import FastAPI, HTTPException, Request
+from orangecheck import InvalidWebhook, verify_webhook
+
+app = FastAPI()
+seen: set[str] = set()  # use your database in production
+
+@app.post("/api/oc/webhook")
+async def oc_webhook(request: Request):
+    raw = await request.body()  # the bytes as sent, never the parsed JSON
+    try:
+        event = verify_webhook(request.headers, raw)
+    except InvalidWebhook as err:
+        raise HTTPException(401, err.reason)
+    if event["id"] in seen:  # deliveries can repeat
+        return {}
+    seen.add(event["id"])
+    on_oc_event(event)
+    return {}
+```
+
+In Flask, pass `request.headers` and `request.get_data()`; in Django,
+`request.headers` and `request.body`.
 
 ## Reception · Rust + Axum
 
@@ -71,18 +108,32 @@ async fn webhook(
 | `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                |
 | `OC-Envelope-Id`      | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
 | `OC-Subtype`          | Event subtype, copied for routing convenience                                   |
-| `OC-Class`            | A · B · C: One-time, Per action, Per session                                    |
-| `OC-Delivery-Attempt` | 1-based retry counter                                                           |
+| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices     |
+| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)     |
 | `Content-Type`        | `application/json`                                                              |
+
+## What the body carries
+
+A billable event arrives as the event itself plus three fields:
+
+| Field              | Meaning                                                                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `kind`             | `oc-billable-event`                                                                                                               |
+| `sub`              | The person, as a pairwise id for your project only. It is not their `did_oc`; the response to the event you fired carries it too. |
+| `scopes`           | Fields the person agreed to share with you, when there are any                                                                    |
+| `id`, `subtype`, … | The event: `id`, `occurred_at`, `class`, `subtype`, `site`, the fee split, `context`, `verify_url`                                |
+
+A project notice (`OC-Class: system`) is
+`{ kind: 'oc-system-event', subtype, project_key, … }` and names no person.
 
 ## Delivery semantics
 
-|                    |                                                                                              |
-| ------------------ | -------------------------------------------------------------------------------------------- |
-| **Guarantee**      | At-least-once. Idempotent on `envelope.id`.                                                  |
-| **Retry schedule** | Jittered exponential: 0s · 30s · 2m · 10m · 1h · 6h · 24h.                                   |
-| **Ack**            | Any 2xx. Anything else triggers retry.                                                       |
-| **Mute**           | After 24h of failure the endpoint is muted. Envelopes still archive on `/api/envelope/[id]`. |
+|                    |                                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Guarantee**      | At-least-once. Deduplicate on `OC-Envelope-Id` (the event's `id`). The signature has no timestamp, so deduplication is also your replay protection.                      |
+| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                 |
+| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due. |
+| **After that**     | The delivery is dead-lettered and listed with your webhooks, where you can requeue it. The endpoint is not muted, and the event stays at `/api/envelope/[id]`.           |
 
 ## The raw-body trap
 

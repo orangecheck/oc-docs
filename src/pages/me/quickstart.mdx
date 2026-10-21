@@ -84,7 +84,13 @@ export default async function session(
 ```
 
 On Express or Hono it is the same three moves: verify with `verifyOcToken`, set
-the cookie, answer `ok`. To sign someone out, clear the cookie.
+the cookie, answer `ok`. A backend in Python or another language checks the
+token itself: see [verify without the SDK](/me/sdk#verify-without-the-sdk).
+
+The token lasts as long as the person's ochk.io session, 30 days at most, and is
+never refreshed: when it expires, they sign in again. To sign someone out, clear
+the cookie and [end the token](/me/sdk#ending-a-session), so me.ochk.io refuses
+it too. Signing out of ochk.io does not sign them out of your site.
 
 `<OcSignIn>` from `@orangecheck/auth-client` mounts the sign-in form in your own
 page instead of a popup. It works only on orangecheck's own sites (`*.ochk.io`
@@ -168,12 +174,13 @@ app.get('/api/auth/me', (c) => {
 });
 ```
 
-`audience` is your own origin: a token issued to any other site is refused.
-`projectKey` makes the wrapper enforce who can sign in (step 4) from your
-project's settings; a key that names no project answers
-`500 unknown_project_key`. The wrapper fetches and caches orangecheck's keys
-itself, so there are no JWKs to handle. `did_oc` is the person's account id, the
-same in every app.
+`audience` is the origin of the page that opened the popup, exactly: your site's
+origin, or `http://localhost:5173` while you develop, never your API's origin. A
+token issued to any other origin is refused. `projectKey` makes the wrapper
+enforce who can sign in (step 4) from your project's settings; a key that names
+no project answers `500 unknown_project_key`. The wrapper fetches and caches
+orangecheck's keys itself, so there are no JWKs to handle. `did_oc` is the
+person's account id, the same in every app.
 
 ### 4 · choose who can sign in
 
@@ -235,8 +242,10 @@ if (!res.earned) {
 ```
 
 Send from your backend, never the browser. The signing secret, on your project's
-**Keys & webhooks** tab, proves the call comes from your project. Every paid
-event gets a receipt anyone can check offline against Bitcoin: see
+**Keys & webhooks** tab, proves the call comes from your project; showing or
+replacing it asks you to confirm it's you. From Python, or without the SDK, see
+[signing an event](/me/api#signing-an-event). Every paid event gets a receipt
+anyone can check offline against Bitcoin: see
 [an example receipt](https://ochk.app/verify/example).
 
 ### 4 · send a test event
@@ -274,9 +283,10 @@ oc-verify=<token>
 
 [me-demo.ochk.io](https://me-demo.ochk.io) is an integration we built ourselves:
 a fictional newsletter site (Lumen Notes), styled deliberately unlike
-orangecheck. Its sign-in button is the `signInWithOc()` popup from step 2.
-Source at
-[`github.com/orangecheck/oc-me-demo-web`](https://github.com/orangecheck/oc-me-demo-web).
+orangecheck. Its sign-in button is the `signInWithOc()` popup from step 2. It
+runs on an `ochk.io` subdomain, so it gets orangecheck's own session rather than
+a token bound to its origin, and it sends no events: your site's path is the one
+on this page.
 
 ## Next
 

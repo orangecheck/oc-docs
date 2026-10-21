@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'orangecheck (Python SDK)',
     description:
-        'Python SDK for the orangecheck ecosystem. Same surface as TypeScript, same conformance vectors.',
+        'Python SDK for the orangecheck ecosystem: stake checks and attestations with the same conformance vectors as TypeScript, and ochk.app sign-in, billable events and webhooks for your backend.',
 };
 
 # `orangecheck` (Python)
@@ -10,25 +10,31 @@ The Python twin of `@orangecheck/sdk`. Same canonical messages, same attestation
 IDs, same conformance vectors. A message built in TypeScript and a message built
 in Python for the same inputs are byte-identical.
 
+It also carries what a Python backend needs to sign people in with
+[ochk.app](/me/quickstart): checking the sign-in token, signing billable events
+and checking webhooks, in the same wire formats as `@orangecheck/me-client`.
+
 ## Install
 
 ```bash
 pip install orangecheck
-# with local BIP-322 verification (Rust-backed via the bip322 extra):
+# with local BIP-322 signature checks (Rust-backed via the bip322 extra):
 pip install 'orangecheck[verify]'
 ```
 
-Python 3.10+. Runs on Linux, macOS, Windows.
+Python 3.9 or later. Runs on Linux, macOS, Windows. The ochk.app functions need
+2.3 or later.
 
 ## Core exports
 
 ```python
 from orangecheck import (
-    # High-level
+    # Stake checks against the hosted API
     check,
     verify,
+    discover,
 
-    # Canonical message primitives
+    # Canonical message primitives (no network)
     build_canonical_message,
     attestation_id,
     format_identities,
@@ -39,20 +45,33 @@ from orangecheck import (
     challenge_issue,
     challenge_verify,
 
-    # Types
-    IdentityBinding,
+    # ochk.app sign-in, events and webhooks, for your backend
+    verify_session,
+    sign_event,
+    verify_webhook,
+
+    # Clients and types
+    Client,
+    AsyncClient,
+    CheckResult,
     VerifyOutcome,
-    StatusCode,
+    IdentityBinding,
+    Session,
+
+    # Errors
+    OrangeCheckError,
+    InvalidSession,
+    InvalidWebhook,
 )
 
-# Optional — available when installed with 'orangecheck[verify]'
+# Present when installed with 'orangecheck[verify]', None otherwise
 from orangecheck import verify_bip322_signature
 ```
 
 ## `check()`
 
 ```python
-result = await check(
+result = check(
     addr='bc1q...',
     min_sats=100_000,
     min_days=30,
@@ -60,29 +79,42 @@ result = await check(
 
 if result.ok:
     print(result.sats, result.days, result.score)
+else:
+    print(result.reasons)
 ```
 
-Accepts `addr`, `id`, or `identity={...}` — one of the three. Applies
-thresholds. Same return shape as the hosted `/api/check`.
+Accepts `addr`, `id`, or `identity=...`, one of the three. Applies thresholds.
+Same return shape as the hosted `/api/check`. The top-level functions are
+synchronous; in async code, use `AsyncClient`:
+
+```python
+from orangecheck import AsyncClient
+
+async with AsyncClient() as oc:
+    result = await oc.check(addr='bc1q...', min_sats=100_000, min_days=30)
+```
 
 ## `verify()`
 
 ```python
-outcome = await verify(
+outcome = verify(
     addr='bc1q...',
     msg=canonical_message,
     sig=signature_base64,
     scheme='bip322',
-    test_mode=False,
 )
 
 if outcome.ok:
-    print(outcome.metrics.sats_bonded, outcome.metrics.days_unspent)
+    print(outcome.sats_bonded, outcome.days_unspent)
+else:
+    print(outcome.codes)
 ```
 
-With the `[verify]` extra installed, the BIP-322 check is fully local (via the
-Rust-backed `bip322` package, which wraps the audited `bitcoin` and `secp256k1`
-crates). Without it, verification falls back to the hosted API.
+`verify()` asks the hosted API, which checks the signature and the address's
+live chain state. To check only a signature on your own machine, install the
+`[verify]` extra and call `verify_bip322_signature(address, message, signature)`
+(the Rust-backed `bip322` package, which wraps the audited `bitcoin` and
+`secp256k1` crates).
 
 ## Canonical message
 
@@ -113,6 +145,66 @@ score = score_v0(sats_bonded=125_000, days_unspent=47)
 
 Reference score only; raw metrics are the authoritative signal.
 
+## ochk.app sign-in, events and webhooks
+
+For a site whose people sign in through the [ochk.app popup](/me/quickstart).
+The popup runs in your page; these run on your server.
+
+### Check the sign-in token
+
+```python
+from orangecheck import InvalidSession, verify_session
+
+try:
+    session = verify_session(token, audience='https://your-site.example')
+except InvalidSession as err:
+    ...  # err.reason: audience, expired, signature, unknown_key, …
+
+session.did_oc  # the person; keep it beside your user row
+```
+
+`audience` is the origin of the page that opened the popup, exactly
+(`http://localhost:5173` while you develop). The key set,
+`https://ochk.io/.well-known/jwks.json`, is fetched and cached for an hour, and
+kept through an outage; pass `jwks=` to check offline. A token for any other
+origin, or one with no `aud`, is refused. The token carries no email address.
+What each claim means is in [verify without the SDK](/me/sdk#verify-without-the-sdk).
+
+### Sign a billable event
+
+```python
+import json, httpx
+from orangecheck import sign_event
+
+body = json.dumps({
+    'project_key': PROJECT_KEY,
+    'subtype': 'account_creation',
+    'user_address': session.did_oc,
+})
+httpx.post(
+    'https://me.ochk.io/api/integrator/event',
+    content=body,  # exactly the string that was signed
+    headers={
+        'Content-Type': 'application/json',
+        'X-OC-Signature': sign_event(SIGNING_SECRET, body),
+    },
+)
+```
+
+Every answer the endpoint gives is in [signing an event](/me/api#signing-an-event).
+
+### Check a webhook
+
+```python
+from orangecheck import InvalidWebhook, verify_webhook
+
+event = verify_webhook(request.headers, raw_body)  # raises InvalidWebhook
+```
+
+Pass the raw body, before any JSON parsing. The key set is
+`https://me.ochk.io/api/dev-jwks`. A full receiver is on
+[Webhooks](/me/webhooks#reception--python).
+
 ## Framework integration
 
 ### Django
@@ -121,25 +213,27 @@ Reference score only; raw metrics are the authoritative signal.
 from django.http import JsonResponse
 from orangecheck import check
 
-async def gated_view(request):
+def gated_view(request):
     addr = request.session.get('verified_address', '')
-    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    r = check(addr=addr, min_sats=100_000, min_days=30)
     if not r.ok:
-        return JsonResponse({'error': 'gated', 'reasons': r.reasons}, status=403)
-    # proceed
+        return JsonResponse({'error': 'gated', 'reasons': list(r.reasons)}, status=403)
     return JsonResponse({'ok': True})
 ```
 
 ### FastAPI
 
 ```python
-from fastapi import Depends, HTTPException
-from orangecheck import check
+from fastapi import Depends, FastAPI, HTTPException
+from orangecheck import AsyncClient
+
+app = FastAPI()
 
 async def require_stake(addr: str):
-    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    async with AsyncClient() as oc:
+        r = await oc.check(addr=addr, min_sats=100_000, min_days=30)
     if not r.ok:
-        raise HTTPException(status_code=403, detail=r.reasons)
+        raise HTTPException(status_code=403, detail=list(r.reasons))
     return addr
 
 @app.post('/post')
@@ -150,23 +244,27 @@ async def post(addr: str = Depends(require_stake)):
 ### Flask
 
 ```python
-from flask import request, jsonify
+from flask import Flask, jsonify, request
 from orangecheck import check
 
+app = Flask(__name__)
+
 @app.post('/post')
-async def post():
+def post():
     addr = request.headers.get('X-Bitcoin-Address', '')
-    r = await check(addr=addr, min_sats=100_000, min_days=30)
+    r = check(addr=addr, min_sats=100_000, min_days=30)
     if not r.ok:
-        return jsonify(error='gated', reasons=r.reasons), 403
+        return jsonify(error='gated', reasons=list(r.reasons)), 403
     return jsonify(ok=True)
 ```
 
 ## Conformance
 
 The package ships a pytest suite that loads the canonical fixtures from
-`oc-protocol/conformance/vectors/` (vendored) and asserts byte-identical output
-to the TypeScript SDK. CI fails on drift.
+`oc-attest-protocol/conformance/vectors/` (vendored) and asserts byte-identical
+output to the TypeScript SDK. The ochk.app functions are held to the vectors
+`@orangecheck/me-client` is tested against (`me-client/test-vectors/integrator.json`
+in `oc-packages`). CI fails on drift.
 
 ## Naming conventions
 
@@ -178,12 +276,15 @@ Python uses `snake_case` where TypeScript uses `camelCase`:
 | `attestationId`                     | `attestation_id`                      |
 | `issueChallenge`, `verifyChallenge` | `challenge_issue`, `challenge_verify` |
 | `buildCanonicalMessage`             | `build_canonical_message`             |
+| `verifyOcToken`                     | `verify_session`                      |
+| `oc.webhook.verify`                 | `verify_webhook`                      |
 
 Each follows its language's idioms. The underlying behavior is identical.
 
 ## See also
 
-- [**`@orangecheck/sdk`**](/sdks/javascript) — the TypeScript twin
+- [**`@orangecheck/sdk`**](/sdk/sdk/README) — the TypeScript twin
+- [**ochk.app quickstart**](/me/quickstart) — sign-in and paying your users
 - [**Canonical message format**](/ecosystem/canonical-message)
 - [**BIP-322 signing**](/ecosystem/bip322) — how the `[verify]` extra wires into
   the Rust crate

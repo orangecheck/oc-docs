@@ -20,7 +20,9 @@ paying them. Three entry points:
 - **`@orangecheck/me-client/server`**: checks the session on your server.
   `withOcAuth` (Next.js Pages), `ocAuthExpress`, `ocAuthHono`,
   `getOcSession(headers)`, `verifyOcToken(token)`. You never fetch or handle a
-  JWK: the SDK does that and caches it.
+  JWK: the SDK does that and caches it. A backend in Python or any other
+  language checks the token itself: see
+  [verify without the SDK](#verify-without-the-sdk).
 - **`@orangecheck/me-client/popup`**: browser only. `signInWithOc()` opens the
   orangecheck sign-in popup and resolves with a token bound to your origin, the
   way Google's and GitHub's popups do.
@@ -188,6 +190,81 @@ The wrappers all take one options bag:
 | `required`    | `true` answers `401` before your handler runs when nobody is signed in.                                                                                                        |
 | `requireBond` | `{ minSats, minDays, maxAgeSecs }` in code. Wins over `projectKey`.                                                                                                            |
 
+## verify without the SDK
+
+A backend in Python, Go or anything else checks the token itself. It is a JWT
+signed by the auth host, ochk.io:
+
+| Part         | What to check                                                                                                                                                                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key set      | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
+| `alg`        | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
+| `iss`        | `https://ochk.io`                                                                                                                                                                                                                            |
+| `aud`        | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
+| `exp`, `iat` | Unix seconds. A token lasts as long as the person's ochk.io session, 30 days at most, and is never refreshed.                                                                                                                                |
+| `sub`        | The person's account id.                                                                                                                                                                                                                     |
+| `did_oc`     | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
+| `jti`        | The token's own id.                                                                                                                                                                                                                          |
+| `oc_bond`    | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
+
+The token carries no email address and no name.
+
+**Python**, with [`orangecheck`](/sdk/python) 2.3 or later:
+
+```python
+from orangecheck import InvalidSession, verify_session
+
+try:
+    session = verify_session(token, audience="https://your-site.example")
+except InvalidSession as err:
+    print(err.reason)  # audience, expired, signature, unknown_key, …
+    raise
+session.did_oc  # who signed in
+```
+
+Or with [PyJWT](https://pyjwt.readthedocs.io) 2.7 or later and `cryptography`:
+
+```python
+import jwt
+
+keys = jwt.PyJWKClient("https://ochk.io/.well-known/jwks.json")
+
+
+def verify(token: str) -> dict:
+    key = keys.get_signing_key_from_jwt(token).key
+    claims = jwt.decode(
+        token,
+        key,
+        algorithms=["EdDSA"],
+        audience="https://your-site.example",
+        issuer="https://ochk.io",
+        options={"require": ["exp", "iat", "iss", "aud", "sub", "jti"]},
+    )
+    if not claims.get("did_oc"):
+        raise jwt.InvalidTokenError("no did_oc")
+    return claims
+```
+
+## ending a session
+
+The session on your site is yours, the way it is with any sign-in provider.
+Signing out of ochk.io does not end it, and nothing refreshes the token. When
+someone signs out of your site, drop your own session, and send the token to the
+auth host so me.ochk.io refuses it from then on:
+
+```sh
+curl -X POST https://ochk.io/api/auth/revoke \
+  -H 'Content-Type: application/json' \
+  -d '{"tokens":["<the token>"]}'
+# → {"ok":true,"revoked":1}
+```
+
+Up to 8 tokens per call, from your server. Holding a token is the authority to
+end it, so no other credential is asked for. A token checked only against the
+key set, as above, still verifies until it expires: an ended token or a deleted
+account is refused by me.ochk.io, not by your own check. Keep your session
+shorter than the token if that matters to you.
+
 ## React, with auth-client
 
 Only for a React app whose server keeps the session in its own cookie, as above.
@@ -318,10 +395,11 @@ if (!result.ok) return res.status(401).end(result.reason);
 ```
 
 A missing header answers `ok: false`, so pass `req.header(...)` straight in. The
-key set at `ochk.io/.well-known/jwks.json` is fetched and cached for an hour
-when you pass no `jwk`. Stale-on-error: a brief outage of that key set uses the
-cached copy rather than rejecting every webhook. [Webhooks](/me/webhooks) has a
-full receiver.
+webhook key set, `https://me.ochk.io/api/dev-jwks`, is fetched and cached for an
+hour when you pass no `jwk`; it is not the sign-in key set at
+`ochk.io/.well-known/jwks.json`. Stale-on-error: a brief outage of that key set
+uses the cached copy rather than rejecting every webhook.
+[Webhooks](/me/webhooks) has a full receiver, in Python too.
 
 > Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
 > [agent.ochk.io](https://agent.ochk.io) / [ochk.io/docs/agent](/agent), not on

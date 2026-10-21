@@ -34,9 +34,8 @@ keeps the token they return in its own cookie.
 | `POST` | `/api/auth/logout`           | clear the `oc_session` cookie                                          |
 | `GET`  | `/api/auth/me`               | crypto-only identity lookup; 401 otherwise                             |
 
-> See
-> [`oc-me-web/src/pages/popup/signin.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/pages/popup/signin.tsx)
-> for the canonical client implementation against these endpoints.
+> The sign-in popup at `me.ochk.io/popup/signin` is the client for these
+> endpoints; `signInWithOc()` from `@orangecheck/me-client/popup` opens it.
 
 ## Public endpoints
 
@@ -103,6 +102,80 @@ test-fire path). Anything else gets `401 project_auth_required`.
 Outside the project's [pay periods](/me/paying-users) both answer `200` with
 `earned: false` (`not_paying` per event in a batch) and record nothing. Paying
 users is optional.
+
+`/event/batch` takes the person's own session, not `user_address`: the cookie,
+or the token from the sign-in popup as `Authorization: Bearer`. Every event in a
+batch earns for that person. A backend that names who earns fires
+`/api/integrator/event` once per event.
+
+### Signing an event
+
+The request body is JSON. The fields, in any order:
+
+| Field                 | Required | Meaning                                                                              |
+| --------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `project_key`         | yes      | Your project, `pk_test_…` or `pk_live_…`                                             |
+| `subtype`             | yes      | An event your project defined and enabled, built-in or your own                      |
+| `user_address`        | backend  | Who earns: the person's `did_oc` from their sign-in token. Accepted only when signed |
+| `payment_amount_sats` | some     | The payment, for an event priced as a share of one                                   |
+| `action_label`        | no       | A short label shown on the receipt                                                   |
+| `is_agent`            | no       | `true` when an AI agent acted for the person                                         |
+
+Sign the exact bytes you send, in one header:
+
+```
+X-OC-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(key, "<t>.<body>")>
+```
+
+The key is the signing secret **as text**, its characters as UTF-8 bytes: do not
+hex-decode it. `<body>` is the raw request body, byte for byte. A `t` more than
+300 seconds from the server's clock is refused. Send `Idempotency-Key` (up to
+200 characters) to make a retry safe: a repeat answers the first result with
+`idempotent_replay: true`.
+
+In Python, with [`orangecheck`](/sdk/python) 2.3 or later:
+
+```python
+import json, os
+import httpx
+from orangecheck import sign_event
+
+body = json.dumps({
+    "project_key": os.environ["OC_PROJECT_KEY"],
+    "subtype": "account_creation",
+    "user_address": did_oc,  # from verify_session(...).did_oc
+})
+r = httpx.post(
+    "https://me.ochk.io/api/integrator/event",
+    content=body,  # the same string that was signed
+    headers={
+        "Content-Type": "application/json",
+        "X-OC-Signature": sign_event(os.environ["OC_SIGNING_SECRET"], body),
+        "Idempotency-Key": f"signup-{user_id}",
+    },
+)
+```
+
+Without the SDK, the header is
+`f"t={t},v1=" + hmac.new(secret.encode(), f"{t}.".encode() + body_bytes, hashlib.sha256).hexdigest()`.
+
+### What the event endpoint answers
+
+| Status | `error` / `reason`                                       | Meaning                                                                                        |
+| ------ | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project     |
+| 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: nothing recorded or charged                                          |
+| 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                               |
+| 401    | `invalid_signature`                                      | The header is there but does not verify (`stale_timestamp`, `bad_signature`, `invalid_format`) |
+| 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                        |
+| 401    | `project_auth_required`                                  | Unsigned, and not from the project owner's own session                                         |
+| 401    | `earner_requires_signature`                              | `user_address` on an unsigned request                                                          |
+| 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                     |
+| 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                    |
+| 403    | `project_frozen`                                         | Frozen by the platform                                                                         |
+| 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                 |
+| 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                               |
+| 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                             |
 
 ## Authenticated · integrator project lifecycle
 

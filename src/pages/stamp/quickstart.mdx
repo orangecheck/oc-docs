@@ -89,6 +89,38 @@ const signer = {
 
 Pass that `signer` to `stamp()` in place of the one above.
 
+### A file too big to hold in memory
+
+`content` also takes the file's hash and size instead of its bytes:
+`{ hash, length }`, where `hash` is `sha256:` followed by 64 lowercase hex
+characters and `length` is the size in bytes. A bare hex digest, or uppercase
+hex, is rejected with `E_MALFORMED`. In Node, hash the file as a stream:
+
+```ts
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+
+import { stamp } from '@orangecheck/stamp-core';
+
+const path = 'release.tar.zst';
+const sha = createHash('sha256');
+for await (const chunk of createReadStream(path)) sha.update(chunk);
+
+const env = await stamp({
+    content: {
+        hash: `sha256:${sha.digest('hex')}`,
+        length: (await stat(path)).size,
+    },
+    mime: 'application/zstd',
+    signer, // { address, signMessage }, as above
+});
+```
+
+The envelope is the one `stamp()` would make from the bytes. To check the file
+later, hash it the same way and compare the result with `env.content.hash`,
+rather than passing the whole file to `verify()` as `content`.
+
 ## Verify
 
 ```ts

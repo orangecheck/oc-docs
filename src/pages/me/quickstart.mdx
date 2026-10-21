@@ -35,6 +35,11 @@ verified: you verify it only to [go live](#5--go-live) with paying.
 
 <InstallTabs pkg="@orangecheck/me-client" />
 
+No bundler? `dist/popup.mjs` in the published package is a 2 kB ES module with
+no imports of its own. Copy it from the version you install to your own origin,
+say as `/js/oc-popup.mjs`, import `signInWithOc` from that path in a
+`<script type="module">`, and copy it again when you upgrade.
+
 Call `signInWithOc()` inside a click handler, or the browser blocks the popup.
 The person signs in on orangecheck's page with email, Google, GitHub or a
 Bitcoin wallet, and the popup hands your page a token bound to your origin. A

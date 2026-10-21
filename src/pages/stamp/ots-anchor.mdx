@@ -100,6 +100,68 @@ Bitcoin node.
 Cache the upgraded proof. Once the chain has confirmed, the proof never changes
 — you can verify it offline forever.
 
+## In a web app
+
+`@orangecheck/stamp-ots` calls the calendars straight from the browser, and that
+works from any origin, with one gap. Measured in Chromium from
+`https://example.com` on 2026-10-21, against alice, bob and finney:
+
+| Request                                                                                | What the page gets                                                             |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `POST /digest`, the 32-byte digest, no `Content-Type` (what `submitToCalendars` sends) | `200` and the pending proof, with `Access-Control-Allow-Origin: *`             |
+| the same POST with a `Content-Type` such as `application/octet-stream`                 | blocked: the preflight `OPTIONS` gets `404` or `501`                           |
+| `GET /timestamp/<commitment>`, once that commitment is in a block                      | `200` and the upgrade, with `Access-Control-Allow-Origin: *`                   |
+| `GET /timestamp/<commitment>`, while it is still pending                               | a network error: the calendar's `404` carries no `Access-Control-Allow-Origin` |
+| mempool.space `GET /api/block-height/<n>` and `GET /api/block/<hash>/header`           | `200`, with `Access-Control-Allow-Origin: *`                                   |
+
+So submitting and upgrading work as shipped. `upgradeProof()` treats a calendar
+it cannot read as "no answer yet", so a pending proof stays pending, and the
+browser console shows a CORS error for each pending check. Allow the three
+calendar hosts and your header source in your Content-Security-Policy's
+`connect-src`.
+
+To tell "still pending" from "calendar down", or to keep those errors out of the
+console, put a small proxy on your own origin. It forwards two paths per
+calendar and nothing else:
+
+- `POST /digest`, the 32-byte body as it came;
+- `GET /timestamp/<hex>`, passing the calendar's status through, so a `404`
+  reaches the page as a `404`.
+
+Point `stamp-ots` at it with its `fetch` option. The proof still names the
+calendars themselves, so anyone can upgrade it later without your proxy:
+
+```ts
+import {
+    mempoolHeaderSource,
+    submitToCalendars,
+    upgradeProof,
+} from '@orangecheck/stamp-ots';
+
+const PROXY: Record<string, string> = {
+    'https://alice.btc.calendar.opentimestamps.org': '/ots/alice',
+    'https://bob.btc.calendar.opentimestamps.org': '/ots/bob',
+    'https://finney.calendar.eternitywall.com': '/ots/finney',
+};
+const viaProxy: typeof fetch = (input, init) => {
+    const url = String(input);
+    const calendar = Object.keys(PROXY).find((c) => url.startsWith(c));
+    return fetch(
+        calendar ? PROXY[calendar] + url.slice(calendar.length) : url,
+        init
+    );
+};
+
+const proof = await submitToCalendars(env.id, { fetch: viaProxy });
+const later = await upgradeProof(proof, env.id, {
+    headerSource: mempoolHeaderSource(),
+    fetch: viaProxy,
+});
+```
+
+stamp.ochk.io runs a proxy like this for its own pages. It is not a public
+service, so don't point another site at it.
+
 ## Verify
 
 `@orangecheck/stamp-ots` parses the OTS proof format itself. Give it a source of
@@ -128,6 +190,72 @@ A header source is any object with `getHeaderAt(height)` returning the 80-byte
 header: a local Bitcoin node, an Esplora mirror, or a bundle of headers on disk.
 With your own headers the check needs no network at all. Without
 `verifyOtsAnchor`, a confirmed proof is reported as `claimed`, not verified.
+
+### What a label may say
+
+The proof names a block height, but only a block header can show the proof leads
+there, and the `ots` block sits outside the signature. Until a header has been
+checked, the height is the envelope's say-so. Word a label by what has been
+checked:
+
+| What you know                                                       | The label                             |
+| ------------------------------------------------------------------- | ------------------------------------- |
+| `anchor.status` is `none`                                           | No timestamp                          |
+| `anchor.status` is `pending`                                        | Waiting for a Bitcoin block           |
+| `anchor.status` is `claimed`: confirmed, header not checked yet     | Waiting to be checked against block N |
+| the proof checked against the header at N (`confirmed`, `verified`) | Stamped in block N                    |
+| a header in hand, and the proof does not lead to it                 | The proof does not lead to block N    |
+
+Never show "Stamped in block N" before the header check. Passing
+`verifyOtsAnchor` straight to `verify()` reports a header source that is down as
+`E_BAD_ANCHOR`, the same as a bad proof, so fetch the header first:
+
+```ts
+import { verifySignature } from '@orangecheck/bip322';
+import { verify } from '@orangecheck/stamp-core';
+import {
+    makeAnchorVerifier,
+    mempoolHeaderSource,
+} from '@orangecheck/stamp-ots';
+
+const verifyBip322 = async (msg: string, sig: string, addr: string) =>
+    verifySignature(addr, msg, sig);
+const headers = mempoolHeaderSource({
+    baseUrl: 'https://esplora.example.com/api',
+});
+
+const result = await verify({ envelope, verifyBip322 }); // no anchor hook yet
+if (!result.ok) throw new Error(result.code);
+const a = result.anchor;
+let label =
+    a.status === 'none' ? 'No timestamp' : 'Waiting for a Bitcoin block';
+if (a.status === 'claimed') {
+    const header = await headers.getHeaderAt(a.blockHeight).catch(() => null);
+    if (!header) {
+        // The source did not answer: the block is still unchecked.
+        label = `Waiting to be checked against block ${a.blockHeight}`;
+    } else {
+        const check = makeAnchorVerifier({
+            headerSource: { getHeaderAt: async () => header },
+        });
+        const leads = await check(
+            envelope.ots!.proof,
+            a.blockHeight,
+            a.blockHash,
+            envelope.id
+        );
+        label = leads
+            ? `Stamped in block ${a.blockHeight}`
+            : `The proof does not lead to block ${a.blockHeight}`;
+    }
+}
+```
+
+The header source learns which block each visitor is checking, and it is trusted
+to say which block sits at a height. Use your own node (any
+`getHeaderAt(height)` that returns the 80-byte header), or an Esplora you name
+on your privacy page: `mempoolHeaderSource({ baseUrl })` in code, or
+`--headers-url` with [`stamp`](/sdk/cli#stamp-cli) on the command line.
 
 ## Offline verification
 

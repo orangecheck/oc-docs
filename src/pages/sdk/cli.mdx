@@ -135,6 +135,70 @@ done < candidates.txt > allowlist.txt
 - `--api-base https://...` — override the hosted verifier
 - `--testnet` / `--signet` — set network mode
 
+## Other command-line tools
+
+Each protocol that has a command-line tool ships it as its own package:
+
+| Package                  | Commands             | What it does                                                                                 |
+| ------------------------ | -------------------- | -------------------------------------------------------------------------------------------- |
+| `@orangecheck/stamp-cli` | `stamp`, `git-stamp` | Sign files and git tags with your Bitcoin address, anchor them to Bitcoin, verify offline. See [stamp-cli](#stamp-cli). |
+| `@orangecheck/agent-cli` | `oc-agent`           | Verify, inspect and canonicalize OC Agent delegations, actions and revocations.              |
+| `@orangecheck/vote-cli`  | `oc-vote`            | Tally, verify and inspect OC Vote polls.                                                     |
+| `@orangecheck/vault-cli` | `oc-vault`           | Resolve `ocv://` secret references and inject them into a process or a config file.         |
+
+## stamp-cli
+
+```bash
+npm i -g @orangecheck/stamp-cli
+# or one-shot
+npx -y -p @orangecheck/stamp-cli stamp --help
+```
+
+| Command                               | What it does                                                                        |
+| ------------------------------------- | ----------------------------------------------------------------------------------- |
+| `stamp file <path> --addr <address>`  | Sign a file and write `<path>.stamp` beside it; submits to the calendars unless `--no-anchor`. |
+| `stamp canonical <path> --addr <a> --id` | Print the id your wallet signs, without writing anything.                        |
+| `stamp anchor <stamp>`                | Submit a stamp to the calendars, or upgrade its pending proof once it is in a block. |
+| `stamp verify <stamp> [content]`      | Check the signature, the content and the anchor. `--require-anchor` fails unless the anchor is confirmed and checked against its block header. |
+| `git-stamp tag <tagname>`             | Stamp `<tagname>^{tree}` and keep it in `.git/stamps/<tagname>.stamp`.              |
+| `git-stamp verify <tagname>`          | Verify that stamp.                                                                  |
+
+To sign in a wallet the CLI can't reach, print the id, sign it, and pass the
+signature back with the same `--signed-at`, since the id commits to it:
+
+```bash
+stamp canonical notes.txt --addr bc1q… --signed-at 2026-10-21T16:00:00Z --id
+# sign the printed id with BIP-322 in your wallet, then:
+stamp file notes.txt --addr bc1q… --signed-at 2026-10-21T16:00:00Z --sig '<base64 signature>'
+```
+
+`stamp verify` exits 0 when the stamp checks out and 2 when a check fails
+(`E_BAD_SIG`, `E_BAD_ANCHOR`, `E_NO_ANCHOR`). `stamp anchor` exits 1 when it
+cannot reach a calendar or the header source.
+
+### `--headers-url`
+
+`stamp verify` and `stamp anchor` take `--headers-url <url>`: the Esplora API
+they read block headers from. The default is `https://mempool.space/api`. For
+each anchor they ask it for two things, `GET <url>/block-height/<n>` and
+`GET <url>/block/<hash>/header`, so the source learns which blocks you check.
+Point it at your own Esplora to keep that to yourself:
+
+```bash
+stamp verify notes.txt.stamp notes.txt --require-anchor --headers-url https://esplora.example.com/api
+```
+
+| The header source                   | `stamp verify`                                                              | with `--require-anchor`           |
+| ----------------------------------- | --------------------------------------------------------------------------- | --------------------------------- |
+| answers, and the proof leads to it  | `confirmed at block N (checked against the block header)`, exit 0           | the same                          |
+| answers, and the proof does not     | `E_BAD_ANCHOR`, exit 2                                                      | the same                          |
+| cannot be reached                   | `claims block N, unverified: block header source unreachable`, exit 0       | `E_NO_ANCHOR`, exit 2             |
+
+`stamp anchor` needs the header to confirm an upgrade, so with the source
+unreachable it stops with `OTS upgrade failed`, exit 1, and leaves the file as
+it was. `git-stamp verify` has no `--headers-url` and always reads mempool.space; to use
+your own source, run `stamp verify .git/stamps/<tagname>.stamp --headers-url …`.
+
 ## See also
 
 - [**OC Attest — HTTP API**](/attest/api) — what the CLI wraps

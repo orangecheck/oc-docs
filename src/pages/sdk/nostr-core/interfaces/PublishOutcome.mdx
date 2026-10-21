@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: PublishOutcome",
+    description: "Auto-generated API reference for Interface: PublishOutcome. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / PublishOutcome
+
+# Interface: PublishOutcome
+
+Defined in: [index.ts:789](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L789)
+
+What a publish achieved, across relays. A reader learns of an event only
+from a relay that holds it, so a revocation or record is in effect for
+anyone once at least one relay has accepted it, and not before. Each relay
+counts once, as accepted if any attempt at it was.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-accepted">&lt;/a> `accepted` | `number` | - | [index.ts:791](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L791) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"none"` \| `"partial"` \| `"all"` | - | [index.ts:790](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L790) |
+| &lt;a id="property-relays">&lt;/a> `relays` | `string`[] | The relays that accepted it. | [index.ts:794](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L794) |
+| &lt;a id="property-total">&lt;/a> `total` | `number` | - | [index.ts:792](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L792) |

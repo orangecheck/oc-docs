@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: verifyActionAsOfSignedAt()",
+    description: "Auto-generated API reference for Function: verifyActionAsOfSignedAt(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README)
+
+***
+
+[@orangecheck/agent-core](../README) / verifyActionAsOfSignedAt
+
+# Function: verifyActionAsOfSignedAt()
+
+```ts
+function verifyActionAsOfSignedAt(input: VerifyActionAsOfSignedAtInput): Promise<VerifyActionResult>;
+```
+
+Defined in: [agent-core/src/verify.ts:364](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L364)
+
+Verify a past action as of its own `signed_at`, for an audit (SPEC §8.6).
+The agent chose that time, so the verdict holds only if the claim is true:
+`asOf.anchored` is false unless a verified OTS anchor fixes it. Never use
+this to decide whether to act on an action now.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`VerifyActionAsOfSignedAtInput`](../type-aliases/VerifyActionAsOfSignedAtInput) |
+
+## Returns
+
+`Promise`\&lt;[`VerifyActionResult`](../type-aliases/VerifyActionResult)\>

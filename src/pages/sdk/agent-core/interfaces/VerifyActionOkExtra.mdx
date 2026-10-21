@@ -11,13 +11,14 @@ export const metadata = {
 
 # Interface: VerifyActionOkExtra
 
-Defined in: [agent-core/src/types.ts:282](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L282)
+Defined in: [agent-core/src/types.ts:283](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L283)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-anchor">&lt;/a> `anchor` | \| \&#123; `status`: `"none"`; \&#125; \| \&#123; `status`: `"pending"`; \&#125; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; `status`: `"claimed"`; `verified`: `false`; \&#125; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; `status`: `"confirmed"`; `verified`: `true`; \&#125; | `claimed` is a confirmed `ots` block no verifier walked: the block is the envelope's say-so. Only a passing `verifyOtsAnchor` yields `confirmed`. | [agent-core/src/types.ts:296](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L296) |
-| &lt;a id="property-chain">&lt;/a> `chain` | [`SubdelegationEnvelope`](SubdelegationEnvelope)[] | The sub-delegation chain `[S_1, …, S_leaf]`. Empty when the action cites the root directly. The action's authority leaf is `chain[chain.length - 1] ?? delegation`. | [agent-core/src/types.ts:290](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L290) |
-| &lt;a id="property-delegation">&lt;/a> `delegation` | [`DelegationEnvelope`](DelegationEnvelope) | The ROOT delegation rooting the authority chain. | [agent-core/src/types.ts:284](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L284) |
-| &lt;a id="property-scopeexercised">&lt;/a> `scopeExercised` | `string` | - | [agent-core/src/types.ts:291](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L291) |
+| &lt;a id="property-anchor">&lt;/a> `anchor` | \| \&#123; `status`: `"none"`; \&#125; \| \&#123; `status`: `"pending"`; \&#125; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; `status`: `"claimed"`; `verified`: `false`; \&#125; \| \&#123; `blockHash`: `string`; `blockHeight`: `number`; `status`: `"confirmed"`; `verified`: `true`; \&#125; | `claimed` is a confirmed `ots` block no verifier walked: the block is the envelope's say-so. Only a passing `verifyOtsAnchor` yields `confirmed`. | [agent-core/src/types.ts:297](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L297) |
+| &lt;a id="property-asof">&lt;/a> `asOf` | \| \&#123; `basis`: `"now"`; `now`: `string`; \&#125; \| \&#123; `anchored`: `boolean`; `basis`: `"signed_at"`; `signedAt`: `string`; \&#125; | The time the verdict holds for. `now`: verifyAction, checked live. `signed_at`: verifyActionAsOfSignedAt, checked as of the time the agent claims; `anchored` is false when only the agent says so. | [agent-core/src/types.ts:307](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L307) |
+| &lt;a id="property-chain">&lt;/a> `chain` | [`SubdelegationEnvelope`](SubdelegationEnvelope)[] | The sub-delegation chain `[S_1, …, S_leaf]`. Empty when the action cites the root directly. The action's authority leaf is `chain[chain.length - 1] ?? delegation`. | [agent-core/src/types.ts:291](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L291) |
+| &lt;a id="property-delegation">&lt;/a> `delegation` | [`DelegationEnvelope`](DelegationEnvelope) | The ROOT delegation rooting the authority chain. | [agent-core/src/types.ts:285](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L285) |
+| &lt;a id="property-scopeexercised">&lt;/a> `scopeExercised` | `string` | - | [agent-core/src/types.ts:292](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L292) |

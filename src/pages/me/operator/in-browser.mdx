@@ -29,9 +29,6 @@ kit-signed one.
 | `operator_id` (`op-<8 bytes hex of sha256(pubkey)>`) | IndexedDB · derivable                                                                      | Same. Identical derivation in the kit (Rust): the portal and kit always agree on the operator_id for a given key. |
 | 24-word BIP-39 mnemonic                              | **Shown once at generate time, then dropped from memory.** Operator records it externally. | Recovery requires re-entering the mnemonic. We do not store it.                                                   |
 
-The schema lives in
-[`oc-me-web/src/lib/operator/browser-key.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/operator/browser-key.ts).
-
 ## Generate, restore, import
 
 Three entry points on the portal:
@@ -69,14 +66,13 @@ const sig = ed25519.sign(message, privkey);
 ```
 
 The Rust kit's `serde_json::to_vec(&ActionPayload)` produces byte-identical
-output. The server-side validator at
-[`oc-me-web/src/lib/operator/envelope.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/operator/envelope.ts)
-re-encodes the payload and verifies the Ed25519 signature against the embedded
-pubkey — same code path for portal-signed and kit-signed envelopes.
+output; its encoder and round-trip tests are public in
+[`oc-guardian-kit/crates/oc-guardian-core/src/actions.rs`](https://github.com/orangecheck/oc-guardian-kit/blob/main/crates/oc-guardian-core/src/actions.rs).
+The server-side validator re-encodes the payload and verifies the Ed25519
+signature against the embedded pubkey — same code path for portal-signed and
+kit-signed envelopes.
 
-Round-trip tests at
-[`src/__tests__/lib/operator-browser-key.test.ts`](https://github.com/orangecheck/oc-me-web/blob/main/src/__tests__/lib/operator-browser-key.test.ts)
-verify each envelope type:
+The portal's round-trip tests cover each envelope type:
 
 - `program-apply` (apply to the operator program)
 - `charter-sign` (ratify a federation charter)

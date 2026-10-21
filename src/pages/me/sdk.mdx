@@ -415,9 +415,6 @@ compare notes can match a user. Scope reads below carry a per-app subject
 instead. To read more (an email, a Bitcoin address, a display name) you ask, and
 the person decides.
 
-Full design at
-[PRIVACY-ARCHITECTURE.md](https://github.com/orangecheck/oc-me-web/blob/main/PRIVACY-ARCHITECTURE.md).
-
 ### `oc.scope.granted`
 
 Read what the signed-in person shares with your project now. Returns the per-app
@@ -441,9 +438,11 @@ console.log(scopes.email); // "user@example.com" · or undefined
 
 ### `oc.scope.request`
 
-Send the person to orangecheck's page that asks them. After they decide, the
-browser returns to `return_to`, and later `oc.scope.granted()` calls reflect
-what they chose.
+Send the person to orangecheck's page that asks them, at ochk.app. After they
+decide, the browser returns to `return_to`, and later `oc.scope.granted()` calls
+reflect what they chose. `return_to` must be an https URL on your project's
+domain, or on a subdomain of it once the domain is verified. Anything else
+leaves the person on ochk.app.
 
 ```ts
 oc.scope.request(['email', 'display_name'], {

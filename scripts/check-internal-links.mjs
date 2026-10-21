@@ -11,6 +11,12 @@
  * page's own URL) to a page file, a file under public/, or the source of a
  * redirect in next.config.ts. Links ending in `.mdx` always fail.
  *
+ * It also fails a link into an orangecheck repo a stranger cannot open. The
+ * federation, custody and operator pages sent readers to a private repo's
+ * files for months; to anyone outside the org each was a 404. A repo missing
+ * from PUBLIC_REPOS counts as private, so a new private repo is caught without
+ * anyone remembering to list it. Add a repo here only once it is public.
+ *
  * Usage: node scripts/check-internal-links.mjs
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -47,6 +53,29 @@ function resolves(path) {
     return routes.has(p) || redirects.has(p) || existsSync(join('public', p));
 }
 
+const PUBLIC_REPOS = new Set([
+    '.github',
+    'bitcoin',
+    'oc-agent-examples',
+    'oc-agent-protocol',
+    'oc-attest-protocol',
+    'oc-chat-protocol',
+    'oc-docs',
+    'oc-guardian-kit',
+    'oc-load-vault-secrets-action',
+    'oc-lock-protocol',
+    'oc-media-kit',
+    'oc-packages',
+    'oc-pledge-protocol',
+    'oc-portal-web',
+    'oc-relay-infra',
+    'oc-stamp-protocol',
+    'oc-vault-extension',
+    'oc-vote-examples',
+    'oc-vote-protocol',
+]);
+const ORG_REPO = /github\.com\/orangecheck\/([A-Za-z0-9._-]+)/g;
+
 // Markdown link targets and JSX href="…" values.
 const LINK_RES = [/\]\(([^)\s]+)\)/g, /href=["']([^"']+)["']/g];
 const FENCE = /^\s*(```|~~~)/;
@@ -61,6 +90,13 @@ for (const file of files) {
     readFileSync(file, 'utf8')
         .split('\n')
         .forEach((line, i) => {
+            // In code too: a `git clone` of a private repo fails a stranger the same way.
+            for (const m of line.matchAll(ORG_REPO)) {
+                const repo = m[1].replace(/\.+$/, '').replace(/\.git$/, ''); // a sentence's full stop is not the name
+                if (!PUBLIC_REPOS.has(repo)) {
+                    failures.push(`${file}:${i + 1}  ${m[0]}  (private repo: a reader gets a 404)`);
+                }
+            }
             if (FENCE.test(line)) inFence = !inFence;
             if (inFence) return;
             for (const re of LINK_RES) {

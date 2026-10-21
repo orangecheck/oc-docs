@@ -23,10 +23,8 @@ of that federation, never as a guardian: zero key shares, no way to reach the
 threshold, no way to move your funds. None of that is in force until a
 federation is bound.
 
-This page is the public-facing version of the operator runbook at
-[`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md)
-in the `oc-me-web` repo. If you're an OC operator binding a federation, read the
-runbook. If you're a user, this page is enough.
+If you run a guardian, read the [operator runbook](/me/operator/runbook). If
+you're a user, this page is enough.
 
 ## What "federation custody" actually means
 
@@ -75,8 +73,8 @@ published in three places:
    fact).
 
 Hash mismatch between any of those three is a red flag. If the federation amends
-its charter without re-publishing the new hash on ochk.app, file an issue at
-[github.com/orangecheck/oc-me-web/issues](https://github.com/orangecheck/oc-me-web/issues).
+its charter without re-publishing the new hash on ochk.app, tell us at
+[ochk.app/contact](https://ochk.app/contact).
 
 ## Provisioning ceremony (what your browser does)
 
@@ -96,8 +94,8 @@ When you sign up via email-OTP:
    your federation balance is held by the guardians, redeemable on-chain or via
    Lightning by you (with the federation's threshold signature) at any time.
 
-You can re-read the source of the React provider that orchestrates this at
-[`src/lib/fedimint/provider.tsx`](https://github.com/orangecheck/oc-me-web/blob/main/src/lib/fedimint/provider.tsx).
+None of this runs today: the browser client was removed in September 2026, with
+no federation to join. See [Current state](#current-state).
 
 ## What if a guardian goes down?
 
@@ -145,18 +143,16 @@ No federation is bound, and the browser-side Fedimint client that would have
 joined one was removed from `oc-me-web` in September 2026 — it could only ever
 reach its own error path, and code that demonstrates a money movement which
 cannot happen reads as a feature someone forgot to link up. The guardians that
-once ran this were torn down in July 2026. The federation operator decision is
-in active resolution per the criteria in
-[`FEDERATION-DEPLOYMENT.md`](https://github.com/orangecheck/oc-me-web/blob/main/FEDERATION-DEPLOYMENT.md).
+once ran this were torn down in July 2026. Who will run the guardians is not
+decided yet.
 
 So today orangecheck holds what you accrue. There is no stored balance to hold,
 strictly speaking — it is recomputed from your signed billable envelopes on
 every read — but the party who owes it is orangecheck, and that is the honest
 way to say it.
 
-We are not soft-pedaling this. The in-tree audit at
-[`NON_CUSTODIAL_AUDIT.md`](https://github.com/orangecheck/oc-me-web/blob/main/NON_CUSTODIAL_AUDIT.md)
-walks the gap with file paths.
+We are not soft-pedaling this. [ochk.app/custody](https://ochk.app/custody) says
+who holds what today.
 
 Signing in via BIP-322 gives you a real, live self-custody property — your
 signing key never reaches OC. It does not make your earned sats self-custodied.

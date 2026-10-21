@@ -124,9 +124,7 @@ to consumers as it does to OC's own apps.
 
 NIP-11 self-report from the live relay: `[1, 2, 4, 9, 11, 20, 22, 28, 40, 70]`.
 Notably **NIP-45 (COUNT) is not supported** — strfry doesn't ship it. If you
-need event counts, use a REQ with `limit` and count client-side (see
-[`oc-www`'s family-stats endpoint](https://github.com/orangecheck/oc-www/blob/main/src/pages/api/family-stats.ts)
-for the pattern).
+need event counts, use a REQ with `limit` and count client-side.
 
 NIP-77 (negentropy sync) is supported. We expect to backfill historical OC
 envelopes from public relays via `strfry sync` once a meaningful share of the

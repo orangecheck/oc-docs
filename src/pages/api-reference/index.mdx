@@ -44,12 +44,13 @@ as a machine-readable hint. What each one returns today:
 
 **`ochk.io` (auth host)**
 
-| Case                      | Status  | Body                                                                                                                                    |
-| ------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Most failures             | 4xx/5xx | `{ "ok": false, "reason": "<code>" }`                                                                                                   |
-| No session                | 401     | `{ "ok": false, "reason": "not_authenticated" }`                                                                                        |
-| Request validation (some) | 400     | `{ "error": "bad_request", "issues": [ … ] }`                                                                                           |
-| Per-IP limit exceeded     | 429     | `{ "ok": false, "reason": "rate_limited" }` on most endpoints; `{ "error": "rate_limited" }` on `/api/challenge` and `/api/auth/switch` |
+| Case                           | Status  | Body                                                                                                                                    |
+| ------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Most failures                  | 4xx/5xx | `{ "ok": false, "reason": "<code>" }`                                                                                                   |
+| No session                     | 401     | `{ "ok": false, "reason": "not_authenticated" }`                                                                                        |
+| Signed out, `GET /api/auth/me` | 200     | `{ "ok": true, "account": null }`, as every family site's own `/api/auth/me` answers; a per-tab token that does not verify is a 401     |
+| Request validation (some)      | 400     | `{ "error": "bad_request", "issues": [ … ] }`                                                                                           |
+| Per-IP limit exceeded          | 429     | `{ "ok": false, "reason": "rate_limited" }` on most endpoints; `{ "error": "rate_limited" }` on `/api/challenge` and `/api/auth/switch` |
 
 **`me.ochk.io`**
 

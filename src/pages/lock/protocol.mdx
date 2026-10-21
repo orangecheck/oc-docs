@@ -135,15 +135,17 @@ future versions may replace it with DLC oracles or BIP-118 covenants.
 
 Bob has a laptop and a phone. Each browser has its own device key. On first
 sign-in, each publishes a separate Nostr record with its own `device_id`.
-Senders fetching Bob's records get a list; they encrypt once per active device.
+Senders fetching Bob's records get a list; they encrypt once per live device.
 
-**To rotate:** Bob generates a new device secret, signs a new binding statement,
-publishes a replacement event (Nostr kind 30078 is addressable — same `d` tag
-overwrites). Old envelopes addressed to the old `device_pk` are unreadable from
-the new device.
+**To rotate:** Bob generates a new device secret under a new `device_id`, signs
+a new binding statement and publishes it, then revokes the old `device_id`. Old
+envelopes addressed to the old `device_pk` are unreadable from the new device.
 
-**To revoke:** Bob publishes an event with `device_pk=revoked`. Conforming
-senders refuse to encrypt to revoked records.
+**To revoke (laptop stolen):** Bob's wallet signs a revocation of the laptop's
+`device_id`, and he publishes it from his phone or any client, under any Nostr
+key. He does not need the laptop. A sender that sees the revocation on any relay
+stops sealing to the laptop, even while another relay still serves its record.
+What the laptop already received stays readable to whoever holds it.
 
 ## Flow 4 — Self-vault (password manager pattern)
 

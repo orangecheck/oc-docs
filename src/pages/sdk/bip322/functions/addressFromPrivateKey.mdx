@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: addressFromPrivateKey()",
+    description: "Auto-generated API reference for Function: addressFromPrivateKey(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/bip322**](../README)
+
+***
+
+[@orangecheck/bip322](../README) / addressFromPrivateKey
+
+# Function: addressFromPrivateKey()
+
+```ts
+function addressFromPrivateKey(
+   privateKey: PrivateKeyInput, 
+   type: "p2wpkh" | "p2tr", 
+   network?: "mainnet" | "testnet" | "regtest"): string;
+```
+
+Defined in: [index.ts:391](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L391)
+
+The P2WPKH or single-key P2TR (BIP-86) address of `privateKey`, the address
+`signMessage` signs for.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `privateKey` | [`PrivateKeyInput`](../type-aliases/PrivateKeyInput) | `undefined` |
+| `type` | `"p2wpkh"` \| `"p2tr"` | `undefined` |
+| `network` | `"mainnet"` \| `"testnet"` \| `"regtest"` | `'mainnet'` |
+
+## Returns
+
+`string`

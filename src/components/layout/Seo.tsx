@@ -21,10 +21,12 @@ export function Seo(props: SEOProps) {
             <meta key="m-title" name="title" content={meta.title} />
             <meta key="m-description" name="description" content={meta.description} />
             {meta.keywords && <meta key="m-keywords" name="keywords" content={meta.keywords} />}
-            <link key="canonical" rel="canonical" href={meta.canonical} />
+            {meta.canonical && <link key="canonical" rel="canonical" href={meta.canonical} />}
 
             <meta key="og:type" property="og:type" content={meta.openGraph.type} />
-            <meta key="og:url" property="og:url" content={meta.openGraph.url} />
+            {meta.openGraph.url && (
+                <meta key="og:url" property="og:url" content={meta.openGraph.url} />
+            )}
             <meta key="og:title" property="og:title" content={meta.openGraph.title} />
             <meta
                 key="og:description"

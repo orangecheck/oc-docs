@@ -8,6 +8,7 @@ export default function ServerError() {
             <Seo
                 title="Server Error"
                 description="An unexpected error occurred on the server."
+                canonical={null}
                 noindex={true}
             />
             {/* The docs home: the router adds /docs. */}

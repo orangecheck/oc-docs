@@ -33,7 +33,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
             <Seo
                 title={docsMeta.title}
                 description={docsMeta.description}
-                canonical={isRoot ? undefined : path}
+                canonical={(Component as DocsPage).bare ? null : path}
                 ogType={isRoot ? 'website' : 'article'}
             />
             <OcSessionProvider>

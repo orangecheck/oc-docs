@@ -2,12 +2,15 @@
  * SEO utilities for ochk.io/docs — mirrors ochk.io's shape so tooling and
  * social-card tests work identically.
  */
+import { cardTitle } from '@orangecheck/site-kit/seo';
+
 import { SITE_CONFIG } from '@/lib/site.config';
 
 export interface SEOConfig {
     title?: string;
     description?: string;
-    canonical?: string;
+    /** A path under /docs ('/' is the docs home), or null for a page that names no canonical (404, 500). */
+    canonical: string | null;
     ogImage?: string;
     ogType?: 'website' | 'article';
     noindex?: boolean;
@@ -19,21 +22,26 @@ const SITE_NAME = 'orangecheck docs';
 const DEFAULT_TITLE = 'orangecheck documentation';
 const DEFAULT_DESCRIPTION =
     'The orangecheck handbook. Six verbs — am, whisper, decide, declare, delegate, swear — mapped to identity, confidentiality, legitimacy, provenance, authority, commitment. Six composable protocols on Bitcoin: OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent, OC Pledge. BIP-322 + Nostr kind-30078 + OpenTimestamps. Every artifact verifies offline, forever.';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 
-export function generateMetaTags(config: SEOConfig = {}) {
+/** The docs card with this page's title; the card already shows the site's name. */
+const ogCard = (title: string) =>
+    `${SITE_URL}/api/og?title=${encodeURIComponent(cardTitle({ name: SITE_NAME }, title))}`;
+
+export function generateMetaTags(config: SEOConfig) {
     const {
         title = DEFAULT_TITLE,
         description = DEFAULT_DESCRIPTION,
         canonical,
-        ogImage = DEFAULT_OG_IMAGE,
+        ogImage = ogCard(title),
         ogType = 'website',
         noindex = false,
         keywords = [],
     } = config;
 
     const fullTitle = title === DEFAULT_TITLE ? title : `${title} — ${SITE_NAME}`;
-    const canonicalUrl = canonical ? `${SITE_URL}${canonical}` : SITE_URL;
+    // '/' is the docs home itself: /docs/ would redirect to /docs.
+    const canonicalUrl =
+        canonical === null ? null : canonical === '/' ? SITE_URL : `${SITE_URL}${canonical}`;
 
     return {
         title: fullTitle,
@@ -57,48 +65,3 @@ export function generateMetaTags(config: SEOConfig = {}) {
         keywords: keywords.length > 0 ? keywords.join(', ') : undefined,
     };
 }
-
-export function generateStructuredData(
-    type: 'Organization' | 'WebSite' | 'WebPage',
-    data?: Record<string, unknown>
-): Record<string, unknown> {
-    const baseUrl = SITE_URL;
-
-    if (type === 'Organization') {
-        return {
-            '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: 'OrangeCheck',
-            url: 'https://ochk.io',
-            logo: 'https://ochk.io/favicon.png',
-            description: DEFAULT_DESCRIPTION,
-        };
-    }
-
-    if (type === 'WebSite') {
-        return {
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            name: SITE_NAME,
-            url: baseUrl,
-            description: DEFAULT_DESCRIPTION,
-        };
-    }
-
-    return {
-        '@context': 'https://schema.org',
-        '@type': 'WebPage',
-        name: (data?.title as string) ?? DEFAULT_TITLE,
-        description: (data?.description as string) ?? DEFAULT_DESCRIPTION,
-        url: (data?.url as string) ?? baseUrl,
-        ...(data ?? {}),
-    };
-}
-
-export const SEO_DEFAULTS = {
-    SITE_URL,
-    SITE_NAME,
-    DEFAULT_TITLE,
-    DEFAULT_DESCRIPTION,
-    DEFAULT_OG_IMAGE,
-};

@@ -8,7 +8,7 @@ export const metadata = {
 
 A consolidated view of what the protocol proves, what it does not prove, the
 trust assumptions it relies on, and the threat model it targets. For the
-detailed 13-threat treatment see the upstream
+detailed threat treatment see the upstream
 [`SECURITY.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/SECURITY.md).
 
 ## Guarantees
@@ -16,14 +16,15 @@ detailed 13-threat treatment see the upstream
 A full verification of an agent-action `A` against its cited delegation `D`
 establishes:
 
-| Check clean                  | Guarantee                                                                        |
-| ---------------------------- | -------------------------------------------------------------------------------- |
-| `E_BAD_SIG` on D             | Holder of `D.principal.address`'s key at `issued_at` authorized this delegation. |
-| `E_REVOKED` absent           | No effective revocation predates the action's signed-at (modulo OTS anchoring).  |
-| `E_BAD_ACTION_STAMP` clean   | Holder of `D.agent.address`'s key at `A.signed_at` authorized this action.       |
-| `E_SCOPE_DENIED` absent      | The exercised scope is a legal narrowing of a granted scope.                     |
-| `E_BOND_UNVERIFIED` absent   | The principal's declared bond is still staked on-chain.                          |
-| `A.ots` confirmed + verified | Action's envelope id existed before the declared Bitcoin block.                  |
+| Check clean                  | Guarantee                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `E_BAD_SIG` on D             | Holder of `D.principal.address`'s key at `issued_at` authorized this delegation.                 |
+| `E_REVOKED` absent           | No revocation is in effect now, and none predates the action's signed-at (modulo OTS anchoring). |
+| `E_STALE` absent             | The action was signed within the verifier's bound of now (live verification).                    |
+| `E_BAD_ACTION_STAMP` clean   | Holder of `D.agent.address`'s key at `A.signed_at` authorized this action.                       |
+| `E_SCOPE_DENIED` absent      | The exercised scope is a legal narrowing of a granted scope.                                     |
+| `E_BOND_UNVERIFIED` absent   | The principal's declared bond is still staked on-chain.                                          |
+| `A.ots` confirmed + verified | Action's envelope id existed before the declared Bitcoin block.                                  |
 
 ## What OC Agent does NOT prove
 
@@ -49,21 +50,22 @@ establishes:
 
 ## Threat model (summary)
 
-| #   | Threat                       | Mitigation                                                                    |
-| --- | ---------------------------- | ----------------------------------------------------------------------------- |
-| T1  | Forged delegation            | BIP-322 under principal's key                                                 |
-| T2  | Forged agent-action          | BIP-322 under agent's key                                                     |
-| T3  | Scope escalation             | Deterministic sub-scope algorithm                                             |
-| T4  | Wrong-agent action           | `agent.address` ↔ `signer.address` equality check                             |
-| T5  | Replay after expiry          | Action `signed_at` must be in `[issued_at, expires_at)`                       |
-| T6  | Replay across delegations    | `delegation_id` is a hash; unique per delegation                              |
-| T7  | Revocation censorship        | Publish to ≥3 diverse relays; absence counts only from the relays that answer |
-| T8  | Revocation forgery           | BIP-322 under principal (or agent-if-authorized)                              |
-| T9  | Priority manipulation        | OTS anchoring of actions and revocations                                      |
-| T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                         |
-| T11 | Unregistered scope confusion | Strict mode rejects unknown; permissive never inflates to wildcard            |
-| T12 | Scope-key confusion          | Strict mode rejects unknown keys; permissive ignores as constraint            |
-| T13 | Malicious relay              | Authenticity is BIP-322 in envelope; relays cannot forge                      |
+| #   | Threat                       | Mitigation                                                                                                                |
+| --- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| T1  | Forged delegation            | BIP-322 under principal's key                                                                                             |
+| T2  | Forged agent-action          | BIP-322 under agent's key                                                                                                 |
+| T3  | Scope escalation             | Deterministic sub-scope algorithm                                                                                         |
+| T4  | Wrong-agent action           | `agent.address` ↔ `signer.address` equality check                                                                         |
+| T5  | Use after expiry             | Live verification checks the delegation at now, whatever `signed_at` says                                                 |
+| T6  | Replay across delegations    | `delegation_id` is a hash; unique per delegation                                                                          |
+| T7  | Revocation censorship        | Publish to ≥3 diverse relays; absence counts only from the relays that answer                                             |
+| T8  | Revocation forgery           | BIP-322 under principal (or agent-if-authorized)                                                                          |
+| T9  | Priority manipulation        | Live: a revocation in effect refuses every action, and `signed_at` is bound to the verifier's clock. Audit: OTS anchoring |
+| T9a | Repeated action              | A verifier that acts on actions acts on each action id once                                                               |
+| T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                                                                     |
+| T11 | Unregistered scope confusion | Strict mode rejects unknown; permissive never inflates to wildcard                                                        |
+| T12 | Scope-key confusion          | Strict mode rejects unknown keys; permissive ignores as constraint                                                        |
+| T13 | Malicious relay              | Authenticity is BIP-322 in envelope; relays cannot forge                                                                  |
 
 ## Trust assumptions
 
@@ -90,7 +92,10 @@ Compliant implementations MUST:
    (without widening) in permissive mode.
 5. Compute the sub-scope relation deterministically.
 6. Cross-reference `A.delegation_id` with `D.id`, `A.signer.address` with
-   `D.agent.address`, `A.signed_at` with `D`'s window.
+   `D.agent.address`, `A.signed_at` with `D`'s window. When the result decides
+   whether to act, verify live: the delegation and every link at now,
+   `signed_at` within the verifier's bound of its clock, and each action id used
+   once.
 7. Query revocation feeds (kind 30085, `#t` with the cited `delegation_id`)
    unless the caller opts out. A relay that rejected the query, closed it or
    timed out has not answered; if none answered, revocation is unchecked, not
@@ -114,8 +119,9 @@ Private security advisory on
 
 ## Known limitations
 
-v1 explicitly defers: sub-delegation (agent-to-agent), on-chain bond slashing,
-privacy-preserving encrypted scopes with public verifiability, multi-principal
-joint delegations, per-action bond increments, and post-quantum hybrid
-signatures. Each is a spec-level addition that composes with v1 rather than
-breaking it.
+v1 explicitly defers: on-chain bond slashing, privacy-preserving encrypted
+scopes with public verifiability, multi-principal joint delegations, per-action
+bond increments, and post-quantum hybrid signatures. Sub-delegation shipped in
+v1.1 ([sub-delegation](/agent/sub-delegation)) and encrypted scopes for named
+recipients in v1.2 ([private scope](/agent/private-scope)). Each is a spec-level
+addition that composes with v1 rather than breaking it.

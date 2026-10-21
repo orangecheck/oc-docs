@@ -30,7 +30,9 @@ value           := quoted-string | bare-token
 ```
 
 No whitespace is permitted inside a scope string. `*` is the wildcard op and
-takes no value.
+takes no value. A bare token is made of `A-Z a-z 0-9 _ . : / @ + -`; any other
+character, such as `?`, `%` or `~`, needs a quoted string:
+`mcp:invoke(server="https://example.com/mcp?v=2",tool=search)`.
 
 ## MVP scope registry
 

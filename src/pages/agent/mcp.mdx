@@ -1,0 +1,160 @@
+export const metadata = {
+    title: 'MCP servers — OC Agent',
+    description:
+        'Sign each MCP tool call as an OC Agent action, send it with the request, and check it on the server before the tool runs.',
+};
+
+# MCP servers
+
+An MCP client sends `tools/call` requests to an MCP server. With OC Agent, each
+call carries an action the agent signed under a delegation from a Bitcoin
+address, and the server checks it before it runs the tool. This page is the
+whole loop: the grant, the client, the server.
+
+## The grant
+
+The principal grants one scope per tool:
+
+```
+mcp:invoke(server=https://example.com/mcp,tool=search)
+mcp:invoke(server=https://example.com/mcp,tool=save_note)
+```
+
+- `server` is the endpoint URL the client calls, exactly. It is compared byte
+  for byte: case, path and a trailing slash all count, and only surrounding
+  whitespace is trimmed. A URL with `?`, `%` or `~` needs a quoted value
+  ([scope grammar](/agent/scopes)).
+- A grant without `tool` admits every tool on that server.
+- `max_invocations` is a number the agent declares in its own exercised scope.
+  Nothing counts calls; a server that wants a limit counts them itself. A grant
+  that carries it refuses an exercised scope that does not, which includes the
+  default one `stampInvocation` builds.
+
+Issue the delegation in code ([quickstart](/agent/quickstart)) or at
+[agent.ochk.io/app/compose/delegation](https://agent.ochk.io/app/compose/delegation).
+Register it with the server when you set the client up: the action names it by
+`delegation_id`.
+
+## The client
+
+```ts
+import { ACTION_META_KEY, invokeWithStamp } from '@orangecheck/agent-mcp';
+import { signMessage } from '@orangecheck/bip322';
+
+const agent = {
+    address: AGENT_ADDRESS,
+    signMessage: async (msg: string) =>
+        signMessage(AGENT_ADDRESS, msg, AGENT_PRIVATE_KEY),
+};
+
+const { result } = await invokeWithStamp({
+    agent,
+    delegation,
+    invocation: {
+        server: 'https://example.com/mcp',
+        tool: 'search',
+        arguments: { q: 'bitcoin' },
+    },
+    // Stamped first; the action rides in the request.
+    call: (inv, action) =>
+        mcp.request('tools/call', {
+            name: inv.tool,
+            arguments: inv.arguments,
+            _meta: { [ACTION_META_KEY]: action },
+        }),
+});
+```
+
+- The action goes in `params._meta["io.ochk/agent-action"]` (`ACTION_META_KEY`).
+  MCP reserves `_meta` for metadata and allows prefixed keys there, so a server
+  that does not check actions ignores it.
+- The action's content is the SHA-256 of the RFC 8785 JSON
+  `{"arguments":…,"server":…,"tool":…}` followed by one LF, with mime
+  `application/vnd.oc-agent.mcp-invocation+json`. `canonicalizeInvocation`
+  builds those bytes.
+- An off-the-shelf client (Claude Desktop, Cursor) signs nothing itself. Run a
+  small local MCP server between it and the remote one: it holds the agent key,
+  forwards every message, and stamps each `tools/call` as above.
+
+## The server
+
+Check the action after parsing the request and before calling the tool:
+
+```ts
+import {
+    createReplayGuard,
+    isSubScope,
+    parseScope,
+    verifyAction,
+} from '@orangecheck/agent-core';
+import {
+    ACTION_META_KEY,
+    canonicalizeInvocation,
+} from '@orangecheck/agent-mcp';
+import { verifySignature } from '@orangecheck/bip322';
+
+const seen = createReplayGuard(); // one process; across instances, the same record in a shared store
+
+async function admit(params) {
+    const action = params._meta?.[ACTION_META_KEY];
+    const delegation = registered.get(action?.delegation_id);
+    if (!action || !delegation) return 'unsigned';
+
+    // Kind 30085 with "#t": [delegation.id]. Only a relay that answered counts.
+    const { answered, revocations } = await lookUpRevocations(delegation.id);
+    if (!answered) return 'unchecked'; // never "not revoked"
+
+    const r = await verifyAction({
+        action,
+        delegation,
+        revocations,
+        verifyBip322: async (m, s, a) => verifySignature(a, m, s),
+        content: canonicalizeInvocation({
+            server: ENDPOINT,
+            tool: params.name,
+            arguments: params.arguments,
+        }),
+    });
+    if (!r.ok) return r.code;
+
+    const here = parseScope(
+        `mcp:invoke(server=${ENDPOINT},tool=${params.name})`
+    );
+    if (!isSubScope(parseScope(action.scope_exercised), here))
+        return 'E_SCOPE_DENIED';
+
+    if (!seen.firstUse(action)) return 'already used';
+    return 'ok';
+}
+```
+
+What each check stops:
+
+| Check                                | Refuses                                                                                                                                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `verifyAction` (live)                | A delegation not in force now (`E_EXPIRED`), a revocation in effect now (`E_REVOKED`), `signed_at` more than 120 seconds from your clock (`E_STALE`), a bad signature, a scope outside the grant |
+| `content`                            | An action stamped over other arguments, another tool or another server (`E_BAD_ACTION_STAMP`)                                                                                                    |
+| Scope pinned to this server and tool | Authority granted for another tool or server, spent here                                                                                                                                         |
+| `createReplayGuard`                  | The same signed call sent twice                                                                                                                                                                  |
+| No relay answered                    | A call whose revocation status is unknown                                                                                                                                                        |
+
+The relays the family reads and publishes to are listed on
+[relay infrastructure](/infrastructure/relay). A clear result may be cached for
+a short time, a minute for example, and only when at least one relay answered
+and each one that answered was read to the end.
+
+## Checking calls later
+
+A log of past calls is an audit. `verifyActionAsOfSignedAt` checks each action
+as of its own `signed_at` and says, in `asOf.anchored`, whether that time is
+fixed by a verified OTS anchor or is only the agent's claim. The command line
+does the same with
+`npx @orangecheck/agent-cli verify pair.json --as-of-signed-at --revocations revs.json`,
+where `pair.json` is `[delegation, action]`; it does not check the content
+binding, which needs the invocation.
+
+A working pair to fork:
+[`mcp-wrap`](https://github.com/orangecheck/oc-agent-examples/tree/main/mcp-wrap)
+(client) and
+[`verifying-mcp-server`](https://github.com/orangecheck/oc-agent-examples/tree/main/verifying-mcp-server)
+(server).

@@ -187,8 +187,9 @@ live signal, not a stored number.
 
 Any downstream transport gets a companion authority artifact:
 
-- **MCP**: an `agent-action(kind=30084)` stamping the tool-invocation arguments
-  as content.
+- **MCP**: an `agent-action(kind=30084)` whose content is the canonical tool
+  invocation (server, tool and arguments), sent with the request so the server
+  checks it before running the tool. See [MCP servers](/agent/mcp).
 - **Nostr posts**: a companion kind-30084 event linked to the underlying kind-1
   post id.
 - **Lightning**: a stamp whose content is the payment hash.

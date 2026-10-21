@@ -25,8 +25,10 @@ Optional:
 ## 1. Delegate
 
 The principal creates a delegation. `signMessage` is any function that returns a
-BIP-322 base64 signature of the given string (in a browser,
-`@orangecheck/wallet-adapter` provides one).
+BIP-322 base64 signature of the given string. In a browser,
+`@orangecheck/wallet-adapter` gets one from the person's wallet. With no wallet,
+[agent.ochk.io/app/compose/delegation](https://agent.ochk.io/app/compose/delegation)
+issues one in the page.
 
 ```ts
 import { createDelegation } from '@orangecheck/agent-signer';
@@ -59,12 +61,16 @@ The agent produces an action envelope citing the delegation.
 
 ```ts
 import { signAsAgent } from '@orangecheck/agent-signer';
+import { signMessage } from '@orangecheck/bip322';
 
 const content = new TextEncoder().encode('hello world');
+
+// The agent's own key, held where the agent runs (P2WPKH or single-key P2TR).
 const action = await signAsAgent({
     agent: {
         address: 'bc1qagent…',
-        signMessage: async (msg: string) => agentKey.signBip322(msg),
+        signMessage: async (msg: string) =>
+            signMessage('bc1qagent…', msg, agentPrivateKey),
     },
     delegation,
     content,
@@ -84,13 +90,18 @@ Every action is:
 ## 3. Verify
 
 Any counterparty — auditor, recipient, the principal themselves — runs the
-verification algorithm offline.
+verification algorithm offline. `verifyAction` is the live check, for deciding
+whether to act on the action now: the delegation must be in force now, a
+revocation already in effect refuses it, and `signed_at` must be within 120
+seconds of your clock (`E_STALE` otherwise; set `maxSkewMs` to change it).
 
 ```ts
 import type { RevocationEnvelope } from '@orangecheck/agent-core';
 
-import { verifyAction } from '@orangecheck/agent-core';
+import { createReplayGuard, verifyAction } from '@orangecheck/agent-core';
 import { verifySignature } from '@orangecheck/bip322';
+
+const seen = createReplayGuard(); // one per process; several instances share a store instead
 
 // The revocations published for this delegation (step 4): query your relays
 // for { kinds: [30085], '#t': [delegation.id] } and keep each envelope whose
@@ -106,7 +117,11 @@ const result = await verifyAction({
     verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
 });
 
-if (!result.ok) {
+// verifyAction keeps no state, so stop a second use of the same action yourself.
+// createReplayGuard remembers ids for as long as they could pass the 120 s bound.
+if (result.ok && !seen.firstUse(action)) {
+    console.log('REJECTED: this action was already used');
+} else if (!result.ok) {
     console.log(`REJECTED: ${result.code} — ${result.message}`);
 } else {
     console.log(
@@ -119,7 +134,13 @@ if (!result.ok) {
 
 `revocations` is required. Leave it out and `verifyAction` returns
 `E_MALFORMED`, unless you pass `skipRevocationCheck: true` to say you are not
-checking revocation at all. `verifyDelegation` has the same rule.
+checking revocation at all. `verifyDelegation` has the same rule. If no relay
+answered, you have not checked: refuse rather than act.
+
+Reading a log of past actions is an audit, not a live check. Use
+`verifyActionAsOfSignedAt`: it checks each action as of its own `signed_at`, and
+its result's `asOf.anchored` says whether that time is fixed by a verified OTS
+anchor or is only the agent's claim. Never use it to decide whether to act.
 
 ## 4. Revoke (optional)
 
@@ -153,9 +174,11 @@ await nostr.publish({
 });
 ```
 
-A verifier passing `revocations: [rev]` to `verifyAction()` will compare its
-effective time (OTS anchor if present, else `signed_at`) against the action's
-and return `E_REVOKED` if the revocation took effect no later than the action.
+A verifier passing `revocations: [rev]` to `verifyAction()` returns `E_REVOKED`
+for every action from the moment the revocation is in effect. An audit with
+`verifyActionAsOfSignedAt()` compares the two times instead: the revocation's
+effective time (a verified OTS anchor if present, else `signed_at`) against the
+action's.
 
 ## From the shell
 
@@ -163,19 +186,27 @@ The CLI mirrors the library for ops work and CI:
 
 ```bash
 npx @orangecheck/agent-cli verify delegation.json
+npx @orangecheck/agent-cli verify pair.json --revocations revs.json   # pair.json: [delegation, action]
+npx @orangecheck/agent-cli verify pair.json --as-of-signed-at         # audit a past action
 npx @orangecheck/agent-cli inspect action.json
 npx @orangecheck/agent-cli canonical revocation.json
 npx @orangecheck/agent-cli scope 'ln:send(max_sats<=1000,node=03abc)'
 npx @orangecheck/agent-cli subscope 'ln:send(max_sats<=1000)' 'ln:send(max_sats=500)'
 ```
 
-Exit codes: `0` = verified / admitted, `1` = any rejection. Every command has
-`--json` for script-friendly output.
+`verify` takes a file: one envelope, or an array `[delegation, action]` or
+`[delegation, revocation]`. It has no relay access, so it checks revocation only
+against the JSON array you pass with `--revocations`, and says so when you pass
+none. An action is checked live, as of now; `--as-of-signed-at` audits it as of
+its own `signed_at`. Exit codes: `0` = verified / admitted, `1` = any rejection.
+`verify`, `inspect`, `scope` and `subscope` take `--json`.
 
 ## Next steps
 
 - Learn the [scope grammar](/agent/scopes) — what the registered scopes express,
   how sub-scope containment works, how to write constraints.
+- An MCP server? [MCP servers](/agent/mcp) — where the action rides in the
+  request, and what to check before running the tool.
 - Try the live [playground](https://agent.ochk.io/playground) — the same
   library, in your browser.
 - Read the [protocol walkthrough](/agent/protocol) for a diagram-first view of

@@ -37,7 +37,7 @@ And optionally, with an Attest reference:
 - **CI / release pipelines** that sign artifacts, stamps, or envelopes on a
   principal's behalf without handing the pipeline the Bitcoin key.
 - **Autonomous trading / LN routing bots** that need a hard ceiling on blast
-  radius — `max_sats<=N`, `recipient in {…}`, `max_actions_per_minute<=M`.
+  radius — `ln:send(max_sats<=N,node=…)`, one grant per payee node.
 - **Social / Nostr bots** that post under a human's identity on a revocable,
   scoped leash.
 - **LLM agents** signing calls to downstream tools where the operator wants a
@@ -47,9 +47,9 @@ And optionally, with an Attest reference:
 
 - **Transferring the principal's Bitcoin key.** The principal's key never leaves
   their wallet. The agent holds only the delegation record and its own keypair.
-- **Transitive re-delegation.** An agent cannot issue sub-delegations in v0. If
-  you need an agent to delegate further, re-mint a delegation from the principal
-  that targets the sub-agent.
+- **Unbounded re-delegation.** An agent can
+  [sub-delegate](/agent/sub-delegation) only a narrower scope for a window
+  inside its own, and verifiers cap the chain (five links by default).
 - **Replacing centralized IAM.** OAuth + role-based access is fine when there's
   a central operator. OC Agent is the answer when the identity root is a Bitcoin
   address, not an issuer.
@@ -109,10 +109,14 @@ Agent inherits the same plumbing every orangecheck protocol uses:
   [`oc-agent-protocol/SPEC.md`](https://github.com/orangecheck/oc-agent-protocol)
 - Reference impls: `@orangecheck/agent-core`, `agent-signer`, `agent-cli`,
   `agent-mcp` in [`oc-packages`](https://github.com/orangecheck/oc-packages)
-- Reference site: [`agent.ochk.io`](https://agent.ochk.io) — sign delegations at
-  [/app](https://agent.ochk.io/app), consume them as the agent at
-  [/agent](https://agent.ochk.io/agent), verify any envelope at
-  [/inspect](https://agent.ochk.io/inspect).
+- Reference site: [`agent.ochk.io`](https://agent.ochk.io/app) — issue a
+  delegation at
+  [/app/compose/delegation](https://agent.ochk.io/app/compose/delegation),
+  revoke one at
+  [/app/compose/revocation](https://agent.ochk.io/app/compose/revocation), use
+  one as the agent at
+  [/app/compose/import](https://agent.ochk.io/app/compose/import), and verify
+  any envelope at [/app/inspect](https://agent.ochk.io/app/inspect).
 - Worked integrations:
   [`oc-agent-examples`](https://github.com/orangecheck/oc-agent-examples) — a
   fork-ready `mcp-wrap` CLI (client side) and `verifying-mcp-server` (server

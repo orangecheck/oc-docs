@@ -393,6 +393,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Scope tokens that never appear in the wire envelope; verifier resolves locally.',
             },
             {
+                href: '/agent/mcp',
+                label: 'MCP servers',
+                blurb: 'Where the action rides in a tool call, and what a server checks before it runs the tool.',
+            },
+            {
                 href: '/agent/sub-delegation',
                 label: 'Sub-delegation (v1.1)',
                 blurb: 'Agents that delegate to other agents — additive extension on kind 30086.',

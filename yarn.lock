@@ -857,17 +857,10 @@
   resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.3.2.tgz#f6ff18e38845d4c573879db198fae81e1056a619"
   integrity sha512-Ladr5yenggudQ9/lgWX5sw4Yu3A4iOB1zKaZU4FKkDzu/YR/YGi2gZImV35/v75cxm6UR5dtwh+puKmMnwz+8w==
 
-"@orangecheck/wallet-adapter@^0.5.0":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.5.2.tgz#880f715d96ec8963386aaabf793779ee0eb83ea8"
-  integrity sha512-N5utXDkfWv0cjYZSSWltLDnUvfYdXiqU1YNYCwyNKTB97EHjr2J2eXU6NSdqx0YgE30HhVW2zzvF8g8lzK8TSg==
-  dependencies:
-    "@orangecheck/bip322" "^1.0.0"
-
-"@orangecheck/wallet-adapter@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.6.0.tgz#8de824d6f4f840bac93950ba67480a49a8551865"
-  integrity sha512-7nahIxpflohVvfuJ1iC9VKyHhIcyX+onzzvTM4gr1o97Au6Fo7Vv7/HJR6QvCV7nqW+yfCOiIaxhmjcGdWo6oA==
+"@orangecheck/wallet-adapter@^0.6.0", "@orangecheck/wallet-adapter@^0.6.5":
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.6.5.tgz#7d2383f529353e8500f2ceb3a4ddaa4f56ae553a"
+  integrity sha512-dg1aUkpupdOWAtYRITGqHRtjMNSiLMWJqRBlak27TPHQnxU/09GJueq6roxOIGlzfIhJta4Tvpjtq3ftv3qdKQ==
   dependencies:
     "@orangecheck/bip322" "^1.0.0"
 

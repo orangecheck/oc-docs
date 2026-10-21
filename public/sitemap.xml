@@ -274,11 +274,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/api</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/custody</loc>
@@ -286,7 +286,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/drops</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/federation</loc>
@@ -294,15 +294,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/glossary</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/integrations</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator/charter</loc>
@@ -310,15 +310,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator/in-browser</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/operator/runbook</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/paying-users</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/quickstart</loc>
@@ -334,7 +334,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/webhooks</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge</loc>
@@ -1090,7 +1090,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcSignIn</loc>
-    <lastmod>2026-10-20</lastmod>
+    <lastmod>2026-10-21</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcSignInButton</loc>

@@ -44,6 +44,13 @@ by address and **verify the binding offline** — no server is trusted. A new
 device is authorized by a fresh BIP-322 signature from your primary wallet over
 a link statement naming the new `device_pk`.
 
+A device registered with your orangecheck sign-in is a **session device**:
+ochk.io vouches that its key belongs to your identity, so others see your
+messages "via ochk.io". Bind a Bitcoin address to it in Settings → Identity, and
+once that binding reaches their relays your messages read **"verified · your
+address"**: the link from the address to the device key is BIP-322 and checks
+offline. ([Session devices](/chat/spec#session-devices-86).)
+
 ### 2. Discovery — fetch a device key by address
 
 To message someone you know, you type their Bitcoin address; the client fetches

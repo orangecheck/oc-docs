@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'Specification · OC Chat',
     description:
-        'The normative OC Chat v0 specification reference: envelope kinds, the recipient-exclusion content-addressing rule, the three send modes, threading, postage, the seal, transport, the directory, channels, the full error-code table, the Nostr kind registry (30110–30115), and the compliance checklist.',
+        'The normative OC Chat v0 specification reference: envelope kinds, the recipient-exclusion content-addressing rule, the three send modes, threading, postage, the seal, transport, the directory, channels, the full error-code table, the Nostr kind registry (30110–30115), session devices and their step-up to a Bitcoin address, and the compliance checklist.',
 };
 
 # Specification
@@ -147,6 +147,25 @@ forward-effective tombstone. Private channels (§8.3.7) are reserved behind the
 same descriptor. Source-intake (§8.5) is a composition. Detail:
 [Channels](/chat/channels).
 
+## Session devices (§8.6)
+
+A `did:oc` identity (the ochk.io session bridge) publishes a kind-30078
+**session device record**, bound to its `did:oc` only by the ochk.io auth host's
+**vouch**, the named trust anchor. That bind is not offline-verifiable, so a
+receiver renders the device's messages as **session** ("via ochk.io").
+
+**Stepping up.** The same device key may also be bound to a Bitcoin address by
+an OC Lock device record it publishes (BIP-322 over a v3 statement that signs
+the key). A receiver looks up the kind-30078 records the signing key published
+and resolves each address as it resolves any address: the BIP-322 signature
+verifies, the record binds the key, and no revocation retires it. When one
+resolves, the message reads **"verified · `address`"**; otherwise it stays
+session. The sender is still the `did:oc`, and ochk.io is still its trust
+anchor; the step-up adds only the offline-verifiable link from the address to
+the key. An address merely linked to the account, or bound to a different key,
+never steps a message up. Vector `vc18`. Normative text:
+[SPEC §8.6](https://github.com/orangecheck/oc-chat-protocol/blob/main/SPEC.md#86-session-devices-didoc--normative).
+
 ## Errors (§9)
 
 In addition to [OC Lock §6 codes](/lock/spec):
@@ -229,6 +248,10 @@ A client is OC Chat v0 compliant iff it:
 - If it offers a named-Fedimint postage fallback: surfaces the federation as a
   named custodian, lets the sender decline, keeps OC out of custody, and gates
   on a money-transmitter analysis.
+- If it accepts `did:oc` session devices: binds a session record only through a
+  vouch that verifies against the ochk.io JWKS, renders it as session, and steps
+  a message up to "verified · `address`" only when the signing key resolves to
+  that address (`vc18`).
 - Emits the §9 + OC Lock §6 error codes.
 
 ## Source documents

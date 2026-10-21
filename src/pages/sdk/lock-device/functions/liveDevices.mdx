@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: liveDevices()",
+    description: "Auto-generated API reference for Function: liveDevices(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / liveDevices
+
+# Function: liveDevices()
+
+```ts
+function liveDevices(records: readonly ParsedDeviceEvent[]): ParsedDeviceEvent[];
+```
+
+Defined in: [live.ts:26](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/live.ts#L26)
+
+The bind records still live after revocations.
+
+`records` MUST already be BIP-322-verified, both binds and revocations: a
+revocation's authority is the address's signature, so one that was not
+verified must not be passed in. A revocation retires every bind of its
+`(address, device_id)` whose signed `created_at` is not later than its signed
+`revoked_at`, whichever Nostr key carried either record and whichever relay
+served it. Relay replacement is not needed, so a lost device can be revoked
+from another device or the wallet, and a relay that missed the revocation
+cannot keep the device alive. A bind signed after the revocation stays live.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `records` | readonly [`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[] |
+
+## Returns
+
+[`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[]

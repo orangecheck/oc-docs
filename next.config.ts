@@ -154,7 +154,7 @@ const nextConfig: NextConfig = {
             {
                 source: '/oc-insights.js',
                 destination:
-                    'https://plausible.io/js/script.hash.outbound-links.pageview-props.tagged-events.js',
+                    'https://plausible.io/js/script.outbound-links.pageview-props.tagged-events.js',
             },
             { source: '/oc-insights/event', destination: 'https://plausible.io/api/event' },
         ];

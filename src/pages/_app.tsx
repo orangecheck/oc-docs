@@ -4,6 +4,7 @@ import type { AppProps } from 'next/app';
 import { MDXProvider } from '@mdx-js/react';
 import { TooltipProvider } from '@orangecheck/app-design/primitives';
 import { OcSessionProvider } from '@orangecheck/auth-client';
+import { useFamilyPageviews } from '@orangecheck/site-kit/analytics';
 import { ThemeProvider } from 'next-themes';
 
 import { DocsFrame } from '@/components/docs/DocsFrame';
@@ -17,6 +18,8 @@ import '@/styles/globals.css';
 type DocsPage = NextPage & { bare?: boolean };
 
 export default function App({ Component, pageProps, router }: AppProps) {
+    // One pageview per page, reported as origin and path only.
+    useFamilyPageviews();
     const path = (router.asPath.split(/[?#]/)[0] ?? '/') || '/';
     const docsMeta = findDocsMeta(path);
     const isRoot = path === '/';

@@ -852,6 +852,11 @@
     "@noble/hashes" "^1.8.0"
     "@scure/base" "^1.2.6"
 
+"@orangecheck/site-kit@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.3.0.tgz#c713709e30e9f675aa4f8112467381015526040e"
+  integrity sha512-22j9PBE3MjHOb1sO7qVVuoS0BKjR0hEdErkHKqn9O7bo53D400vOdt6qfyHEUUCFkra7ogWEkp6/hjwikzmD8w==
+
 "@orangecheck/wallet-adapter@^0.5.0":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.5.2.tgz#880f715d96ec8963386aaabf793779ee0eb83ea8"

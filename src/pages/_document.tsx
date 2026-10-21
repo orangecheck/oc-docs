@@ -1,30 +1,12 @@
+import { FamilyAnalytics } from '@orangecheck/site-kit/analytics';
 import { Head, Html, Main, NextScript } from 'next/document';
 
 import { SITE_CONFIG } from '@/lib/site.config';
 
-// Plausible analytics — privacy-first, no cookies, GDPR-clean. Every
-// site in the family reports under one Plausible property
-// (`data-domain="ochk.io"`); the actual hostname and path (`ochk.io/docs`,
-// `lock.ochk.io`, ...) are captured by Plausible's standard event payload
-// so per-subdomain breakdowns are a dashboard filter away. Override the
-// site rollup target via NEXT_PUBLIC_PLAUSIBLE_DOMAIN if a deploy needs
-// to report somewhere else (e.g. a separate property).
-const DOMAIN_RE = /^[a-z0-9][a-z0-9.-]{0,253}$/i;
-const SAFE_URL_RE = /^https:\/\/[a-z0-9.-]+(:\d+)?(\/[\w./+%@~,!$&'()*-]*)?$/i;
-// First-party proxy paths (rewritten to plausible.io in next.config) are
-// what keep the script off ad-blocker blocklists. Raw paths in this file do
-// not get basePath, so it is added by hand here and on the favicons.
+// Raw paths in this file do not get basePath, so it is added by hand here
+// and on the favicons. Analytics post to the first-party proxy under it.
 const BASE = SITE_CONFIG.basePath;
-const SAFE_PATH_RE = /^\/[\w./-]*$/;
-const RAW_PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'ochk.io';
-const RAW_PLAUSIBLE_SRC = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC ?? `${BASE}/oc-insights.js`;
-const RAW_PLAUSIBLE_API = process.env.NEXT_PUBLIC_PLAUSIBLE_API ?? `${BASE}/oc-insights/event`;
-const PLAUSIBLE_DOMAIN = DOMAIN_RE.test(RAW_PLAUSIBLE_DOMAIN) ? RAW_PLAUSIBLE_DOMAIN : '';
-const isSafeRef = (v: string) => SAFE_URL_RE.test(v) || SAFE_PATH_RE.test(v);
-const PLAUSIBLE_SRC = isSafeRef(RAW_PLAUSIBLE_SRC) ? RAW_PLAUSIBLE_SRC : '';
-const PLAUSIBLE_API = isSafeRef(RAW_PLAUSIBLE_API) ? RAW_PLAUSIBLE_API : '';
-const ANALYTICS_ENABLED =
-    process.env.NODE_ENV === 'production' && Boolean(PLAUSIBLE_DOMAIN) && Boolean(PLAUSIBLE_SRC);
+const PLAUSIBLE_API = process.env.NEXT_PUBLIC_PLAUSIBLE_API ?? `${BASE}/oc-insights/event`;
 
 export default function Document() {
     return (
@@ -60,26 +42,9 @@ export default function Document() {
                 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
                 <meta name="color-scheme" content="light dark" />
 
-                {ANALYTICS_ENABLED && (
-                    <script
-                        dangerouslySetInnerHTML={{
-                            __html: `
-                                window.plausible = window.plausible || function() {
-                                    (window.plausible.q = window.plausible.q || []).push(arguments)
-                                };
-                                (function() {
-                                    var script = document.createElement('script');
-                                    script.defer = true;
-                                    script.dataset.domain = ${JSON.stringify(PLAUSIBLE_DOMAIN)};
-                                    if (${JSON.stringify(PLAUSIBLE_API)}) script.dataset.api = ${JSON.stringify(PLAUSIBLE_API)};
-                                    script.src = ${JSON.stringify(PLAUSIBLE_SRC)};
-                                    script.onerror = function() {};
-                                    document.head.appendChild(script);
-                                })();
-                            `,
-                        }}
-                    />
-                )}
+                {/* Plausible, each page reported as origin and path only. The docs
+                    never loaded oc-pulse, and still don't. */}
+                <FamilyAnalytics api={PLAUSIBLE_API} pulseSrc="" />
             </Head>
             <body>
                 <Main />

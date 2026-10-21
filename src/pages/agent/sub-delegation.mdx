@@ -54,8 +54,9 @@ and enforces:
 | Linkage      | `child.parent_id == parent.id` AND `child.principal == parent.agent`              |
 | Scope        | every scope in `child.scopes` is a sub-scope of _some_ scope in `parent.scopes`   |
 | Time         | `child.issued_at >= parent.issued_at` AND `child.expires_at <= parent.expires_at` |
+| In force     | the link is in force at the time of verification (live verification)              |
 | Authenticity | `child` carries a valid BIP-322 signature by `child.principal.address`            |
-| Revocation   | no published revocation against this link predates the action                     |
+| Revocation   | no revocation of this link is in effect, or predates the action                   |
 
 If any check fails at any link, the action fails verification. The leaf-level
 checks (action's signer, window, scope) are run against the leaf subdelegation,
@@ -93,8 +94,10 @@ different verb (and a deferred v2 question).
 Revoking ANY link in the chain invalidates that link AND every descendant. The
 verifier implements this naturally — it queries Nostr kind-30085 for revocations
 targeting every link in the chain (one filter,
-`{ kinds: [30085], '#t': [<root id>, <link 1 id>, …] }`), and any revocation
-predating the action's effective time fires `E_REVOKED`.
+`{ kinds: [30085], '#t': [<root id>, <link 1 id>, …] }`). Live verification
+refuses with `E_REVOKED` when a revocation of any link is in effect at the time
+of verification, or predates the action's effective time. An audit of a past
+action applies only the second test.
 
 If the root principal wants to nuke an entire sub-tree, they revoke the root
 delegation. If a sub-principal wants to disown one branch they created, they
@@ -176,8 +179,9 @@ existing test vectors v01–v09 change verdict under v1.1.**
   — base v1.0 spec.
 - [`@orangecheck/agent-core`](https://github.com/orangecheck/oc-packages/tree/main/agent-core)
   — reference TypeScript impl. `verifyAction({ subdelegationChain: [...] })` is
-  the chain-walking entry point; `verifySubdelegation` is the standalone helper
-  for inspection.
+  the chain-walking entry point, checked as of now; `verifyActionAsOfSignedAt`
+  takes the same chain to audit a past action; `verifySubdelegation` is the
+  standalone helper for inspection.
 - Test vectors `v10`–`v14` in
   [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors).
 - [Errors](/agent/spec) — the four new v1.1 codes (`E_SUBDELEGATION_*`) live

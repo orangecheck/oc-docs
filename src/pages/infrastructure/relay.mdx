@@ -20,26 +20,34 @@ reliability and family-curated indexing — not as a trust anchor.
 ## What it does
 
 It's a [strfry](https://github.com/hoytech/strfry) instance running on Fly.io
-(region `fra`), configured with two non-default policies:
+(region `fra`). strfry has no kind allowlist of its own, so one write-policy
+plugin,
+[`policy/oc-dtag-filter.py`](https://github.com/orangecheck/oc-relay-infra/blob/main/policy/oc-dtag-filter.py),
+decides what it stores. It applies two gates:
 
-1. **Kind allowlist (30078–30086).** Events outside the canonical OC family
-   range are rejected at the C++ ingest layer with
-   `{"reason": "blocked: not an oc family event"}`.
-2. **`d`-tag prefix gate.** Even within the allowed kinds, only events whose `d`
-   tag starts with a canonical OC namespace prefix are accepted. The gate is
-   enforced by a
-   [Deno write-policy plugin](https://github.com/orangecheck/oc-relay-infra/blob/main/policy/oc-dtag-filter.ts):
+1. **Kind allowlist.** Only the family's kinds are accepted: 30078, 30080–30087,
+   and OC Chat's 30110–30112 and 30114. Anything else is rejected with
+   `blocked: kind <n> is not in the oc family allowlist`.
+2. **`d`-tag prefix gate.** Within those kinds, an event is accepted only if its
+   `d` tag starts with one of its kind's namespace prefixes. Anything else is
+   rejected with
+   `blocked: d tag '<d>' is not an oc namespace prefix for kind <n>`.
 
-| kind  | sub-protocol                             | required `d`-tag prefix                                                                |
-| ----- | ---------------------------------------- | -------------------------------------------------------------------------------------- |
-| 30078 | OC Attest / OC Lock / OC Pledge          | `oc-attest:`, `oc-lock:`, `oc-pledge:`, `oc-pledge-outcome:`, `oc-pledge-abandonment:` |
-| 30080 | OC Vote · poll                           | `oc-vote-poll:`                                                                        |
-| 30081 | OC Vote · ballot                         | `oc-vote-ballot:`                                                                      |
-| 30082 | OC Vote · reveal                         | `oc-vote-reveal:`                                                                      |
-| 30083 | OC Stamp · stamp / OC Agent · delegation | `oc-stamp:` or `oc-agent-del:`                                                         |
-| 30084 | OC Agent · action                        | `oc-agent-act:`                                                                        |
-| 30085 | OC Agent · revocation                    | `oc-agent-rev:`                                                                        |
-| 30086 | OC Agent · sub-delegation                | `oc-agent-sub:`                                                                        |
+| kind  | sub-protocol                              | accepted `d` tag                                                                                                                            |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 30078 | OC Attest / OC Lock / OC Pledge / OC Chat | an attestation's bare id (64 lowercase hex), or `oc-lock:`, `oc-pledge:`, `oc-pledge-outcome:`, `oc-pledge-abandonment:`, `oc-chat:device:` |
+| 30080 | OC Vote · poll                            | `oc-vote:poll:`                                                                                                                             |
+| 30081 | OC Vote · ballot                          | `oc-vote:ballot:`                                                                                                                           |
+| 30082 | OC Vote · reveal                          | `oc-vote:reveal:`                                                                                                                           |
+| 30083 | OC Stamp · stamp / OC Agent · delegation  | `oc-stamp:` or `oc-agent-del:`                                                                                                              |
+| 30084 | OC Agent · action                         | `oc-agent-act:`                                                                                                                             |
+| 30085 | OC Agent · revocation                     | `oc-agent-rev:`                                                                                                                             |
+| 30086 | OC Agent · sub-delegation                 | `oc-agent-sub:`                                                                                                                             |
+| 30087 | OC Me (ochk.app)                          | `oc-me-event:`, `oc-me-payment:`, `oc-me-rebind:`, `oc-me-trust:`, `oc-me-payout-binding:`, `oc-me-distribution:`, `oc-me-drop:`            |
+| 30110 | OC Chat · channel descriptor              | `oc-lock-chat-ch:`                                                                                                                          |
+| 30111 | OC Chat · channel post                    | `oc-lock-chat-msg:`                                                                                                                         |
+| 30112 | OC Chat · seal                            | `oc-lock-chat-seal:`                                                                                                                        |
+| 30114 | OC Chat · directory                       | `oc-lock-chat-dir:` or `oc-lock-chat-chdir:`                                                                                                |
 
 Together, those two gates mean **every event served from relay.ochk.io is by
 construction an orangecheck family event**. Spam is structurally impossible

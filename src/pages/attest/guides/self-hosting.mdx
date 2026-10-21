@@ -201,8 +201,8 @@ call.
 
 - **Rate limiting** is in-memory and resets on every cold start — fine for a
   casual deploy, inadequate for a busy one. For production, put
-  [Vercel WAF](https://vercel.com/docs/edge-network/waf), Cloudflare, or a
-  Redis-backed limiter in front. See
+  [Vercel WAF rate limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting),
+  Cloudflare, or a Redis-backed limiter in front. See
   [Security implications](/ecosystem/security#relay-censorship--partition) for
   context.
 - **Session revocation** is a single row in `sessions` — delete it and the JWT

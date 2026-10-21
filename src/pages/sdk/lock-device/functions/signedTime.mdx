@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Function: signedTime()",
+    description: "Auto-generated API reference for Function: signedTime(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / signedTime
+
+# Function: signedTime()
+
+```ts
+function signedTime(statement: string, field: "created_at" | "revoked_at"): number | null;
+```
+
+Defined in: [live.ts:7](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/live.ts#L7)
+
+A timestamp line from a signed device statement, as epoch ms, or null.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `statement` | `string` |
+| `field` | `"created_at"` \| `"revoked_at"` |
+
+## Returns
+
+`number` \| `null`

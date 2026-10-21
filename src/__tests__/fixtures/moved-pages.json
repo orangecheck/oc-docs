@@ -1,0 +1,269 @@
+{
+    "source": "Every docs page this repo ever had that answered 404 on 2026-10-20, and where it lands now (src/lib/moved-pages.ts). Locations are the full address a browser lands on.",
+    "routes": [
+        {
+            "path": "/docs/api",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/api-reference/fleet",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/console",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/console/api",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/console/integrations",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/console/quickstart",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/console/webhooks",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/api",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/bond",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/compliance",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/integrations",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/interop",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/quickstart",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/reputation",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/fleet/webhooks",
+            "location": "https://ochk.io/docs"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/functions/invokeWithStampAndPost",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/functions/postActionToFleet",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/interfaces/FleetClient",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/interfaces/InvokeWithStampAndPostInput",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/interfaces/InvokeWithStampAndPostResult",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-anthropic/interfaces/PostActionResult",
+            "location": "https://ochk.io/docs/sdk/agent-anthropic/README"
+        },
+        {
+            "path": "/docs/sdk/agent-core/functions/canonicalize",
+            "location": "https://ochk.io/docs/sdk/agent-core/variables/canonicalize"
+        },
+        {
+            "path": "/docs/sdk/agent-core/functions/hexEncode",
+            "location": "https://ochk.io/docs/sdk/agent-core/README"
+        },
+        {
+            "path": "/docs/sdk/agent-langgraph/functions/postActionToFleet",
+            "location": "https://ochk.io/docs/sdk/agent-langgraph/README"
+        },
+        {
+            "path": "/docs/sdk/agent-langgraph/interfaces/FleetClient",
+            "location": "https://ochk.io/docs/sdk/agent-langgraph/README"
+        },
+        {
+            "path": "/docs/sdk/agent-langgraph/interfaces/PostActionResult",
+            "location": "https://ochk.io/docs/sdk/agent-langgraph/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/functions/invokeWithStampAndPost",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/functions/postActionToFleet",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/interfaces/FleetClient",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/interfaces/InvokeWithStampAndPostInput",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/interfaces/InvokeWithStampAndPostResult",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-openai/interfaces/PostActionResult",
+            "location": "https://ochk.io/docs/sdk/agent-openai/README"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/canonicalizeScope",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/canonicalizeScope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/canonicalizeScopes",
+            "location": "https://ochk.io/docs/sdk/agent-signer/variables/canonicalizeScopes"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/computeActionId",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/computeActionId"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/computeDelegationId",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/computeDelegationId"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/computeRevocationId",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/computeRevocationId"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/isSubScope",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/isSubScope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/parseScope",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/parseScope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/verifyAction",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/verifyAction"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/verifyDelegation",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/verifyDelegation"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/functions/verifyRevocation",
+            "location": "https://ochk.io/docs/sdk/agent-core/functions/verifyRevocation"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/ActionEnvelope",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/ActionEnvelope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/ActionOts",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/ActionOts"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/DelegationBond",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/DelegationBond"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/DelegationEnvelope",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/DelegationEnvelope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/RevocationEnvelope",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/RevocationEnvelope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/Scope",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/Scope"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/interfaces/ScopeConstraint",
+            "location": "https://ochk.io/docs/sdk/agent-core/interfaces/ScopeConstraint"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/type-aliases/AgentErrorCode",
+            "location": "https://ochk.io/docs/sdk/agent-core/type-aliases/AgentErrorCode"
+        },
+        {
+            "path": "/docs/sdk/agent-signer/variables/REGISTERED_SCOPES",
+            "location": "https://ochk.io/docs/sdk/agent-core/variables/REGISTERED_SCOPES"
+        },
+        {
+            "path": "/docs/sdk/agent-vercel/functions/postActionToFleet",
+            "location": "https://ochk.io/docs/sdk/agent-vercel/README"
+        },
+        {
+            "path": "/docs/sdk/agent-vercel/interfaces/FleetClient",
+            "location": "https://ochk.io/docs/sdk/agent-vercel/README"
+        },
+        {
+            "path": "/docs/sdk/agent-vercel/interfaces/PostActionResult",
+            "location": "https://ochk.io/docs/sdk/agent-vercel/README"
+        },
+        {
+            "path": "/docs/sdk/auth-client/interfaces/OcSignInProps",
+            "location": "https://ochk.io/docs/sdk/auth-client/type-aliases/OcSignInProps"
+        },
+        {
+            "path": "/docs/sdk/me-client/functions/OcSignInButton",
+            "location": "https://ochk.io/docs/sdk/auth-client/functions/OcSignInButton"
+        },
+        {
+            "path": "/docs/sdk/me-client/interfaces/OcSignInButtonProps",
+            "location": "https://ochk.io/docs/sdk/auth-client/interfaces/OcSignInButtonProps"
+        },
+        {
+            "path": "/docs/sdk/react/interfaces/AttestationEnvelope",
+            "location": "https://ochk.io/docs/sdk/react/type-aliases/AttestationEnvelope"
+        },
+        {
+            "path": "/docs/sdk/react/interfaces/CheckResult",
+            "location": "https://ochk.io/docs/sdk/sdk/interfaces/CheckResult"
+        },
+        {
+            "path": "/docs/sdk/react/interfaces/IdentityBinding",
+            "location": "https://ochk.io/docs/sdk/sdk/interfaces/IdentityBinding"
+        },
+        {
+            "path": "/docs/sdk/react/interfaces/Metrics",
+            "location": "https://ochk.io/docs/sdk/sdk/interfaces/Metrics"
+        },
+        {
+            "path": "/docs/sdk/react/interfaces/VerifyOutcome",
+            "location": "https://ochk.io/docs/sdk/sdk/interfaces/VerifyOutcome"
+        },
+        {
+            "path": "/docs/sdk/react/type-aliases/Network",
+            "location": "https://ochk.io/docs/sdk/sdk/type-aliases/Network"
+        },
+        {
+            "path": "/docs/sdk/react/type-aliases/Scheme",
+            "location": "https://ochk.io/docs/sdk/sdk/type-aliases/Scheme"
+        },
+        {
+            "path": "/docs/sdk/react/type-aliases/ScoringAlgorithm",
+            "location": "https://ochk.io/docs/sdk/sdk/type-aliases/ScoringAlgorithm"
+        }
+    ]
+}

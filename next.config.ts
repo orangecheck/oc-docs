@@ -7,6 +7,7 @@ import createMDX from '@next/mdx';
 import { rehypeCode } from '@orangecheck/app-design/code';
 import rehypeSlug from 'rehype-slug';
 
+import { MOVED_PAGES } from './src/lib/moved-pages';
 import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
 import rehypeTypedoc from './src/lib/rehype-typedoc.mjs';
 import { SITE_CONFIG } from './src/lib/site.config';
@@ -93,6 +94,12 @@ const nextConfig: NextConfig = {
                 basePath: false,
                 permanent: true,
             },
+            // Pages that are gone, sent where their content lives now.
+            ...Object.entries(MOVED_PAGES).map(([source, destination]) => ({
+                source,
+                destination,
+                permanent: true,
+            })),
             ...SDK_PACKAGES.map((pkg) => ({
                 source: `/sdk/${pkg}`,
                 destination: `/sdk/${pkg}/README`,

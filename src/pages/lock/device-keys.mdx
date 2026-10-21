@@ -103,7 +103,9 @@ the envelope for every device it finds. Each device can independently decrypt.
 
 ## Revocation
 
-Publish a revocation event:
+The address signs a revocation statement, and any Nostr key may publish it. You
+do not need the old device or its key, so this works for a lost or stolen
+device:
 
 ```ts
 import {
@@ -120,10 +122,10 @@ const revocation = buildRevocationStatement({
 
 const sig = await walletSignBIP322(revocation);
 
-// Same d tag, signed by the old device's key, so it replaces that device's record.
+// A one-off key carries it. The authority is the wallet's signature, not the key.
 await publishEvent(
     finalizeDeviceEvent({
-        deviceSk: oldDeviceSk,
+        deviceSk: crypto.getRandomValues(new Uint8Array(32)),
         address: 'bc1qbob...',
         device_id: oldDeviceId,
         device_pk: 'revoked',
@@ -133,13 +135,16 @@ await publishEvent(
 );
 ```
 
-A recipient finding both a binding and a revocation for the same (address,
-device_id) pair MUST treat the device as revoked and refuse to use that
-device_pk for future envelopes.
+A sender resolving the address collects the records from every relay it queried,
+drops any whose `binding_sig` does not verify, and seals only to binds that no
+revocation retires. A revocation of `(address, device_id)` retires each bind of
+that pair whose signed `created_at` is at or before its signed `revoked_at`,
+whichever key carried either record. `liveDevices` from
+`@orangecheck/lock-device` applies the rule ([spec §3.5](/lock/spec)).
 
-**Limitation:** Nostr doesn't guarantee all relays have seen the revocation. For
-anything high-stakes, query multiple relays for the most recent event and
-fail-closed if any relay disagrees.
+A revocation one relay holds retires the bind another relay still serves, so a
+sender that reads several relays needs only one of them to have it. A sender
+that reads none of the relays holding it keeps sealing to the device.
 
 ## Rotation
 

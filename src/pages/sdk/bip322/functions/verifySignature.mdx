@@ -18,12 +18,13 @@ function verifySignature(
    signatureBase64: string): boolean;
 ```
 
-Defined in: [index.ts:322](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L322)
+Defined in: [index.ts:327](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L327)
 
 Whether `signatureBase64` signs `message` for `address`: a BIP-322 simple
-signature from a P2WPKH, P2SH-P2WPKH or single-key P2TR address, or a
-legacy BIP-137 signature (always, for a P2PKH address). Never throws;
-anything malformed is simply not a valid signature.
+signature from a P2WPKH, P2SH-P2WPKH or single-key P2TR address, with or
+without the finalized BIP's `smp` prefix, or a legacy BIP-137 signature
+(always, for a P2PKH address). Never throws; anything malformed is simply
+not a valid signature.
 
 ## Parameters
 

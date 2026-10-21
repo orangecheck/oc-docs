@@ -1,0 +1,50 @@
+export const metadata = {
+    title: "Function: signMessage()",
+    description: "Auto-generated API reference for Function: signMessage(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/bip322**](../README)
+
+***
+
+[@orangecheck/bip322](../README) / signMessage
+
+# Function: signMessage()
+
+```ts
+function signMessage(
+   address: string, 
+   message: string, 
+   privateKey: PrivateKeyInput, 
+   opts?: {
+  auxRand?: Uint8Array<ArrayBufferLike>;
+  prefixed?: boolean;
+}): string;
+```
+
+Defined in: [index.ts:420](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L420)
+
+Sign `message` for `address` with a BIP-322 simple signature, base64.
+
+`address` must be the P2WPKH or single-key P2TR (BIP-86) address of
+`privateKey`; anything else throws. P2WPKH signatures are deterministic
+(RFC 6979). P2TR signatures use fresh randomness unless `auxRand` is given.
+
+By default the signature carries no `smp` prefix, the form every deployed
+BIP-322 verifier reads; pass `prefixed: true` for the finalized BIP's form.
+`verifySignature` accepts both.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `address` | `string` |
+| `message` | `string` |
+| `privateKey` | [`PrivateKeyInput`](../type-aliases/PrivateKeyInput) |
+| `opts` | \&#123; `auxRand?`: `Uint8Array`\&lt;`ArrayBufferLike`\>; `prefixed?`: `boolean`; \&#125; |
+| `opts.auxRand?` | `Uint8Array`\&lt;`ArrayBufferLike`\> |
+| `opts.prefixed?` | `boolean` |
+
+## Returns
+
+`string`

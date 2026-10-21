@@ -66,10 +66,9 @@ function pagerFor(path: string): { prev?: PagerLink; next?: PagerLink } {
     return { prev: prev ? link(prev) : undefined, next: next ? link(next) : undefined };
 }
 
-// Signed out, the family's one account phrase and address; signed in, the account menu.
-// app-design types the phrase as a NavItem, whose label could be any node; it is a string.
+// Signed out, the family's one account phrase and address, drawn as ochk.io draws it; signed in, the account menu.
 const actions = (
-    <SessionAccount signInLabel={GET_AN_ACCOUNT.label as string} signInHref={GET_AN_ACCOUNT.href} />
+    <SessionAccount signInLabel={GET_AN_ACCOUNT.label} signInHref={GET_AN_ACCOUNT.href} />
 );
 const search = <DocsSearch />;
 

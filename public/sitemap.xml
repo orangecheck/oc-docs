@@ -22,7 +22,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/scopes</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/security</loc>
@@ -38,23 +38,23 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/agent/why</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/api-reference</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/api-reference/attest</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/api-reference/auth-host</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest</loc>
-    <lastmod>2026-04-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/api</loc>
@@ -74,7 +74,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/nostr-relay</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/attest/guides/self-hosting</loc>
@@ -122,7 +122,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/how-it-works</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/modes</loc>
@@ -162,15 +162,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/chat/why</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/connect</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/cosign</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/cosign/how-it-works</loc>
@@ -178,15 +178,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/cosign/quickstart</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/cosign/trust</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/bip322</loc>
@@ -194,7 +194,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/canonical-message</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/conformance</loc>
@@ -206,7 +206,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/ecosystem/security</loc>
-    <lastmod>2026-10-16</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/federation/oc-me-v1</loc>
@@ -222,11 +222,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/infrastructure/relay</loc>
-    <lastmod>2026-05-08</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/integration</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock</loc>
@@ -234,7 +234,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/chat</loc>
-    <lastmod>2026-06-11</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/device-keys</loc>
@@ -242,11 +242,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/envelope</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/envelope-format</loc>
-    <lastmod>2026-04-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/how-it-works</loc>
@@ -266,11 +266,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/spec</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/lock/why</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me</loc>
@@ -290,7 +290,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/me/federation</loc>
-    <lastmod>2026-10-19</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/me/glossary</loc>
@@ -338,15 +338,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/composition</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/enforcement-by-exposure</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/how-it-works</loc>
@@ -362,7 +362,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/resolution-grammar</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/security</loc>
@@ -378,11 +378,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/pledge/why</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/reference/error-codes</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/reference/faq</loc>
@@ -390,11 +390,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/reference/glossary</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/reference/multi-account</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk</loc>
@@ -1066,7 +1066,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/README</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcAccountChip</loc>
@@ -1086,11 +1086,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcSessionProvider</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcSignIn</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/OcSignInButton</loc>
@@ -1102,11 +1102,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/buildAddAccountUrl</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/buildSignInUrl</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/clearTabSession</loc>
@@ -1122,7 +1122,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/familyReturnTarget</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/fetchOcBond</loc>
@@ -1134,7 +1134,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/handleSudoRequired</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/installTabFetchInterceptor</loc>
@@ -1146,7 +1146,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/isSudoAccountMismatch</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/functions/keepFragmentOnReturnLinks</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/readTabSession</loc>
@@ -1154,11 +1158,23 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/redirectToSudo</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/functions/restoreReturnFragment</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/functions/returnToHere</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/safeReturnTo</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/functions/stripFragment</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/tabSessionHeader</loc>
@@ -1170,11 +1186,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/useOcSession</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/useOptionalOcSession</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/useStepUpAuth</loc>
@@ -1189,16 +1205,20 @@
     <lastmod>2026-09-24</lastmod>
   </url>
   <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/functions/withoutFragment</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
     <loc>https://ochk.io/docs/sdk/auth-client/functions/writeTabSession</loc>
     <lastmod>2026-09-24</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/DisplayIdentity</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcAccount</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcAccountChipProps</loc>
@@ -1210,7 +1230,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcAccountSummary</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcAddressInputProps</loc>
@@ -1218,7 +1238,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcAuthConfig</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcBondProps</loc>
@@ -1238,7 +1258,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcSessionState</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/OcSignInButtonProps</loc>
@@ -1250,7 +1270,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/RedirectToSudoArgs</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/interfaces/UseOcAddressSuggestionOptions</loc>
@@ -1278,19 +1298,19 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/type-aliases/DisplayIdentityKind</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/type-aliases/OcSessionStatus</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/type-aliases/OcSignInProps</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/type-aliases/OcSignOutScope</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/type-aliases/WebAuthnAssertionStatus</loc>
@@ -1322,11 +1342,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/variables/DEFAULT_CONFIG</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/variables/DISPLAY_IDENTITY_KINDS</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-client/variables/FRAGMENT_TTL_MS</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/variables/OcAddressInput</loc>
@@ -1334,7 +1358,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/variables/SUDO_ACCOUNT_MISMATCH_MESSAGE</loc>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-client/variables/TAB_ACCOUNT_HINT_KEY</loc>
@@ -1354,119 +1378,147 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/README</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/audienceSatisfied</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/bondMeets</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/clearSessionCookieHeader</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/functions/createRevocationCheck</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/functions/familyRevocationCheck</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/getOcSession</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/loadPrivateKey</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/loadPublicKey</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/parsePublicJwk</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/readAllSessionCookies</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/readBondClaim</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/readSessionCookie</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/functions/resetFamilyRevocationCheckForTests</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/resetJwksCachesForTests</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/resolveDisplayIdentity</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/resolveSessionFromRequest</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/functions/revocationKey</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/serializeSessionCookie</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/signSession</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/verifyOcToken</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/verifySessionToken</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/verifyStepUpClaim</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/functions/verifySudoClaim</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/BondClaim</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/CookieOptions</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/DisplayIdentity</loc>
     <lastmod>2026-09-24</lastmod>
   </url>
   <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/interfaces/RevocableClaims</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/interfaces/RevocationCheck</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/interfaces/RevocationCheckOptions</loc>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/SessionPayload</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/SessionRequestHeaders</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/SignConfig</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/VerifyConfig</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/interfaces/VerifyOcOptions</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/type-aliases/AudienceRule</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/type-aliases/AuthKey</loc>
@@ -1478,11 +1530,15 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/type-aliases/IncomingRequestHeaders</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/type-aliases/ResolveSessionResult</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
+  </url>
+  <url>
+    <loc>https://ochk.io/docs/sdk/auth-core/type-aliases/RevocationStatus</loc>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/variables/DEFAULT_ISSUER</loc>
@@ -1502,7 +1558,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/auth-core/variables/TAB_SESSION_HEADER</loc>
-    <lastmod>2026-10-17</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/bip322/README</loc>
@@ -3654,7 +3710,7 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/python</loc>
-    <lastmod>2026-05-09</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/sdk/react/README</loc>
@@ -5154,11 +5210,11 @@
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp</loc>
-    <lastmod>2026-10-07</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/envelope</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-10-20</lastmod>
   </url>
   <url>
     <loc>https://ochk.io/docs/stamp/how-it-works</loc>

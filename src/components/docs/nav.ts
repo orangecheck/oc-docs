@@ -478,13 +478,13 @@ export const DOCS_NAV: DocsSection[] = [
     },
     {
         slug: 'me',
-        label: 'orangecheck · ochk.app',
+        label: 'ochk.app',
         blurb: 'One account, with Bitcoin behind it. Free sign-in for apps; paying users in sats is optional.',
         items: [
             {
                 href: '/me',
                 label: 'Overview',
-                blurb: 'What orangecheck is, what is live today, and every page in this section.',
+                blurb: 'What ochk.app is, what is live today, and every page in this section.',
             },
             {
                 href: '/me/quickstart',
@@ -868,11 +868,11 @@ export const DOCS_NAV: DocsSection[] = [
                 label: '@orangecheck/pledge-core',
                 blurb: 'OC Pledge canonical messages, envelope formats, state machine, bond verification.',
             },
-            // ── me (orangecheck · ochk.app; API at me.ochk.io) ─────────
+            // ── me (ochk.app; API at me.ochk.io) ─────────
             {
                 href: '/sdk/me-client/README',
                 label: '@orangecheck/me-client',
-                blurb: 'orangecheck client SDK (API at me.ochk.io) — sign-in, accounts, events.',
+                blurb: 'ochk.app client SDK (API at me.ochk.io) — sign-in, accounts, events.',
             },
             // ── integrations + UI ──────────────────────────────────────
             {

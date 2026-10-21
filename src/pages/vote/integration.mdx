@@ -183,6 +183,141 @@ console.log(JSON.stringify(result));
 `queryEvents` reports which relays answered in `relayStatus`; a relay that did
 not answer is not evidence that a ballot is missing.
 
+## publish a poll and a ballot from code
+
+The poll and each ballot are signed with the creator's and voter's own keys
+(BIP-322), then carried in Nostr events signed by any fresh key. The `t` tags
+are what readers query, so copy them exactly: the full shapes are on
+[the spec page](/vote/spec#1-poll-object).
+
+<InstallTabs pkg="@orangecheck/vote-core @orangecheck/nostr-core @orangecheck/bip322 @noble/curves @noble/hashes" />
+
+```ts
+import type { NostrEvent } from '@orangecheck/nostr-core';
+import type { Ballot, Poll } from '@orangecheck/vote-core';
+
+import { schnorr, secp256k1 } from '@noble/curves/secp256k1';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
+import { addressFromPrivateKey, signMessage } from '@orangecheck/bip322';
+import {
+    getEventHash,
+    publishEvent,
+    publishOutcome,
+} from '@orangecheck/nostr-core';
+import { ballotId, canonicalBytes, pollId } from '@orangecheck/vote-core';
+
+const iso = (ms: number) =>
+    new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+// A Nostr event under a fresh key: the BIP-322 signature in `content` is the proof.
+function nostrEvent(
+    kind: number,
+    tags: string[][],
+    content: string
+): NostrEvent {
+    const sk = secp256k1.utils.randomSecretKey();
+    const pubkey = bytesToHex(schnorr.getPublicKey(sk));
+    const unsigned = {
+        kind,
+        tags,
+        content,
+        pubkey,
+        created_at: Math.floor(Date.now() / 1000),
+    };
+    const id = getEventHash(unsigned);
+    return {
+        ...unsigned,
+        id,
+        sig: bytesToHex(schnorr.sign(hexToBytes(id), sk)),
+    };
+}
+
+// 1. The poll, signed by its creator.
+const creatorKey = process.env.CREATOR_KEY!; // WIF of the creator's address
+const creator = addressFromPrivateKey(creatorKey, 'p2wpkh');
+const poll: Poll = {
+    v: 0,
+    kind: 'oc-vote/poll',
+    creator,
+    question: 'Ship the release on Friday?',
+    options: [
+        { id: 'yes', label: 'Yes' },
+        { id: 'no', label: 'No' },
+    ],
+    deadline: iso(Date.now() + 7 * 86_400_000),
+    snapshot_block: 'deadline',
+    weight_mode: 'sats',
+    weight_params: null,
+    min_sats: 10_000,
+    min_days: 0,
+    mode: 'public',
+    reveal_pk: null,
+    tiebreak: 'latest',
+    notes: null,
+    created_at: iso(Date.now()),
+    sig: { alg: 'bip322', pubkey: creator, value: '' },
+};
+const id = pollId(poll);
+poll.sig.value = signMessage(creator, id, creatorKey);
+
+const pollEvent = nostrEvent(
+    30080,
+    [
+        ['d', `oc-vote:poll:${id}`],
+        ['t', id],
+        ['t', 'oc-vote-poll'],
+        ['t', creator],
+        ['poll_id', id],
+        ['creator', creator],
+        ['deadline', poll.deadline],
+        ['snapshot', String(poll.snapshot_block)],
+        ['mode', poll.mode],
+    ],
+    canonicalBytes(poll)
+);
+console.log('poll:', publishOutcome(await publishEvent(pollEvent)));
+
+// 2. A ballot, signed by a voter.
+const voterKey = process.env.VOTER_KEY!;
+const voter = addressFromPrivateKey(voterKey, 'p2wpkh');
+const ballot: Ballot = {
+    v: 0,
+    kind: 'oc-vote/ballot',
+    poll_id: id,
+    voter,
+    option: 'yes',
+    attestation_id: null,
+    secret: null,
+    created_at: iso(Date.now()),
+    sig: { alg: 'bip322', pubkey: voter, value: '' },
+};
+const bid = ballotId(ballot);
+ballot.sig.value = signMessage(voter, bid, voterKey);
+
+const ballotEvent = nostrEvent(
+    30081,
+    [
+        ['d', `oc-vote:ballot:${id}:${voter}`],
+        ['t', id],
+        ['t', 'oc-vote-ballot'],
+        ['t', voter],
+        ['poll_id', id],
+        ['voter', voter],
+        ['ballot_id', bid],
+    ],
+    canonicalBytes(ballot)
+);
+console.log('ballot:', publishOutcome(await publishEvent(ballotEvent)));
+console.log(`https://vote.ochk.io/p/${id}`);
+```
+
+`publishEvent` sends to the default relays and reports each one;
+`publishOutcome` says whether `none`, `some` (`partial`) or `all` accepted. A
+relay's `OK` is not proof it stored the event: read it back with `queryEvents`
+before telling anyone the poll is live. A wallet can sign in place of a key you
+hold: `signMessage` takes the 64-hex id, as [`getSigner`](/stamp/quickstart)
+does in a browser.
+
 ## gate a Discord bot
 
 ```ts

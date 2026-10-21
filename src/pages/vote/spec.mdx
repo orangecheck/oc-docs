@@ -35,7 +35,29 @@ export const metadata = {
 **poll_id** = `SHA256(canonical bytes of poll with sig.value = "")` expressed as
 lowercase hex.
 
-Publication: Nostr kind `30080`, `d`-tag `oc-vote:poll:<poll_id>`.
+Publication (SPEC §3.4): an addressable Nostr event of kind `30080`. The `t`
+tags are the ones readers query: vote.ochk.io and the CLI find a poll by
+`{"kinds":[30080],"#t":["<poll_id>"]}`, so a poll without them is never found.
+
+```
+kind    = 30080
+tags    = [
+  ["d",        "oc-vote:poll:<poll_id>"],
+  ["t",        "<poll_id>"],
+  ["t",        "oc-vote-poll"],
+  ["t",        "<creator>"],
+  ["poll_id",  "<poll_id>"],
+  ["creator",  "<creator>"],
+  ["deadline", "<deadline>"],
+  ["snapshot", "<snapshot_block, or deadline>"],
+  ["mode",     "public" | "secret"]
+]
+content = canonical bytes of the poll, sig.value included
+pubkey  = any fresh Nostr key; the BIP-322 sig inside content is the proof
+```
+
+[Integration → publish from code](/vote/integration#publish-a-poll-and-a-ballot-from-code)
+has a working example.
 
 ## 2. ballot object
 
@@ -58,9 +80,23 @@ Publication: Nostr kind `30080`, `d`-tag `oc-vote:poll:<poll_id>`.
 
 **ballot_id** = `SHA256(canonical bytes with sig.value = "")`.
 
-Publication: kind `30081`, `d`-tag `oc-vote:ballot:<poll_id>:<voter>`. Each
-ballot event has its own Nostr key, so relays keep a voter's earlier ballots;
-the tiebreak (§5 step 3 below) picks one.
+Publication (SPEC §4.5): kind `30081`. Each ballot event has its own Nostr key,
+so relays keep a voter's earlier ballots; the tiebreak (§5 step 3 below) picks
+one. Talliers find ballots by `{"kinds":[30081],"#t":["<poll_id>"]}`.
+
+```
+kind    = 30081
+tags    = [
+  ["d",         "oc-vote:ballot:<poll_id>:<voter>"],
+  ["t",         "<poll_id>"],
+  ["t",         "oc-vote-ballot"],
+  ["t",         "<voter>"],
+  ["poll_id",   "<poll_id>"],
+  ["voter",     "<voter>"],
+  ["ballot_id", "<ballot_id>"]
+]
+content = canonical bytes of the ballot, sig.value included
+```
 
 ## 3. reveal object (secret mode)
 
@@ -75,7 +111,21 @@ the tiebreak (§5 step 3 below) picks one.
 }
 ```
 
-Publication: kind `30082`, `d`-tag `oc-vote:reveal:<poll_id>`.
+Publication (SPEC §6.3): kind `30082`.
+
+```
+kind    = 30082
+tags    = [
+  ["d",       "oc-vote:reveal:<poll_id>"],
+  ["t",       "<poll_id>"],
+  ["t",       "oc-vote-reveal"],
+  ["poll_id", "<poll_id>"]
+]
+content = canonical bytes of the reveal, sig.value included
+```
+
+The multi-letter tags (`poll_id`, `creator`, `voter`, …) are diagnostics. Relays
+index single-letter tags only, so a reader MUST NOT depend on them.
 
 ## 4. canonicalization (SPEC §7)
 

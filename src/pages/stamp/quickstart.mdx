@@ -73,8 +73,21 @@ console.log(JSON.stringify(anchored, null, 2));
 `signMessage` receives the envelope id as a 64-character hex string and must
 return a base64 BIP-322 signature of it by `address`. In a browser,
 `getSigner('unisat', { address })` from `@orangecheck/wallet-adapter` returns
-one (also `xverse`, `leather`, `okx`, `phantom`). On a server, use any BIP-322
-signer for a key you hold.
+one (also `xverse`, `leather`, `okx`, `phantom`). On a server, `signMessage`
+from `@orangecheck/bip322` (1.1 and later) signs with a key you hold, for its
+P2WPKH or P2TR address:
+
+```ts
+import { addressFromPrivateKey, signMessage } from '@orangecheck/bip322';
+
+const key = process.env.STAMP_KEY!; // WIF, 64 hex characters, or 32 bytes
+const signer = {
+    address: addressFromPrivateKey(key, 'p2wpkh'), // or 'p2tr'
+    signMessage: async (id: string) => signMessage(signer.address, id, key),
+};
+```
+
+Pass that `signer` to `stamp()` in place of the one above.
 
 ## Verify
 

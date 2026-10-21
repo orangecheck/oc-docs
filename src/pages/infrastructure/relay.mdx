@@ -57,11 +57,11 @@ without anyone deciding what's spam — the policy is shape-only, never content.
 - **It does not act as a custodian or trust anchor.** Relays are commodity
   infrastructure. Trust anchors are Bitcoin (BIP-322 attestations) and
   Nostr-published envelopes (offline-verifiable forever).
-- **It does not replace public relays.** Every OC web app's `DEFAULT_RELAYS`
-  ships with five entries — four public (`relay.nostr.band`, `nos.lol`,
-  `relay.primal.net`, `offchain.pub`) plus relay.ochk.io. The
-  `@orangecheck/nostr-core` package has a build-time TypeScript invariant that
-  fails the build if a future engineer reduces the set to relay.ochk.io alone.
+- **It does not replace public relays.** `@orangecheck/nostr-core`'s
+  `DEFAULT_RELAYS` ships with five entries — four public (`nos.lol`,
+  `relay.primal.net`, `offchain.pub`, `relay.snort.social`) plus relay.ochk.io.
+  A build-time TypeScript invariant in the package fails the build if a future
+  engineer reduces the set to relay.ochk.io alone.
 
 ## Where it sits in the stack
 
@@ -74,10 +74,10 @@ without anyone deciding what's spam — the policy is shape-only, never content.
                 │                │
        ┌────────┴───── DEFAULT_RELAYS ────────┐
        │                                       │
-       │  wss://relay.nostr.band  (public)     │
        │  wss://nos.lol            (public)    │
        │  wss://relay.primal.net   (public)    │
        │  wss://offchain.pub       (public)    │
+       │  wss://relay.snort.social (public)    │
        │  wss://relay.ochk.io      (OC-curated)│
        └───────────────────────────────────────┘
 ```

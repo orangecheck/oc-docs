@@ -1,0 +1,59 @@
+export const metadata = {
+    title: "Interface: Subscription",
+    description: "Auto-generated API reference for Interface: Subscription. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / Subscription
+
+# Interface: Subscription
+
+Defined in: [index.ts:898](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L898)
+
+## Methods
+
+### getHealth()
+
+```ts
+getHealth(): {
+  connected: number;
+  total: number;
+};
+```
+
+Defined in: [index.ts:902](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L902)
+
+Relays whose subscription is currently open.
+
+#### Returns
+
+```ts
+{
+  connected: number;
+  total: number;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `connected` | `number` | [index.ts:902](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L902) |
+| `total` | `number` | [index.ts:902](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L902) |
+
+***
+
+### stop()
+
+```ts
+stop(): void;
+```
+
+Defined in: [index.ts:900](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L900)
+
+CLOSE the subscription on every relay and stop reconnecting.
+
+#### Returns
+
+`void`

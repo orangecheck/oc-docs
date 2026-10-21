@@ -134,7 +134,8 @@ url = r.json()["url"]  # redirect this user to it
   **Replace** it in the console; the old key stops working immediately.
 - **Optional `email` and `email_verified`.** Pass the user's email, and
   `email_verified: true` only when you verified it, to let them claim by signing
-  in with it (above). The base call needs neither.
+  in with it (above). We keep only a keyed hash of the address, never the
+  address. The base call needs neither.
 - An integrator can only ever create and manage **its own** users' orangecheck
   accounts — a Connect key can never reach into anyone else's account.
 

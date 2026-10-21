@@ -37,8 +37,10 @@ verified: you verify it only to [go live](#5--go-live) with paying.
 
 Call `signInWithOc()` inside a click handler, or the browser blocks the popup.
 The person signs in on orangecheck's page with email, Google, GitHub or a
-Bitcoin wallet, and the popup hands your page a token bound to your origin. Post
-it to your own server:
+Bitcoin wallet, and the popup hands your page a token bound to your origin. A
+page served with `Cross-Origin-Opener-Policy: same-origin` never gets it back;
+send `same-origin-allow-popups`, or no such header. Post the token to your own
+server:
 
 ```ts
 import { signInWithOc } from '@orangecheck/me-client/popup';
@@ -278,6 +280,10 @@ oc-verify=<token>
 # OR a meta tag in <head> at https://yourapp.example/
 <meta name="oc-domain-verify" content="<token>" />
 ```
+
+The check reads the HTML your server sends for `https://yourapp.example/`. A
+single-page app must put the tag in its static `index.html`: one added by
+JavaScript after load is never seen.
 
 ## See it working
 

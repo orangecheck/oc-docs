@@ -40,6 +40,10 @@ Each line LF-terminated; no trailing LF after `nonce`. Scopes are serialized in
 **sorted order** (lexicographic byte order) and joined by a single ASCII comma.
 Envelope id = `sha256(canonical_message_bytes)` rendered as lowercase hex.
 
+A delegation lasts at most 365 days: `expires_at - issued_at` is at most
+31,536,000 seconds (§SPEC 4.4). A longer one is malformed whatever the clock
+says.
+
 ## Agent-action canonical message (§SPEC 5.1)
 
 ```
@@ -96,7 +100,7 @@ per scope are on [Scopes](/agent/scopes).
 ```
 verify(D):
   1. v == 1 else E_UNSUPPORTED_VERSION
-  2. shape check else E_MALFORMED
+  2. shape check, incl. issued_at < expires_at ≤ issued_at + 365 days, else E_MALFORMED
   3. reconstruct canonical → id' == D.id else E_BAD_ID
   4. scopes parse + validate else E_BAD_SCOPE_GRAMMAR
   5. BIP-322(D.principal, D.id) verifies else E_BAD_SIG

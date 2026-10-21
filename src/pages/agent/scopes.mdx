@@ -62,7 +62,8 @@ to a wildcard.
 To make sub-scope comparison deterministic, scopes are canonicalized before use:
 
 1. Constraints sorted lexicographically by key.
-2. Bare tokens lowercased unless the registered key is case-sensitive.
+2. Values kept exactly as written, case included, and compared byte for byte.
+   Write hex, bech32 addresses and MIME types in lowercase.
 3. No whitespace.
 
 `ln:send(node=03abc,max_sats<=1000)` canonicalizes to

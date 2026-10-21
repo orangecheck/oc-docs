@@ -66,16 +66,75 @@ accrues to it. Federation custody, then the user's own keys, is where that goes
 [federation custody](/me/federation). You now know "my user ↔ this orangecheck
 account" and can show it, or call other orangecheck APIs on their behalf.
 
+## Paying your users, and how they claim it
+
+Fire [billable events](/me/api#signing-an-event) for a provisioned user with
+their `did_oc` as `user_address`, signed with your project's secret. What they
+earn waits in that account. Nobody can sign in to it, so to see and cash it out
+the person claims it into an orangecheck account of their own, at ochk.app.
+
+**A claim link.** When your signed-in user asks to claim, mint a link from your
+backend and send them to it:
+
+```ts
+const res = await fetch('https://ochk.io/api/connect/claim-link', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OCHK_CONNECT_KEY}`,
+    },
+    body: JSON.stringify({ user_id: yourUser.id }),
+});
+const { url } = await res.json(); // https://ochk.app/connect/claim#t=…
+// redirect this user, and only this user, to url
+```
+
+The link works once, for fifteen minutes. Its token is in the URL fragment, so
+it reaches no server log; treat it as a secret anyway, and mint it only for the
+user you have just signed in. A user you never provisioned answers
+`404 unknown_user`; an account already claimed answers `409 already_claimed`.
+
+**A verified email.** Pass `email_verified: true` with `email` when you checked
+the address yourself (a code or a link the user answered). Someone who signs in
+to ochk.app with that address, verified, is offered the claim on their account
+page. Without `email_verified`, an email proves nothing, because it could be
+anyone's, and only a claim link works.
+
+Either way, ochk.app shows the person what the account holds before anything
+changes, and they confirm with a passkey tap or an emailed code or wallet
+signature. Then:
+
+- `/api/connect/provision` keeps returning the **same** `did_oc` for that user.
+  Keep firing events for it; they land with the person.
+- Your project's webhooks get a `connect.claimed` notice
+  (`{ kind: 'oc-system-event', subtype: 'connect.claimed', did_oc, sub }`),
+  naming the account by the `did_oc` you hold.
+- You are never told the id of the account it was joined to, so two sites a
+  person claims from cannot link them through one id.
+
+In Python, the link is one request:
+
+```python
+import os, httpx
+
+r = httpx.post(
+    "https://ochk.io/api/connect/claim-link",
+    headers={"Authorization": f"Bearer {os.environ['OCHK_CONNECT_KEY']}"},
+    json={"user_id": str(user.id)},
+)
+url = r.json()["url"]  # redirect this user to it
+```
+
 ## Notes
 
-- **Server-to-server only.** Call `/api/connect/provision` from your backend —
-  never the browser. The API key must stay secret.
-- **The key is shown once.** Save it when you register the app. Lost it? Hit
-  _regenerate key_ in the console — the old key stops working immediately.
-- **Optional `email`.** You may also pass the user's email
-  (`{ user_id, email }`). It is recorded as a hint so the same person can be
-  unified to one account across apps later. The base call does not need it, and
-  it is never treated as verified.
+- **Server-to-server only.** Call `/api/connect/provision` and
+  `/api/connect/claim-link` from your backend, never the browser. The API key
+  must stay secret.
+- **The key is shown once.** Save it when you register the app. Lost it?
+  **Replace** it in the console; the old key stops working immediately.
+- **Optional `email` and `email_verified`.** Pass the user's email, and
+  `email_verified: true` only when you verified it, to let them claim by signing
+  in with it (above). The base call needs neither.
 - An integrator can only ever create and manage **its own** users' orangecheck
   accounts — a Connect key can never reach into anyone else's account.
 

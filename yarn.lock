@@ -828,10 +828,10 @@
     sonner "^2.0.7"
     tailwind-merge "^3.3.1"
 
-"@orangecheck/auth-client@^2.33.4":
-  version "2.33.4"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.33.4.tgz#59ab1b2fe19ed4173500ab23af66d1e2534a43cb"
-  integrity sha512-/leYg6uIFYTROXxs0Wtpre+FfD1ym7I1DHy72QgIME3BtFzitwwG9afnv4joCqg6vcSglAqjuEozmlfew5oaYQ==
+"@orangecheck/auth-client@^2.35.2":
+  version "2.35.2"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.35.2.tgz#1511489c3e225a444006f8a376509e017db436c9"
+  integrity sha512-p3bZmEB5/U1AbcAmZaaEU4j4smUHCvXOYVOUIQLm1hgsw8WqI1OhWROeZ3h7BnbM/Y+9fxmA6tsfdJjRJbMQ5g==
   dependencies:
     "@orangecheck/wallet-adapter" "^0.6.0"
     "@simplewebauthn/browser" "^13.3.0"

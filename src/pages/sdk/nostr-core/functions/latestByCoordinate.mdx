@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Function: latestByCoordinate()",
+    description: "Auto-generated API reference for Function: latestByCoordinate(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / latestByCoordinate
+
+# Function: latestByCoordinate()
+
+```ts
+function latestByCoordinate<T>(events: readonly T[]): T[];
+```
+
+Defined in: [index.ts:822](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L822)
+
+Keep only the latest version of each replaceable event, as NIP-01 says a
+relay should: per (kind, pubkey, d tag) for addressable kinds 30000–39999,
+per (kind, pubkey) for kinds 0, 3 and 10000–19999. The highest `created_at`
+wins; a tie goes to the lowest id. Other events pass through.
+
+`queryEvents` de-duplicates by id only, so when relays disagree an old and a
+new version of the same record arrive side by side. Use this wherever a
+reader wants the current version.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` *extends* [`NostrEvent`](../interfaces/NostrEvent) |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `events` | readonly `T`[] |
+
+## Returns
+
+`T`[]

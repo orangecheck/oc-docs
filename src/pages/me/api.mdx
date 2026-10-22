@@ -94,6 +94,16 @@ user session proves a user, never the paying project, so an unsigned POST is
 admitted only when the session belongs to the project's own owner (the CLI
 test-fire path). Anything else gets `401 project_auth_required`.
 
+The header is `t=<unix-seconds>,v1=<hex>`, where `v1` is
+`hmac_sha256(signing_secret, "${t}.${body}")` over the exact bytes you send. `t`
+must be within the last 300 seconds and at most 60 seconds ahead of me.ochk.io's
+clock. The same signed bytes are processed once: POSTing them again, with or
+without an `Idempotency-Key`, returns the first event
+(`idempotent_replay: true`, or `duplicate` per event in a batch) and bills
+nothing. To retry, resend the same bytes, or sign again with the same
+`Idempotency-Key`. Two identical bodies signed in the same second are one
+request.
+
 | Method | Path                          | Purpose                                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------------------------------------- |
 | `POST` | `/api/integrator/event`       | fire a billable event under a project_key (live mode requires domain verification) |

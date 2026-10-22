@@ -28,8 +28,19 @@ domain:  yourapp.example
 ```
 
 A new project starts in test mode, so its key starts `pk_test_`. Put it in your
-server's environment as `OC_PROJECT_KEY`. Sign-in never needs your domain
-verified: you verify it only to [go live](#5--go-live) with paying.
+server's environment as `OC_PROJECT_KEY`. Sign-in itself never needs your domain
+verified. You verify it for two things:
+
+- **Refusing sessions people ended everywhere.** The list of ended sessions is
+  served only for your verified domain's origins
+  ([when someone ends every session](/me/sdk#when-someone-ends-every-session)).
+  Once your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, verify the
+  domain before you deploy: until it is verified the list is refused, and the
+  SDKs then refuse writes from signed-in sessions (reads go on).
+- **[Going live](#5--go-live) with paying.**
+
+For a project that only signs people in, verifying changes nothing else: no
+events, no charges, and sign-in works the same before and after.
 
 ### 2 · add the sign-in popup
 

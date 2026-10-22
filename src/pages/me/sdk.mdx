@@ -303,6 +303,31 @@ session = verify_session(token, audience="https://your-site.example",
 # SessionEnded (an InvalidSession, reason "ended") when the person ended it.
 ```
 
+`REVOCATIONS.status(rh, aud, iat)` answers one of three things, and
+`verify_session` acts on it:
+
+| `status`       | Means                                                                                                                                                                      | `verify_session` with `revocations=`                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `"live"`       | Not ended. Also every token without `rh`.                                                                                                                                  | Returns the session.                                                                                                              |
+| `"revoked"`    | The person ended it: its `rh` is in the list and its `iat` is before the cutoff.                                                                                           | Raises `SessionEnded` (reason `ended`).                                                                                           |
+| `"unverified"` | No list for that origin younger than ten minutes (by its own `at`) could be read: me.ochk.io unreachable, or the list refused (domain not verified, an origin outside it). | Returns the session for `GET`, `HEAD` or `OPTIONS`; raises `InvalidSession` (reason `revocations_unavailable`) for anything else. |
+
+That is the Node rule too: while the list can't be read, reads go on and writes
+are refused. With no `method`, a request counts as a write.
+
+The list for an origin is fetched inside the call that first needs it, then at
+most once a minute. A fetch waits at most three seconds; after a failure the
+next try waits ten seconds, and the last copy answers meanwhile. The first
+failure logs one warning on the `orangecheck` logger. To keep the fetch off your
+requests, warm the list at startup and from a background thread once a minute,
+for each origin you serve:
+
+```python
+REVOCATIONS.status("warm", "https://your-site.example", 0)
+```
+
+Requests then read the copy in memory.
+
 **If your own session replaces the token**, as when you sign the person into
 your own auth system after checking it, keep the token's `rh`, `aud` and `iat`
 with that session and ask the list about them on each request. In Node, keep one

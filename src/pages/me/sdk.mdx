@@ -430,8 +430,12 @@ that origin, read once a minute per origin and checked from memory, so a refusal
 lands within about two minutes. A site served from `www` and the apex is covered
 by one configuration: each token is looked up for its own origin. If the list
 can't be read, or is more than ten minutes old by its own clock, reads go on and
-writes are refused until it can. A token without `rh`, and every token while the
-two variables are unset, is checked by its signature alone.
+writes are refused until it can: the wrappers answer such a write
+`503 revocations_unavailable` (me-client 0.38.0), not as signed out, so your
+page retries instead of sending the person to sign in. In your own code,
+`checkOcSession(headers, options)` tells the cases apart: `signed_in` with the
+session, `signed_out`, or `unavailable`. A token without `rh`, and every token
+while the two variables are unset, is checked by its signature alone.
 
 **Python** ([`orangecheck`](/sdk/python) 2.8.0 or later): keep one list per
 process and pass it with the request's method.

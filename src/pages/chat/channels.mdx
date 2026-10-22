@@ -74,6 +74,10 @@ Normative rules a conforming client MUST honor:
   an address in the **prior** `admins` set — making governance tamper-evident
   and offline-verifiable (the [`parent_id` trick](/chat/threading) applied to
   governance). A descriptor not so authored is `E_CH_UNAUTHORIZED`.
+- **Any authorized copy of a descriptor counts.** The signing key is in the
+  event, outside `descriptor_id`, so one descriptor can arrive in events under
+  different keys. A resolver keeps every such event and accepts the descriptor
+  if any one copy is authored as above (OC Chat 0.2.1).
 - **Exactly one `write.policy`, with a `rooted` flag that MUST match it.**
   `utxo-floor` ⇒ `rooted:true`; `allowlist`/`founder`/`open` ⇒ `rooted:false`. A
   mismatch is `E_CH_POLICY_INVALID`. This makes the Bitcoin claim a property of

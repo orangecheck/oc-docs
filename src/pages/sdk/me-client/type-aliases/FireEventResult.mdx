@@ -31,7 +31,7 @@ type FireEventResult =
 };
 ```
 
-Defined in: [me-client/src/event.ts:114](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L114)
+Defined in: [me-client/src/event.ts:116](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L116)
 
 What `oc.event.fire` answers.
 
@@ -53,13 +53,13 @@ What `oc.event.fire` answers.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `earned` | `true` | The event earned the user their share and charged the project. | [me-client/src/event.ts:118](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L118) |
-| `escrow_mode` | `"simulation"` \| `"live"` | - | [me-client/src/event.ts:121](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L121) |
-| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:119](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L119) |
-| `idempotent_replay?` | `boolean` | Set when the same Idempotency-Key already landed: `event` is the prior one. | [me-client/src/event.ts:123](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L123) |
-| `ok` | `true` | - | [me-client/src/event.ts:116](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L116) |
-| `simulation_mode_note?` | `string` | - | [me-client/src/event.ts:124](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L124) |
-| `webhooks_fired` | `number` | - | [me-client/src/event.ts:120](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L120) |
+| `earned` | `true` | The event earned the user their share and charged the project. | [me-client/src/event.ts:120](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L120) |
+| `escrow_mode` | `"simulation"` \| `"live"` | - | [me-client/src/event.ts:123](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L123) |
+| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:121](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L121) |
+| `idempotent_replay?` | `boolean` | Set when the same Idempotency-Key already landed: `event` is the prior one. | [me-client/src/event.ts:125](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L125) |
+| `ok` | `true` | - | [me-client/src/event.ts:118](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L118) |
+| `simulation_mode_note?` | `string` | - | [me-client/src/event.ts:126](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L126) |
+| `webhooks_fired` | `number` | - | [me-client/src/event.ts:122](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L122) |
 
 ***
 
@@ -77,8 +77,8 @@ What `oc.event.fire` answers.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `detail` | `string` | - | [me-client/src/event.ts:131](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L131) |
-| `earned` | `false` | The project isn't paying its users now. Nothing recorded or charged. | [me-client/src/event.ts:129](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L129) |
-| `next_pay_period` | [`PayPeriod`](../interfaces/PayPeriod) \| `null` | The next pay period, or null when none is scheduled. | [me-client/src/event.ts:133](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L133) |
-| `ok` | `true` | - | [me-client/src/event.ts:127](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L127) |
-| `reason` | `"not_paying"` | - | [me-client/src/event.ts:130](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L130) |
+| `detail` | `string` | - | [me-client/src/event.ts:133](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L133) |
+| `earned` | `false` | The project isn't paying its users now. Nothing recorded or charged. | [me-client/src/event.ts:131](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L131) |
+| `next_pay_period` | [`PayPeriod`](../interfaces/PayPeriod) \| `null` | The next pay period, or null when none is scheduled. | [me-client/src/event.ts:135](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L135) |
+| `ok` | `true` | - | [me-client/src/event.ts:129](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L129) |
+| `reason` | `"not_paying"` | - | [me-client/src/event.ts:132](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L132) |

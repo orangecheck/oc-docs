@@ -22,5 +22,5 @@ Input for signature verification
 | &lt;a id="property-addr">&lt;/a> `addr?` | `string` | Bitcoin address (optional when using attestation_id) | [types.ts:83](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L83) |
 | &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (alternative to addr/msg/sig) | [types.ts:91](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L91) |
 | &lt;a id="property-msg">&lt;/a> `msg?` | `string` | Canonical message (optional when using attestation_id) | [types.ts:85](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L85) |
-| &lt;a id="property-scheme">&lt;/a> `scheme?` | [`Scheme`](../type-aliases/Scheme) | Signature scheme (auto-detected if not provided) | [types.ts:89](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L89) |
+| &lt;a id="property-scheme">&lt;/a> ~~`scheme?`~~ | [`Scheme`](../type-aliases/Scheme) | **Deprecated** Ignored: the signature's own bytes decide the scheme. | [types.ts:89](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L89) |
 | &lt;a id="property-sig">&lt;/a> `sig?` | `string` | Signature (optional when using attestation_id) | [types.ts:87](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/types.ts#L87) |

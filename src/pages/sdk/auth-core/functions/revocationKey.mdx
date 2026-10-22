@@ -15,7 +15,7 @@ export const metadata = {
 function revocationKey(kind: "jti" | "sub", value: string): Promise<string>;
 ```
 
-Defined in: [revocation.ts:88](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L88)
+Defined in: [revocation.ts:104](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L104)
 
 The feed key for a token (`kind: "jti"`) or an account (`kind: "sub"`):
 base64url of the first 16 bytes of sha256(`ocrev1:<kind>:<value>`). The

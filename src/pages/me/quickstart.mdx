@@ -1,12 +1,12 @@
 export const metadata = {
     title: 'ochk.app · Quickstart',
     description:
-        'Two tracks. Sign in (free): create a project, add the sign-in popup, check the session on your server, choose who can sign in. Pay your users (optional): when you pay, what each event earns, send events from your server, send a test event, go live.',
+        'Two tracks. Sign in (free): create a project, add the sign-in popup, check the session on your server, choose who can sign in, check it before real people sign in. Pay your users (optional): when you pay, what each event earns, send events from your server, send a test event, go live.',
 };
 
 # ochk.app · Quickstart
 
-Two tracks. **Sign in** is free and stands on its own: four steps, and your app
+Two tracks. **Sign in** is free and stands on its own: five steps, and your app
 signs people in and can keep bots out. **Pay your users** is optional, and you
 can add it whenever you like: five steps, the last one going live. Nothing here
 needs a sales call, and nothing is destructive.
@@ -217,6 +217,29 @@ a `back_url`, where the person can back their account. Details, and how to keep
 one account per coin: [Who can sign in](/me/require-bond).
 
 That is sign-in. It costs nothing, in test mode or live.
+
+### 5 · check it before real people sign in
+
+Each line is a way an integration has gone wrong.
+
+- [ ] Your server verifies the token with your exact origin as `audience`, and
+      keeps it in an httpOnly cookie. No script keeps it: not in `localStorage`,
+      not in `sessionStorage`.
+- [ ] Signing out clears your cookie and
+      [ends the token](/me/sdk#ending-a-session).
+- [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, your domain is
+      verified, and a session someone ended everywhere is refused within about
+      two minutes
+      ([when someone ends every session](/me/sdk#when-someone-ends-every-session)).
+- [ ] Anything you mint while someone is signed in (your own session, API keys,
+      OAuth grants, refresh tokens) ends when their session ends everywhere.
+- [ ] If you keep your own users: a first sign-in creates a new user with a
+      random id and a row keyed by `did_oc`. Nothing looks a user up by an
+      identifier derived from the did
+      ([your own accounts](/me/sdk#your-own-accounts)).
+- [ ] Linking orangecheck to an existing account asks for a fresh sign-in with
+      your own login first, refuses a did another user already has, and the
+      account page shows the link with an unlink button.
 
 ## Pay your users (optional)
 

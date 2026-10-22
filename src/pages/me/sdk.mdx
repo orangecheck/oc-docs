@@ -298,6 +298,41 @@ for ten minutes, and with none read in that time the sign-in is refused (reason
 `bond_policy_unavailable`) rather than let through (2.10.1 or later).
 `bond_meets(session, min_sats=…, min_days=…)` is the check on its own.
 
+## your own accounts
+
+When your site keeps users of its own, the token's `did_oc` is what ties a
+person to one of them. Get this tie wrong and a stranger can take over an
+account.
+
+**A first sign-in creates a user; it never finds one.** Keep a table keyed by
+`did_oc`, read from the verified token only:
+
+```sql
+CREATE TABLE oc_accounts (
+    did_oc  text PRIMARY KEY,
+    user_id uuid NOT NULL UNIQUE REFERENCES users (id)
+);
+```
+
+When a token's `did_oc` has no row, create a new user with an id you generate at
+random and add the row in the same transaction; if the insert hits the primary
+key, another request signed the same person in first, so read its row. Never
+derive an identifier from the did (an email such as `sha256(did)@yoursite`, a
+username, a slug) and look a user up by it, or "find or create" by it: anyone
+can compute it from a did, register that account first, and the person's first
+sign-in walks into it. If a row points somewhere you don't expect, refuse the
+sign-in and log it.
+
+**Linking orangecheck to an account someone already has.**
+
+- Ask for a fresh sign-in with your own login first (within the last few
+  minutes), then open the popup.
+- Link the did only if no other user has it; otherwise refuse.
+- Show the linked did on the account page, with an unlink button that deletes
+  the row and ends the sessions it started.
+- Keep it to one did per account (the `UNIQUE` above) unless your site has a
+  reason for more.
+
 ## verify without the SDK
 
 A backend in Python, Go or anything else checks the token itself. It is a JWT
@@ -436,6 +471,13 @@ with that session and ask the list about them on each request. In Node, keep one
 process and `await check.status({ rh, aud, iat })`; in Python,
 `REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session.
 
+**Anything you mint during that session ends with it.** Your own session cookie,
+API keys, OAuth grants to other apps, refresh tokens, long-lived links: if your
+site issues it while someone is signed in through orangecheck, keep the token's
+`rh`, `aud` and `iat` beside it (or beside the session that minted it), and when
+the list answers `"revoked"`, revoke it too. Otherwise "sign out everywhere"
+ends the cookie and leaves an API key working.
+
 **Anything else.** Sign a GET with your secret over its method, path and query,
 URI-encoding the key and the audience:
 
@@ -476,6 +518,7 @@ arguments as `verify_session` and fetches whichever of those is due, without
 raising. Call it at startup and then every ten seconds from a background thread:
 
 ```python
+import logging
 import threading
 import time
 
@@ -484,7 +527,9 @@ from orangecheck import warm_session
 
 def keep_warm() -> None:
     while True:
-        warm_session("https://your-site.example", revocations=REVOCATIONS, policy=POLICY)
+        result = warm_session("https://your-site.example", revocations=REVOCATIONS, policy=POLICY)
+        if not result.ok:
+            logging.warning("orangecheck warming: %s", "; ".join(result.failures()))
         time.sleep(10)
 
 
@@ -493,6 +538,15 @@ threading.Thread(target=keep_warm, daemon=True).start()
 
 A copy is fetched only once it is due, so the thread makes nearly every fetch
 and requests read memory. Pass a list of origins if you serve more than one.
+
+From 2.11.0 `warm_session` says what it did. `result.keys`, `result.policy` and
+`result.lists[origin]` each have a `state`: `"fetched"` (read just now),
+`"kept"` (the copy is still fresh) or `"failed"`, with a `reason` such as
+`HTTP 403 domain_unverified`, `unknown_project_key` or a list older than ten
+minutes by its own clock. `result.failures()` lists the failed parts as
+`"<part>: <reason>"`, and `result.ok` is true when there are none. A failure
+does not mean requests are refused yet: an older copy may still answer, within
+the limits below.
 
 - **Threads.** One `RevocationList` and one `SignInPolicy` are safe to share
   between threads. Each copy has its own lock: while one thread fetches it, the

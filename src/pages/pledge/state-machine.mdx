@@ -22,6 +22,9 @@ State transitions are **pure functions** of
 Two verifiers with the same inputs produce the same classification. This is a
 **conformance requirement** — disagreement on state is a protocol bug.
 
+An outcome whose `resolved_at` is later than now does not count yet: until then
+the pledge classifies as if it had none.
+
 ## Transitions
 
 ```mermaid size=957x573

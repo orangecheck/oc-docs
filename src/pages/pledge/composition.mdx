@@ -110,6 +110,12 @@ The pledge counts against the **principal's** history, not the agent's.
 Scope-grammar extensions for `pledge:create` are coordinated with the
 [OC Agent spec](/agent/scopes).
 
+A verifier checks the delegation as of the time it verifies: unexpired then, and
+not revoked. The agent writes the pledge's `sworn_at`, so that time does not
+decide whether the delegation was in force, and once the delegation expires or
+is revoked the pledge stops counting. A history can still show it as of its
+`sworn_at` with `verifyPledgeAsOfSwornAt`, which says that time is unanchored.
+
 ## Lock for private counterparty negotiation
 
 A bilateral pledge often has confidential negotiation before the public

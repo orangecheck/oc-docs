@@ -11,13 +11,23 @@ export const metadata = {
 
 # Interface: TalliedResult
 
-Defined in: [vote-core/src/types.ts:94](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L94)
+Defined in: [vote-core/src/types.ts:102](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L102)
+
+Fields every tally result carries (SPEC §8).
+
+## Extends
+
+- [`TallyResultHead`](TallyResultHead)
 
 ## Properties
 
-| Property | Type | Defined in |
-| ------ | ------ | ------ |
-| &lt;a id="property-snapshot_block">&lt;/a> `snapshot_block` | `number` | [vote-core/src/types.ts:96](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L96) |
-| &lt;a id="property-state">&lt;/a> `state` | `"tallied"` | [vote-core/src/types.ts:95](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L95) |
-| &lt;a id="property-tallies">&lt;/a> `tallies` | `Record`\&lt;`string`, `number`\> | [vote-core/src/types.ts:98](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L98) |
-| &lt;a id="property-turnout">&lt;/a> `turnout` | [`TallyTurnout`](TallyTurnout) | [vote-core/src/types.ts:97](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L97) |
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-basis">&lt;/a> `basis` | `"anchored"` \| `"voter_clocks"` | What decided whether a ballot was in time: its anchor, or the voter's own `created_at`. | [`TallyResultHead`](TallyResultHead).[`basis`](TallyResultHead#property-basis) | [vote-core/src/types.ts:97](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L97) |
+| &lt;a id="property-close_height">&lt;/a> `close_height?` | `number` \| `null` | `H_close` for an anchored poll, null until a block's median_time_past passes the deadline; absent otherwise. | [`TallyResultHead`](TallyResultHead).[`close_height`](TallyResultHead#property-close_height) | [vote-core/src/types.ts:99](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L99) |
+| &lt;a id="property-counted">&lt;/a> `counted` | `string`[] | Ascending `ballot_id` of the ballot that stood for each voter, withdrawals and zero weights included. | - | [vote-core/src/types.ts:109](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L109) |
+| &lt;a id="property-snapshot_block">&lt;/a> `snapshot_block` | `number` | - | - | [vote-core/src/types.ts:105](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L105) |
+| &lt;a id="property-state">&lt;/a> `state` | `"tallied"` \| `"provisional"` | `provisional` until an anchored poll's tip reaches `H_close + G + 6` (SPEC §4.6, §8). | - | [vote-core/src/types.ts:104](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L104) |
+| &lt;a id="property-tallies">&lt;/a> `tallies` | `Record`\&lt;`string`, `number`\> | - | - | [vote-core/src/types.ts:107](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L107) |
+| &lt;a id="property-turnout">&lt;/a> `turnout` | [`TallyTurnout`](TallyTurnout) | - | - | [vote-core/src/types.ts:106](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L106) |
+| &lt;a id="property-unanchored">&lt;/a> `unanchored?` | `number` | Provisional tallies only: how many counted ballots have no anchor at or below `H_close + G` yet. | - | [vote-core/src/types.ts:111](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L111) |

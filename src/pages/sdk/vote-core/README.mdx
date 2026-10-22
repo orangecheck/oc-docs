@@ -20,17 +20,20 @@ export const metadata = {
 - [BallotSecret](interfaces/BallotSecret)
 - [BipSig](interfaces/BipSig)
 - [BlockTimeSource](interfaces/BlockTimeSource)
+- [DeferredResult](interfaces/DeferredResult)
 - [Poll](interfaces/Poll)
 - [PollOption](interfaces/PollOption)
 - [Reveal](interfaces/Reveal)
 - [TalliedResult](interfaces/TalliedResult)
 - [TallyOptions](interfaces/TallyOptions)
+- [TallyResultHead](interfaces/TallyResultHead)
 - [TallyTurnout](interfaces/TallyTurnout)
 - [Utxo](interfaces/Utxo)
 - [WeightParams](interfaces/WeightParams)
 
 ## Type Aliases
 
+- [CloseResolution](type-aliases/CloseResolution)
 - [PollMode](type-aliases/PollMode)
 - [SignatureVerifier](type-aliases/SignatureVerifier)
 - [SnapshotResolution](type-aliases/SnapshotResolution)
@@ -43,6 +46,10 @@ export const metadata = {
 
 ## Variables
 
+- [ANCHOR\_CUTOVER](variables/ANCHOR_CUTOVER)
+- [ANCHOR\_FINAL\_CONFIRMATIONS](variables/ANCHOR_FINAL_CONFIRMATIONS)
+- [ANCHOR\_GRACE\_BLOCKS](variables/ANCHOR_GRACE_BLOCKS)
+- [BALLOT\_STAMP\_MIME](variables/BALLOT_STAMP_MIME)
 - [BALLOT\_VERSION](variables/BALLOT_VERSION)
 - [MIN\_SNAPSHOT\_CONFIRMATIONS](variables/MIN_SNAPSHOT_CONFIRMATIONS)
 - [POLL\_VERSION](variables/POLL_VERSION)
@@ -51,18 +58,24 @@ export const metadata = {
 ## Functions
 
 - [ageDays](functions/ageDays)
+- [anchoredTallyIsFinal](functions/anchoredTallyIsFinal)
+- [anchorHeightFromStamps](functions/anchorHeightFromStamps)
 - [ballotId](functions/ballotId)
+- [ballotStampContent](functions/ballotStampContent)
 - [buildCommitMessage](functions/buildCommitMessage)
 - [canonicalBytes](functions/canonicalBytes)
 - [canonicalize](functions/canonicalize)
 - [commit](functions/commit)
 - [distinctBallotCopies](functions/distinctBallotCopies)
+- [isAnchoredPoll](functions/isAnchoredPoll)
 - [isMainnetAddress](functions/isMainnetAddress)
 - [isSupportedMode](functions/isSupportedMode)
+- [lastAnchorHeight](functions/lastAnchorHeight)
 - [mempoolBlockTimeSource](functions/mempoolBlockTimeSource)
 - [parseUtc](functions/parseUtc)
 - [pollId](functions/pollId)
 - [qualifyingUtxos](functions/qualifyingUtxos)
+- [resolveCloseBlock](functions/resolveCloseBlock)
 - [resolveDeadlineSnapshot](functions/resolveDeadlineSnapshot)
 - [resolvePollSnapshot](functions/resolvePollSnapshot)
 - [revealId](functions/revealId)

@@ -315,23 +315,37 @@ CREATE TABLE oc_accounts (
 ```
 
 When a token's `did_oc` has no row, create a new user with an id you generate at
-random and add the row in the same transaction; if the insert hits the primary
-key, another request signed the same person in first, so read its row. Never
-derive an identifier from the did (an email such as `sha256(did)@yoursite`, a
-username, a slug) and look a user up by it, or "find or create" by it: anyone
-can compute it from a did, register that account first, and the person's first
-sign-in walks into it. If a row points somewhere you don't expect, refuse the
-sign-in and log it.
+random and add the row in the same transaction. Never derive an identifier from
+the did (an email such as `sha256(did)@yoursite`, a username, a slug) and look a
+user up by it, or "find or create" by it: anyone can compute it from a did,
+register that account first, and the person's first sign-in walks into it. If a
+row points somewhere you don't expect, refuse the sign-in and log it.
+
+**Two first sign-ins at once.** If the insert hits the primary key, another
+request signed the same person in first. Either read the winner's row and carry
+on, or answer `409` "try again" and the retry reads it. Both are safe, as long
+as the losing request deletes the user it created: a user with no did is an
+account nobody can reach.
+
+**If an identity provider holds your users** (Supabase, Auth0, Cognito…), make
+sure no one else can create the user a first sign-in is about to create: turn
+public signup off, or create users only through the provider's admin API with a
+call that refuses an existing address or username. When you then mint a provider
+session for the new user, check it is for that user, and refuse it otherwise.
 
 **Linking orangecheck to an account someone already has.**
 
 - Ask for a fresh sign-in with your own login first (within the last few
-  minutes), then open the popup.
+  minutes), then open the popup. Never accept a sign-in the did itself started
+  as that proof: on an account with its own login, a stolen orangecheck session
+  must not be able to attach itself. Unlinking asks the same.
 - Link the did only if no other user has it; otherwise refuse.
-- Show the linked did on the account page, with an unlink button that deletes
-  the row and ends the sessions it started.
-- Keep it to one did per account (the `UNIQUE` above) unless your site has a
-  reason for more.
+- Keep it to one did per account, enforced by the database (the `UNIQUE` above),
+  unless your site has a reason for more.
+- Email the account's own address when a did is linked or unlinked.
+- Show the linked did on the account page, with an unlink button. Unlinking
+  deletes the row and ends the sessions that did started on your site, and any
+  grants it approved.
 
 ## verify without the SDK
 
@@ -469,18 +483,32 @@ failure logs one warning on the `orangecheck` logger. To keep the fetch off your
 requests, see [Python: warming](#python-warming).
 
 **If your own session replaces the token**, as when you sign the person into
-your own auth system after checking it, keep the token's `rh`, `aud` and `iat`
-with that session and ask the list about them on each request. In Node, keep one
-`integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later per
-process and `await check.status({ rh, aud, iat })`; in Python,
-`REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session.
+your own auth system (or a provider's) after checking it, spend the token once
+and don't store it:
+
+- Keep its `rh`, `aud` and `iat` with that session on your server, written
+  before you hand the session to the browser. Never let the browser bind them in
+  a second call: it could bind another token's handle, or none.
+- Spend its `jti` in a store all your servers share, until `exp`, so the same
+  token can't start a second session on another instance.
+- Refuse a token without `rh`: nothing could end the session it starts. Refuse
+  to start a deployment that is missing `OC_PROJECT_KEY` or `OC_SIGNING_SECRET`.
+- Ask the list about the session on each request. In Node, keep one
+  `integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later
+  per process and `await check.status({ rh, aud, iat })`; in Python,
+  `REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session;
+  `"unverified"` means reads go on and writes wait (answer `503`, never "signed
+  out"). If your own table of handles can't be read, treat only sessions
+  orangecheck started as unverified; your other logins carry on.
 
 **Anything you mint during that session ends with it.** Your own session cookie,
 API keys, OAuth grants to other apps, refresh tokens, long-lived links: if your
 site issues it while someone is signed in through orangecheck, keep the token's
 `rh`, `aud` and `iat` beside it (or beside the session that minted it), and when
 the list answers `"revoked"`, revoke it too. Otherwise "sign out everywhere"
-ends the cookie and leaves an API key working.
+ends the cookie and leaves an API key working. While the list answers
+`"unverified"`, the same rule as for your session applies to them: reads go on,
+and writes made with them wait.
 
 **Anything else.** Sign a GET with your secret over its method, path and query,
 URI-encoding the key and the audience:

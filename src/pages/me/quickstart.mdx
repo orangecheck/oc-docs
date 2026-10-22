@@ -220,26 +220,72 @@ That is sign-in. It costs nothing, in test mode or live.
 
 ### 5 · check it before real people sign in
 
-Each line is a way an integration has gone wrong.
+Each line is a way an integration has gone wrong, with why it matters.
 
-- [ ] Your server verifies the token with your exact origin as `audience`, and
-      keeps it in an httpOnly cookie. No script keeps it: not in `localStorage`,
-      not in `sessionStorage`.
-- [ ] Signing out clears your cookie and
-      [ends the token](/me/sdk#ending-a-session).
-- [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, your domain is
-      verified, and a session someone ended everywhere is refused within about
-      two minutes
-      ([when someone ends every session](/me/sdk#when-someone-ends-every-session)).
-- [ ] Anything you mint while someone is signed in (your own session, API keys,
-      OAuth grants, refresh tokens) ends when their session ends everywhere.
-- [ ] If you keep your own users: a first sign-in creates a new user with a
-      random id and a row keyed by `did_oc`. Nothing looks a user up by an
-      identifier derived from the did
-      ([your own accounts](/me/sdk#your-own-accounts)).
-- [ ] Linking orangecheck to an existing account asks for a fresh sign-in with
-      your own login first, refuses a did another user already has, and the
-      account page shows the link with an unlink button.
+**The token**
+
+- [ ] No script ever holds it: not in `localStorage`, not in `sessionStorage`.
+      _Any script on the page could read it._
+- [ ] Your server verifies it with your exact origin as `audience`. _A token
+      made for another site must not sign anyone in here._
+- [ ] If your site has its own sessions (yours, or a provider's such as Supabase
+      or Auth0), the token is spent once and never stored: your session takes
+      over. Otherwise keep it in an httpOnly cookie, as in step 2. _A stored
+      token is a 30-day credential you didn't need to keep._ When your session
+      takes over:
+    - [ ] the token's `jti` is spent in a store all your servers share, until
+          `exp`. _A token replayed to another instance must not sign in twice._
+    - [ ] its `rh`, `aud` and `iat` go with your session on the server, before
+          you hand the session out, never in a second call from the browser.
+          _The browser could bind another token's handle, or none._
+
+**Ending sessions**
+([when someone ends every session](/me/sdk#when-someone-ends-every-session))
+
+- [ ] Signing out clears your session and
+      [ends the token](/me/sdk#ending-a-session). _Otherwise the token stays
+      good until it expires._
+- [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, refuses to start
+      without either, and your domain is verified. _Without them, "sign out
+      everywhere" never reaches your site._
+- [ ] A session someone ended everywhere is refused within about two minutes,
+      and a token without `rh` is refused. _Nothing could ever end it._
+- [ ] Anything you mint while someone is signed in (your session, a provider
+      session, API keys, OAuth grants, refresh tokens) ends when their session
+      ends everywhere. _Otherwise sign-out ends the cookie and leaves a key
+      working._
+- [ ] While the list can't be read, writes wait for those grants and tokens too,
+      not only for web sessions; reads go on. If your own table of handles
+      breaks, only orangecheck sessions are affected. _A failure on our side or
+      yours must not lock out your other logins, or let ended sessions write._
+
+**Your own accounts** ([your own accounts](/me/sdk#your-own-accounts))
+
+- [ ] A first sign-in creates a new user with a random id and a row keyed by
+      `did_oc`; nothing finds a user by an identifier derived from the did.
+      _Anyone can compute it from the did and register that account first._
+- [ ] Outsiders can't pre-register the address or username a first sign-in
+      creates in your identity provider: public signup is off, or users are
+      created only through an admin API that refuses an existing one. A provider
+      session minted for anyone but the expected user is refused. _Otherwise the
+      first sign-in walks into an account someone prepared._
+- [ ] A first sign-in that loses a race leaves no orphan account. _A stray user
+      with no did is an account nobody can reach or clean up._
+- [ ] One did per account, enforced by the database. _Code checks race; a unique
+      key doesn't._
+
+**Linking and unlinking** ([linking](/me/sdk#your-own-accounts))
+
+- [ ] Link and unlink each ask for a fresh sign-in with your own login, never
+      one the did itself started, on accounts that have their own login. _A
+      stolen orangecheck session must not attach or detach itself._
+- [ ] A did another user already has is refused. _One person, one account._
+- [ ] The account's own email address is told on link and unlink. _The owner
+      learns of a change they didn't make._
+- [ ] Unlink ends the sessions the unlinked did started, and the grants it
+      approved. _Otherwise unlinking leaves it signed in._
+- [ ] The account page shows the link, with an unlink button. _People can see
+      and undo it._
 
 ## Pay your users (optional)
 

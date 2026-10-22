@@ -159,7 +159,11 @@ auth host with a signed `oc-chat:device-revoke:v1` statement dated by the host.
 The host that vouches for a device can revoke it: the same named trust anchor. A
 revocation seen on any relay counts. ochk.io keeps keys it rotated out in its
 JWKS, marked retired, and a retired key verifies only what it signed before it
-retired (OC Chat 0.3.0).
+retired (OC Chat 0.3.0). The host never vouches again for a device it revoked,
+and revoking a device ends the ochk.io sign-in that set it up (every other
+sign-in of the account when the host cannot tell which), with an offer to end
+the rest. A device that reads its own revocation asks for no new vouch and stops
+sending (OC Chat 0.3.1).
 
 **Stepping up.** The same device key may also be bound to a Bitcoin address by
 an OC Lock device record it publishes (BIP-322 over a v3 statement that signs
@@ -265,7 +269,8 @@ A client is OC Chat v0 compliant iff it:
 - If it accepts `did:oc` session devices: binds a session record only through a
   vouch that verifies against the ochk.io JWKS, renders it as session, and steps
   a message up to "verified · `address`" only when the signing key resolves to
-  that address (`vc18`).
+  that address (`vc18`), and never asks for a new vouch for a device it has read
+  a revocation of.
 - Emits the §9 + OC Lock §6 error codes.
 
 ## Source documents

@@ -787,6 +787,11 @@ export const DOCS_NAV: DocsSection[] = [
                 label: '@orangecheck/nostr-core',
                 blurb: 'Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).',
             },
+            {
+                href: '/sdk/bip322/README',
+                label: '@orangecheck/bip322',
+                blurb: 'Verify BIP-322 and BIP-137 message signatures; since 1.1, sign BIP-322 with a key you hold.',
+            },
             // ── agent (oc-agent-protocol) ──────────────────────────────
             {
                 href: '/sdk/agent-core/README',

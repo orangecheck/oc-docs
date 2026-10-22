@@ -191,11 +191,13 @@ yourself.
 
 ## Get your own attestation
 
-Signing needs a wallet that can do BIP-322 (UniSat, Xverse, Leather, Sparrow,
-Electrum, OKX, Phantom). Open [attest.ochk.io](https://attest.ochk.io), connect
-it, and sign one short canonical message — your Bitcoin never moves and no
-private key leaves your wallet. [How it works](/attest/how-it-works) is the
-whole protocol on one page.
+Signing needs a wallet that can sign a message: UniSat, Xverse, Leather, OKX,
+Phantom and Sparrow sign with BIP-322, and Electrum's legacy `signmessage`
+signature is accepted too
+([which forms](/ecosystem/bip322#what-the-verifier-accepts)). Open
+[attest.ochk.io](https://attest.ochk.io), connect it, and sign one short
+canonical message — your Bitcoin never moves and no private key leaves your
+wallet. [How it works](/attest/how-it-works) is the whole protocol on one page.
 
 ## The machine-readable contract
 

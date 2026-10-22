@@ -38,6 +38,32 @@ This is critical: any canonicalization or trimming the wallet does would cause
 the signature to validate against different bytes than the verifier uses when
 recomputing the attestation ID, and the whole chain breaks.
 
+## What the verifier accepts
+
+What [`@orangecheck/bip322`](/sdk/bip322/README) 1.1.0 accepts, measured by
+signing and verifying rather than by reading its code:
+
+| Address                 | BIP-322 simple | simple with `smp` | BIP-322 full (`ful`) | Legacy `signmessage` (BIP-137) |
+| ----------------------- | -------------- | ----------------- | -------------------- | ------------------------------ |
+| P2WPKH (`bc1q…`)        | accepted       | accepted          | refused              | accepted                       |
+| P2TR (`bc1p…`, one key) | accepted       | accepted          | refused              | accepted                       |
+| P2SH-P2WPKH (`3…`)      | accepted       | accepted          | refused              | accepted                       |
+| P2PKH (`1…`)            | refused        | refused           | refused              | accepted                       |
+
+- **Legacy signatures.** A 65-byte `signmessage` signature passes for any of
+  these address types when the key it recovers is the address's own: its hash
+  for P2PKH, P2WPKH and P2SH-P2WPKH, its BIP-86 output key for P2TR. The
+  header's address-type flag is not checked, so a wallet that signs a SegWit
+  address with the P2PKH flags passes the same as one that uses BIP-137's SegWit
+  flags. That is how Electrum signs; no Electrum version has been run against
+  it.
+- **The `smp` prefix.** The finalized BIP-322 prefixes a simple signature with
+  `smp`. A verifier needs `@orangecheck/bip322` 1.1.0 or later to accept it;
+  older verifiers, and `bip322-js`, refuse it. `signMessage` leaves the prefix
+  off unless asked.
+- **Full and proof-of-funds signatures** (`ful`, `pof`) are refused unread, so a
+  wallet that produces only those cannot sign on the family's sites.
+
 ## Wallet support matrix
 
 | Wallet                                        | Type              | BIP-322 support                                                         |
@@ -48,7 +74,7 @@ recomputing the attestation ID, and the whole chain breaks.
 | [Alby](https://getalby.com)                   | browser           | No. WebLN signs with a Lightning node key, not a Bitcoin address        |
 | [Sparrow](https://sparrowwallet.com)          | desktop           | Yes, via "Sign message" (right-click an address)                        |
 | [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | Partial. BIP-322 for P2WPKH / P2TR via `signmessage`, version-dependent |
-| [Electrum](https://electrum.org)              | desktop           | No. Legacy scheme only (no BIP-322 for SegWit)                          |
+| [Electrum](https://electrum.org)              | desktop           | Yes, through its legacy `signmessage` signature (see above)             |
 | Hardware wallets (Coldcard / Trezor / Ledger) | HW                | Partial, via a PSBT flow. Not one-click signing                         |
 
 If your wallet isn't on the list, the canonical test is: does signing a message

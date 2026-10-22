@@ -21,12 +21,14 @@ message + signature is the artifact; you share it directly.
 
 ## Which wallets work?
 
-Anything that signs via BIP-322. Preferred because it works with every address
-type (P2WPKH / P2TR / P2PKH / P2SH).
+Anything that signs a message with BIP-322, or with the legacy `signmessage`
+format (BIP-137) using the address's own key. BIP-322 is preferred; the legacy
+format is accepted for every address type too.
 
 - **Browser:** UniSat, Xverse, Leather, OKX, Phantom. Not Alby: WebLN signs with
   a Lightning node key, not a Bitcoin address.
-- **Desktop:** Sparrow, Bitcoin Core, Electrum (legacy scheme only for Electrum)
+- **Desktop:** Sparrow, Bitcoin Core, Electrum (through its legacy `signmessage`
+  signature)
 - **Hardware:** via PSBT flow — Coldcard, Trezor (with limitations), Ledger
   (limited)
 

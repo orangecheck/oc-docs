@@ -150,9 +150,17 @@ Each protocol that has a command-line tool ships it as its own package:
 
 ```bash
 npm i -g @orangecheck/stamp-cli
-# or one-shot
-npx -y -p @orangecheck/stamp-cli stamp --help
 ```
+
+Or run it once with npx, in either form. Both run `stamp`, with the same
+output and exit code:
+
+```bash
+npx -y @orangecheck/stamp-cli verify notes.txt.stamp notes.txt
+npx -y -p @orangecheck/stamp-cli stamp verify notes.txt.stamp notes.txt
+```
+
+`git-stamp` needs the second form: `npx -y -p @orangecheck/stamp-cli git-stamp …`.
 
 | Command                               | What it does                                                                        |
 | ------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -173,7 +181,7 @@ stamp file notes.txt --addr bc1q… --signed-at 2026-10-21T16:00:00Z --sig '<bas
 ```
 
 `stamp verify` exits 0 when the stamp checks out and 2 when a check fails
-(`E_BAD_SIG`, `E_BAD_ANCHOR`, `E_NO_ANCHOR`). `stamp anchor` exits 1 when it
+(`E_BAD_SIG`, `E_BAD_CONTENT`, `E_BAD_ANCHOR`, `E_NO_ANCHOR`). `stamp anchor` exits 1 when it
 cannot reach a calendar or the header source.
 
 ### `--headers-url`

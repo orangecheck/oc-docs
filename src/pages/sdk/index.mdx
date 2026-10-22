@@ -58,6 +58,7 @@ Serve every sibling protocol.
 | [`@orangecheck/auth-core`](/sdk/auth-core/README)                 | Ed25519 JWT verify + cookie helpers — consumer half of the ochk.io auth host.                          |
 | [`@orangecheck/auth-client`](/sdk/auth-client/README)             | React provider + hooks for cross-subdomain auth via the ochk.io host.                                  |
 | [`@orangecheck/nostr-core`](/sdk/nostr-core/README)               | Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).                                      |
+| [`@orangecheck/bip322`](/sdk/bip322/README)                     | Bitcoin message signatures, currently 1.1.0: `verifySignature()` for BIP-322 and legacy BIP-137, and since 1.1 `signMessage()` for a key you hold. No bitcoinjs-lib. |
 | [`@orangecheck/design`](/sdk/design/README)                        | The family design system — tokens, primitives, family chrome. Storybook at [design.ochk.io](https://design.ochk.io). |
 | [`@orangecheck/legal`](https://www.npmjs.com/package/@orangecheck/legal) | Family-internal Terms / Privacy / security-disclosure documents rendered by every family site.   |
 | [`@orangecheck/insights-client`](/sdk/insights-client/README) | Server-side event emit for oc insights, the family's first-party analytics.  |
@@ -139,7 +140,7 @@ changelog if something looks ambiguous.
 
 `@orangecheck/sdk`, `@orangecheck/agent-core`, `@orangecheck/pledge-core`,
 `@orangecheck/lock-core`, `@orangecheck/stamp-core`, `@orangecheck/vote-core`
-are at v1.0.0+ — wire-format-stable; type changes are semver-respecting.
+and `@orangecheck/bip322` are at v1.0.0+ — wire-format-stable; type changes are semver-respecting.
 
 ## Cross-implementation conformance
 

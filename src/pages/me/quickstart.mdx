@@ -97,7 +97,9 @@ token itself: see [verify without the SDK](/me/sdk#verify-without-the-sdk).
 The token lasts as long as the person's ochk.io session, 30 days at most, and is
 never refreshed: when it expires, they sign in again. To sign someone out, clear
 the cookie and [end the token](/me/sdk#ending-a-session), so me.ochk.io refuses
-it too. Signing out of ochk.io does not sign them out of your site.
+it too. Signing out of ochk.io does not sign them out of your site; signing out
+everywhere does, once your server has your project key and signing secret (see
+[when someone ends every session](/me/sdk#when-someone-ends-every-session)).
 
 `<OcSignIn>` from `@orangecheck/auth-client` mounts the sign-in form in your own
 page instead of a popup. It works only on orangecheck's own sites (`*.ochk.io`

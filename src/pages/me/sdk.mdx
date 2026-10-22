@@ -260,10 +260,62 @@ curl -X POST https://ochk.io/api/auth/revoke \
 ```
 
 Up to 8 tokens per call, from your server. Holding a token is the authority to
-end it, so no other credential is asked for. A token checked only against the
-key set, as above, still verifies until it expires: an ended token or a deleted
-account is refused by me.ochk.io, not by your own check. Keep your session
-shorter than the token if that matters to you.
+end it, so no other credential is asked for.
+
+### when someone ends every session
+
+A person can end all their sessions at once: "Sign out everywhere", removing a
+passkey, or deleting the account. A token checked only against the key set still
+verifies after that, until it expires. To refuse it on your site too, give your
+server your project key and signing secret (from
+[ochk.app/me/projects](https://ochk.app/me/projects)):
+
+```sh
+OC_PROJECT_KEY=pk_live_…
+OC_SIGNING_SECRET=…
+```
+
+With both set, `getOcSession`, `withOcAuth`, `ocAuthExpress` and `ocAuthHono`
+(me-client 0.34.0 or later) refuse such a session on their own. They read the
+list of ended accounts from me.ochk.io once a minute and check each request from
+memory, so a refusal lands within about two minutes. If me.ochk.io can't be
+reached, reads go on and writes are refused until it can. Without the two
+variables nothing changes, and the token stays valid until it expires.
+
+**Python** ([`orangecheck`](/sdk/python) 2.7.0 or later): keep one list per
+process and pass it with the request's method.
+
+```python
+from orangecheck import RevocationList, SessionEnded, verify_session
+
+REVOCATIONS = RevocationList(PROJECT_KEY, SIGNING_SECRET)
+
+session = verify_session(token, audience="https://your-site.example",
+                         revocations=REVOCATIONS, method=request.method)
+# SessionEnded (an InvalidSession, reason "ended") when the person ended it.
+```
+
+**If your own session replaces the token**, as when you sign the person into
+your own auth system after checking it, keep the token's `sub` and `iat` with
+that session and ask the list about them on each request. In Node, keep one
+`integratorRevocationCheck()` from `@orangecheck/auth-core` 2.11.0 or later per
+process and `await check.status({ sub, iat })`; in Python,
+`REVOCATIONS.status(sub, iat)`. `"revoked"` means end your session.
+
+**Anything else.**
+`GET https://me.ochk.io/api/integrator/revocations?project_key=<key>`, signed
+like an event, over the query instead of a body:
+`X-OC-Signature: t=<unix>,v1=hmac_sha256(signing_secret, "<t>.project_key=<key>")`.
+It answers
+`{ "v": 1, "at": …, "tokens": [], "accounts": { "<key>": <cutoff> } }`. A
+session is ended when `accounts` holds
+`base64url(sha256("ocrev1:sub:" + sub)[0:16])` (no padding) and its `iat` is
+before that cutoff, or it has no `iat`. The keys are hashes, so the list names
+no one. Fetch it at most once a minute.
+
+The list comes from ochk.io, the auth host, and me.ochk.io serves it; both are
+orangecheck. A plain sign-out on ochk.io still does not end your session, by
+design, as with any sign-in provider.
 
 ## React, with auth-client
 

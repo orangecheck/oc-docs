@@ -74,12 +74,13 @@ const anchored = { ...env, ots: toStampOts(await submitToCalendars(env.id)) };
 // anchored.ots.status is "pending"
 ```
 
-`submitToCalendars()` POSTs the envelope's `id` bytes to one or more OTS
+`submitToCalendars()` POSTs the envelope's `id` bytes to the three default OTS
 calendars (`alice.btc.calendar.opentimestamps.org`,
-`bob.btc.calendar.opentimestamps.org`, etc.). The calendars batch many digests
-into a Merkle tree and publish the tree root to Bitcoin. At this point the proof
-is **pending** — you have a receipt that says "your digest is in a batch" but
-the batch hasn't hit the chain yet.
+`bob.btc.calendar.opentimestamps.org` and `finney.calendar.eternitywall.com`)
+and needs two of them to answer. The calendars batch many digests into a Merkle
+tree and publish the tree root to Bitcoin. At this point the proof is
+**pending** — you have a receipt that says "your digest is in a batch" but the
+batch hasn't hit the chain yet.
 
 Once a Bitcoin block confirms, the proof can be **upgraded**:
 

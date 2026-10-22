@@ -29,7 +29,8 @@ export const meta = {
 - **§3 Canonical message** — six lines, LF-separated, no trailing LF,
   `oc-stamp:v1` as domain separator.
 - **§4 Envelope format** — `.stamp` / `application/vnd.oc-stamp+json`.
-- **§5 Canonicalization** — RFC 8785 JSON canonicalization.
+- **§5 Canonicalization** — RFC 8785 JSON canonicalization, ending in LF. These
+  bytes serialize the envelope; the id is over §3's message, never these.
 - **§6 OpenTimestamps integration** — submit → pending → upgrade → confirmed.
 - **§7 Nostr directory** — kind-30083 (optional).
 - **§8 Verification algorithm** — seven steps.
@@ -48,7 +49,7 @@ address: <btc_address>
 content_hash: sha256:<64-hex>
 content_length: <positive integer, decimal>
 content_mime: <RFC 6838 media type>
-signed_at: <ISO 8601 UTC>
+signed_at: <YYYY-MM-DDTHH:MM:SSZ or YYYY-MM-DDTHH:MM:SS.sssZ, as written>
 ```
 
 Each line terminated by single LF (`0x0a`), no trailing LF after `signed_at`.

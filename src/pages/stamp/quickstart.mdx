@@ -35,9 +35,9 @@ No account. No server. No fees.
    64-character hex string. Sign with your browser wallet (UniSat, Xverse,
    Leather, OKX or Phantom), or sign the id in any wallet and paste the
    signature.
-5. The client submits the envelope id to three OpenTimestamps calendars. You get
-   a **pending** proof immediately, and a **confirmed** anchor within about an
-   hour.
+5. The client submits the envelope id to the three default OpenTimestamps
+   calendars (alice, bob, finney); two must answer. You get a **pending** proof
+   immediately, and a **confirmed** anchor within about an hour.
 6. Download the `.stamp` file. Ship it alongside your content, or copy the share
    link.
 
@@ -71,6 +71,15 @@ const anchored = { ...env, ots: toStampOts(proof) };
 // 3. Share — the envelope is self-contained JSON.
 console.log(JSON.stringify(anchored, null, 2));
 ```
+
+`signed_at` defaults to now. To set it, pass `signedAt` as a `Date` (its
+milliseconds are kept) or as a string already in the spec's form,
+`YYYY-MM-DDTHH:MM:SSZ` or `YYYY-MM-DDTHH:MM:SS.sssZ`, which is used exactly as
+given. The id covers `signed_at` as written, so `stamp()` never rounds it:
+anything else throws `E_MALFORMED`.
+
+`submitToCalendars` sends the id to the three default calendars and needs two of
+them to answer, as the spec recommends. Pass `minSuccesses: 1` to accept one.
 
 `signMessage` receives the envelope id as a 64-character hex string and must
 return a base64 BIP-322 signature of it by `address`. In a browser,
@@ -125,12 +134,20 @@ rather than passing the whole file to `verify()` as `content`.
 
 ## Verify
 
+An envelope you receive, from a `.stamp` file, a Nostr event or a request body,
+goes through `parseStamp` first. It checks every field's shape and type and
+returns the envelope typed, or throws `StampError` with `E_MALFORMED` (or
+`E_UNSUPPORTED_VERSION` for a newer `v`). Never cast `JSON.parse` to
+`StampEnvelope`.
+
 ```ts
 import { verifySignature } from '@orangecheck/bip322';
-import { verify } from '@orangecheck/stamp-core';
+import { parseStamp, verify } from '@orangecheck/stamp-core';
+
+const received = parseStamp(text); // the .stamp file or JSON you were sent
 
 const result = await verify({
-    envelope: anchored,
+    envelope: received,
     content: new TextEncoder().encode('hello stamp'), // optional; checks bytes match
     verifyBip322: async (msg, sig, addr) => verifySignature(addr, msg, sig),
 });
@@ -139,6 +156,12 @@ if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
 console.log('signed by', result.envelope.signer.address); // authorship + content
 console.log('anchor:', result.anchor.status); // 'pending' until a block confirms it
 ```
+
+`verify()` calls `verifyBip322(message, signatureB64, address)`, where `message`
+is the envelope id as 64 lowercase hex characters. Note the order:
+`@orangecheck/bip322`'s `verifySignature` takes the address first, hence the
+wrapper. Leave `verifyBip322` out and `verify()` fails closed with `E_BAD_SIG`;
+only `skipSignatureVerification: true` skips the check.
 
 This proves who signed and that the bytes match. Priority needs a confirmed
 anchor checked against Bitcoin block headers: upgrade the proof, then pass

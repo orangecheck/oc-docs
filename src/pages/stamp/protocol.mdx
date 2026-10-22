@@ -47,7 +47,7 @@ Bitcoin headers.
 4. Client derives `id = sha256(canonical_message)` and shows her the message
    beside it.
 5. Her wallet signs the hex `id` via BIP-322. One prompt. The client submits the
-   id to two OTS calendars.
+   id to the three default OTS calendars (alice, bob, finney); two must answer.
 6. Client assembles the envelope: v, kind, id, content (hash + length + mime +
    ref), signer, signed_at, stake (null), ots (pending), sig.
 7. About an hour later, an OTS calendar anchors the root to a Bitcoin block. The

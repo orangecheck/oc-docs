@@ -86,8 +86,11 @@ transport is the user's choice (URL fragment, email, IPFS, Nostr, QR, paper).
 
 ### `signed_at`
 
-ISO 8601 UTC. MUST match the canonical message. **Self-declared** — the signer's
-claim. Only the OTS anchor proves the id existed _before_ a specific block.
+`YYYY-MM-DDTHH:MM:SSZ` or `YYYY-MM-DDTHH:MM:SS.sssZ`, a real UTC instant, and
+nothing else: a verifier rejects any other form. MUST match the canonical
+message, and is hashed into the id exactly as written, so no implementation may
+round or reformat it. **Self-declared** — the signer's claim. Only the OTS
+anchor proves the id existed _before_ a specific block.
 
 ### `stake` (optional)
 
@@ -144,6 +147,12 @@ Per
 [RFC 8785 JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785)
 — lexicographically sorted keys at every level, no insignificant whitespace,
 LF-terminated.
+
+These bytes serialize the envelope for equality checks and storage. They never
+feed the id: the id is the SHA-256 of the six-line canonical message, which has
+no trailing LF. In `@orangecheck/stamp-core`, `canonicalEnvelopeBytes` is this
+byte form; `canonicalizeEnvelope` is the same JSON as a string, without the
+final LF.
 
 Unlike OC Lock (which needs a custom sort rule for `recipients[]`), OC Stamp
 envelopes have no array field requiring stable per-element sorting. RFC 8785

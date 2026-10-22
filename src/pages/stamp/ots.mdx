@@ -47,8 +47,14 @@ Defaults to three independently-operated calendars:
 - `https://finney.calendar.eternitywall.com`
 
 Clients SHOULD submit to at least two independent calendars. Submitting to a
-single calendar is a single point of failure for upgrade liveness. The proof
-keeps the receipt of every calendar that answered, and `calendars` lists them.
+single calendar is a single point of failure for upgrade liveness. So
+`submitToCalendars` needs two calendars to answer by default and throws if fewer
+do; pass `minSuccesses: 1` to accept one. The proof keeps the receipt of every
+calendar that answered, and `calendars` lists them.
+
+The digest goes as the raw 32-byte body of `POST /digest` with no `Content-Type`
+header: a browser sends a CORS preflight for any other type, and the public
+calendars refuse it.
 
 ## Step 3: Pending proof
 
@@ -96,7 +102,9 @@ const env = { ...anchored, ots: toStampOts(upgraded) };
 ```
 
 While the calendars have not anchored the batch, `upgradeProof()` returns the
-proof still pending; call it again later.
+proof still pending; call it again later. `headerSource` is required: the proof
+becomes `confirmed` only once the header at its attested height has the proof's
+Merkle root, so nothing is confirmed on the proof's say-so.
 
 The upgrade rewrites `ots` only. It does not touch `id`, `sig`, or any other
 signed-domain field. The signature domain does not include `ots`, so the upgrade

@@ -61,7 +61,8 @@ for the full reporting protocol.
 - **BIP-322 is implemented correctly.** Pin a verifier known to handle all
   address types (P2WPKH, P2TR, P2WSH, P2PKH).
 - **At least one OTS calendar is non-colluding.** Submit to ≥2
-  independently-operated calendars.
+  independently-operated calendars. `@orangecheck/stamp-ots` sends to three
+  default calendars (alice, bob, finney) and needs two to answer.
 - **SHA-256 is collision-resistant.** Practical collisions break `id`
   uniqueness.
 - **Randomness at signing time is strong** for any ephemeral values used by the

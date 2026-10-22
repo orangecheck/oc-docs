@@ -127,8 +127,13 @@ For OC Stamp this is **harmless in practice**:
   verification on the consumer side.
 
 The **common** reason to republish with the same d-tag is an OTS upgrade:
-pending → confirmed. Verifiers that see multiple versions of the same id SHOULD
-accept the one with `ots.status === "confirmed"` and the latest `upgraded_at`.
+pending → confirmed. A verifier that sees several versions of the same id
+chooses by verified anchor (SPEC §7.2): check each version's proof against a
+block header, and take the one whose proof reaches the earliest checked block.
+That height comes from walking the proof, not from the declared `block_height`.
+Never choose by `upgraded_at`: like everything in `ots`, it sits outside the
+signature, and whoever republishes sets it. A version with no checked anchor is
+at most claimed.
 
 ## Recommended relays
 

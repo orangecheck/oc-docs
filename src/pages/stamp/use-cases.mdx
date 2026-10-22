@@ -159,10 +159,8 @@ Embed an OC Attest reference in every Stamp envelope. Feed aggregators can then
 filter posts by signer stake:
 
 ```ts
-import type { StampEnvelope } from '@orangecheck/stamp-core';
-
 import { verifySignature } from '@orangecheck/bip322';
-import { checkStake, stamp, verify } from '@orangecheck/stamp-core';
+import { checkStake, parseStamp, stamp, verify } from '@orangecheck/stamp-core';
 
 const post = await stamp({
     content: postBytes,
@@ -178,7 +176,14 @@ const post = await stamp({
 
 // Aggregator:
 for (const incoming of feed) {
-    const env = JSON.parse(incoming.content) as StampEnvelope;
+    // From the network, so parse it at the edge: parseStamp throws StampError
+    // (E_MALFORMED) for anything that is not an envelope.
+    let env;
+    try {
+        env = parseStamp(incoming.content);
+    } catch {
+        continue;
+    }
     const r = await verify({
         envelope: env,
         content: incoming.bytes,

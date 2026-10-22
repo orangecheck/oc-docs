@@ -76,12 +76,13 @@ key so your error handler can switch on the cause:
 
 ## Context codes
 
-| Code               | Severity | Meaning                                                                                                       | What to tell the user                                                                                  |
-| ------------------ | -------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `aud_mismatch`     | warn     | `audience` in the signed message doesn't match what the verifier expected.                                    | Usually means the signature was made for a different host — verify-intentional or refuse, your choice. |
-| `expired`          | error    | `expires_at` has passed (relevant for signed-challenge auth, not attestations — attestations have no expiry). | "Your challenge has expired. Request a fresh one."                                                     |
-| `network_testmode` | warn     | Signature is on testnet or signet.                                                                            | "Test networks can't be verified in production. Use mainnet."                                          |
-| `bad_request`      | error    | Structural problem with the request body — missing fields, wrong types.                                       | "Check your request shape against the docs."                                                           |
+| Code               | Severity | Meaning                                                                                                | What to tell the user                                                                                  |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `aud_mismatch`     | warn     | `audience` in the signed message doesn't match what the verifier expected.                             | Usually means the signature was made for a different host — verify-intentional or refuse, your choice. |
+| `expired`          | error    | The signed `expires` has passed or is not an RFC 3339 time; for a sign-in challenge, its `expires_at`. | "This has expired. Sign a fresh one."                                                                  |
+| `not_yet_valid`    | error    | The signed `issued_at` is more than two minutes ahead of the verifier's clock.                         | "This is dated in the future. Check the clock that signed it, then sign again."                        |
+| `network_testmode` | warn     | Signature is on testnet or signet.                                                                     | "Test networks can't be verified in production. Use mainnet."                                          |
+| `bad_request`      | error    | Structural problem with the request body — missing fields, wrong types.                                | "Check your request shape against the docs."                                                           |
 
 ## Programmatic access
 

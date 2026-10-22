@@ -177,7 +177,8 @@ cache.
 | `below_min_sats`         | error    | Policy threshold — `/api/check` only        |
 | `below_min_days`         | error    | Policy threshold — `/api/check` only        |
 | `aud_mismatch`           | warn     | Signed audience ≠ expected (challenge flow) |
-| `expired`                | error    | Challenge TTL exceeded                      |
+| `expired`                | error    | Signed `expires` passed or unreadable       |
+| `not_yet_valid`          | error    | Signed `issued_at` ahead of the clock       |
 | `network_testmode`       | warn     | Signature is on testnet/signet              |
 | `bad_request`            | error    | Structural problem with request body        |
 

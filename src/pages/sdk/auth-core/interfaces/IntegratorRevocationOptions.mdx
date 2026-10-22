@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Interface: IntegratorRevocationOptions",
+    description: "Auto-generated API reference for Interface: IntegratorRevocationOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / IntegratorRevocationOptions
+
+# Interface: IntegratorRevocationOptions
+
+Defined in: [revocation.ts:208](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L208)
+
+## Extends
+
+- `Omit`\&lt;[`RevocationCheckOptions`](RevocationCheckOptions), `"url"` \| `"token"` \| `"headers"` \| `"developing"`\>
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | - | [`RevocationCheckOptions`](RevocationCheckOptions).[`fetch`](RevocationCheckOptions#property-fetch) | [revocation.ts:63](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L63) |
+| &lt;a id="property-maxstalems">&lt;/a> `maxStaleMs?` | `number` | Past this age a copy cannot vouch for a write. Default 10 min. | [`RevocationCheckOptions`](RevocationCheckOptions).[`maxStaleMs`](RevocationCheckOptions#property-maxstalems) | [revocation.ts:52](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L52) |
+| &lt;a id="property-meorigin">&lt;/a> `meOrigin?` | `string` | Default `OC_ME_ORIGIN`, else `https://me.ochk.io`. | - | [revocation.ts:215](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L215) |
+| &lt;a id="property-now">&lt;/a> `now?` | () => `number` | - | [`RevocationCheckOptions`](RevocationCheckOptions).[`now`](RevocationCheckOptions#property-now) | [revocation.ts:64](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L64) |
+| &lt;a id="property-projectkey">&lt;/a> `projectKey?` | `string` | Default `OC_PROJECT_KEY`. | - | [revocation.ts:211](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L211) |
+| &lt;a id="property-retryms">&lt;/a> `retryMs?` | `number` | After a failed fetch, how long to wait before the next. Default 10 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`retryMs`](RevocationCheckOptions#property-retryms) | [revocation.ts:56](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L56) |
+| &lt;a id="property-signingsecret">&lt;/a> `signingSecret?` | `string` | Default `OC_SIGNING_SECRET`. | - | [revocation.ts:213](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L213) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | One fetch's time limit. Default 3 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`timeoutMs`](RevocationCheckOptions#property-timeoutms) | [revocation.ts:54](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L54) |
+| &lt;a id="property-ttlms">&lt;/a> `ttlMs?` | `number` | How long a copy is used before fetching again. Default 60 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`ttlMs`](RevocationCheckOptions#property-ttlms) | [revocation.ts:50](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L50) |

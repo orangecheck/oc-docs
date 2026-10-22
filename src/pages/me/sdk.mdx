@@ -270,23 +270,32 @@ The wrappers all take one options bag:
 `verify_session`:
 
 ```python
-from orangecheck import BondRequired, SignInPolicy, verify_session
+from orangecheck import BondRequired, InvalidSession, SignInPolicy, verify_session
 
 POLICY = SignInPolicy(PROJECT_KEY)  # one per process; reads your project's rule, held a minute
 
 try:
     session = verify_session(token, audience="https://your-site.example", policy=POLICY)
-except BondRequired as err:
-    # 403 in your API: err.need, err.have (the account's floors, or None), err.back_url
-    ...
+except BondRequired as err:  # before InvalidSession: it is one
+    ...  # 403: err.need, err.have (the account's floors, or None), err.back_url
+except InvalidSession as err:
+    ...  # 401: err.reason
 ```
 
+`BondRequired` and `SessionEnded` are both `InvalidSession`s. Put their handlers
+first: an `except InvalidSession` above them takes them too.
+
+`verify_session` reads the rule from me.ochk.io inside the first call that needs
+it, then holds it a minute. That read is one round trip (235 to 270 ms in our
+measurements) and waits at most four seconds; to keep it off your requests, see
+[Python: warming](#python-warming).
 `require_bond={"min_sats": …, "min_days": …, "max_age_secs": …}` sets the
-requirement in code and wins over `policy`, like `requireBond`. A key that names
-no project raises `InvalidSession` with reason `unknown_project_key`; while the
-rule can't be read, the last one read stands, and with none read yet the sign-in
-is refused (reason `bond_policy_unavailable`) rather than let through.
-`bond_meets(session, min_sats=…, min_days=…)` is the check on its own.
+requirement in code and wins over `policy`, like `requireBond`, with nothing to
+read. A key that names no project raises `InvalidSession` with reason
+`unknown_project_key`; while the rule can't be read, the last one read stands,
+and with none read yet the sign-in is refused (reason `bond_policy_unavailable`)
+rather than let through. `bond_meets(session, min_sats=…, min_days=…)` is the
+check on its own.
 
 ## verify without the SDK
 
@@ -414,35 +423,10 @@ That is the Node rule too: while the list can't be read, reads go on and writes
 are refused. With no `method`, a request counts as a write.
 
 The list for an origin is fetched inside the call that first needs it, then at
-most once a minute. That fetch is one round trip to me.ochk.io (250 to 470 ms in
-our measurements); a lookup in the copy in memory takes microseconds. A fetch
-waits at most three seconds; after a failure the next try waits ten seconds, and
-the last copy answers meanwhile. The first failure logs one warning on the
-`orangecheck` logger. To keep the fetch off your requests, warm each origin you
-serve at startup, then from a background thread every ten seconds:
-
-```python
-REVOCATIONS.status("warm", "https://your-site.example", 0)
-```
-
-Until the copy is a minute old the call only reads memory, so the thread makes
-nearly every fetch and requests read the copy.
-
-**Threads, processes and async.**
-
-- **Threads.** One `RevocationList` is safe to share between threads. Each
-  origin has its own lock: while one thread fetches an origin's list, other
-  threads asking about that origin wait for that same fetch, and threads asking
-  about other origins go on.
-- **Processes.** Each process keeps its own copy and makes its own fetches, so
-  four gunicorn workers fetch four times a minute per origin. Start the warming
-  thread inside each worker (gunicorn's `post_fork` hook, for example): a thread
-  started before the fork does not run in the workers.
-- **Async.** `status()` and `verify_session` are synchronous and wait on the
-  network when they fetch. In an `async` handler, call them with
-  `await asyncio.to_thread(...)`.
-
-`SignInPolicy` is the same on all three counts.
+most once a minute. A fetch waits at most three seconds; after a failure the
+next try waits ten seconds, and the last copy answers meanwhile. The first
+failure logs one warning on the `orangecheck` logger. To keep the fetch off your
+requests, see [Python: warming](#python-warming).
 
 **If your own session replaces the token**, as when you sign the person into
 your own auth system after checking it, keep the token's `rh`, `aud` and `iat`
@@ -473,6 +457,56 @@ site's handles for the same person never match yours. The list does show you how
 many accounts ended their sessions recently, and when, as handles you can't tie
 to anyone who hasn't signed in to your site. A plain sign-out on ochk.io still
 does not end your session, by design, as with any sign-in provider.
+
+### Python: warming
+
+On a cold process, the first `verify_session` fetches what it needs inside the
+request:
+
+| What                              | Held     | First fetch, our measurements |
+| --------------------------------- | -------- | ----------------------------- |
+| ochk.io's key set                 | an hour  | 150 to 230 ms                 |
+| your project's sign-in rule       | a minute | 235 to 270 ms                 |
+| the revocation list for an origin | a minute | 250 to 470 ms                 |
+
+Together that is 0.6 to 0.8 s; afterwards each is read from memory in
+microseconds. `warm_session` (`orangecheck` 2.10.0 or later) takes the same
+arguments as `verify_session` and fetches whichever of those is due, without
+raising. Call it at startup and then every ten seconds from a background thread:
+
+```python
+import threading
+import time
+
+from orangecheck import warm_session
+
+
+def keep_warm() -> None:
+    while True:
+        warm_session("https://your-site.example", revocations=REVOCATIONS, policy=POLICY)
+        time.sleep(10)
+
+
+threading.Thread(target=keep_warm, daemon=True).start()
+```
+
+A copy is fetched only once it is due, so the thread makes nearly every fetch
+and requests read memory. Pass a list of origins if you serve more than one.
+
+- **Threads.** One `RevocationList` and one `SignInPolicy` are safe to share
+  between threads. Each copy has its own lock: while one thread fetches it, the
+  other threads that need it wait for that same fetch, and nothing else waits.
+- **Processes.** Each process keeps its own copies and makes its own fetches, so
+  four gunicorn workers fetch four times as often. Start the warming thread
+  inside each worker (gunicorn's `post_fork` hook, for example): a thread
+  started before the fork does not run in the workers.
+- **Async.** `verify_session`, `status()` and `warm_session` are synchronous and
+  wait on the network when they fetch. In an `async` handler, call
+  `verify_session` with `await asyncio.to_thread(...)`.
+- **Failures.** After a failed fetch each copy waits ten seconds before trying
+  again (the key set from 2.10.0), and the last good copy answers meanwhile: the
+  key set for up to six hours, the list until it is ten minutes old, the rule
+  until a read succeeds.
 
 ## React
 

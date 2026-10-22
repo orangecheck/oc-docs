@@ -47,6 +47,10 @@ from orangecheck import (
 
     # ochk.app sign-in, events and webhooks, for your backend
     verify_session,
+    warm_session,
+    SignInPolicy,
+    RevocationList,
+    bond_meets,
     sign_event,
     verify_webhook,
 
@@ -61,6 +65,8 @@ from orangecheck import (
     # Errors
     OrangeCheckError,
     InvalidSession,
+    BondRequired,
+    SessionEnded,
     InvalidWebhook,
 )
 
@@ -169,6 +175,13 @@ session.did_oc  # the person; keep it beside your user row
 kept through an outage; pass `jwks=` to check offline. A token for any other
 origin, or one with no `aud`, is refused. The token carries no email address.
 What each claim means is in [verify without the SDK](/me/sdk#verify-without-the-sdk).
+
+Who may sign in (`SignInPolicy`, `BondRequired`), sessions ended everywhere
+(`RevocationList`, `SessionEnded`) and keeping their reads off your requests
+(`warm_session`) are in the SDK reference:
+[checking the session on your server](/me/sdk#checking-the-session-on-your-server),
+[when someone ends every session](/me/sdk#when-someone-ends-every-session) and
+[Python: warming](/me/sdk#python-warming).
 
 ### Sign a billable event
 

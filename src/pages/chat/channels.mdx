@@ -28,7 +28,11 @@ the single source of truth for identity, roles, and the read/write policy.
 Content-addressed.
 
 ```jsonc
-// kind 30110, addressable. d-tag = "oc-lock-chat-ch:" || base64url(SHA-256("oc-lock-chat-ch/v1:" || channel_id))
+// kind 30110, addressable. Every version has its own coordinate (OC Chat 0.3.0):
+// d-tag   = "oc-lock-chat-ch:" || descriptor_id
+// t-tag   = channel_id   (a reader fetches every version with {"#t": [channel_id]})
+// s-tag   = supersedes   (every version but the genesis; a reader walks forward by it)
+// binding = the signer's kind-30078 device record (JSON), outside descriptor_id
 {
     "v": 1,
     "channel_id": "<hex = SHA-256('oc-lock-chat-ch/v1:' || founder_address || ':' || slug)>",
@@ -67,17 +71,56 @@ Normative rules a conforming client MUST honor:
   `SHA-256(founder_address || slug)`. Two founders may reuse a `slug` →
   different `channel_id`s. The slug is non-authoritative; the client MUST render
   `founder_address` + its trust tier alongside the slug.
+- **Every version keeps its own coordinate.** Each version, the genesis
+  included, is published at `"oc-lock-chat-ch:" || descriptor_id` with a `t` tag
+  equal to `channel_id`, so no version replaces another at a relay, and every
+  version but the genesis has an `s` tag equal to its `supersedes`. A reader
+  fetches `{"kinds":[30110],"#t":[channel_id]}`, paging up to a bound it states,
+  plus the salted legacy d-tag
+  `"oc-lock-chat-ch:" || base64url(SHA-256("oc-lock-chat-ch/v1:" || channel_id))`
+  for channels published before 0.3.0. Nothing is published at the legacy d-tag.
+- **Reading past a flood.** Anyone can publish under the `t` and `s` tags, so a
+  reader also reads the versions the founder's keys signed (`#t` with
+  `authors`), then walks forward from each by `#s`, with each key of the founder
+  and the admins that version names. It reads every key those addresses have
+  ever bound, revoked ones included, one key per read: an earlier version stands
+  on its binding whatever became of the key since. It walks forward only from
+  versions those reads returned. When an open read stops at its bound, the
+  reader says the channel could not be read, never that it does not exist,
+  unless a chain resolves and those reads were complete.
 - **The descriptor is a governance hash-chain.** Every change (add admin, raise
-  the floor, change policy) is a new kind-30110 at the same d-tag with
-  `supersedes` → the prior `descriptor_id`. A client MUST validate the new
-  descriptor's signing inbox key is device-bound (kind-30078) to the founder OR
-  an address in the **prior** `admins` set — making governance tamper-evident
-  and offline-verifiable (the [`parent_id` trick](/chat/threading) applied to
+  the floor, change policy) is a new kind-30110 version with `supersedes` → the
+  prior `descriptor_id`. A client MUST validate the new descriptor's signing
+  inbox key is device-bound (kind-30078) to the founder OR an address in the
+  **prior** `admins` set — making governance tamper-evident and
+  offline-verifiable (the [`parent_id` trick](/chat/threading) applied to
   governance). A descriptor not so authored is `E_CH_UNAUTHORIZED`.
 - **Any authorized copy of a descriptor counts.** The signing key is in the
   event, outside `descriptor_id`, so one descriptor can arrive in events under
   different keys. A resolver keeps every such event and accepts the descriptor
   if any one copy is authored as above (OC Chat 0.2.1).
+- **Each version carries its signer's binding; the last version needs a live
+  key.** The `binding` tag holds the device record that binds the event's key:
+  an OC Lock v3 record for a Bitcoin address, or a session record with its
+  ochk.io vouch for a `did:oc`. A version with a later version after it stands
+  on that binding. The last version of a chain also needs it to be live, with no
+  revocation seen on any relay; otherwise the chain ends at the version before
+  it (OC Chat 0.3.0).
+- **At a fork, the founder's live branch wins.** Versions on chains that resolve
+  and supersede the same parent, and the geneses of one channel, rank:
+  founder-signed with a live binding first, founder-signed with a binding since
+  revoked second, any other third. Branches through a lower rank are overruled;
+  then the longest chain wins, then the freshest `created_at`.
+- **Revoking a device.** A device that was replaced has the channels it signed
+  last re-signed, as they stand, from a live device. A device that may be in
+  someone else's hands is never re-signed as it stands: the client shows every
+  version it signed, republishes from a live device the ones on the way to the
+  version you confirm, and publishes that version again. If it held the
+  channel's inbox key, the client starts a new genesis instead.
+- **A founder can re-sign a channel.** When no version verifies, or the device
+  holding the inbox key is revoked: a new genesis for the same `channel_id`,
+  from a bound device, with the settings carried over. Posts are keyed by
+  `channel_id` and stay.
 - **Exactly one `write.policy`, with a `rooted` flag that MUST match it.**
   `utxo-floor` ⇒ `rooted:true`; `allowlist`/`founder`/`open` ⇒ `rooted:false`. A
   mismatch is `E_CH_POLICY_INVALID`. This makes the Bitcoin claim a property of

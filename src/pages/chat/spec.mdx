@@ -154,6 +154,13 @@ A `did:oc` identity (the ochk.io session bridge) publishes a kind-30078
 **vouch**, the named trust anchor. That bind is not offline-verifiable, so a
 receiver renders the device's messages as **session** ("via ochk.io").
 
+**Revocation.** A session device is revoked by its own key, or by the ochk.io
+auth host with a signed `oc-chat:device-revoke:v1` statement dated by the host.
+The host that vouches for a device can revoke it: the same named trust anchor. A
+revocation seen on any relay counts. ochk.io keeps keys it rotated out in its
+JWKS, marked retired, and a retired key verifies only what it signed before it
+retired (OC Chat 0.3.0).
+
 **Stepping up.** The same device key may also be bound to a Bitcoin address by
 an OC Lock device record it publishes (BIP-322 over a v3 statement that signs
 the key). A receiver looks up the kind-30078 records the signing key published
@@ -235,10 +242,17 @@ A client is OC Chat v0 compliant iff it:
   early-release / brick risks at compose time.
 - Operates **no OC payment rail** for postage.
 - If it offers public channels: publishes a founder-rooted descriptor with one
-  `write.policy` + matching `rooted` flag, validates the governance hash-chain
-  on every replacement, rejects a non-empty `recipients[]` channel post,
+  `write.policy` + matching `rooted` flag, gives every version its own d-tag, a
+  `t` tag, an `s` tag (but the genesis) and a `binding` tag, fetches every
+  version by `#t` (plus the legacy d-tag), reads every key the founder and
+  admins have bound, revoked ones included, one key per read, walks forward by
+  `#s` only from versions those reads returned, reports a read cut off at its
+  bound as not read unless those reads were complete, validates the governance
+  hash-chain over them (earlier versions by their binding, the last version only
+  while its binding is live), rejects a non-empty `recipients[]` channel post,
   verifies `utxo-floor` proofs offline, renders non-rooted channels in the muted
-  "via ochk.io" tier, honors tombstones, and reproduces `vc14`–`vc17`.
+  "via ochk.io" tier, honors tombstones, and reproduces `vc14`–`vc17`, `vc19`
+  and `vc20`.
 - If it supports an `auth-required` relay: completes the kind-22242 handshake,
   signs with a fresh per-connection ephemeral key by default, surfaces the relay
   as a named trust anchor, and never presents AUTH as making a relay trustless.

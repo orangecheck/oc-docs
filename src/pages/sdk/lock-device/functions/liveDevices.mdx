@@ -12,10 +12,10 @@ export const metadata = {
 # Function: liveDevices()
 
 ```ts
-function liveDevices(records: readonly ParsedDeviceEvent[]): ParsedDeviceEvent[];
+function liveDevices(records: readonly ParsedDeviceEvent[], opts?: LiveOptions): ParsedDeviceEvent[];
 ```
 
-Defined in: [live.ts:26](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/live.ts#L26)
+Defined in: [live.ts:57](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/live.ts#L57)
 
 The bind records still live after revocations.
 
@@ -24,15 +24,16 @@ revocation's authority is the address's signature, so one that was not
 verified must not be passed in. A revocation retires every bind of its
 `(address, device_id)` whose signed `created_at` is not later than its signed
 `revoked_at`, whichever Nostr key carried either record and whichever relay
-served it. Relay replacement is not needed, so a lost device can be revoked
-from another device or the wallet, and a relay that missed the revocation
-cannot keep the device alive. A bind signed after the revocation stays live.
+served it. A bind signed after the revocation stays live. A bind whose signed
+`created_at` is later than the reader's clock plus `maxSkewMs` is not live yet
+(see pendingDevices).
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `records` | readonly [`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[] |
+| `opts` | [`LiveOptions`](../interfaces/LiveOptions) |
 
 ## Returns
 

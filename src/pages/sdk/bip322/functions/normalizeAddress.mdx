@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: normalizeAddress()",
+    description: "Auto-generated API reference for Function: normalizeAddress(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/bip322**](../README)
+
+***
+
+[@orangecheck/bip322](../README) / normalizeAddress
+
+# Function: normalizeAddress()
+
+```ts
+function normalizeAddress(input: string): string | null;
+```
+
+Defined in: [index.ts:300](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L300)
+
+The canonical spelling of an address a person typed or scanned: surrounding
+whitespace dropped, bech32 lowercased (QR codes carry it in capitals, which
+BIP-173 allows), base58 unchanged. Null when the result is not an address
+`decodeAddress` reads, mixed-case bech32 included. Store, key and compare
+addresses in this form only.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `string` |
+
+## Returns
+
+`string` \| `null`

@@ -53,10 +53,12 @@ floor gets:
 ```
 
 Link that person to `back_url`, where they can back their account. `have` is
-`null` when no coin backs it. If your requirement has never been readable, the
-request gets `503 bond_policy_unavailable` rather than being let through
-unchecked. A `projectKey` that names no project gets `500 unknown_project_key`
-(me-client 0.32 and later).
+`null` when no coin backs it. If your requirement can't be read, the last one
+read stands for ten minutes; with none read in that time, the request gets
+`503 bond_policy_unavailable` rather than being let through unchecked (me-client
+0.36.1 and `orangecheck` 2.10.1 and later; an answer that doesn't state the
+requirement counts as unreadable). A `projectKey` that names no project gets
+`500 unknown_project_key` (me-client 0.32 and later).
 
 ochk.io re-checks the coin when its last check is over ten minutes old, and
 every claim says when that was (`oc_bond.checked_at`). You can't ask for a fresh

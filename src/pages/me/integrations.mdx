@@ -102,7 +102,7 @@ Signing in:
 | `401` right after a sign-in     | The token is bound to your origin, and your server's `audience` is missing or a different origin (`http` for `https`, `www`, a port). me-client logs a warning naming `audience` when it can tell. | Pass your exact origin as `audience`, in the session route and in `withOcAuth`.                         |
 | `403 bond_required`             | The account isn't backed above the bar you set under **Who can sign in**. The body has `need`, `have` and a `back_url`.                                                                            | Send the person to `back_url`, where they can back their account.                                       |
 | `500 unknown_project_key`       | `projectKey` names no project. me-client logs which key, once. (Before 0.32 this read as a `503`.)                                                                                                 | Copy the key from your project at [ochk.app/me/projects](https://ochk.app/me/projects).                 |
-| `503 bond_policy_unavailable`   | Your project's sign-in requirement couldn't be read from me.ochk.io, and none had been read before, so the request is refused, not let through.                                                    | Retry; the wrapper asks again after ten seconds. Check your server can reach me.ochk.io.                |
+| `503 bond_policy_unavailable`   | Your project's sign-in requirement couldn't be read from me.ochk.io, and none was read in the last ten minutes, so the request is refused, not let through.                                        | Retry; the wrapper asks again after ten seconds. Check your server can reach me.ochk.io.                |
 
 Paying your users:
 

@@ -263,6 +263,7 @@ The wrappers all take one options bag:
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `audience`    | Your own origin. A token issued to any other site is refused. Leave it out only on a `*.ochk.io` site that reads the family cookie.                                            |
 | `projectKey`  | Enforces [who can sign in](/me/require-bond) as set on your project: everyone, or only accounts backed by bitcoin. A key that names no project gets `500 unknown_project_key`. |
+| `meOrigin`    | Where the project's rule and its list of ended sessions are read. Default `https://me.ochk.io`.                                                                                |
 | `required`    | `true` answers `401` before your handler runs when nobody is signed in.                                                                                                        |
 | `requireBond` | `{ minSats, minDays, maxAgeSecs }` in code. Wins over `projectKey`.                                                                                                            |
 
@@ -292,10 +293,10 @@ measurements) and waits at most four seconds; to keep it off your requests, see
 `require_bond={"min_sats": …, "min_days": …, "max_age_secs": …}` sets the
 requirement in code and wins over `policy`, like `requireBond`, with nothing to
 read. A key that names no project raises `InvalidSession` with reason
-`unknown_project_key`; while the rule can't be read, the last one read stands,
-and with none read yet the sign-in is refused (reason `bond_policy_unavailable`)
-rather than let through. `bond_meets(session, min_sats=…, min_days=…)` is the
-check on its own.
+`unknown_project_key`; while the rule can't be read, the last one read stands
+for ten minutes, and with none read in that time the sign-in is refused (reason
+`bond_policy_unavailable`) rather than let through (2.10.1 or later).
+`bond_meets(session, min_sats=…, min_days=…)` is the check on its own.
 
 ## verify without the SDK
 
@@ -506,7 +507,7 @@ and requests read memory. Pass a list of origins if you serve more than one.
 - **Failures.** After a failed fetch each copy waits ten seconds before trying
   again (the key set from 2.10.0), and the last good copy answers meanwhile: the
   key set for up to six hours, the list until it is ten minutes old, the rule
-  until a read succeeds.
+  for ten minutes (from 2.10.1).
 
 ## React
 

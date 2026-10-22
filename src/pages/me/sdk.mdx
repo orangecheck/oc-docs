@@ -31,9 +31,9 @@ paying them. Three entry points:
 
 <InstallTabs pkg="@orangecheck/me-client" />
 
-That is all sign-in needs. `@orangecheck/auth-client` is only for a React app,
-once your server keeps the session in its own cookie: see
-[React](#react-with-auth-client) below.
+That is all sign-in needs, in a React app too ([React](#react) below).
+`@orangecheck/auth-client` is for orangecheck's own sites; integrators use
+me-client.
 
 ## What changed in 0.32
 
@@ -93,6 +93,61 @@ if (outcome.status === 'blocked')
     showHint('Allow pop-ups for this site, then try again.');
 if (outcome.status === 'signed_in') await keepSession(outcome.token);
 ```
+
+### a Bitcoin wallet in the popup
+
+The popup offers a Bitcoin wallet beside email, Google and GitHub. Your page
+gets the same token whichever the person picks, bound to your origin, and never
+the address.
+
+- **With a browser wallet** (UniSat, Xverse, Leather), the popup asks the wallet
+  to sign.
+- **Without one** (a phone, Sparrow, a hardware wallet), the popup shows the
+  message; the person signs it in any wallet and pastes the signature back.
+
+Any address the verifier accepts can sign in: a BIP-322 simple signature from a
+`bc1q…`, `bc1p…` or `3…` address, or a legacy `signmessage` signature from those
+or a `1…` address. The full table is in
+[what the verifier accepts](/ecosystem/bip322#what-the-verifier-accepts).
+
+The message the popup shows. Every line ends in a newline, the last one
+included:
+
+```text
+orangecheck-auth
+address: bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4
+nonce: 7b021c61b7bfa698dbf2c562900c8aad
+issued_at: 2026-10-22T18:04:11Z
+expires_at: 2026-10-22T18:09:11Z
+ack: I authorize this session under the OrangeCheck auth challenge.
+audience: https://me.ochk.io
+purpose: login
+```
+
+| Line                                             | What varies                                                                                                                                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `orangecheck-auth`, `ack`, `audience`, `purpose` | Nothing. `audience` is the popup's own origin, `https://me.ochk.io`, never yours: the signature signs the person in to orangecheck, and your page still gets a token for its origin. |
+| `address`                                        | The address the person entered.                                                                                                                                                      |
+| `nonce`                                          | 32 hex digits, new for every message, accepted once.                                                                                                                                 |
+| `issued_at`, `expires_at`                        | UTC to the second, five minutes apart. A signature that arrives after `expires_at` is refused; the person starts again for a new message.                                            |
+
+The wallet must sign these bytes exactly. A wallet, or a copy and paste, that
+drops the final newline makes a signature that fails.
+
+To test with a throwaway key instead of a wallet, sign the message the popup
+shows with [`@orangecheck/bip322`](/sdk/bip322/README):
+
+```ts
+import { randomBytes } from 'node:crypto';
+
+import { addressFromPrivateKey, signMessage } from '@orangecheck/bip322';
+
+const key = randomBytes(32); // never a key that holds coins
+const address = addressFromPrivateKey(key, 'p2wpkh'); // enter this in the popup
+const signature = signMessage(address, message, key); // message: the popup's text, exactly
+```
+
+Each new key signs in as a new orangecheck account.
 
 ## the session cookie
 
@@ -359,17 +414,35 @@ That is the Node rule too: while the list can't be read, reads go on and writes
 are refused. With no `method`, a request counts as a write.
 
 The list for an origin is fetched inside the call that first needs it, then at
-most once a minute. A fetch waits at most three seconds; after a failure the
-next try waits ten seconds, and the last copy answers meanwhile. The first
-failure logs one warning on the `orangecheck` logger. To keep the fetch off your
-requests, warm the list at startup and from a background thread once a minute,
-for each origin you serve:
+most once a minute. That fetch is one round trip to me.ochk.io (250 to 470 ms in
+our measurements); a lookup in the copy in memory takes microseconds. A fetch
+waits at most three seconds; after a failure the next try waits ten seconds, and
+the last copy answers meanwhile. The first failure logs one warning on the
+`orangecheck` logger. To keep the fetch off your requests, warm each origin you
+serve at startup, then from a background thread every ten seconds:
 
 ```python
 REVOCATIONS.status("warm", "https://your-site.example", 0)
 ```
 
-Requests then read the copy in memory.
+Until the copy is a minute old the call only reads memory, so the thread makes
+nearly every fetch and requests read the copy.
+
+**Threads, processes and async.**
+
+- **Threads.** One `RevocationList` is safe to share between threads. Each
+  origin has its own lock: while one thread fetches an origin's list, other
+  threads asking about that origin wait for that same fetch, and threads asking
+  about other origins go on.
+- **Processes.** Each process keeps its own copy and makes its own fetches, so
+  four gunicorn workers fetch four times a minute per origin. Start the warming
+  thread inside each worker (gunicorn's `post_fork` hook, for example): a thread
+  started before the fork does not run in the workers.
+- **Async.** `status()` and `verify_session` are synchronous and wait on the
+  network when they fetch. In an `async` handler, call them with
+  `await asyncio.to_thread(...)`.
+
+`SignInPolicy` is the same on all three counts.
 
 **If your own session replaces the token**, as when you sign the person into
 your own auth system after checking it, keep the token's `rh`, `aud` and `iat`
@@ -401,45 +474,78 @@ many accounts ended their sessions recently, and when, as handles you can't tie
 to anyone who hasn't signed in to your site. A plain sign-out on ochk.io still
 does not end your session, by design, as with any sign-in provider.
 
-## React, with auth-client
+## React
 
-Only for a React app whose server keeps the session in its own cookie, as above.
-`<OcSessionProvider>` from `@orangecheck/auth-client` reads your own
-`/api/auth/me`, so answer it with an account `id` and its `did_oc`, as the
-`withOcAuth` sample does.
-
-<InstallTabs pkg="@orangecheck/auth-client" />
+The session is your own cookie, so a React app reads it from your own
+`/api/auth/me` (the `withOcAuth` sample above). No orangecheck library is needed
+on the page beyond the popup; a small provider does it:
 
 ```tsx
 import type { ReactNode } from 'react';
 
-import { OcSessionProvider, useOcSession } from '@orangecheck/auth-client';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 
-export function Providers({ children }: { children: ReactNode }) {
-    // Your own cookie, one account: no tab pinning against ochk.io.
+type Account = { id: string; did_oc: string; display_name: string | null };
+type Status = 'loading' | 'authenticated' | 'anonymous' | 'error';
+type Session = {
+    status: Status;
+    account: Account | null;
+    refresh: () => Promise<void>;
+};
+
+const SessionContext = createContext<Session | null>(null);
+
+export function SessionProvider({ children }: { children: ReactNode }) {
+    const [status, setStatus] = useState<Status>('loading');
+    const [account, setAccount] = useState<Account | null>(null);
+    const refresh = useCallback(async () => {
+        try {
+            const r = await fetch('/api/auth/me');
+            const next: Account | null = r.ok
+                ? ((await r.json()).account ?? null)
+                : null;
+            setAccount(next);
+            setStatus(
+                next
+                    ? 'authenticated'
+                    : r.status === 401
+                      ? 'anonymous'
+                      : 'error'
+            );
+        } catch {
+            setStatus('error');
+        }
+    }, []);
+    useEffect(() => void refresh(), [refresh]);
     return (
-        <OcSessionProvider config={{ multiAccount: false }}>
+        <SessionContext.Provider value={{ status, account, refresh }}>
             {children}
-        </OcSessionProvider>
+        </SessionContext.Provider>
     );
 }
 
-export function Header({ signIn }: { signIn: () => void }) {
-    const { status, account } = useOcSession();
-    if (status === 'loading') return null;
-    if (!account) return <button onClick={signIn}>Sign in</button>; // signInWithOc(), as above
-    return <span>signed in as {account.didOc.slice(0, 16)}…</span>;
+export function useSession(): Session {
+    const session = useContext(SessionContext);
+    if (!session) throw new Error('useSession needs <SessionProvider>');
+    return session;
 }
 ```
 
-`useOcSession()` returns `{ status, account, refresh, error, … }`, with status
-`loading | authenticated | anonymous | error`. `useOptionalOcSession()` returns
-`null` instead of throwing when no provider is mounted. Sign people out with
-your own route that clears the cookie, then call `refresh()`.
+After `signInWithOc()` and your session route answer `ok`, call `refresh()`. To
+sign out, call your own route that clears the cookie and
+[ends the token](#ending-a-session), then `refresh()`. Treat `error` as "could
+not check", not as signed out: offer a retry rather than the sign-in button.
 
-`@orangecheck/me-client` does not re-export any of this: import `OcAccount`,
-`OcSessionState`, `OcSessionStatus` and `OcAuthConfig` from
-`@orangecheck/auth-client`.
+`@orangecheck/auth-client` is for orangecheck's own sites (`*.ochk.io` and
+ochk.app), which share orangecheck's session: its `<OcSessionProvider>` and
+`<OcSignIn>` call ochk.io with the person's ochk.io cookie, which ochk.io
+accepts only from those sites. Integrators use `@orangecheck/me-client`.
 
 ## `oc.event.fire` · send an event
 

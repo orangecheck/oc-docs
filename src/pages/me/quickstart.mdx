@@ -112,10 +112,10 @@ it too. Signing out of ochk.io does not sign them out of your site; signing out
 everywhere does, once your server has your project key and signing secret (see
 [when someone ends every session](/me/sdk#when-someone-ends-every-session)).
 
-`<OcSignIn>` from `@orangecheck/auth-client` mounts the sign-in form in your own
-page instead of a popup. It works only on orangecheck's own sites (`*.ochk.io`
-and ochk.app), which share orangecheck's session. Everywhere else, use the
-popup.
+`@orangecheck/auth-client` is for orangecheck's own sites; integrators use
+me-client. Its `<OcSignIn>` and `<OcSessionProvider>` work only on `*.ochk.io`
+and ochk.app, which share orangecheck's session. On your site, use the popup,
+and read your own session in React as [React](/me/sdk#react) shows.
 
 ### 3 · check the session on your server
 

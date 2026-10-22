@@ -25,6 +25,7 @@ Reject with `decode_error` if:
 - Extensions (lines after the core fields, before `ack`) aren't
   lexicographically sorted by name
 - Any identifier in `identities:` contains a comma, newline, or CR
+- Any key appears twice
 
 Read the address, identities, `issued_at` and `expires` from this message. In an
 envelope only `message` and `signature` are signed; its `address`, `identities`,
@@ -69,10 +70,12 @@ Emit `bond_confirmed` if metrics computed cleanly, or `bond_zero` /
 
 ### 6. Apply policy thresholds
 
-When a lookup by address or identity finds several attestations, the one checked
-is the newest by the `issued_at` its message signs, skipping any dated more than
-two minutes ahead of the verifier's clock, and the first of those whose
-signature verifies (OC Attest SPEC §7.2).
+A lookup by id, address or identity reads every event a relay holds under the
+subject's tag, paging past the relay's limit (the SDK reads up to 2,000 per
+relay), since anyone can publish under those tags. When it finds several
+attestations, the one checked is the newest by the `issued_at` its message
+signs, skipping any dated more than two minutes ahead of the verifier's clock,
+and the first of those whose signature verifies (OC Attest SPEC §7.2).
 
 If the caller passed `min_sats` and/or `min_days`, compare them against the
 computed metrics. Add `below_min_sats` / `below_min_days` to the codes list on

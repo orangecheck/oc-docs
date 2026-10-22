@@ -84,10 +84,12 @@ Raw attestation verification — no relay lookup, no thresholds. Give it
 {
     "addr": "bc1q...",
     "msg": "orangecheck\nidentities: ...\n...",
-    "sig": "AUBH...",
-    "scheme": "bip322"
+    "sig": "AUBH..."
 }
 ```
+
+`scheme` may still be sent, as `bip322` or `legacy`, and is ignored: the
+signature's bytes decide which it is.
 
 ### Response — 200
 
@@ -164,10 +166,10 @@ cache.
 | Code                     | Severity | Meaning                                     |
 | ------------------------ | -------- | ------------------------------------------- |
 | `sig_ok_bip322`          | success  | BIP-322 signature verified                  |
-| `sig_ok_legacy`          | success  | Legacy signmessage verified (P2PKH only)    |
+| `sig_ok_legacy`          | success  | Legacy signmessage verified, any address    |
 | `sig_invalid`            | error    | Signature does not match                    |
-| `sig_unsupported_script` | error    | Legacy sig for SegWit address               |
-| `invalid_scheme`         | error    | `scheme` field unknown                      |
+| `sig_unsupported_script` | error    | BIP-322 full or proof-of-funds signature    |
+| `invalid_scheme`         | error    | Not sent: the signature decides the scheme  |
 | `decode_error`           | error    | Canonical message malformed                 |
 | `invalid_attestation_id` | error    | Claimed ID doesn't match sha256(msg)        |
 | `bond_confirmed`         | success  | Chain lookup returned usable metrics        |

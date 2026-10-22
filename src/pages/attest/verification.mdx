@@ -35,9 +35,12 @@ more than two minutes ahead of the verifier's clock as `not_yet_valid`.
 
 ### 2. Verify the BIP-322 signature
 
-Against the declared address, using [BIP-322](/ecosystem/bip322). Reject with
-`sig_invalid` if the signature doesn't verify, with `sig_unsupported_script` if
-the wallet produced a legacy signature for a SegWit/Taproot address.
+Against the declared address, using [BIP-322](/ecosystem/bip322). The
+signature's bytes decide the scheme: a 65-byte signature is a legacy
+`signmessage` (BIP-137) one, accepted on any address type, and anything else is
+BIP-322 simple, with or without `smp`. Reject with `sig_invalid` if the
+signature doesn't verify, and with `sig_unsupported_script` if it is a BIP-322
+full or proof-of-funds signature (`ful`, `pof`).
 
 ### 3. Verify the attestation ID
 

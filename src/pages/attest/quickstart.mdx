@@ -146,7 +146,7 @@ Everything above is a convenience over a pure function. `/api/check` is
 `attest.ochk.io` reading a public index; if you would rather not trust that,
 don't.
 
-<InstallTabs pkg="@orangecheck/sdk@^1.7.0" />
+<InstallTabs pkg="@orangecheck/sdk@^1.7.0 @orangecheck/bip322@^1.1.2" />
 
 The version floor matters. In `1.3.0` and earlier, `check()` filtered relays on
 a multi-letter `#address` tag, which NIP-12 relays do not index — so it answered
@@ -163,6 +163,18 @@ const result = await check({
     minDays: 90,
 });
 // { ok: true, sats: 10000, days: 307, score: 103.46 }
+```
+
+An address a person typed or scanned goes through `normalizeAddress` from
+`@orangecheck/bip322` first. QR codes carry bech32 in capitals, and verification
+reads only the lowercase spelling:
+
+```ts
+import { normalizeAddress } from '@orangecheck/bip322';
+
+const addr = normalizeAddress(input); // 'BC1Q…' becomes 'bc1q…'; null if it is not an address
+if (!addr) throw new Error('Not a Bitcoin address');
+const result = await check({ addr, minSats: 5000, minDays: 90 });
 ```
 
 Same shape as the HTTP response, and **no call to `attest.ochk.io`** — `check()`

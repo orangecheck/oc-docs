@@ -40,15 +40,16 @@ recomputing the attestation ID, and the whole chain breaks.
 
 ## What the verifier accepts
 
-What [`@orangecheck/bip322`](/sdk/bip322/README) 1.1.0 accepts, measured by
+What [`@orangecheck/bip322`](/sdk/bip322/README) 1.1.2 accepts, measured by
 signing and verifying rather than by reading its code:
 
-| Address                 | BIP-322 simple | simple with `smp` | BIP-322 full (`ful`) | Legacy `signmessage` (BIP-137) |
-| ----------------------- | -------------- | ----------------- | -------------------- | ------------------------------ |
-| P2WPKH (`bc1q…`)        | accepted       | accepted          | refused              | accepted                       |
-| P2TR (`bc1p…`, one key) | accepted       | accepted          | refused              | accepted                       |
-| P2SH-P2WPKH (`3…`)      | accepted       | accepted          | refused              | accepted                       |
-| P2PKH (`1…`)            | refused        | refused           | refused              | accepted                       |
+| Address                    | BIP-322 simple | simple with `smp` | BIP-322 full (`ful`) | Legacy `signmessage` (BIP-137) |
+| -------------------------- | -------------- | ----------------- | -------------------- | ------------------------------ |
+| P2WPKH (`bc1q…`)           | accepted       | accepted          | refused              | accepted                       |
+| P2TR (`bc1p…`, one key)    | accepted       | accepted          | refused              | accepted                       |
+| P2SH-P2WPKH (`3…`)         | accepted       | accepted          | refused              | accepted                       |
+| P2PKH (`1…`)               | refused        | refused           | refused              | accepted                       |
+| Uppercase bech32 (`BC1Q…`) | refused        | refused           | refused              | refused                        |
 
 - **Legacy signatures.** A 65-byte `signmessage` signature passes for any of
   these address types when the key it recovers is the address's own: its hash
@@ -63,6 +64,11 @@ signing and verifying rather than by reading its code:
   off unless asked.
 - **Full and proof-of-funds signatures** (`ful`, `pof`) are refused unread, so a
   wallet that produces only those cannot sign on the family's sites.
+- **Uppercase addresses.** Verification reads bech32 only in lowercase, so one
+  key never has two addresses. QR codes carry bech32 in capitals: pass what a
+  person types or scans through `normalizeAddress()` (`normalize_address()` in
+  Python 2.5.0), which lowercases an all-capitals address, trims whitespace and
+  returns `null` for mixed case or anything that is not an address.
 
 ## Wallet support matrix
 
@@ -84,22 +90,29 @@ accepts? If yes, it works.
 
 ## Error: `sig_unsupported_script`
 
-A common failure mode: the wallet produces a _legacy_ signature for a SegWit or
-Taproot address. Legacy signatures only validate for P2PKH, so the verifier
-correctly refuses them.
+From `@orangecheck/sdk` 1.16.0 this code means one thing: the wallet made a
+BIP-322 full or proof-of-funds signature (`ful`, `pof`), which no verifier here
+reads. Sign with a BIP-322 simple signature, or with legacy message signing,
+which every address type in the table accepts. The signature's bytes decide the
+scheme, never the address: a 65-byte signature that verifies is `sig_ok_legacy`
+on any address type, and a BIP-137 signature from the wrong key is
+`sig_invalid`.
 
-Fix: use a BIP-322-capable wallet (see above), or switch to a P2PKH address
-(`1…` on mainnet) if your wallet only supports the legacy scheme.
+Before 1.16.0 the same code meant a legacy signature on a SegWit address, and
+whether a 3… address got it depended on the signature's recovery id.
 
 ## Verifying a BIP-322 signature
 
 ### TypeScript
 
 ```ts
-import { verifySignature } from '@orangecheck/bip322';
+import { normalizeAddress, verifySignature } from '@orangecheck/bip322';
+
+const address = normalizeAddress(typed); // BC1Q… from a QR code becomes bc1q…; null if not an address
+if (!address) throw new Error('Not a Bitcoin address');
 
 const valid = verifySignature(
-    address, // bc1q... or bc1p... or 1...
+    address, // bc1q... or bc1p... or 3... or 1...
     canonicalMsg, // exact bytes the wallet signed
     signatureBase64
 ); // true | false, never throws
@@ -113,8 +126,11 @@ tightened PSBT extraction.
 ### Python
 
 ```python
-from orangecheck import verify_bip322_signature
+from orangecheck import normalize_address, verify_bip322_signature
 
+address = normalize_address(typed)  # None if not an address
+if address is None:
+    raise ValueError("Not a Bitcoin address")
 valid = verify_bip322_signature(address, canonical_msg, signature_base64)
 ```
 

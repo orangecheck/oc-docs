@@ -51,15 +51,20 @@ reference is re-checked against the chain when verified.
 <InstallTabs pkg="@orangecheck/stamp-core @orangecheck/stamp-ots @orangecheck/bip322" />
 
 ```ts
+import { normalizeAddress } from '@orangecheck/bip322';
 import { stamp } from '@orangecheck/stamp-core';
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
+
+// Your address as typed or scanned: 'BC1Q…' from a QR code becomes 'bc1q…'.
+const address = normalizeAddress(typed);
+if (!address) throw new Error('Not a Bitcoin address');
 
 // 1. Build a signed stamp envelope.
 const env = await stamp({
     content: new TextEncoder().encode('hello stamp'),
     mime: 'text/plain',
     signer: {
-        address: 'bc1q…', // your address
+        address,
         signMessage: async (msg) => walletSignBIP322(msg), // your wallet
     },
 });

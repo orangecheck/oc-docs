@@ -180,9 +180,11 @@ stamp canonical notes.txt --addr bc1q… --signed-at 2026-10-21T16:00:00Z --id
 stamp file notes.txt --addr bc1q… --signed-at 2026-10-21T16:00:00Z --sig '<base64 signature>'
 ```
 
-`stamp verify` exits 0 when the stamp checks out and 2 when a check fails
-(`E_BAD_SIG`, `E_BAD_CONTENT`, `E_BAD_ANCHOR`, `E_NO_ANCHOR`). `stamp anchor` exits 1 when it
-cannot reach a calendar or the header source.
+`stamp verify` exits 0 when the stamp checks out, 1 when the file is not a stamp
+envelope, and 2 when a check fails (`E_BAD_SIG`, `E_BAD_CONTENT`, `E_BAD_ANCHOR`,
+`E_NO_ANCHOR`). With `--require-anchor` it exits 3 (`ANCHOR_UNCHECKED`) when the
+block header could not be read: nothing failed, so run it again later. `stamp anchor`
+exits 1 when it cannot reach a calendar or the header source.
 
 ### `--headers-url`
 
@@ -200,7 +202,8 @@ stamp verify notes.txt.stamp notes.txt --require-anchor --headers-url https://es
 | ----------------------------------- | --------------------------------------------------------------------------- | --------------------------------- |
 | answers, and the proof leads to it  | `confirmed at block N (checked against the block header)`, exit 0           | the same                          |
 | answers, and the proof does not     | `E_BAD_ANCHOR`, exit 2                                                      | the same                          |
-| cannot be reached                   | `claims block N, unverified: block header source unreachable`, exit 0       | `E_NO_ANCHOR`, exit 2             |
+| has no block at that height (404)   | `E_BAD_ANCHOR`, exit 2                                                      | the same                          |
+| errors, answers 5xx or is unreachable | `claims block N, couldn't check: …`, `anchor_state: unchecked`, exit 0    | `ANCHOR_UNCHECKED`, exit 3        |
 
 `stamp anchor` needs the header to confirm an upgrade, so with the source
 unreachable it stops with `OTS upgrade failed`, exit 1, and leaves the file as

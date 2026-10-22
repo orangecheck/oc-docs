@@ -111,13 +111,16 @@ device:
 import {
     buildRevocationStatement,
     finalizeDeviceEvent,
+    revokedAtFor,
 } from '@orangecheck/lock-device';
 import { publishEvent } from '@orangecheck/nostr-core';
 
+// records: the verified device records you read for the address. The date is
+// now, or that device's own signed created_at if it is later.
 const revocation = buildRevocationStatement({
     address: 'bc1qbob...',
     device_id: oldDeviceId,
-    revoked_at: new Date().toISOString(),
+    revoked_at: revokedAtFor(records, 'bc1qbob...', oldDeviceId),
 });
 
 const sig = await walletSignBIP322(revocation);
@@ -139,8 +142,9 @@ A sender resolving the address collects the records from every relay it queried,
 drops any whose `binding_sig` does not verify, and seals only to binds that no
 revocation retires. A revocation of `(address, device_id)` retires each bind of
 that pair whose signed `created_at` is at or before its signed `revoked_at`,
-whichever key carried either record. `liveDevices` from
-`@orangecheck/lock-device` applies the rule ([spec §3.5](/lock/spec)).
+whichever key carried either record, and holds back a bind dated later than its
+own clock. `liveDevices` from `@orangecheck/lock-device` applies the rule, and
+`pendingDevices` lists the binds held back ([spec §3.5](/lock/spec)).
 
 A revocation one relay holds retires the bind another relay still serves, so a
 sender that reads several relays needs only one of them to have it. A sender

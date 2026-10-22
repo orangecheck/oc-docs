@@ -60,7 +60,8 @@ gets `503 bond_policy_unavailable` rather than being let through unchecked
 state the requirement counts as unreadable). The requirement is about who signs
 in: a request with no session is not held to it and never waits on reading it
 (me-client 0.37.0), so pages for signed-out people keep working while me.ochk.io
-can't be reached. `orangecheck`'s `verify_session` only ever runs on a token. A
+can't be reached. Set `required: true` if a route must refuse signed-out
+requests. `orangecheck`'s `verify_session` only ever runs on a token. A
 `projectKey` that names no project gets `500 unknown_project_key` (me-client
 0.32 and later).
 

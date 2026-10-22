@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: parseUtc()",
+    description: "Auto-generated API reference for Function: parseUtc(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / parseUtc
+
+# Function: parseUtc()
+
+```ts
+function parseUtc(value: unknown): number | null;
+```
+
+Defined in: [vote-core/src/verify.ts:51](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/verify.ts#L51)
+
+Milliseconds for an `iso8601_utc` string (SPEC §0): `YYYY-MM-DDTHH:MM:SSZ`,
+optionally with `.sss`. Null for anything else, including a time with no
+zone, which `Date.parse` reads in the reader's own time zone, and a date
+that does not exist, which it rolls over.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `unknown` |
+
+## Returns
+
+`number` \| `null`

@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: distinctBallotCopies()",
+    description: "Auto-generated API reference for Function: distinctBallotCopies(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / distinctBallotCopies
+
+# Function: distinctBallotCopies()
+
+```ts
+function distinctBallotCopies(ballots: Ballot[]): Ballot[];
+```
+
+Defined in: [vote-core/src/tally.ts:315](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/tally.ts#L315)
+
+The ballots read from relays with byte-identical copies (signature included)
+collapsed, in first-seen order. Copies that differ in anything, `sig.value`
+included, are all kept: pass them all to `tally`, which verifies each.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ballots` | [`Ballot`](../interfaces/Ballot)[] |
+
+## Returns
+
+[`Ballot`](../interfaces/Ballot)[]

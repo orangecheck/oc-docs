@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: anchoredTallyIsFinal()",
+    description: "Auto-generated API reference for Function: anchoredTallyIsFinal(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / anchoredTallyIsFinal
+
+# Function: anchoredTallyIsFinal()
+
+```ts
+function anchoredTallyIsFinal(closeHeight: number | null, tipHeight: number): boolean;
+```
+
+Defined in: [vote-core/src/anchor.ts:34](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/anchor.ts#L34)
+
+Whether a tally of an anchored poll is final at `tipHeight`: `H_close` is
+known and the tip is at least `H_close + G + 6`. A null `closeHeight` means
+no block's median_time_past has passed the deadline yet.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `closeHeight` | `number` \| `null` |
+| `tipHeight` | `number` |
+
+## Returns
+
+`boolean`

@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: resolveCloseBlock()",
+    description: "Auto-generated API reference for Function: resolveCloseBlock(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / resolveCloseBlock
+
+# Function: resolveCloseBlock()
+
+```ts
+function resolveCloseBlock(deadlineIso: string, source: BlockTimeSource): Promise<CloseResolution>;
+```
+
+Defined in: [vote-core/src/snapshot.ts:47](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/snapshot.ts#L47)
+
+`H_close` (SPEC §0, §4.6): the greatest block whose median_time_past ≤ the
+deadline, with the chain tip it was read against. `height` is null while no
+block's median_time_past has passed the deadline, because a later block
+could still qualify. Unlike the snapshot it needs no confirmations; an
+anchored tally is final only once the tip reaches `H_close + G + 6`. Fails
+closed on any lookup error.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `deadlineIso` | `string` |
+| `source` | [`BlockTimeSource`](../interfaces/BlockTimeSource) |
+
+## Returns
+
+`Promise`\&lt;[`CloseResolution`](../type-aliases/CloseResolution)\>

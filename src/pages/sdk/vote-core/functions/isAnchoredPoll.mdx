@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Function: isAnchoredPoll()",
+    description: "Auto-generated API reference for Function: isAnchoredPoll(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / isAnchoredPoll
+
+# Function: isAnchoredPoll()
+
+```ts
+function isAnchoredPoll(poll: Pick<Poll, "deadline">): boolean;
+```
+
+Defined in: [vote-core/src/anchor.ts:19](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/anchor.ts#L19)
+
+Whether `poll` is anchored (SPEC §4.6). A deadline that does not parse is not.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `poll` | `Pick`\&lt;[`Poll`](../interfaces/Poll), `"deadline"`\> |
+
+## Returns
+
+`boolean`

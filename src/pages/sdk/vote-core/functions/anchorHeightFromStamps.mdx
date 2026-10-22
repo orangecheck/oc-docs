@@ -1,0 +1,47 @@
+export const metadata = {
+    title: "Function: anchorHeightFromStamps()",
+    description: "Auto-generated API reference for Function: anchorHeightFromStamps(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / anchorHeightFromStamps
+
+# Function: anchorHeightFromStamps()
+
+```ts
+function anchorHeightFromStamps(
+   ballotIdHex: string, 
+   stamps: readonly unknown[], 
+   verifyAnchor: (stamp: {
+  content: {
+     hash: string;
+  };
+}) => number | Promise<number | null> | null): Promise<number | null>;
+```
+
+Defined in: [vote-core/src/anchor.ts:59](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/anchor.ts#L59)
+
+`anchor_height(b)` (SPEC §4.6) from every stamp copy read from every relay:
+the lowest height among stamps whose `content.hash` names this ballot and
+whose anchor `verifyAnchor` confirms. `verifyAnchor` must rebuild the stamp's
+id from the same object and walk its OpenTimestamps proof to a block header
+the caller checked, returning that header's height or null. It must throw
+when it cannot check (headers unreachable), and then this rejects too, even
+if another copy verified: the copy that could not be checked may hold the
+lowest anchor, and a failed lookup is never a missing anchor. Never pass one
+copy per ballot or per `d` tag: copies of one stamp carry different proofs.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ballotIdHex` | `string` |
+| `stamps` | readonly `unknown`[] |
+| `verifyAnchor` | (`stamp`: \&#123; `content`: \&#123; `hash`: `string`; \&#125;; \&#125;) => `number` \| `Promise`\&lt;`number` \| `null`\> \| `null` |
+
+## Returns
+
+`Promise`\&lt;`number` \| `null`\>

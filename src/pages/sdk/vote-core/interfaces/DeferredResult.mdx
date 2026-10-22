@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Interface: DeferredResult",
+    description: "Auto-generated API reference for Interface: DeferredResult. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/vote-core**](../README)
+
+***
+
+[@orangecheck/vote-core](../README) / DeferredResult
+
+# Interface: DeferredResult
+
+Defined in: [vote-core/src/types.ts:119](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L119)
+
+The snapshot block is not yet known or has fewer than 6 confirmations (SPEC §10.5).
+
+## Extends
+
+- [`TallyResultHead`](TallyResultHead)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-basis">&lt;/a> `basis` | `"anchored"` \| `"voter_clocks"` | What decided whether a ballot was in time: its anchor, or the voter's own `created_at`. | [`TallyResultHead`](TallyResultHead).[`basis`](TallyResultHead#property-basis) | [vote-core/src/types.ts:97](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L97) |
+| &lt;a id="property-close_height">&lt;/a> `close_height?` | `number` \| `null` | `H_close` for an anchored poll, null until a block's median_time_past passes the deadline; absent otherwise. | [`TallyResultHead`](TallyResultHead).[`close_height`](TallyResultHead#property-close_height) | [vote-core/src/types.ts:99](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L99) |
+| &lt;a id="property-code">&lt;/a> `code` | `"E_REORG"` | - | - | [vote-core/src/types.ts:121](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L121) |
+| &lt;a id="property-state">&lt;/a> `state` | `"deferred"` | - | - | [vote-core/src/types.ts:120](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/types.ts#L120) |

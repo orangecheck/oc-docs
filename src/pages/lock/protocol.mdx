@@ -142,10 +142,10 @@ a new binding statement and publishes it, then revokes the old `device_id`. Old
 envelopes addressed to the old `device_pk` are unreadable from the new device.
 
 **To revoke (laptop stolen):** Bob's wallet signs a revocation of the laptop's
-`device_id`, and he publishes it from his phone or any client, under any Nostr
-key. He does not need the laptop. A sender that sees the revocation on any relay
-stops sealing to the laptop, even while another relay still serves its record.
-What the laptop already received stays readable to whoever holds it.
+`device_id`, and he publishes it from his phone or any client, under a fresh
+Nostr key. He does not need the laptop. A sender that sees the revocation on any
+relay stops sealing to the laptop, even while another relay still serves its
+record. What the laptop already received stays readable to whoever holds it.
 
 ## Flow 4 — Self-vault (password manager pattern)
 

@@ -103,9 +103,11 @@ the envelope for every device it finds. Each device can independently decrypt.
 
 ## Revocation
 
-The address signs a revocation statement, and any Nostr key may publish it. You
+The address signs a revocation statement, and a fresh Nostr key carries it. You
 do not need the old device or its key, so this works for a lost or stolen
-device:
+device. Never carry it with the key of another device that is still in use:
+relays replace a record by `(pubkey, kind, d)`, so it would take that device's
+record's place.
 
 ```ts
 import {

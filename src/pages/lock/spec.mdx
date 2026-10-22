@@ -123,8 +123,13 @@ device_id: <device_id>
 revoked_at: <iso8601 utc>
 ```
 
-Every line ends in LF, the last one too. Any Nostr key MAY publish it: the
-device's own, another device's, or a fresh key. The authority is the address's
+Every line ends in LF, the last one too. File it under `oc-lock:device:<addr>`,
+which every reader queries. A device revoking itself should carry it under its
+own Nostr key, so that every relay that accepts it stops serving that device's
+bind; it may use a fresh key. Carry a revocation of another device with a fresh
+key. Never carry one with a key that carries another live bind of the address:
+relays replace a record by `(pubkey, kind, d)`, so it would take that bind's
+place. Readers accept it under any key. The authority is the address's
 signature, so a lost device can be revoked with the wallet alone.
 
 **Which binds are live.** Collect the device records for the address from every
@@ -152,7 +157,10 @@ again before you report it revoked.
 
 ### §3.6 Multi-device
 
-Publish one record per device under `oc-lock:device:<addr>:<device_id>`. Senders
+Each device publishes its record under its own Nostr key at
+`oc-lock:device:<addr>`, so the records stay apart by `pubkey`. New records
+should use that form. The per-device form `oc-lock:device:<addr>:<device_id>`
+stays valid, but a `#d` query for the address does not return it. Senders
 encrypt once per live device (§3.5).
 
 ## §4 Envelope format
@@ -297,6 +305,9 @@ A client is OC Lock v2 compliant iff:
 - Verifies sender BIP-322 signatures before accepting envelope contents.
 - Seals only to live binds: applies every revocation whose BIP-322 signature
   verifies, from any relay and any Nostr key, by signed timestamps (§3.5).
+- Files a revocation it publishes under `oc-lock:device:<addr>`: a
+  self-revocation under the device's own key, a revocation of another device
+  under a fresh key, never under a key that carries another live bind (§3.5).
 - Enforces `expires_at` when present.
 - Emits error codes per §6.
 

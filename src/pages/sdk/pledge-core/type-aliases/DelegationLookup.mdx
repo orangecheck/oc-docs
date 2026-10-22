@@ -17,17 +17,13 @@ type DelegationLookup = (delegationId: string, nowIso: string) => Promise<
 | null>;
 ```
 
-Defined in: [pledge-core/src/types.ts:314](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L314)
+Defined in: [pledge-core/src/types.ts:331](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L331)
 
-Caller-supplied delegation resolver. Returns the resolved delegation
-fields (principal, agent, scope strings, expires_at) or null if the
-delegation cannot be resolved or its signature does not verify.
-
-The adapter is responsible for fetching the delegation envelope from
-wherever it lives (typically Nostr kind 30083 with d-tag
-`oc-agent-del:<delegation_id>`) and running OC Agent's full
-verifyDelegation check before returning the typed shape. pledge-core
-trusts the adapter's output for the §7.3 1–5 logic.
+`nowIso` is the time the verdict is for: the time of verification in
+verifyPledge, the pledge's sworn_at in verifyPledgeAsOfSwornAt. Return null
+for a delegation that is not in force then, or that a valid revocation in
+effect at or before then has ended, and when the revocations could not be
+read at all (SPEC §11.12).
 
 ## Parameters
 

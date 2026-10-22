@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: verifyPledgeAsOfSwornAt()",
+    description: "Auto-generated API reference for Function: verifyPledgeAsOfSwornAt(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README)
+
+***
+
+[@orangecheck/pledge-core](../README) / verifyPledgeAsOfSwornAt
+
+# Function: verifyPledgeAsOfSwornAt()
+
+```ts
+function verifyPledgeAsOfSwornAt(input: VerifyPledgeAsOfSwornAtInput): Promise<VerifyPledgeResult>;
+```
+
+Defined in: [pledge-core/src/pledge.ts:239](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/pledge.ts#L239)
+
+Verify a past pledge as of its own `sworn_at`, for an audit or a history.
+The swearer, or the agent, chose that time, so the verdict holds only if the
+claim is true: `asOf.anchored` is false, since a v1 pledge carries no anchor
+that fixes it. Never use this to decide whether a pledge counts now.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`VerifyPledgeAsOfSwornAtInput`](../type-aliases/VerifyPledgeAsOfSwornAtInput) |
+
+## Returns
+
+`Promise`\&lt;[`VerifyPledgeResult`](../type-aliases/VerifyPledgeResult)\>

@@ -1,0 +1,33 @@
+{
+    "url": "https://ochk.io/docs",
+    "manual": [
+        {
+            "kind": "ui",
+            "label": "search",
+            "entry": "src/components/docs/DocsSearch.tsx",
+            "reach": "any page: Search the docs, / or Ctrl+K, or ?q=",
+            "area": "search"
+        },
+        {
+            "kind": "redirect",
+            "label": "old-host",
+            "entry": "next.config.ts",
+            "reach": "docs.ochk.io/<path> to ochk.io/docs/<path>, query kept",
+            "area": "redirects"
+        },
+        {
+            "kind": "redirect",
+            "label": "moved-pages",
+            "entry": "src/lib/moved-pages.ts",
+            "reach": "a retired docs path to where its content lives now",
+            "area": "redirects"
+        },
+        {
+            "kind": "redirect",
+            "label": "sdk-package",
+            "entry": "next.config.ts",
+            "reach": "/sdk/<package> to /sdk/<package>/README",
+            "area": "redirects"
+        }
+    ]
+}

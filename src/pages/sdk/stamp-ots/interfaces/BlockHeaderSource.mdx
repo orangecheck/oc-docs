@@ -21,9 +21,11 @@ Defined in: [types.ts:68](https://github.com/orangecheck/oc-packages/blob/main/s
 getHeaderAt(height: number): Promise<Uint8Array<ArrayBufferLike> | null>;
 ```
 
-Defined in: [types.ts:70](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/types.ts#L70)
+Defined in: [types.ts:74](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/types.ts#L74)
 
-Return the 80-byte raw block header at the given height, or null if unknown.
+The 80-byte raw block header at the given height, or null when there is
+no block at that height. Throw when the header could not be read: a
+failed lookup must never read as a missing block.
 
 #### Parameters
 

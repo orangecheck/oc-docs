@@ -829,11 +829,11 @@
     tailwind-merge "^3.3.1"
 
 "@orangecheck/auth-client@^2.35.2":
-  version "2.35.2"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.35.2.tgz#1511489c3e225a444006f8a376509e017db436c9"
-  integrity sha512-p3bZmEB5/U1AbcAmZaaEU4j4smUHCvXOYVOUIQLm1hgsw8WqI1OhWROeZ3h7BnbM/Y+9fxmA6tsfdJjRJbMQ5g==
+  version "2.36.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.36.0.tgz#1a974d17df52d31a7d9abb0677c6d3657b85ac86"
+  integrity sha512-8tJMjo11eR9xgSZVSWpkXOhtXi/zjWbi2+1Ec41N2EoMIV1yD/UF8EkjacftdmsZYBK/t7Ea4gns7FsKpS7aCw==
   dependencies:
-    "@orangecheck/wallet-adapter" "^0.6.0"
+    "@orangecheck/wallet-adapter" "^0.7.0"
     "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/bip322@^1.0.0":
@@ -846,14 +846,14 @@
     "@scure/base" "^1.2.6"
 
 "@orangecheck/site-kit@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.5.1.tgz#4c8288d21e46e50e354003b01168a1401ce0e246"
-  integrity sha512-/1sjd/KpJBSF5m83BsgYptAOcI2Ba/kKrpZXcC8aaiViOBtb3XsqkLFSG3cq7Hv/8mBed2ZPLAbFBf+L5nYjCQ==
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.5.2.tgz#7a11f2258de5c72f2a12f2c472281c3ffee5ea9c"
+  integrity sha512-Ujyrkg6fK18nRtKvSlZ2VkjZzGEBNgY55MJoGWJCOxPcfzm4mKivdqyEQ5TXWNdKXYtSLzmwEA0XY9qu3gSHpg==
 
-"@orangecheck/wallet-adapter@^0.6.0", "@orangecheck/wallet-adapter@^0.6.5":
-  version "0.6.5"
-  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.6.5.tgz#7d2383f529353e8500f2ceb3a4ddaa4f56ae553a"
-  integrity sha512-dg1aUkpupdOWAtYRITGqHRtjMNSiLMWJqRBlak27TPHQnxU/09GJueq6roxOIGlzfIhJta4Tvpjtq3ftv3qdKQ==
+"@orangecheck/wallet-adapter@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.7.0.tgz#9231f5faceff155b500b80c51bbdd40220a9576f"
+  integrity sha512-JF54bW+vfXoldLSQqFC3FOxsLCoHEITM9m8nwdN3XDVcDFDUDleUqdUqgBFroZzROROSlqsXlRbar0GDfY4xcA==
   dependencies:
     "@orangecheck/bip322" "^1.0.0"
 

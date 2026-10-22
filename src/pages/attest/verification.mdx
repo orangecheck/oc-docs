@@ -26,6 +26,12 @@ Reject with `decode_error` if:
   lexicographically sorted by name
 - Any identifier in `identities:` contains a comma, newline, or CR
 
+Read the address, identities, `issued_at` and `expires` from this message. In an
+envelope only `message` and `signature` are signed; its `address`, `identities`,
+`issued_at` and `expires_at` are copies, so a verifier never uses, sorts by or
+returns them. An `expires:` value that is not an RFC 3339 time is rejected as
+`expired`.
+
 ### 2. Verify the BIP-322 signature
 
 Against the declared address, using [BIP-322](/ecosystem/bip322). Reject with
@@ -58,6 +64,11 @@ Emit `bond_confirmed` if metrics computed cleanly, or `bond_zero` /
 `bond_pending` / `bond_insufficient` as appropriate.
 
 ### 6. Apply policy thresholds
+
+When a lookup by address or identity finds several attestations, the one checked
+is the newest by the `issued_at` its message signs, skipping any dated more than
+two minutes ahead of the verifier's clock, and the first of those whose
+signature verifies (OC Attest SPEC §7.2).
 
 If the caller passed `min_sats` and/or `min_days`, compare them against the
 computed metrics. Add `below_min_sats` / `below_min_days` to the codes list on

@@ -49,6 +49,9 @@ The signed attestation is a self-contained JSON blob:
 }
 ```
 
+Only `message` and `signature` are signed. The other fields are copies of what
+the message says, and a verifier reads them from the message.
+
 This blob is published to [Nostr kind-30078](/ecosystem/nostr-kind-30078) for
 durable public discovery. The `d`-tag is the attestation_id; a `t` tag carrying
 the Bitcoin address lets verifiers query by address with `#t`.

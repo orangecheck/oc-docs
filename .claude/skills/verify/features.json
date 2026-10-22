@@ -48,6 +48,14 @@
     ],
     "features": [
         {
+            "id": "api:ANY /api/[...unknown]",
+            "kind": "api",
+            "entry": "src/pages/api/[...unknown].ts",
+            "reach": "https://ochk.io/docs/api/[...unknown]",
+            "area": "home",
+            "tests": ["src/lib/unknown-api-route.test.ts"]
+        },
+        {
             "id": "api:ANY /api/og",
             "kind": "api",
             "entry": "src/pages/api/og.tsx",

@@ -37,6 +37,7 @@ recipe covers an id that no longer exists.
 - [search](search.md): the search dialog.
 - [site](site.md): docs.ochk.io's 308s, moved pages, SDK aliases, `/api/og`, `/404`,
   `/500`.
+- [unknown-api](unknown-api.md): the JSON 404 for any `/api` address the site does not serve.
 
 ## Entry contract
 

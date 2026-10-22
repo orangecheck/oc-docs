@@ -73,6 +73,27 @@ anywhere else. It resolves to `{ account, token }`, or `null` when the person
 closes the popup, the browser blocks it, or your `signal` aborts. Trust only the
 token; `account` is unsigned.
 
+To tell a blocked window from a closed one, use `signInWithOcOutcome()`
+(me-client 0.36.0 or later), which takes the same options and resolves with a
+`status`:
+
+| `status`    | Means                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `signed_in` | Signed in; `account` and `token` as from `signInWithOc`.                               |
+| `blocked`   | The browser refused to open the window. Ask to allow pop-ups, then retry from a click. |
+| `closed`    | The person closed the window without signing in.                                       |
+| `aborted`   | Your `signal` fired.                                                                   |
+| `failed`    | Not in a browser, or the popup's answer was malformed.                                 |
+
+```ts
+import { signInWithOcOutcome } from '@orangecheck/me-client/popup';
+
+const outcome = await signInWithOcOutcome();
+if (outcome.status === 'blocked')
+    showHint('Allow pop-ups for this site, then try again.');
+if (outcome.status === 'signed_in') await keepSession(outcome.token);
+```
+
 ## the session cookie
 
 Post the token to a route of your own that verifies it and keeps it in an
@@ -189,6 +210,28 @@ The wrappers all take one options bag:
 | `projectKey`  | Enforces [who can sign in](/me/require-bond) as set on your project: everyone, or only accounts backed by bitcoin. A key that names no project gets `500 unknown_project_key`. |
 | `required`    | `true` answers `401` before your handler runs when nobody is signed in.                                                                                                        |
 | `requireBond` | `{ minSats, minDays, maxAgeSecs }` in code. Wins over `projectKey`.                                                                                                            |
+
+**Python** ([`orangecheck`](/sdk/python) 2.9.0 or later) does the same with
+`verify_session`:
+
+```python
+from orangecheck import BondRequired, SignInPolicy, verify_session
+
+POLICY = SignInPolicy(PROJECT_KEY)  # one per process; reads your project's rule, held a minute
+
+try:
+    session = verify_session(token, audience="https://your-site.example", policy=POLICY)
+except BondRequired as err:
+    # 403 in your API: err.need, err.have (the account's floors, or None), err.back_url
+    ...
+```
+
+`require_bond={"min_sats": …, "min_days": …, "max_age_secs": …}` sets the
+requirement in code and wins over `policy`, like `requireBond`. A key that names
+no project raises `InvalidSession` with reason `unknown_project_key`; while the
+rule can't be read, the last one read stands, and with none read yet the sign-in
+is refused (reason `bond_policy_unavailable`) rather than let through.
+`bond_meets(session, min_sats=…, min_days=…)` is the check on its own.
 
 ## verify without the SDK
 

@@ -11,19 +11,21 @@ export const metadata = {
 
 # Interface: RevocationCheckOptions
 
-Defined in: [revocation.ts:39](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L39)
+Defined in: [revocation.ts:42](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L42)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-developing">&lt;/a> `developing?` | `boolean` | With no token: true answers `live` (local development and tests, where no feed exists); false answers `unverified`, so writes are refused. Default: true unless NODE_ENV is production. | [revocation.ts:62](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L62) |
-| &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | - | [revocation.ts:63](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L63) |
-| &lt;a id="property-headers">&lt;/a> `headers?` | () => \| `Record`\&lt;`string`, `string`\> \| `Promise`\&lt;`Record`\&lt;`string`, `string`\>\> | Headers for each fetch, in place of the feed token: an integrator's request signed with its project secret ([integratorRevocationCheck](../functions/integratorRevocationCheck)). | [revocation.ts:48](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L48) |
-| &lt;a id="property-maxstalems">&lt;/a> `maxStaleMs?` | `number` | Past this age a copy cannot vouch for a write. Default 10 min. | [revocation.ts:52](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L52) |
-| &lt;a id="property-now">&lt;/a> `now?` | () => `number` | - | [revocation.ts:64](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L64) |
-| &lt;a id="property-retryms">&lt;/a> `retryMs?` | `number` | After a failed fetch, how long to wait before the next. Default 10 s. | [revocation.ts:56](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L56) |
-| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | One fetch's time limit. Default 3 s. | [revocation.ts:54](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L54) |
-| &lt;a id="property-token">&lt;/a> `token?` | `string` | This site's feed token. Default `OC_REVOCATION_FEED_TOKEN`. | [revocation.ts:43](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L43) |
-| &lt;a id="property-ttlms">&lt;/a> `ttlMs?` | `number` | How long a copy is used before fetching again. Default 60 s. | [revocation.ts:50](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L50) |
-| &lt;a id="property-url">&lt;/a> `url?` | `string` | Default `${OC_AUTH_ISSUER ?? "https://ochk.io"}/api/auth/revocations`. | [revocation.ts:41](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L41) |
+| &lt;a id="property-developing">&lt;/a> `developing?` | `boolean` | With no token: true answers `live` (local development and tests, where no feed exists); false answers `unverified`, so writes are refused. Default: true unless NODE_ENV is production. | [revocation.ts:74](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L74) |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | - | [revocation.ts:75](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L75) |
+| &lt;a id="property-headers">&lt;/a> `headers?` | () => \| `Record`\&lt;`string`, `string`\> \| `Promise`\&lt;`Record`\&lt;`string`, `string`\>\> | Headers for each fetch, in place of the feed token: an integrator's request signed with its project secret ([integratorRevocationCheck](../functions/integratorRevocationCheck)). | [revocation.ts:51](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L51) |
+| &lt;a id="property-maxstalems">&lt;/a> `maxStaleMs?` | `number` | Past this age a copy cannot vouch for a write. Default 10 min. | [revocation.ts:55](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L55) |
+| &lt;a id="property-now">&lt;/a> `now?` | () => `number` | - | [revocation.ts:76](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L76) |
+| &lt;a id="property-retryms">&lt;/a> `retryMs?` | `number` | After a failed fetch, how long to wait before the next. Default 10 s. | [revocation.ts:68](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L68) |
+| &lt;a id="property-skewms">&lt;/a> `skewMs?` | `number` | Clock difference tolerated between the list's `at` and this host. Default 60 s. | [revocation.ts:64](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L64) |
+| &lt;a id="property-stalefrom">&lt;/a> `staleFrom?` | `"fetch"` \| `"at"` | What a copy's age is measured from: when this process fetched it (`"fetch"`, the default), or the list's own `at` (`"at"`), so a list that was already old when served is not taken for a fresh one. With `"at"`, a list dated more than `skewMs` ahead cannot vouch either. | [revocation.ts:62](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L62) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | One fetch's time limit. Default 3 s. | [revocation.ts:66](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L66) |
+| &lt;a id="property-token">&lt;/a> `token?` | `string` | This site's feed token. Default `OC_REVOCATION_FEED_TOKEN`. | [revocation.ts:46](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L46) |
+| &lt;a id="property-ttlms">&lt;/a> `ttlMs?` | `number` | How long a copy is used before fetching again. Default 60 s. | [revocation.ts:53](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L53) |
+| &lt;a id="property-url">&lt;/a> `url?` | `string` | Default `${OC_AUTH_ISSUER ?? "https://ochk.io"}/api/auth/revocations`. | [revocation.ts:44](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L44) |

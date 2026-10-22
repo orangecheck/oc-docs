@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: revokedAtFor()",
+    description: "Auto-generated API reference for Function: revokedAtFor(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / revokedAtFor
+
+# Function: revokedAtFor()
+
+```ts
+function revokedAtFor(
+   records: readonly ParsedDeviceEvent[], 
+   address: string, 
+   deviceId: string, 
+   now?: Date): string;
+```
+
+Defined in: [live.ts:83](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/live.ts#L83)
+
+The `revoked_at` to sign when revoking `(address, deviceId)`: the current
+time, or the latest signed `created_at` among that device's binds in
+`records` if later, so the revocation also retires a bind dated ahead.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `records` | readonly [`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[] |
+| `address` | `string` |
+| `deviceId` | `string` |
+| `now` | `Date` |
+
+## Returns
+
+`string`

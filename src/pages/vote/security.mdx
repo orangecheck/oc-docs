@@ -46,8 +46,23 @@ reply to every report within 30 days. We can't promise a time to a fix yet.
   sensitive, do not publish.
 - **Censorship resistance of Nostr relays** — hostile relays can refuse to store
   or serve. Mitigation: multi-relay publication (default 4) + self-hostable.
+- **A ballot cast just after the deadline, in an anchored poll's grace window**
+  — `median_time_past` trails the clock by about six blocks, so a ballot dated
+  at or before `deadline` but cast after it can still be anchored at or below
+  `H_close + G` (`G` = 36) and count
+  ([SPEC §4.6](/vote/spec#3-anchoring-a-ballot-spec-46)). In a public poll that
+  voter can first see more of the running tally. The trade is deliberate: an
+  honest ballot cast just before the deadline still anchors in time.
 - **Claim to replace legal voting** — this is a signaling primitive, not a
   replacement for statutory elections.
+
+## assumptions
+
+Abridged from the spec's `SECURITY.md`.
+
+- **OpenTimestamps calendars and anchorers are trusted for liveness only.** They
+  can delay or withhold an anchor, never backdate one. A voter's own client,
+  vote.ochk.io's convenience anchorer, or anyone else can anchor a ballot.
 
 ## normative compliance (restated)
 
@@ -62,6 +77,8 @@ Conforming implementations MUST:
    from the tally (never silently accepted).
 6. Reject polls with unsupported `weight_mode` (no partial support).
 7. Enforce `poll.deadline`. Ballots with `created_at > deadline` are discarded.
+   In an anchored poll, a final tally counts only ballots anchored at or below
+   `H_close + G`, verified against block headers (SPEC §4.6, §10.8).
 
 ## caveats
 

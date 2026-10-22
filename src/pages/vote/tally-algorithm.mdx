@@ -21,8 +21,14 @@ function tally(opts: {
     utxosAt: (address: string, blockHeight: number) => Utxo[] | Promise<Utxo[]>;
     // Required when poll.snapshot_block is "deadline"; see resolvePollSnapshot().
     snapshotBlock?: number;
-    // Current tip: throws E_REORG if the snapshot has fewer than 6 confirmations.
+    // Current tip: the result is deferred (E_REORG) while the snapshot has fewer
+    // than 6 confirmations. Required for an anchored poll.
     tipHeight?: number;
+    // Anchored polls only, and required for them: H_close, or null while unknown.
+    closeHeight?: number | null;
+    // Anchored polls only: a ballot's verified anchor height, or null. See
+    // anchorHeightFromStamps(); throw when an anchor cannot be checked.
+    anchorHeight?: (ballotId: string) => Promise<number | null> | number | null;
     // Secret-mode polls: returns a ballot's option once the reveal key is published.
     unseal?: (ballot: Ballot) => Promise<string | null> | string | null;
     // Preferred: named arguments can't be swapped.
@@ -44,12 +50,62 @@ function tally(opts: {
 
 `tally` throws unless it gets `verify`, `verifyBip322` or an explicit
 `skipSignatures`, so it never counts unverified ballots by accident. It also
-throws on a `"deadline"` poll without `snapshotBlock`: resolve the block with
-`resolvePollSnapshot(poll, mempoolBlockTimeSource())` (or your own node) and
-pass `snapshotBlock: snap.height`.
+throws on a clock-dated `"deadline"` poll without `snapshotBlock`: resolve the
+block with `resolvePollSnapshot(poll, mempoolBlockTimeSource())` (or your own
+node) and pass `snapshotBlock: snap.height`. An anchored poll needs `tipHeight`,
+`closeHeight` (from `resolveCloseBlock(poll.deadline, source)`) and
+`anchorHeight`; its `"deadline"` snapshot is `closeHeight`. This is
+`@orangecheck/vote-core` 2.0.0 and later.
 
 The function is async only because `utxosAt` and the verifier may be. Everything
 else is deterministic synchronous computation.
+
+## Anchored and clock-dated polls
+
+A poll whose `deadline` is on or after `2026-11-15T00:00:00Z` is an **anchored
+poll** (SPEC §4.6). Whether a ballot is in time is decided by the Bitcoin block
+that anchors its ballot id, through an [OC Stamp](/stamp) over the ballot. A
+poll with an earlier deadline is **clock-dated**: it is tallied by `created_at`,
+which each voter's own clock sets, and its result says so. The poll's bytes are
+the same either way.
+
+An anchored tally takes three more inputs: your chain tip, `H_close`, and each
+ballot's anchor height.
+
+- **`H_close`** is the greatest block height whose `median_time_past` is at or
+  before `deadline`. It is `none` until a block whose `median_time_past` is
+  after `deadline` exists.
+- **`G`** is 36 blocks, about six hours, for calendar aggregation and block
+  inclusion.
+- A final tally counts a ballot only if its anchor height is at or below
+  `H_close + G`. Any other ballot is dropped with `E_NOT_ANCHORED`.
+- The tally is final only once `H_close` is known and your chain tip is at least
+  `H_close + G + 6`. Before that it is `provisional`.
+
+### Anchor height
+
+A ballot's anchor height is the lowest block height among the stamps over it
+whose OpenTimestamps anchor you verified yourself. Find the stamps with
+`{"kinds":[30083],"#t":["sha256:<ballot_id>"]}`. A stamp counts only if:
+
+- its id reconstructs (OC Stamp §8.1 step 3);
+- its `content.hash`, read from the rebuilt stamp, equals
+  `"sha256:" || ballot_id`. Check it: the `#t` tag that found the stamp is relay
+  metadata, outside the stamp id;
+- its proof walks from that id to a Bitcoin attestation whose block header you
+  checked yourself. The height is that of the earliest such attestation in the
+  proof, never a declared `block_height` that disagrees.
+
+Query several relays. Keep every stamp over a ballot that any of them returns,
+never one per ballot or one per `d` tag: several stamps can cover one ballot,
+and copies of one stamp carry different proofs as calendars upgrade them. Take
+the lowest height you verified across all of them. Who signed a stamp does not
+bear on its height, and you may skip checking the stamp's own signature. A
+ballot with no such stamp has no anchor height.
+
+An anchor you could not check, because a block header could not be read, is not
+a missing anchor. Until you can check every stamp you hold, produce no final
+tally.
 
 ## Steps
 
@@ -59,8 +115,10 @@ else is deterministic synchronous computation.
   id: the SHA-256 of the canonical poll with `sig.value` set to `""`. If it
   fails, the whole tally fails with `E_BAD_SIG`.
 - Drop a ballot whose `poll_id` is not this poll's, whose `voter` is not a
-  mainnet address, whose `created_at` is after `poll.deadline`, or whose
-  signature over its ballot id does not verify.
+  mainnet address, whose `created_at` is not `iso8601_utc` or is after
+  `poll.deadline`, or whose signature over its ballot id does not verify.
+- In a final tally of an anchored poll, also drop a ballot with no anchor at or
+  below `H_close + G` (`E_NOT_ANCHORED`). A provisional tally keeps it.
 - Public polls: drop a ballot whose `option` is null or is neither `"withdraw"`
   nor one of the poll's option ids. Secret polls: drop a ballot with no
   `secret`.
@@ -70,23 +128,38 @@ important: nobody can block a tally by publishing a bad ballot.
 
 ### 2. One ballot per voter
 
-If a voter has several valid ballots, the poll's `tiebreak` picks one: `latest`
-takes the greatest `created_at`, `first` the least. Equal times are broken by
-ballot id, greater for `latest` and lesser for `first`. Relays keep every ballot
-a voter publishes (each is its own Nostr event), so this step, not the relay, is
-what decides. Conformance vectors `v04` and `v06` test it.
+If a voter has several valid ballots, the poll's `tiebreak` picks one. Each
+ballot has a key: `(anchor height, created_at, ballot id)` in an anchored poll,
+`(created_at, ballot id)` in a clock-dated one, with `created_at` compared as an
+instant. `latest` takes the greater key, `first` the lesser.
+
+Anchor height ranks first. Under `first`, a ballot dated earlier but anchored
+later does not displace the one anchored first. In a provisional tally, an
+unanchored ballot sorts after every anchored one.
+
+Relays keep every ballot a voter publishes (each is its own Nostr event), so
+this step, not the relay, is what decides. Conformance vectors `v04`, `v06` and
+`v10` test it.
 
 ### 3. Reveal (secret polls)
 
-Without the reveal key the result is `{ "state": "awaiting_reveal" }`. With it,
-each voter's chosen ballot is unsealed and its commitment checked; a voter whose
-ballot does not open to a valid option is dropped.
+Without an accepted reveal the result is `awaiting_reveal`. In an anchored poll,
+you accept a reveal only once your chain tip is at least `H_close + G + 6`, and
+never while `H_close` is `none`. In a clock-dated poll, only once your own clock
+reads at or after the deadline. The reveal's `revealed_at` decides neither. So a
+secret anchored poll is never provisional: until its tally can be final, it is
+`awaiting_reveal`.
+
+With an accepted reveal, each voter's chosen ballot is unsealed and its
+commitment checked; a voter whose ballot does not open to a valid option is
+dropped.
 
 ### 4. Snapshot block
 
-`poll.snapshot_block` if it is a height. If it is `"deadline"`, the block whose
-median time past is the greatest at or before the deadline, with at least six
-confirmations.
+`poll.snapshot_block` if it is a height. If it is `"deadline"`, `H_close`: the
+greatest block height whose median time past is at or before the deadline. While
+the snapshot block is not yet known, or has fewer than six confirmations at your
+chain tip, the result is `deferred` with `E_REORG`.
 
 ### 5. Weigh and sum
 
@@ -108,47 +181,115 @@ for voter, ballot in chosen:
 caller with an offline chain snapshot (e.g., a compact block-filter database)
 can supply their own `utxosAt` and compute the tally fully offline.
 
+## States
+
+| `state`           | When                                                                                                                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tallied`         | The final result. For an anchored poll, only once `H_close` is known and your chain tip is at least `H_close + G + 6`.                                                                   |
+| `provisional`     | An anchored poll before that. It counts every ballot that passes the other checks, anchored or not, and reports in `unanchored` how many are not yet anchored at or below `H_close + G`. |
+| `awaiting_reveal` | A secret poll with no accepted reveal.                                                                                                                                                   |
+| `deferred`        | The snapshot block is not yet known or has fewer than six confirmations. The result carries `"code": "E_REORG"`.                                                                         |
+
+A client must show a `provisional` tally as not yet final, and a
+`"voter_clocks"` tally as dated by the voters.
+
 ## Output shape
+
+A final tally of an anchored poll:
 
 ```json
 {
     "state": "tallied",
+    "basis": "anchored",
+    "close_height": 900000,
     "snapshot_block": 900000,
     "turnout": { "voters": 2, "weight": 210000000 },
-    "tallies": { "keep": 180000000, "midnight": 30000000 }
+    "tallies": { "keep": 180000000, "midnight": 30000000 },
+    "counted": ["<each voter's standing ballot_id, ascending>"]
 }
 ```
+
+A provisional result has the same fields plus `unanchored`. A deferred result
+has no tallies:
+
+```json
+{
+    "state": "deferred",
+    "code": "E_REORG",
+    "basis": "anchored",
+    "close_height": 900000
+}
+```
+
+- `basis` is on every result, `awaiting_reveal` and `deferred` included:
+  `"anchored"` for an anchored poll, `"voter_clocks"` for a clock-dated poll,
+  whose ballots are dated by the voters' own clocks.
+- `close_height` is on every result for an anchored poll: `H_close`, or `null`
+  while it is `none`.
+- `counted` lists the ballot id that stood for each voter after step 3,
+  withdrawals and ballots that weigh zero included, as lowercase hex in
+  ascending order.
+- `unanchored`, on a provisional result, is how many of the `counted` ballots
+  have no anchor at or below `H_close + G` yet (no anchor at all while `H_close`
+  is `none`).
 
 Every option appears in `tallies`, with `0` if nobody chose it. There is no
 winner field: which tally wins, and whether turnout is enough, is the caller's
 policy. Two independent implementations that disagree on any field have a bug.
 
+### Ballots found after a tally
+
+A tally covers the ballots its tallier found. A ballot found later counts in a
+later tally under the same rules. If you show an earlier tally, show such a
+ballot apart from it, as surfaced after that tally, and do not fold it into that
+tally's figures. `counted` records what one tally saw; it never excludes a
+ballot from another tally, whoever publishes it.
+
 ## Conformance
 
-The 6 canonical vectors in `oc-vote-protocol/test-vectors/`:
+The 16 canonical vectors in `oc-vote-protocol/test-vectors/`. In anchored-poll
+vectors, `inputs.chain` gives the chain tip and `H_close`, and `inputs.anchors`
+gives each anchored ballot's verified anchor height; a ballot not listed has no
+anchor.
 
-| Vector | What it pins                                                                   |
-| ------ | ------------------------------------------------------------------------------ |
-| `v01`  | Minimal public poll — one voter, `sats`                                        |
-| `v02`  | `sats` with three voters, one under `min_sats` and weighing zero               |
-| `v03`  | `sats_days` with a 180-day cap; one voter with two UTXOs, one past the cap     |
-| `v04`  | Vote change — one voter, two ballots, `tiebreak: latest` picks the later       |
-| `v05`  | Secret ballot — option null before the reveal, the commitment binds the choice |
-| `v06`  | `tiebreak: first` — three ballots from one voter, a tie broken by `ballot_id`  |
+| Vector | What it pins                                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------------------------------ |
+| `v01`  | Minimal public poll — one voter, `sats`                                                                            |
+| `v02`  | `sats` with three voters, one under `min_sats` and weighing zero                                                   |
+| `v03`  | `sats_days` with a 180-day cap; one voter with two UTXOs, one past the cap                                         |
+| `v04`  | Vote change — one voter, two ballots, `tiebreak: latest` picks the later                                           |
+| `v05`  | Secret ballot — option null before the reveal, the commitment binds the choice                                     |
+| `v06`  | `tiebreak: first` — three ballots from one voter, a tie broken by `ballot_id`                                      |
+| `v07`  | Ballot times — `created_at` dated `late-15`, with no zone, or on 31 April is dropped                               |
+| `v08`  | Anchored poll — a ballot anchored at `H_close + G + 1`, and one with no anchor, are dropped (`E_NOT_ANCHORED`)     |
+| `v09`  | Anchored poll — a ballot anchored at exactly `H_close + G` counts                                                  |
+| `v10`  | Anchored poll, `tiebreak: first` — the ballot anchored lower beats one dated earlier but anchored later            |
+| `v11`  | Secret anchored poll — a reveal checked at tip `H_close + G + 5` is not accepted; the poll stays `awaiting_reveal` |
+| `v12`  | Clock-dated poll — no anchors needed; the result says `basis: "voter_clocks"`                                      |
+| `v13`  | Anchored poll at tip `H_close + G + 5` — `provisional`, still counts the unanchored ballot, `unanchored: 1`        |
+| `v14`  | Anchored poll still open — `H_close` is `none`, so `provisional` with `close_height: null`                         |
+| `v15`  | `"deadline"` snapshot with 4 confirmations — `deferred` with `E_REORG`, still carrying `basis` and `close_height`  |
+| `v16`  | `counted` order — each voter's standing ballot id, lowercase hex ascending; a superseded ballot is not listed      |
 
-`@orangecheck/vote-core` passes all 6 on every CI run. A reimplementation in
-another language is conformant iff it also passes all 6.
+The `@orangecheck/vote-core` suite loads this directory and checks every vector
+byte for byte. A reimplementation in another language is conformant iff it
+passes all 16.
 
 ## Edge cases
 
 - **Voter has no UTXOs at snapshot.** Weight = 0. The ballot is valid but
-  contributes nothing and is not in `turnout`.
-- **Ballot after the deadline.** Dropped in step 1, so a late ballot can't race
-  the tally.
+  contributes nothing and is not in `turnout`. It is still listed in `counted`.
+- **Ballot dated after the deadline.** Dropped in step 1.
+- **Ballot cast just after the deadline, in an anchored poll.**
+  `median_time_past` trails the clock by about six blocks, so `H_close` is
+  usually mined about an hour after `deadline`. A ballot dated at or before
+  `deadline` but cast after it can still be anchored at or below `H_close + G`
+  and count.
 - **Two ballots from the same voter with the same `created_at`.** The ballot id
-  breaks the tie, per `tiebreak`.
-- **Zero valid ballots.** Every option tallies `0`, and `turnout` is
-  `{ "voters": 0, "weight": 0 }`.
+  breaks the tie, per `tiebreak`. In an anchored poll, anchor height is compared
+  first.
+- **Zero valid ballots.** Every option tallies `0`, `turnout` is
+  `{ "voters": 0, "weight": 0 }`, and `counted` is empty.
 
 ## See also
 

@@ -71,6 +71,10 @@ const result = await tally({
 });
 ```
 
+For an anchored poll (deadline on or after 2026-11-15T00:00:00Z), also pass
+`tipHeight`, `closeHeight` and `anchorHeight`: see the
+[tally algorithm](/vote/tally-algorithm#anchored-and-clock-dated-polls).
+
 Pure function. Same inputs → byte-identical output. `tally()` refuses to run
 without a signature verifier. The
 [integration guide](/vote/integration#tally-it-yourself) has a complete version

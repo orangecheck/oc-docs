@@ -124,16 +124,21 @@ voters:
 ```json
 {
     "state": "tallied",
+    "basis": "anchored",
+    "close_height": 900000,
     "snapshot_block": 900000,
     "turnout": { "voters": 2, "weight": 210000000 },
-    "tallies": { "keep": 180000000, "midnight": 30000000 }
+    "tallies": { "keep": 180000000, "midnight": 30000000 },
+    "counted": ["<four ballot ids, ascending>"]
 }
 ```
 
 The same ballots weigh `keep 1,000,000 / midnight 500,000` under `sats` and
 `1 / 1` under `one_per_address`. `turnout` counts only voters whose weight is
-above zero. The result names no winner: reading the tallies is the caller's
-policy.
+above zero; `counted` lists all four voters' ballots, Carol's and Dave's
+included. The result names no winner: reading the tallies is the caller's
+policy. `basis` and `close_height` are explained in
+[tally algorithm](/vote/tally-algorithm#output-shape).
 
 ## See also
 

@@ -180,6 +180,10 @@ const result = await tally({
 console.log(JSON.stringify(result));
 ```
 
+For an anchored poll (deadline on or after 2026-11-15T00:00:00Z), also pass
+`tipHeight`, `closeHeight` and `anchorHeight`: see the
+[tally algorithm](/vote/tally-algorithm#anchored-and-clock-dated-polls).
+
 `queryEvents` reports which relays answered in `relayStatus`; a relay that did
 not answer is not evidence that a ballot is missing.
 
@@ -336,7 +340,7 @@ async function onPollCommand(pollId: string, user: string) {
 ```
 
 For long-running votes, poll `/api/tally` every 5 minutes; for settled
-decisions, run one CLI verification at close.
+decisions, run one CLI verification once the tally is final.
 
 ## gate a forum / submission queue
 
@@ -351,7 +355,7 @@ decisions, run one CLI verification at close.
 DAO governance frameworks can treat an OC Vote tally as the oracle for an
 on-chain execution. Pattern:
 
-1. A DAO contract waits for a specific `poll_id` to close.
+1. A DAO contract waits for a specific `poll_id`'s tally to be final.
 2. A signer (any honest observer) submits the tally + a proof (all ballot
    events + UTXO snapshot root) to the contract.
 3. The contract verifies the tally by running the pure function in-contract OR

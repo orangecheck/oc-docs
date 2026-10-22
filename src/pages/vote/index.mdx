@@ -9,9 +9,8 @@ export const metadata = {
 **Stake-weighted, sybil-resistant polls on Bitcoin.** OC Vote lets you run a
 poll whose outcome depends on how much Bitcoin each voter holds (optionally
 weighted by time held). The tally is deterministic, pure, and
-cross-implementation testable — there is one correct answer for any poll
-
-- ballot set, and every reference impl produces it.
+cross-implementation testable — there is one correct answer for any poll and
+ballot set, and every reference impl produces it.
 
 ## What it gives you
 
@@ -37,6 +36,28 @@ cross-implementation testable — there is one correct answer for any poll
   voter's choice under coercion (plaintext immediately; commit-reveal at reveal
   time). For coercion-resistant e-voting, the research literature has much more
   careful constructions — OC Vote is not one of them.
+
+## Anchoring
+
+A poll whose deadline is on or after 2026-11-15T00:00:00Z is **anchored**.
+Whether a ballot is in time is decided by the Bitcoin block that anchors its
+ballot id, through an [OC Stamp](/stamp) over the ballot. A final tally counts
+only ballots anchored at or below `H_close + G`: `H_close` is the greatest block
+whose median time past is at or before the deadline, and `G` is 36 blocks. Until
+the chain tip reaches `H_close + G + 6`, the tally is provisional. A poll with
+an earlier deadline is clock-dated, and its tally says so. The
+[tally algorithm](/vote/tally-algorithm#anchored-and-clock-dated-polls) has the
+rules.
+
+Anyone can anchor a ballot: the voter's own client, or anyone else who sees it.
+A tally reads the anchors, not who made them. vote.ochk.io runs a convenience
+anchorer that stamps every ballot it sees in an open anchored poll. It is never
+required, and anyone can run another.
+
+- **vote.ochk.io anchorer:** `bc1q24yhqzremqsd9nj49cfdt54faqnzkha62pypa2`
+  (liveness only; replaceable; its signature carries no authority)
+- **Published at:**
+  [`https://vote.ochk.io/.well-known/oc-vote-anchorer.json`](https://vote.ochk.io/.well-known/oc-vote-anchorer.json)
 
 ## Section contents
 
@@ -71,7 +92,7 @@ See [SDK overview](/sdk).
 - [Canonical message format](/ecosystem/canonical-message) — what polls and
   ballots are signed as
 - [BIP-322 signing](/ecosystem/bip322) — how voters sign ballots
-- [Conformance vectors](/ecosystem/conformance) — `v01`–`v05` test fixtures
+- [Conformance vectors](/ecosystem/conformance) — `v01`–`v16` test fixtures
 - [Security model](/ecosystem/security)
 
 ## Spec + implementation
@@ -80,5 +101,7 @@ See [SDK overview](/sdk).
   [`oc-vote-protocol`](https://github.com/orangecheck/oc-vote-protocol) (MIT)
 - Reference impl: `@orangecheck/vote-core`, `vote-cli` in
   [`oc-packages`](https://github.com/orangecheck/oc-packages)
-- Conformance vectors: 5 fixtures covering minimal public poll, sats weighting,
-  `sats_days` with cap, vote-change semantics, secret-ballot commit-reveal
+- Conformance vectors: 16 fixtures covering minimal public poll, sats weighting,
+  `sats_days` with cap, vote-change semantics, secret-ballot commit-reveal,
+  ballot times, anchored and clock-dated polls, provisional and deferred
+  tallies, and the order of `counted`

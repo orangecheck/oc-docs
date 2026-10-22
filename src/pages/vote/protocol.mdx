@@ -45,10 +45,23 @@ kind 30081 under `d = oc-vote:ballot:<poll_id>:<bob_addr>`.
 Nostr key; the tally counts the later one because the poll's `tiebreak` is
 `latest`.
 
-**At deadline:** the client resolves the snapshot block (greatest block with
-`median_time_past ≤ deadline` and ≥ 6 confirmations). Any observer re-runs the
-tally function against the published ballots + their own UTXO-source. Everyone
-gets the same numbers.
+**After the deadline:** the client resolves the snapshot block (`H_close`, the
+greatest block with `median_time_past ≤ deadline`, once it has ≥ 6
+confirmations). Any observer re-runs the tally function against the published
+ballots + their own UTXO-source. Everyone gets the same numbers. The result says
+`basis: "voter_clocks"`: this poll's deadline is before 2026-11-15, so each
+ballot was dated by its voter's own clock.
+
+**The same poll with a later deadline:** a poll whose deadline is on or after
+2026-11-15T00:00:00Z is anchored
+([anchoring](/vote/spec#3-anchoring-a-ballot-spec-46)). Bob's client also stamps
+his ballot with OC Stamp and sends the stamp id to OpenTimestamps calendars;
+vote.ochk.io's anchorer stamps every ballot it sees as a fallback. The tally
+checks each ballot's anchor against Bitcoin block headers and counts only
+ballots anchored at or below `H_close + G` (`G` = 36 blocks). Until the
+tallier's chain tip reaches `H_close + G + 6` the result says
+`"state": "provisional"` and how many counted ballots are not yet anchored;
+after that it is `"tallied"` with `"basis": "anchored"`.
 
 ## flow 2 — one-per-address with high threshold
 
@@ -72,8 +85,11 @@ poll; `reveal_sk` stays local.
 commits to `sha256("oc-vote/v0/commit\npoll_id:…\nvoter:…\noption:yes\n")`, and
 signs the ballot. Observers see Bob voted — but not what.
 
-**At deadline** Alice publishes `reveal_sk` as a kind-30082 event. Tallier
-unseals every ballot, verifies each commit, and computes the tally.
+**After the deadline** Alice publishes `reveal_sk` as a kind-30082 event. In an
+anchored poll talliers accept the reveal only once their chain tip reaches
+`H_close + G + 6`, roughly eight hours after the deadline, so her client waits
+until then. The tallier unseals every ballot, verifies each commit, and computes
+the tally.
 
 If Alice refuses to reveal, the poll is permanently **abandoned**. Participation
 is still provable; the tally is not. This is an honest trade-off — see
@@ -123,8 +139,10 @@ defined by the spec's pure tally function, not by any server.
   UTXO snapshot.
 - **OC Lock** — every secret-mode ballot is an OC Lock envelope addressed to the
   poll's `reveal_pk`. The envelope format is unchanged.
-- **OC Stamp** — a `vote_resolves` envelope can be stamped + OTS-anchored to
-  give the resolved tally durable Bitcoin-block priority for archival.
+- **OC Stamp** — in an anchored poll, an OC Stamp over each ballot's `ballot_id`
+  decides whether the ballot is in time. Separately, a `vote_resolves` envelope
+  can be stamped + OTS-anchored to give the resolved tally durable Bitcoin-block
+  priority for archival.
 - **OC Agent** — `vote:cast(poll_id=…)` is a registered agent scope, but a
   ballot counts only when its `voter` signed it: OC Vote v0 has no delegated
   ballots (spec §13, future work). An agent votes with its own address.

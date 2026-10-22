@@ -30,7 +30,8 @@ Each envelope is independently verifiable:
   the agent's address, (b) the referenced delegation verifies, and (c) the
   exercised scope is within the granted scope set.
 - A **revocation** is authentic iff its BIP-322 signature verifies under the
-  principal's address (or, if the delegation granted it, the agent's).
+  principal's address or the agent's. Either may always revoke;
+  `revocation.holders` is outside the signature and decides nothing.
 
 ## Delegation — the grant
 

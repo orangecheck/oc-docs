@@ -151,7 +151,7 @@ import { revoke } from '@orangecheck/agent-signer';
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots'; // optional anchoring
 
 const rev = await revoke({
-    signer: principal, // or agent, if delegation.revocation.holders includes 'agent'
+    signer: principal, // or the agent: either may always revoke
     delegation,
     reason: 'agent key rotated',
 });

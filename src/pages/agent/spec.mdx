@@ -78,7 +78,8 @@ under the appropriate signer's Bitcoin address:
 
 - Delegation → principal's address.
 - Agent-action → agent's address.
-- Revocation → signer's address (must be in `delegation.revocation.holders`).
+- Revocation → the delegation's principal or agent. Either may always revoke
+  (SPEC §9.5); `revocation.holders` decides nothing.
 
 ## Scope grammar
 

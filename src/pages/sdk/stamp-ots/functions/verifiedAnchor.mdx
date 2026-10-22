@@ -1,0 +1,49 @@
+export const metadata = {
+    title: "Function: verifiedAnchor()",
+    description: "Auto-generated API reference for Function: verifiedAnchor(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / verifiedAnchor
+
+# Function: verifiedAnchor()
+
+```ts
+function verifiedAnchor(
+   proofB64: string, 
+   idHex: string, 
+   headerSource: BlockHeaderSource): Promise<
+  | {
+  blockHash: string;
+  blockHeight: number;
+}
+| null>;
+```
+
+Defined in: [upgrade.ts:99](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L99)
+
+The lowest Bitcoin block a proof anchors `idHex` in, checked against
+`headerSource`: the proof is walked from `idHex`, and an attestation counts
+only if the header at its height has the proof's Merkle root. Whatever
+height or status the stamp declares is not read. Null when no attestation
+checks out, or the proof does not parse from `idHex`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `proofB64` | `string` |
+| `idHex` | `string` |
+| `headerSource` | [`BlockHeaderSource`](../interfaces/BlockHeaderSource) |
+
+## Returns
+
+`Promise`\&lt;
+  \| \&#123;
+  `blockHash`: `string`;
+  `blockHeight`: `number`;
+\&#125;
+  \| `null`\>

@@ -45,11 +45,17 @@ reach its own error path.
 
 ## The three options at threshold
 
-|                                          | signing_method                              | how it works                                                                                                        | live today?                                                                                                                           |
-| ---------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **federation custody** (the destination) | `fedimint_threshold`                        | guardians collectively hold the key. recovery by re-proving email.                                                  | no. no federation is bound, so no client can join one — `/api/federations` publishes that state.                                      |
-| **fedimint client**                      | `fedimint_threshold` (different federation) | sweep to a fedimint federation you trust more (your community's, your country's, your own).                         | opens once (1) binds; depends on the graduation envelope.                                                                             |
-| **self-custody**                         | `bip-322`                                   | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Sparrow, hardware wallet). only you can sign. | sign-in is live (in-place, no redirect) and the signing key is yours. the sat sweep is not — there is no federation balance to sweep. |
+|                                          | how it works                                                                                                        | live today?                                                                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **federation custody** (the destination) | guardians collectively hold the key. recovery by re-proving email.                                                  | no. no federation is bound, so no client can join one — `/api/federations` publishes that state.                                      |
+| **fedimint client**                      | sweep to a fedimint federation you trust more (your community's, your country's, your own).                         | opens once (1) binds; depends on the graduation envelope.                                                                             |
+| **self-custody**                         | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Sparrow, hardware wallet). only you can sign. | sign-in is live (in-place, no redirect) and the signing key is yours. the sat sweep is not — there is no federation balance to sweep. |
+
+None of these is the `signing_method` on your session. That claim says only who
+holds your signing key: `bip322` once a BIP-322-verified Bitcoin address is
+linked to your account, `fedimint_threshold` otherwise. ochk.io works it out
+from your verified identities each time it signs you in, so no one can set it,
+and where your sats sit never changes it.
 
 The protocol accommodates the round-trip back to federation custody via
 attestation re-issuance under the new custody descriptor.
@@ -122,12 +128,13 @@ The descriptor id is `fed:` + lowercase hex
 
 ## What stays the same when you move to your own keys
 
-| Stays the same                                            | Changes                                                           |
-| --------------------------------------------------------- | ----------------------------------------------------------------- |
-| Your bitcoin address (the canonical identifier)           | The signing method (`fedimint_threshold` → `bip-322`)             |
-| Your backing, if you backed your account with a coin      | Who holds the private key (you, instead of the federation)        |
-| Your /me/earn history, connected sites, agent delegations | How recovery works (you own backup; lose the key, lose the funds) |
-| Your sat-earning rate                                     | The shape of `signing_method` in attestation envelopes            |
+| Stays the same                                                    | Changes                                                            |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Your bitcoin address (the canonical identifier)                   | Where your sats sit (a wallet you hold, instead of the federation) |
+| Your backing, if you backed your account with a coin              | Who holds the key to them (you, instead of the guardians)          |
+| Your /me/earn history, connected sites, agent delegations         | How recovery works (you own backup; lose the key, lose the funds)  |
+| Your sat-earning rate                                             |                                                                    |
+| Your `signing_method`, which says only who holds your signing key |                                                                    |
 
 ## Guardian rotation
 

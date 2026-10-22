@@ -132,10 +132,9 @@ Not live — there is no federation balance to sweep. When one is bound,
 2. Sweep the federation balance to your destination via on-chain withdrawal
    (federation-signed) or via Lightning, depending on amount and destination
    type.
-3. Your OC identity stays the same — what changes is the `signing_method` claim
-   on your `/api/auth/me` payload (from `fedimint_threshold` to `bip322` or to a
-   different federation's `fedimint_threshold`). Sat-earning continues
-   unchanged.
+3. Your OC identity stays the same, and so does the `signing_method` on your
+   `/api/auth/me` payload: it says only whether you sign with your own Bitcoin
+   key, never where your sats sit. Sat-earning continues unchanged.
 
 ## Current state
 

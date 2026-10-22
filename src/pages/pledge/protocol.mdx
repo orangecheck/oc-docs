@@ -424,23 +424,29 @@ The envelope additionally carries:
 "sig": { "pubkey": "bc1qagent…", "value": "<BIP-322 by agent over pledge_id>" }
 ```
 
+These three fields are outside the pledge id, so the relays can hold copies of
+one pledge that differ in them. A reader runs the whole check below on each
+copy, delegation included, and uses one that passes (SPEC §11.11).
+
 ### A verifier checks
 
 The verifier:
 
 1. Reconstructs the pledge canonical message; computes id; matches.
-2. Verifies the BIP-322 signature under `bc1qagent…` (the agent address) over
+2. Refuses the envelope if `agent_address` equals the swearer: the agent is
+   never the principal (§7.3).
+3. Verifies the BIP-322 signature under `bc1qagent…` (the agent address) over
    the hex pledge id.
-3. Resolves the named delegation per OC Agent SPEC §8.1.
-4. Confirms `delegation.principal == swearer` (`bc1qprincipal…`) and
+4. Resolves the named delegation per OC Agent SPEC §8.1.
+5. Confirms `delegation.principal == swearer` (`bc1qprincipal…`) and
    `delegation.agent == agent_address`.
-5. Confirms scope: `pledge:create(max_bond_sats<=2000000,mechanism=chain_state)`
+6. Confirms scope: `pledge:create(max_bond_sats<=2000000,mechanism=chain_state)`
    — pledge bonds 1M sats (≤ 2M ceiling) with mechanism `chain_state`. Pass.
-6. Confirms the delegation is in force now: `expires_at` is later than both the
+7. Confirms the delegation is in force now: `expires_at` is later than both the
    time of verification and `sworn_at`, and no revocation of it is in effect.
    Pass.
-7. Verifies bond against live chain state.
-8. Classifies state per §4.4.
+8. Verifies bond against live chain state.
+9. Classifies state per §4.4.
 
 The pledge counts in `bc1qprincipal…`'s public ledger, not the agent's. The
 agent is an authorized signer; the principal is the swearer of record.

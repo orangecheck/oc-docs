@@ -15,7 +15,11 @@ export const metadata = {
 function canonicalizeEnvelope(env: StampEnvelope): string;
 ```
 
-Defined in: [stamp-core/src/canonical.ts:96](https://github.com/orangecheck/oc-packages/blob/main/stamp-core/src/canonical.ts#L96)
+Defined in: [stamp-core/src/canonical.ts:120](https://github.com/orangecheck/oc-packages/blob/main/stamp-core/src/canonical.ts#L120)
+
+The envelope's RFC 8785 JSON as a string, ending in `}`. SPEC §5's byte form
+adds a final LF: use canonicalEnvelopeBytes for that. Neither feeds the id,
+which is computed over the canonical message (SPEC §3.1, no trailing LF).
 
 ## Parameters
 

@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: isSignedAt()",
+    description: "Auto-generated API reference for Function: isSignedAt(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-core**](../README)
+
+***
+
+[@orangecheck/stamp-core](../README) / isSignedAt
+
+# Function: isSignedAt()
+
+```ts
+function isSignedAt(value: string): boolean;
+```
+
+Defined in: [stamp-core/src/canonical.ts:45](https://github.com/orangecheck/oc-packages/blob/main/stamp-core/src/canonical.ts#L45)
+
+The one form `signed_at` takes (SPEC §0): `YYYY-MM-DDTHH:MM:SSZ` or
+`YYYY-MM-DDTHH:MM:SS.sssZ`, a real UTC instant. stamp(), verify() and
+parseStamp() all hold it to this, and none of them rewrites it: the id is
+computed over the string exactly as written.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `string` |
+
+## Returns
+
+`boolean`

@@ -39,7 +39,8 @@ stamp verify release.tar.gz.stamp release.tar.gz --require-anchor
 # signature_checked: true
 ```
 
-The exit code is `2` if the signature, the bytes or the anchor do not check out.
+The exit code is `2` if the signature, the bytes or the anchor do not check out,
+and `1` if the file is not a stamp envelope at all (it names the field).
 
 Better than PGP keysigning because there's no keyserver rot — the Bitcoin
 address is the canonical identifier, checkable forever.

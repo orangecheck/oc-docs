@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: RevocationCheck
 
-Defined in: [revocation.ts:32](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L32)
+Defined in: [revocation.ts:34](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L34)
 
 ## Methods
 
@@ -21,7 +21,7 @@ Defined in: [revocation.ts:32](https://github.com/orangecheck/oc-packages/blob/m
 refuses(claims: RevocableClaims, method?: string): Promise<boolean>;
 ```
 
-Defined in: [revocation.ts:39](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L39)
+Defined in: [revocation.ts:41](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L41)
 
 Whether to refuse the session for a request with this method: always when
 revoked, and for an unsafe method (or none given) when unverified. Reads
@@ -46,7 +46,7 @@ keep working through an outage of the auth host; writes stop.
 status(claims: RevocableClaims): Promise<RevocationStatus>;
 ```
 
-Defined in: [revocation.ts:33](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L33)
+Defined in: [revocation.ts:35](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L35)
 
 #### Parameters
 

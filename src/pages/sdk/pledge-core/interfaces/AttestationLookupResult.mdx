@@ -11,13 +11,13 @@ export const metadata = {
 
 # Interface: AttestationLookupResult
 
-Defined in: [pledge-core/src/types.ts:518](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L518)
+Defined in: [pledge-core/src/types.ts:535](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L535)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-address">&lt;/a> `address` | `string` | Bitcoin address the attestation was signed by — the OrangeCheck attestation's canonical-message `address` field. | [pledge-core/src/types.ts:523](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L523) |
-| &lt;a id="property-days_unspent">&lt;/a> `days_unspent` | `number` | Days unspent at the verifier's clock of the coins covering `coverSats` (SPEC §8, OC Attest SPEC §7 step 5.d): the address's confirmed outputs oldest first until they reach `coverSats`, aged by the youngest of them. | [pledge-core/src/types.ts:534](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L534) |
-| &lt;a id="property-sats_bonded">&lt;/a> `sats_bonded` | `number` | Sats currently bonded by the named UTXOs at the verifier's clock. Computed by the caller's chain accessor. | [pledge-core/src/types.ts:528](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L528) |
-| &lt;a id="property-utxo_spent_at_or_before_now">&lt;/a> `utxo_spent_at_or_before_now` | `boolean` | True if the named UTXO has been spent at or before `now`. | [pledge-core/src/types.ts:536](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L536) |
+| &lt;a id="property-address">&lt;/a> `address` | `string` | Bitcoin address the attestation was signed by — the OrangeCheck attestation's canonical-message `address` field. | [pledge-core/src/types.ts:540](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L540) |
+| &lt;a id="property-days_unspent">&lt;/a> `days_unspent` | `number` | Days unspent at the verifier's clock of the coins covering `coverSats` (SPEC §8, OC Attest SPEC §7 step 5.d): the address's confirmed outputs oldest first until they reach `coverSats`, aged by the youngest of them. | [pledge-core/src/types.ts:551](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L551) |
+| &lt;a id="property-sats_bonded">&lt;/a> `sats_bonded` | `number` | Sats currently bonded by the named UTXOs at the verifier's clock. Computed by the caller's chain accessor. | [pledge-core/src/types.ts:545](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L545) |
+| &lt;a id="property-utxo_spent_at_or_before_now">&lt;/a> `utxo_spent_at_or_before_now` | `boolean` | True if the named UTXO has been spent at or before `now`. | [pledge-core/src/types.ts:553](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L553) |

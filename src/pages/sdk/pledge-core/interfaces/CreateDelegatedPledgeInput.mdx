@@ -1,0 +1,43 @@
+export const metadata = {
+    title: "Interface: CreateDelegatedPledgeInput",
+    description: "Auto-generated API reference for Interface: CreateDelegatedPledgeInput. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README)
+
+***
+
+[@orangecheck/pledge-core](../README) / CreateDelegatedPledgeInput
+
+# Interface: CreateDelegatedPledgeInput
+
+Defined in: [pledge-core/src/types.ts:256](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L256)
+
+An agent signs under an OC Agent delegation (SPEC §7.3). The swearer is
+`swearer`, an address; nothing the principal holds is needed.
+`via_delegation` (the delegation id) and `agent_address` (the agent's
+address) appear in the envelope but are NOT in the canonical message.
+
+## Extends
+
+- [`CreatePledgeTerms`](CreatePledgeTerms)
+
+## Properties
+
+| Property | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-bond">&lt;/a> `bond` | [`PledgeBond`](PledgeBond) | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`bond`](PledgeCanonicalInput#property-bond) | [pledge-core/src/types.ts:191](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L191) |
+| &lt;a id="property-counterparty">&lt;/a> `counterparty` | `string` \| `null` | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`counterparty`](PledgeCanonicalInput#property-counterparty) | [pledge-core/src/types.ts:192](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L192) |
+| &lt;a id="property-dispute">&lt;/a> `dispute` | [`PledgeDispute`](PledgeDispute) | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`dispute`](PledgeCanonicalInput#property-dispute) | [pledge-core/src/types.ts:193](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L193) |
+| &lt;a id="property-expires_at">&lt;/a> `expires_at` | `string` | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`expires_at`](PledgeCanonicalInput#property-expires_at) | [pledge-core/src/types.ts:190](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L190) |
+| &lt;a id="property-nonce">&lt;/a> `nonce?` | `string` | 32 lowercase hex chars (16 random bytes). If omitted, a fresh random nonce is generated via crypto.getRandomValues. Pass an explicit value for test-vector reproduction. | [`CreatePledgeTerms`](CreatePledgeTerms).[`nonce`](CreatePledgeTerms#property-nonce) | [pledge-core/src/types.ts:239](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L239) |
+| &lt;a id="property-proposition">&lt;/a> `proposition` | `string` | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`proposition`](PledgeCanonicalInput#property-proposition) | [pledge-core/src/types.ts:187](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L187) |
+| &lt;a id="property-remediation">&lt;/a> `remediation?` | `"breach_recorded"` | Defaults to "breach_recorded" (the only legal value in v0.1). | [`CreatePledgeTerms`](CreatePledgeTerms).[`remediation`](CreatePledgeTerms#property-remediation) | [pledge-core/src/types.ts:241](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L241) |
+| &lt;a id="property-resolution">&lt;/a> `resolution` | [`PledgeResolution`](PledgeResolution) | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`resolution`](PledgeCanonicalInput#property-resolution) | [pledge-core/src/types.ts:188](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L188) |
+| &lt;a id="property-resolves_at">&lt;/a> `resolves_at` | [`PledgeResolvesAt`](../type-aliases/PledgeResolvesAt) | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`resolves_at`](PledgeCanonicalInput#property-resolves_at) | [pledge-core/src/types.ts:189](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L189) |
+| &lt;a id="property-swearer">&lt;/a> `swearer` | `string` | - | [`PledgeCanonicalInput`](PledgeCanonicalInput).[`swearer`](PledgeCanonicalInput#property-swearer) | [pledge-core/src/types.ts:186](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L186) |
+| &lt;a id="property-swearersigner">&lt;/a> ~~`swearerSigner?`~~ | [`Bip322Signer`](Bip322Signer) | **Deprecated** Not read on this path beyond its address, which must equal `swearer`. Leave it out. | - | [pledge-core/src/types.ts:262](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L262) |
+| &lt;a id="property-swornat">&lt;/a> `swornAt?` | `string` \| `Date` | Defaults to "now" (truncated to seconds, ISO 8601 UTC, Z-terminated). | [`CreateDirectPledgeInput`](CreateDirectPledgeInput).[`swornAt`](CreateDirectPledgeInput#property-swornat) | [pledge-core/src/types.ts:233](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L233) |
+| &lt;a id="property-viadelegation">&lt;/a> `viaDelegation` | \&#123; `agent_signer`: [`Bip322Signer`](Bip322Signer); `delegation_id`: `string`; \&#125; | - | - | [pledge-core/src/types.ts:257](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L257) |
+| `viaDelegation.agent_signer` | [`Bip322Signer`](Bip322Signer) | - | - | [pledge-core/src/types.ts:257](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L257) |
+| `viaDelegation.delegation_id` | `string` | - | - | [pledge-core/src/types.ts:257](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L257) |

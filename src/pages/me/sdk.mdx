@@ -497,6 +497,17 @@ page retries instead of sending the person to sign in. In your own code,
 session, `signed_out`, or `unavailable`. Every token while the two variables are
 unset is checked by its signature alone.
 
+**While you build.** A sign-in on `http://localhost:<port>` or
+`http://127.0.0.1:<port>` gets a token for that origin, and no domain proves it.
+On a test project, enter it as the development origin (your project's Sign-in
+page on ochk.app, under Local development), and set the same origin as your
+server's expected audience while you build. The list for that origin is then
+served to that project's key, with or without a verified domain. Every test
+project using that origin reads the same list; it names no one. "Sign out
+everywhere" on ochk.app then ends your local session as it would a live one. A
+live project has none, and going live clears it; any other project asking for a
+local origin gets `403 dev_origin_not_declared`.
+
 A token bound to your site without `rh` is refused, reason `no_session_handle`
 (me-client 0.40.0, `orangecheck` 3.0.0): nothing could end it. Every token from
 the sign-in popup carries one. `requireHandle: false` (Python
@@ -580,8 +591,8 @@ GET https://me.ochk.io/api/integrator/revocations?project_key=<key>&aud=<aud>
 X-OC-Signature: t=<unix>,v1=hmac_sha256(signing_secret, "<t>.GET /api/integrator/revocations?project_key=<key>&aud=<aud>")
 ```
 
-`aud` is the token's `aud` exactly as it is, and must be your verified domain or
-a subdomain of it. The answer is
+`aud` is the token's `aud` exactly as it is, and must be your verified domain, a
+subdomain of it, or your test project's development origin. The answer is
 `{ "v": 1, "at": …, "tokens": [], "accounts": {}, "handles": { "<rh>": <cutoff> } }`.
 A session is ended when `handles` holds its `rh` and its `iat` is before that
 cutoff, or it has no `iat`. Fetch it at most once a minute per origin, and don't

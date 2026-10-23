@@ -201,7 +201,7 @@ Without the SDK, the header is
 | `PATCH`  | `/api/me/projects/[id]`             | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
 | `POST`   | `/api/me/projects/[id]/domain`      | change the domain: `{ domain }`. Never verified: replaced at once. Verified: opens a move (see below)                     |
 | `DELETE` | `/api/me/projects/[id]/domain`      | cancel an open move · owner-gated                                                                                         |
-| `DELETE` | `/api/me/projects/[id]`             | delete project · owner-gated                                                                                              |
+| `DELETE` | `/api/me/projects/[id]`             | delete project; refused while it holds sats or owes a step ([below](#deleting-a-project)) · owner-gated                   |
 | `POST`   | `/api/me/projects/[id]/pay-periods` | when the project pays its users: `add`, `end`, `set_end`, `cancel` ([details](/me/paying-users)) · owner-gated            |
 | `POST`   | `/api/me/projects/[id]/verify`      | run a domain-ownership check (DNS TXT, falls back to meta tag); during a move, checks the new domain · rate-limited 5/min |
 | `DELETE` | `/api/me/projects/[id]/verify`      | reissue the verification token; a verified domain stays verified until its next check · owner-gated                       |
@@ -225,6 +225,27 @@ failed check changes nothing.
 Opening a move needs a fresh identity check, as revealing the signing secret
 does: without one the call answers 401 `identity_reproof_required`. A frozen
 project answers 409 `project_frozen`.
+
+### Deleting a project
+
+Deleting a project takes everything that only served it: its key, its webhooks
+and their queued deliveries, an open handover offer, its release schedules, its
+rate counters and its event index. What belongs to someone else stays: the
+receipts people earned, the escrow ledger, payouts and release records.
+Statements the project made about accounts stay too: a statement outlives the
+project that made it, and still names it.
+
+While the project holds sats or owes a step, the delete answers 409 with a
+`reason` and a `detail` sentence saying what to do first, and deletes nothing:
+
+| `reason`             | What to do first                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `escrow_balance`     | The project holds sats in escrow (`balance_sats`). Refunds aren't self-serve yet: write to billing@ochk.io. |
+| `escrow_held`        | An event is being charged right now. Wait a minute.                                                         |
+| `escrow_settling`    | An event's charge is still being settled, within the hour.                                                  |
+| `drop_open`          | A release schedule still holds what people earned. Turn it off, which releases what it holds at once.       |
+| `connect_moving`     | Its Connect app is still being handed back after a handover. Try again in an hour.                          |
+| `transfer_accepting` | Someone is accepting the project right now. Reload in a minute: it may already be theirs.                   |
 
 ## Response shapes
 

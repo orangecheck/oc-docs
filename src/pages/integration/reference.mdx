@@ -72,10 +72,15 @@ Everything comes from one free project at
 Put them in `.env` as the example's `.env.example` names them, with
 `SITE_ORIGIN` set to the site's exact origin.
 
-On localhost, leave the signing secret empty. A project's domain can't be
-localhost, so the list of ended sessions can't be read for a local origin. A
-local run signs in but doesn't refuse a session someone ended everywhere, and a
-banner says so. A deployment refuses to start without the secret.
+On localhost, declare a development origin on your test project (its Sign-in
+page, under Local development), equal to `SITE_ORIGIN` exactly, port included.
+Set the signing secret locally too, and "Sign out everywhere" on ochk.app ends
+your local session as it would a live one
+([how it works](/me/sdk#when-someone-ends-every-session)). With the secret set
+and no origin declared, sign-in itself answers `503 revocations_unavailable`;
+with no secret, a local run signs in but doesn't refuse a session someone ended
+everywhere, and a banner says so. A deployment refuses to start without the
+secret.
 
 ## What each step follows
 

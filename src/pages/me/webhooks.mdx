@@ -39,9 +39,10 @@ app.post('/api/oc/webhook', async (req, res) => {
     if (!result.ok) return res.status(401).end(result.reason);
 
     const envelope = JSON.parse(req.body);
-    // envelope.kind === 'oc-billable-event'
-    // envelope.subtype === 'session_creation' | 'payment_authorization' | …
-    // envelope.id is content-addressed — idempotent
+    // envelope.kind === 'oc-billable-event' | 'oc-system-event'
+    // envelope.subtype === 'session_creation' | 'connect.claimed' | …
+    // A billable event's id is in the signed body; a system notice has none,
+    // only the OC-Envelope-Id header. Deduplicate on whichever it has.
     await onOcEvent(envelope);
     res.status(200).end();
 });
@@ -71,9 +72,13 @@ async def oc_webhook(request: Request):
         event = verify_webhook(request.headers, raw)
     except InvalidWebhook as err:
         raise HTTPException(401, err.reason)
-    if event["id"] in seen:  # deliveries can repeat
+    # A billable event's id is in the signed body. A system notice
+    # (connect.claimed, escrow.low, …) has none: its id is the OC-Envelope-Id header.
+    event_id = event.get("id") or request.headers.get("OC-Envelope-Id")
+    if event_id in seen:  # deliveries can repeat
         return {}
-    seen.add(event["id"])
+    if event_id:
+        seen.add(event_id)
     on_oc_event(event)
     return {}
 ```
@@ -108,15 +113,15 @@ async fn webhook(
 
 ## Headers OC sends
 
-| Header                | Meaning                                                                         |
-| --------------------- | ------------------------------------------------------------------------------- |
-| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                      |
-| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                |
-| `OC-Envelope-Id`      | Idempotency key — same envelope retried after 2xx ack is your problem to dedupe |
-| `OC-Subtype`          | Event subtype, copied for routing convenience                                   |
-| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices     |
-| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)     |
-| `Content-Type`        | `application/json`                                                              |
+| Header                | Meaning                                                                                                                      |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                                                                   |
+| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                                                             |
+| `OC-Envelope-Id`      | The event's `id` for a billable event; for a system notice, which has no `id` in its body, the delivery's own id. Not signed |
+| `OC-Subtype`          | Event subtype, copied for routing convenience                                                                                |
+| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices                                                  |
+| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)                                                  |
+| `Content-Type`        | `application/json`                                                                                                           |
 
 ## What the body carries
 
@@ -130,9 +135,10 @@ A billable event arrives as the event itself plus three fields:
 | `id`, `subtype`, … | The event: `id`, `occurred_at`, `class`, `subtype`, `site`, the fee split, `context`, `verify_url`                                |
 
 A project notice (`OC-Class: system`) is
-`{ kind: 'oc-system-event', subtype, project_key, … }` and names no person. A
-webhook gets every notice through `*`, or only the ones it names in
-`subscribed`:
+`{ kind: 'oc-system-event', subtype, project_key, … }` with no `id`. It names no
+person, except `connect.claimed`, which carries the `did_oc` your Connect app
+was given and the person's `sub` for your project. A webhook gets every notice
+through `*`, or only the ones it names in `subscribed`:
 
 | Subtype                          | When                                                                                                                                                                                                                                           |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -150,12 +156,12 @@ their account has one.
 
 ## Delivery semantics
 
-|                    |                                                                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Guarantee**      | At-least-once. Deduplicate on `OC-Envelope-Id` (the event's `id`). The signature has no timestamp, so deduplication is also your replay protection.                      |
-| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                 |
-| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due. |
-| **After that**     | The delivery is dead-lettered and listed with your webhooks, where you can requeue it. The endpoint is not muted, and the event stays at `/api/envelope/[id]`.           |
+|                    |                                                                                                                                                                                                                                                                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Guarantee**      | At-least-once. Deduplicate a billable event on its `id`, from the signed body: the signature has no timestamp, so that is also your replay protection. A system notice has no `id` in its body; deduplicate it on `OC-Envelope-Id`, which is not signed, and handle it so a repeat changes nothing. |
+| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                            |
+| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due.                                                                                                                            |
+| **After that**     | The delivery is dead-lettered and listed with your webhooks, where you can requeue it. The endpoint is not muted, and the event stays at `/api/envelope/[id]`.                                                                                                                                      |
 
 ## The raw-body trap
 
@@ -206,8 +212,10 @@ app.post('/api/oc/webhook', async (req, res) => {
     if (!result.ok) return res.status(401).end(result.reason);
 
     const envelope = JSON.parse(req.body);
-    if (seen.has(envelope.id)) return res.status(200).end(); // already processed
-    seen.set(envelope.id, true);
+    // A system notice has no id in its body; its id is the OC-Envelope-Id header.
+    const id: string | undefined = envelope.id ?? req.header('OC-Envelope-Id');
+    if (id && seen.has(id)) return res.status(200).end(); // already processed
+    if (id) seen.set(id, true);
 
     try {
         await onOcEvent(envelope);

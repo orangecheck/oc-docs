@@ -60,6 +60,7 @@ If it does, that device's envelopes are compromised.
 import {
     authorizedDevices,
     DEVICE_KIND,
+    liveDevices,
     parseDeviceEvent,
 } from '@orangecheck/lock-device';
 import { queryEvents } from '@orangecheck/nostr-core';
@@ -93,13 +94,21 @@ for (const event of events) {
         verified.push(record);
     }
 }
-const devices = authorizedDevices(verified); // drops revoked and ambiguous records
+// The binds no revocation retires, from any relay and any key (SPEC §3.5).
+const live = liveDevices(verified);
+// One recipient per device: a device can carry more than one live record.
+const devices = [...new Map(live.map((d) => [d.device_id, d])).values()];
 // Each device.device_pk is a 32-byte X25519 public key we'll encrypt to.
+
+// Only to deliver over Nostr: the keys that are each device's inbox (SPEC §3.4).
+const inboxes = authorizedDevices(live);
 ```
 
-The sender MUST verify each record's BIP-322 signature before encrypting to it;
-a record whose signature fails is forged. `authorizedDevices` expects records
-that already passed that check.
+The sender MUST verify each record's BIP-322 signature before using it; a record
+whose signature fails is forged. `liveDevices` then applies every revocation
+among the verified records, so a revoked device gets nothing new. Seal to
+`devices`, not to `inboxes`: a device whose record names no inbox key still
+receives the envelope by link.
 
 ## 3. Sender seals
 
@@ -125,17 +134,18 @@ const envelope = await seal({
 });
 ```
 
-Inside `seal()`:
+Inside `seal()` ([spec §4.2](/lock/spec)):
 
-1. Generate an ephemeral X25519 keypair `(eph_sk, eph_pk)` for this envelope.
-2. For each recipient, compute `shared = X25519(eph_sk, recipient.device_pk)`.
-3. Derive the symmetric key:
-   `sym = HKDF-SHA256(shared, salt=envelope_id, info="oc-lock v0")`.
-4. Encrypt the payload: `AES-256-GCM(sym, nonce, plaintext, aad=envelope_id)`.
-5. Wrap the ciphertext + ephemeral public key + per-recipient metadata in a
-   canonicalized JSON envelope.
-6. Sender signs the envelope with BIP-322 (binds the envelope to the sender's
-   Bitcoin address).
+1. Generate a random 32-byte `content_key` and a 12-byte `nonce_ct`, and encrypt
+   the payload once with AES-256-GCM under `content_key`.
+2. For each recipient device, generate an ephemeral X25519 keypair, compute
+   `shared = X25519(eph_sk, device_pk)`, derive
+   `kek = HKDF-SHA256(shared, salt=nonce_ct, info="oc-lock/v2/kek:" || device_id)`,
+   and wrap `content_key` under `kek` with AES-256-GCM.
+3. Canonicalize the envelope and set its `id` to the SHA-256 of the canonical
+   bytes with `sig.value` emptied.
+4. The sender signs the `id` with BIP-322, binding the envelope to their Bitcoin
+   address.
 
 The result is a self-contained JSON blob. Send it over any transport.
 

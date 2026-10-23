@@ -120,11 +120,11 @@ empty record.
 The canonical way to pledge "I will publish X by time T":
 
 ```ts
-import type { CreatePledgeInput } from '@orangecheck/pledge-core';
+import type { Bip322Signer, CreatePledgeInput } from '@orangecheck/pledge-core';
 
 import { createPledge } from '@orangecheck/pledge-core';
 
-declare const swearer: CreatePledgeInput['swearerSigner']; // the swearer's wallet signer
+declare const swearer: Bip322Signer; // the swearer's wallet signer
 declare const contentHash: string; // 64 hex: sha256 of what will be published
 // expires_at, bond, counterparty and dispute, as in the quickstart
 declare const terms: Pick<
@@ -176,7 +176,7 @@ delegation and checks its scope (SPEC §7.3).
 
 ```ts
 import type { SignerRef } from '@orangecheck/agent-signer';
-import type { CreatePledgeInput } from '@orangecheck/pledge-core';
+import type { CreatePledgeTerms } from '@orangecheck/pledge-core';
 
 import { createDelegation } from '@orangecheck/agent-signer';
 import { createPledge } from '@orangecheck/pledge-core';
@@ -184,10 +184,7 @@ import { createPledge } from '@orangecheck/pledge-core';
 declare const principal: SignerRef; // the principal's wallet
 declare const agent: SignerRef; // the agent's own key
 // proposition, resolution, bond and the rest, as in the quickstart
-declare const terms: Omit<
-    CreatePledgeInput,
-    'swearer' | 'swearerSigner' | 'viaDelegation'
->;
+declare const terms: Omit<CreatePledgeTerms, 'swearer'>;
 
 // Principal mints a delegation:
 const delegation = await createDelegation({
@@ -198,12 +195,11 @@ const delegation = await createDelegation({
 });
 
 // Agent later swears a pledge under that delegation and signs it with its own
-// key. The swearer stays the principal; on this path only swearerSigner's
-// address is read.
+// key. The swearer stays the principal, named by address; the principal signs
+// nothing here (pledge-core 3.3.0 and later).
 const pledge = await createPledge({
     ...terms,
     swearer: principal.address,
-    swearerSigner: principal,
     viaDelegation: { delegation_id: delegation.id, agent_signer: agent },
 });
 ```

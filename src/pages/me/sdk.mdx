@@ -310,9 +310,30 @@ except InvalidSession as err:
 `BondRequired` and `SessionEnded` are both `InvalidSession`s. Put their handlers
 first: an `except InvalidSession` above them takes them too.
 
-The Python SDK has no framework wrapper and no status mapping like `withOcAuth`
-and `checkOcSession`: the answer a refusal gets is yours to choose. Its reasons
-are `malformed`, `algorithm`, `unknown_key`, `key_set_unavailable`, `signature`,
+`check_oc_session` (3.2 or later) takes the same arguments and gives the answer
+`withOcAuth` gives with `required: true`, as a status and a JSON body, instead
+of raising: 401 `unauthenticated` for no token, a bad one or one the person
+ended; 401 `no_session_handle`; 403 `bond_required` with `need`, `have` and
+`back_url`; 503 `revocations_unavailable`, `key_set_unavailable` or
+`bond_policy_unavailable`; 500 `unknown_project_key`. Both SDKs are held to the
+same vectors.
+
+```python
+from typing import Optional
+
+from orangecheck import check_oc_session
+
+bearer: Optional[str]  # the token the request brought, or None
+
+checked = check_oc_session(bearer, "https://your-site.example", method="POST")
+if checked.ok:
+    session = checked.session  # signed in
+else:
+    status, body = checked.status, checked.body  # answer with these
+```
+
+The Python SDK has no framework wrapper. `verify_session`'s reasons are
+`malformed`, `algorithm`, `unknown_key`, `key_set_unavailable`, `signature`,
 `issuer`, `expired`, `not_yet_valid`, `claims`, `retired_key`, `audience`,
 `no_session_handle` (3.0 or later), `ended`, `revocations_unavailable`,
 `unknown_project_key`, `bond_policy_unavailable` and `bond_required`.
@@ -322,9 +343,12 @@ A `Session` has `sub`, `did_oc`, `jti`, `aud`, `iat` (it can be `None`), `exp`,
 3.1, read `session.claims["rh"]`). To keep your own session, keep that `rh`,
 your site's origin as `aud`, and `iat`.
 
-`issuer=` changes only the `iss` a token must carry: the keys still come from
-ochk.io's key set. To check against keys of your own, a stand-in issuer in tests
-say, pass `jwks=` as well, a dict shaped like the key set's JSON.
+`issuer=` names another auth host, a test stack's say: the token must carry it
+as `iss`, and from 3.2 the keys come from `<issuer>/.well-known/jwks.json`, as
+in Node (https, or http on localhost only). Before 3.2 they came from ochk.io's
+key set whatever the issuer. To check against keys you hold, a stand-in issuer
+in tests say, pass `jwks=`, a dict shaped like the key set's JSON; it wins, and
+nothing is fetched.
 
 `verify_session` reads the rule from me.ochk.io inside the first call that needs
 it, then holds it a minute. That read is one round trip (235 to 270 ms in our
@@ -465,6 +489,40 @@ curl -X POST https://ochk.io/api/auth/revoke \
 Up to 8 tokens per call, from your server. Holding a token is the authority to
 end it, so no other credential is asked for.
 
+`revokeToken` (me-client 0.41.0 or later) and `revoke_token` (`orangecheck`
+3.2.0 or later) make that call. A call that can't be valid throws before
+anything is sent; an outage or a refusal is a result, never a throw, so it can't
+break a sign-out. `revoked` is 0 when ochk.io could not read the token as its
+own, as when it has expired already.
+
+```ts
+import { revokeToken } from '@orangecheck/me-client/server';
+
+declare const token: string; // the token the person signed in with
+
+const result = await revokeToken(token);
+if (!result.ok)
+    console.warn(
+        'could not end the token at ochk.io:',
+        result.reason,
+        result.status
+    );
+```
+
+```python
+from orangecheck import RevokeRefusal, revoke_token
+
+token: str  # the token the person signed in with
+
+result = revoke_token(token)
+if isinstance(result, RevokeRefusal):
+    print("could not end the token at ochk.io:", result.reason, result.status)
+```
+
+The reasons are `rate_limited`, `bad_request` and `unavailable` (an outage, a
+timeout or an answer the SDK can't read; the token still ends when it expires).
+Both take `issuer` for another auth host.
+
 ### when someone ends every session
 
 A person can end all their sessions at once: "Sign out everywhere", removing a
@@ -561,7 +619,13 @@ and don't store it:
   before you hand the session to the browser. Never let the browser bind them in
   a second call: it could bind another token's handle, or none.
 - Spend its `jti` in a store all your servers share, until `exp`, so the same
-  token can't start a second session on another instance.
+  token can't start a second session on another instance:
+  `spendOnce(jti, exp, store)` (me-client 0.41.0) or
+  `spend_once(jti, exp, store)` (`orangecheck` 3.2.0). True the first time,
+  false for a repeat or an expired token. The store is yours, anything with an
+  atomic `add(jti, exp)` that answers true when it recorded the jti: a unique
+  row, or Redis `SET jti 1 NX EXAT exp`. `MemoryJtiStore` is for tests and a
+  single process only.
 - A token without `rh` is refused before it gets here (me-client 0.40.0,
   `orangecheck` 3.0.0): nothing could end the session it starts. Don't turn that
   off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or
@@ -620,10 +684,10 @@ request:
 Together that is 0.6 to 0.8 s; afterwards each is read from memory in
 microseconds. `warm_session` (`orangecheck` 2.10.0 or later) takes your audience
 and the `revocations` and `policy` you pass to `verify_session`, as
-`warm_session(audience, *, revocations=None, policy=None)`; it takes no `issuer`
-or `jwks`, and always warms ochk.io's own key set. It fetches whichever is due,
-without raising. Call it at startup and then every ten seconds from a background
-thread:
+`warm_session(audience, *, revocations=None, policy=None, issuer=…, jwks=None)`.
+From 3.2.0 it takes the same `issuer` and `jwks` too, and warms that issuer's
+key set; with `jwks` given it fetches none. It fetches whichever is due, without
+raising. Call it at startup and then every ten seconds from a background thread:
 
 ```python
 import logging

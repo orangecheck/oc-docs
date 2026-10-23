@@ -48,12 +48,18 @@ from orangecheck import (
 
     # ochk.app sign-in, events and webhooks, for your backend
     verify_session,
+    check_oc_session,  # 3.2 or later
     warm_session,
     SignInPolicy,
     RevocationList,
     bond_meets,
     sign_event,
     verify_webhook,
+
+    # After a sign-in: one session per token, then end it (3.2 or later)
+    spend_once,
+    MemoryJtiStore,
+    revoke_token,
 
     # OC Connect, for a site with its own login (2.13 or later)
     connect_provision,
@@ -73,6 +79,9 @@ from orangecheck import (
     ConnectClaimLink,
     ConnectDeleted,
     ConnectRefusal,
+    SessionCheck,
+    TokensRevoked,
+    RevokeRefusal,
 
     # Errors
     OrangeCheckError,
@@ -203,15 +212,18 @@ session.did_oc  # the person; keep it beside your user row
 
 `audience` is the origin of the page that opened the popup, exactly
 (`http://localhost:5173` while you develop). The key set,
-`https://ochk.io/.well-known/jwks.json`, is fetched and cached for an hour, and
-kept through an outage; pass `jwks=` to check offline. A token for any other
+`https://ochk.io/.well-known/jwks.json` (or `<issuer>/.well-known/jwks.json` for
+another `issuer=`, 3.2 or later), is fetched and cached for an hour, and kept
+through an outage; pass `jwks=` to check offline. A token for any other
 origin, or one with no `aud`, is refused. The token carries no email address.
 What each claim means is in [verify without the SDK](/me/sdk#verify-without-the-sdk).
 
-Who may sign in (`SignInPolicy`, `BondRequired`), sessions ended everywhere
-(`RevocationList`, `SessionEnded`) and keeping their reads off your requests
-(`warm_session`) are in the SDK reference:
+Who may sign in (`SignInPolicy`, `BondRequired`), the HTTP answer for a request
+(`check_oc_session`), sessions ended everywhere (`RevocationList`,
+`SessionEnded`), spending and ending the token (`spend_once`, `revoke_token`) and
+keeping their reads off your requests (`warm_session`) are in the SDK reference:
 [checking the session on your server](/me/sdk#checking-the-session-on-your-server),
+[ending a session](/me/sdk#ending-a-session),
 [when someone ends every session](/me/sdk#when-someone-ends-every-session) and
 [Python: warming](/me/sdk#python-warming).
 
@@ -320,7 +332,7 @@ The package ships a pytest suite that loads the canonical fixtures from
 `oc-attest-protocol/conformance/vectors/` (vendored) and asserts byte-identical
 output to the TypeScript SDK. The ochk.app functions are held to the vectors
 `@orangecheck/me-client` is tested against (`me-client/test-vectors/integrator.json`
-in `oc-packages`). CI fails on drift.
+and `server-helpers.json` in `oc-packages`). CI fails on drift.
 
 ## Naming conventions
 
@@ -333,6 +345,8 @@ Python uses `snake_case` where TypeScript uses `camelCase`:
 | `issueChallenge`, `verifyChallenge` | `challenge_issue`, `challenge_verify` |
 | `buildCanonicalMessage`             | `build_canonical_message`             |
 | `verifyOcToken`                     | `verify_session`                      |
+| `withOcAuth` (its answer)           | `check_oc_session`                    |
+| `spendOnce`, `revokeToken`          | `spend_once`, `revoke_token`          |
 | `oc.webhook.verify`                 | `verify_webhook`                      |
 
 Each follows its language's idioms. The underlying behavior is identical.

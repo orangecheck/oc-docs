@@ -234,7 +234,8 @@ Each line is a way an integration has gone wrong, with why it matters.
       token is a 30-day credential you didn't need to keep._ When your session
       takes over:
     - [ ] the token's `jti` is spent in a store all your servers share, until
-          `exp`. _A token replayed to another instance must not sign in twice._
+          `exp` (`spendOnce` / `spend_once`). _A token replayed to another
+          instance must not sign in twice._
     - [ ] its `rh`, `aud` and `iat` go with your session on the server, before
           you hand the session out, never in a second call from the browser.
           _The browser could bind another token's handle, or none._

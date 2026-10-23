@@ -17,6 +17,9 @@
  *
  * Usage: node scripts/check-snippets.mjs [--only ts|python] [--page <path part>] [--json out.json]
  *        (needs network and python3)
+ *
+ * Before a release, check the docs against your local build instead of the
+ * published one: SNIPPETS_USE='@orangecheck/me-client=/path/to/me-client.tgz,orangecheck=/path/to/sdk-py'
  */
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -39,6 +42,13 @@ const TYPES_FOR = {
     'express-session': '@types/express-session',
     react: '@types/react',
 };
+/** Local builds to install in place of the published packages (see Usage). */
+const USE = Object.fromEntries(
+    (process.env.SNIPPETS_USE ?? '')
+        .split(',')
+        .filter(Boolean)
+        .map((pair) => [pair.slice(0, pair.indexOf('=', 1)), pair.slice(pair.indexOf('=', 1) + 1)])
+);
 /** PyPI names for the modules Python blocks import, where they differ. */
 const PYPI_FOR = { jwt: 'PyJWT' };
 const PY_STDLIB = new Set(sys_stdlib());
@@ -90,6 +100,10 @@ async function checkTs(list) {
         }
     const specs = [];
     for (const p of [...pkgs].sort()) {
+        if (USE[p]) {
+            specs.push(USE[p]);
+            continue;
+        }
         // The latest as npm itself says, so a release racing this check is read
         // from the registry it was published to, not a lagging mirror.
         const res = await fetch(`https://registry.npmjs.org/${p.replace('/', '%2f')}`);
@@ -193,7 +207,7 @@ function checkPython(list) {
     const py = join(venv, 'bin', 'python');
     const mods = new Set();
     for (const b of list) for (const m of pyImports(b.code)) if (!PY_STDLIB.has(m)) mods.add(m);
-    const reqs = ['mypy', ...[...mods].map((m) => PYPI_FOR[m] ?? m)];
+    const reqs = ['mypy', ...[...mods].map((m) => USE[PYPI_FOR[m] ?? m] ?? PYPI_FOR[m] ?? m)];
     const quiet = { stdio: ['ignore', 'ignore', 'inherit'] };
     // A fresh venv: python3's own, or uv's where python3 ships without ensurepip.
     if (spawnSync('python3', ['-m', 'venv', venv]).status === 0) {

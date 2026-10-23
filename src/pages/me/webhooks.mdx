@@ -154,6 +154,29 @@ Both federation notices carry `migration_id`, `from` and `to`. The project's
 owner also sees each one in their ochk.app notifications, and by email when
 their account has one.
 
+`@orangecheck/me-client` 0.41.0 or later types both:
+`FederationMigratingWebhookPayload` (with `flip_not_before`, an ISO time, and
+`successor`: `slug`, `name`, `threshold`, `network`, `charter_hash`, and the
+seats' operator keys as `guardians`) and
+`FederationMigrationCancelledWebhookPayload`.
+
+```ts
+import type {
+    FederationMigratingWebhookPayload,
+    SystemWebhookPayload,
+} from '@orangecheck/me-client';
+
+declare const body: string; // the raw body, verified
+
+const notice = JSON.parse(body) as SystemWebhookPayload;
+if (notice.subtype === 'federation.migrating') {
+    const move = notice as FederationMigratingWebhookPayload;
+    console.log(
+        `top-ups pause; ${move.from} moves to ${move.successor.name} no sooner than ${move.flip_not_before}`
+    );
+}
+```
+
 ## Delivery semantics
 
 |                    |                                                                                                                                                                                                                                                                                                     |

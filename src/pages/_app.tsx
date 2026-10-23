@@ -3,10 +3,10 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 
 import { MDXProvider } from '@mdx-js/react';
+import { ThemeProvider } from '@orangecheck/app-design/chrome';
 import { TooltipProvider } from '@orangecheck/app-design/primitives';
 import { OcSessionProvider } from '@orangecheck/auth-client';
 import { useFamilyPageviews } from '@orangecheck/site-kit/analytics';
-import { ThemeProvider } from 'next-themes';
 
 import { DocsFrame } from '@/components/docs/DocsFrame';
 import { docsMdxComponents } from '@/components/docs/mdx';
@@ -28,12 +28,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
     const docsMeta = findDocsMeta(path);
     const isRoot = path === '/';
     return (
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
+        <ThemeProvider>
             <Seo
                 title={docsMeta.title}
                 description={docsMeta.description}

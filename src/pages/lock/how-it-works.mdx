@@ -171,14 +171,17 @@ const { payload, sender, matchedDeviceId } = await unseal({
 });
 ```
 
-Inside `unseal()`:
+Inside `unseal()` ([spec §4.3](/lock/spec)):
 
-1. Find the recipient entry matching the local `device_id`.
-2. Recompute the shared secret: `shared = X25519(device_sk, envelope.eph_pk)`.
-3. Derive `sym = HKDF-SHA256(shared, salt=envelope_id, info="oc-lock v0")`.
-4. Decrypt: `AES-256-GCM(sym, nonce, ciphertext, aad=envelope_id)`.
-5. Verify the sender's BIP-322 signature over the envelope's canonical
-   representation. Reject if invalid.
+1. Recompute the envelope `id` from its canonical bytes and reject a mismatch.
+2. Verify the sender's BIP-322 signature over `id` for `from.address`, and
+   reject if it fails.
+3. Find the recipient entry matching the local `device_id`.
+4. Recompute `shared = X25519(device_sk, eph_pk)` from that entry's `eph_pk`,
+   derive
+   `kek = HKDF-SHA256(shared, salt=nonce_ct, info="oc-lock/v2/kek:" || device_id)`,
+   and unwrap `content_key` with AES-256-GCM.
+5. Decrypt the payload with `content_key`. A failed tag rejects the envelope.
 
 On success, the recipient gets the plaintext + a verified sender address.
 

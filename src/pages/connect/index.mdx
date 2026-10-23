@@ -11,7 +11,10 @@ email/password — whatever you already run. It works exactly as it does today.
 Drop in one server-side call so that when your user signs in, an orangecheck
 account is created for them at the same time.
 
-There is no new SDK. A Connect integration is one HTTPS `POST`.
+A Connect integration is one server-side call: `connectProvision` from
+[`@orangecheck/me-client`](/me/sdk) 0.39.0 or later, `connect_provision` from
+the `orangecheck` Python package 2.13.0 or later, or one HTTPS `POST` from any
+language.
 
 > **New to orangecheck integration?** See the
 > [Integration overview](/integration) first — Connect is one of two pathways.
@@ -24,15 +27,60 @@ There is no new SDK. A Connect integration is one HTTPS `POST`.
 1. Open your project at [ochk.app/me/projects](https://ochk.app/me/projects) and
    choose **Your own login** under **Sign-in**: you get an **API key**.
 2. Your user signs in however they already do. Nothing changes.
-3. Right after, your backend calls `POST https://ochk.io/api/connect/provision`
-   with your API key and your own id for that user.
+3. Right after, your backend calls `connectProvision` (it posts to
+   `https://ochk.io/api/connect/provision`) with your API key and your own id
+   for that user.
 4. OrangeCheck returns the account id (`did_oc`). Store it on your user record.
 
 ## The whole integration
 
 ```ts
-// When you make a user's record, after their first sign-in your own way (or
-// when they tick your consent box). Run this from your backend.
+// When you make a user's record, after their first sign-in your own way.
+// Run this from your backend: it refuses to run in a browser.
+import { connectProvision } from '@orangecheck/me-client/server';
+
+declare const yourUser: { id: string }; // the user you just made
+const r = await connectProvision({
+    apiKey: process.env.OCHK_CONNECT_KEY!,
+    userId: yourUser.id,
+});
+if (r.ok) {
+    // store r.did_oc on your user record — that is the whole integration.
+}
+```
+
+`OCHK_CONNECT_KEY` is the API key from the console. `userId` is your own stable
+id for the user. That is everything — no token to forward, no provider to name,
+no keypair, no redirect.
+
+In Python:
+
+```python
+import os
+
+from orangecheck import connect_provision
+
+user_id: str  # the user you just made
+
+result = connect_provision(os.environ["OCHK_CONNECT_KEY"], user_id)
+if result.ok:
+    did_oc = result.did_oc  # store it on your user record
+```
+
+Call it **once per user** and keep the `did_oc`; there is no need to call it on
+every sign-in. It is idempotent, so a retry after a timeout is safe: the same
+user always resolves to the same `did:oc` (`is_new` tells you whether this call
+created it). A call makes no record of when your user signed in.
+
+**It never blocks your sign-in.** A refusal or an outage is a result,
+`{ ok: false, reason, status }`, never a throw, and a call gives up after five
+seconds (`timeoutMs` in Node, `timeout` in Python, at most 30). Only a mistake
+in the call itself throws, before anything is sent: an option it does not read,
+a missing key or user id, or `consent: false`.
+
+**Without an SDK**, it is one request:
+
+```ts
 declare const yourUser: { id: string }; // the user you just made
 const res = await fetch('https://ochk.io/api/connect/provision', {
     method: 'POST',
@@ -43,22 +91,120 @@ const res = await fetch('https://ochk.io/api/connect/provision', {
     body: JSON.stringify({ user_id: yourUser.id }),
 });
 const { did_oc, is_new } = await res.json();
-// store did_oc on your user record — that is the whole integration.
 ```
 
-`OCHK_CONNECT_KEY` is the API key from the console. `user_id` is your own stable
-id for the user. That is everything — no token to forward, no provider to name,
-no keypair, no redirect.
+## With or without asking
 
-Call it **once per user** and keep the `did_oc`; there is no need to call it on
-every sign-in. It is idempotent, so a retry after a timeout is safe: the same
-user always resolves to the same `did:oc` (`is_new` tells you whether this call
-created it). A call makes no record of when your user signed in.
+You choose one of two ways, per site:
 
-**With or without asking.** Make the account with no prompt, or only for people
-who tick a consent box at sign-up. When they tick it, add `consent: true` to the
-body; it is recorded once. An account made without it is identity only: it can't
-be paid. A site that will pay its users asks first.
+- **Without asking.** Every user who signs in gets an account, made by the call
+  above with no `consent`. It is identity only: it can't be paid.
+- **With an opt-in box.** On your sign-in or sign-up, show a checkbox with these
+  words, exactly:
+
+    > **Also create my orangecheck account**
+    >
+    > It stays with orangecheck until you claim it at ochk.app. Then you can use
+    > it on other sites, or delete it.
+
+    Both SDKs export them: `CONNECT_CONSENT_LABEL` and `CONNECT_CONSENT_BLURB`,
+    from `@orangecheck/me-client/connect-consent` (no dependencies, safe in any
+    bundle) and from `orangecheck`.
+
+The rules for the box:
+
+- **Unticked by default.** Never pre-tick it, and never bundle it with your
+  Terms or with any other box.
+- **Unticked means no call at all.** Don't call `connectProvision` for that
+  user. The SDKs refuse `consent: false`, because a call without consent makes
+  an account the person did not ask for.
+- **Ticked means `consent: true`**, sent only on a tick, at the moment of the
+  tick. It is recorded once.
+- **A later tick upgrades.** If you started without asking and later offer the
+  box (in account settings, say), a tick calls again with `consent: true`: the
+  same `did_oc`, now consented.
+- **After a deletion**, provision answers `410 account_deleted` until the person
+  ticks the box again.
+- **Before a claim, deleting it is yours to do.** The person can delete the
+  account at ochk.app only once they have claimed it. Until then, delete it with
+  `connectDelete` when they delete their account with you (below).
+
+A site that will pay its users asks first.
+
+In plain HTML, the words go in as text:
+
+```html
+<label>
+    <input type="checkbox" name="orangecheck" />
+    Also create my orangecheck account
+</label>
+<p>
+    It stays with orangecheck until you claim it at ochk.app. Then you can use
+    it on other sites, or delete it.
+</p>
+```
+
+In React, import them:
+
+```tsx
+import type { ReactElement } from 'react';
+
+import {
+    CONNECT_CONSENT_BLURB,
+    CONNECT_CONSENT_LABEL,
+} from '@orangecheck/me-client/connect-consent';
+
+export function OrangecheckOptIn(): ReactElement {
+    return (
+        <div>
+            <label>
+                <input type="checkbox" name="orangecheck" />
+                {CONNECT_CONSENT_LABEL}
+            </label>
+            <p>{CONNECT_CONSENT_BLURB}</p>
+        </div>
+    );
+}
+```
+
+On your server, call only on a tick:
+
+```ts
+import { connectProvision } from '@orangecheck/me-client/server';
+
+declare const yourUser: { id: string }; // the user who just signed up
+declare const form: FormData; // the sign-up form they sent
+
+if (form.get('orangecheck') === 'on') {
+    const r = await connectProvision({
+        apiKey: process.env.OCHK_CONNECT_KEY!,
+        userId: yourUser.id,
+        consent: true,
+    });
+    if (r.ok) {
+        // store r.did_oc on your user record
+    }
+}
+// unticked: no call at all
+```
+
+In Python:
+
+```python
+import os
+
+from orangecheck import CONNECT_CONSENT_BLURB, CONNECT_CONSENT_LABEL, connect_provision
+
+# Render CONNECT_CONSENT_LABEL and CONNECT_CONSENT_BLURB beside an unticked box.
+user_id: str  # the user who just signed up
+ticked: bool  # whether they ticked it
+
+if ticked:
+    result = connect_provision(os.environ["OCHK_CONNECT_KEY"], user_id, consent=True)
+    if result.ok:
+        did_oc = result.did_oc  # store it on your user record
+# unticked: no call at all
+```
 
 ## What you get back
 
@@ -66,7 +212,8 @@ be paid. A site that will pay its users asks first.
 { "ok": true, "did_oc": "did:oc:…", "is_new": true }
 ```
 
-Or a refusal, `{ "ok": false, "reason": … }`:
+Or a refusal, `{ "ok": false, "reason": … }`. The SDKs return the same reasons,
+and `unavailable` for an outage, a timeout or an answer they can't read:
 
 - `410 account_deleted`: this user's account was deleted, by the person or by
   you (below). Stop. Provision them again only when they have just asked for an
@@ -95,17 +242,16 @@ the person claims it into an orangecheck account of their own, at ochk.app.
 backend and send them to it:
 
 ```ts
+import { connectClaimLink } from '@orangecheck/me-client/server';
+
 declare const yourUser: { id: string }; // the signed-in user asking to claim
-const res = await fetch('https://ochk.io/api/connect/claim-link', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OCHK_CONNECT_KEY}`,
-    },
-    body: JSON.stringify({ user_id: yourUser.id }),
+const r = await connectClaimLink({
+    apiKey: process.env.OCHK_CONNECT_KEY!,
+    userId: yourUser.id,
 });
-const { url } = await res.json(); // https://ochk.app/connect/claim#t=…
-// redirect this user, and only this user, to url
+if (r.ok) {
+    // redirect this user, and only this user, to r.url (https://ochk.app/connect/claim#t=…)
+}
 ```
 
 The link works once, for fifteen minutes, and a new one closes the one before
@@ -132,21 +278,18 @@ signature. Then:
 - You are never told the id of the account it was joined to, so two sites a
   person claims from cannot link them through one id.
 
-In Python, the link is one request:
+In Python:
 
 ```python
 import os
 
-import httpx
+from orangecheck import connect_claim_link
 
 user_id: str  # your own id for the signed-in user asking to claim
 
-r = httpx.post(
-    "https://ochk.io/api/connect/claim-link",
-    headers={"Authorization": f"Bearer {os.environ['OCHK_CONNECT_KEY']}"},
-    json={"user_id": user_id},
-)
-url = r.json()["url"]  # redirect this user to it
+result = connect_claim_link(os.environ["OCHK_CONNECT_KEY"], user_id)
+if result.ok:
+    url = result.url  # redirect this user to it
 ```
 
 ## When your user deletes their account
@@ -154,17 +297,17 @@ url = r.json()["url"]  # redirect this user to it
 Delete the one you made for them, from your backend:
 
 ```ts
+import { connectDelete } from '@orangecheck/me-client/server';
+
 declare const yourUser: { id: string }; // the user who is leaving
-const res = await fetch('https://ochk.io/api/connect/delete', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OCHK_CONNECT_KEY}`,
-    },
-    body: JSON.stringify({ user_id: yourUser.id }),
+const r = await connectDelete({
+    apiKey: process.env.OCHK_CONNECT_KEY!,
+    userId: yourUser.id,
 });
-const { result } = await res.json(); // 'deleted', 'detached' or 'already_deleted'
+// r.ok: r.result is 'deleted', 'detached' or 'already_deleted'
 ```
+
+In Python, `connect_delete(api_key, user_id)` returns the same.
 
 - `deleted`: nobody had claimed it, so it is gone.
 - `detached`: the person claimed it, so it is theirs and stays. It is no longer
@@ -196,7 +339,9 @@ you describe your sign-in, in your words, and keep these facts:
 
 - **Server-to-server only.** Call `/api/connect/provision`,
   `/api/connect/claim-link` and `/api/connect/delete` from your backend, never
-  the browser. The API key must stay secret.
+  the browser. The API key must stay secret: import the me-client calls only
+  from server code that never reaches a client bundle. They refuse to run where
+  there is a `document`, which catches the commonest slip but is not a guard.
 - **Limits.** 1,000 new accounts a day per app, and 20 apps per account.
 - **The key is shown once.** Save it when you register the app. Lost it?
   **Replace** it in the console; the old key stops working immediately.

@@ -286,7 +286,9 @@ The link works once, for fifteen minutes, and a new one closes the one before
 it. Its token is in the URL fragment, so it reaches no server log; treat it as a
 secret anyway, and mint it only for the user you have just signed in. A user you
 never provisioned answers `404 unknown_user`; an account already claimed answers
-`409 already_claimed`.
+`409 already_claimed`. It can also answer `429 rate_limited`,
+`401 invalid_api_key`, `403 app_suspended` and `400 bad_request`; the SDKs
+return anything else, an outage or a timeout as `unavailable`.
 
 **A verified email.** Pass `email_verified: true` with `email` when you checked
 the address yourself (a code or a link the user answered). Someone who signs in
@@ -346,6 +348,11 @@ In Python, `connect_delete(api_key, user_id)` returns the same.
 - `already_deleted`: nothing left to do.
 - `409 holds_earnings`: nobody claimed it, but it earned. That is the person's,
   so it stays; send them a claim link before they go.
+- `404 unknown_user`: you never provisioned this user.
+- `409 not_deletable`: ochk.io could not erase it just now, so nothing was
+  deleted. Try again later.
+- `429 rate_limited`, `401 invalid_api_key`, `400 bad_request`: as named. The
+  SDKs return anything else, an outage or a timeout as `unavailable`.
 
 After any of these, `provision` answers `410 account_deleted` for that user. The
 same happens when the person deletes their orangecheck account themselves.
@@ -374,6 +381,11 @@ you describe your sign-in, in your words, and keep these facts:
   from server code that never reaches a client bundle. They refuse to run where
   there is a `document`, which catches the commonest slip but is not a guard.
 - **Limits.** 1,000 new accounts a day per app, and 20 apps per account.
+- **Your user id** is 1 to 256 characters, counted in UTF-16 code units.
+- **No redirects.** These endpoints never redirect, so the SDKs treat a redirect
+  as an error: the key goes to ochk.io and nowhere else.
+- **Unknown options are refused** before anything is sent: me-client throws, and
+  Python raises `TypeError`.
 - **The key is shown once.** Save it when you register the app. Lost it?
   **Replace** it in the console; the old key stops working immediately.
 - **Optional `email` and `email_verified`.** Pass the user's email, and

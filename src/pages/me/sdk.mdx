@@ -99,6 +99,17 @@ if (outcome.status === 'blocked')
 if (outcome.status === 'signed_in') await keepSession(outcome.token);
 ```
 
+Both take `{ signal, popupOrigin, popupPath, features }`. `popupOrigin` (default
+`https://me.ochk.io`) and `popupPath` (default `/popup/signin`) point the popup
+somewhere else, such as a stand-in of your own while you test; the answer is
+accepted only from exactly `popupOrigin`, so give it with no trailing slash.
+`features` is the `window.open` feature string.
+
+**Without a bundler.** `dist/popup.mjs` has no imports of its own. Fetch it with
+`npm pack @orangecheck/me-client@<version>`, serve `package/dist/popup.mjs` from
+your own origin, and import it in a `<script type="module">`. Copy it again when
+you upgrade.
+
 ### a Bitcoin wallet in the popup
 
 The popup offers a Bitcoin wallet beside email, Google and GitHub. Your page
@@ -291,11 +302,29 @@ try:
 except BondRequired as err:  # before InvalidSession: it is one
     ...  # 403: err.need, err.have (the account's floors, or None), err.back_url
 except InvalidSession as err:
-    ...  # 401: err.reason
+    # An outage is never "signed out": 503 for these, 401 for any other reason.
+    unavailable = err.reason in {"revocations_unavailable", "key_set_unavailable", "bond_policy_unavailable"}
+    ...  # 503 if unavailable else 401, with err.reason
 ```
 
 `BondRequired` and `SessionEnded` are both `InvalidSession`s. Put their handlers
 first: an `except InvalidSession` above them takes them too.
+
+The Python SDK has no framework wrapper and no status mapping like `withOcAuth`
+and `checkOcSession`: the answer a refusal gets is yours to choose. Its reasons
+are `malformed`, `algorithm`, `unknown_key`, `key_set_unavailable`, `signature`,
+`issuer`, `expired`, `not_yet_valid`, `claims`, `retired_key`, `audience`,
+`no_session_handle` (3.0 or later), `ended`, `revocations_unavailable`,
+`unknown_project_key`, `bond_policy_unavailable` and `bond_required`.
+
+A `Session` has `sub`, `did_oc`, `jti`, `aud`, `iat` (it can be `None`), `exp`,
+`oc_bond`, `claims` and, from 3.1, `rh`, the token's revocation handle (before
+3.1, read `session.claims["rh"]`). To keep your own session, keep that `rh`,
+your site's origin as `aud`, and `iat`.
+
+`issuer=` changes only the `iss` a token must carry: the keys still come from
+ochk.io's key set. To check against keys of your own, a stand-in issuer in tests
+say, pass `jwks=` as well, a dict shaped like the key set's JSON.
 
 `verify_session` reads the rule from me.ochk.io inside the first call that needs
 it, then holds it a minute. That read is one round trip (235 to 270 ms in our
@@ -373,11 +402,13 @@ signed by the auth host, ochk.io:
 | `sub`        | The person's account id.                                                                                                                                                                                                                     |
 | `did_oc`     | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
 | `jti`        | The token's own id.                                                                                                                                                                                                                          |
+| `rh`         | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
 | `oc_bond`    | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
 
 The token carries no email address and no name.
 
-**Python**, with [`orangecheck`](/sdk/python) 2.3 or later:
+**Python**, with [`orangecheck`](/sdk/python) 3.0 or later, which also refuses a
+token without `rh`:
 
 ```python
 from orangecheck import InvalidSession, verify_session
@@ -412,6 +443,8 @@ def verify(token: str) -> dict:
     )
     if not claims.get("did_oc"):
         raise jwt.InvalidTokenError("no did_oc")
+    if not isinstance(claims.get("rh"), str) or not claims["rh"]:
+        raise jwt.InvalidTokenError("no rh: nothing could end this session")
     return claims
 ```
 
@@ -574,9 +607,12 @@ request:
 | the revocation list for an origin | a minute | 250 to 470 ms                 |
 
 Together that is 0.6 to 0.8 s; afterwards each is read from memory in
-microseconds. `warm_session` (`orangecheck` 2.10.0 or later) takes the same
-arguments as `verify_session` and fetches whichever of those is due, without
-raising. Call it at startup and then every ten seconds from a background thread:
+microseconds. `warm_session` (`orangecheck` 2.10.0 or later) takes your audience
+and the `revocations` and `policy` you pass to `verify_session`, as
+`warm_session(audience, *, revocations=None, policy=None)`; it takes no `issuer`
+or `jwks`, and always warms ochk.io's own key set. It fetches whichever is due,
+without raising. Call it at startup and then every ten seconds from a background
+thread:
 
 ```python
 import logging
@@ -619,9 +655,11 @@ the limits below.
   four gunicorn workers fetch four times as often. Start the warming thread
   inside each worker (gunicorn's `post_fork` hook, for example): a thread
   started before the fork does not run in the workers.
-- **Async.** `verify_session`, `status()` and `warm_session` are synchronous and
-  wait on the network when they fetch. In an `async` handler, call
-  `verify_session` with `await asyncio.to_thread(...)`.
+- **Async.** `verify_session`, `status()`, `warm_session`, `verify_webhook` and
+  the `connect_*` calls are synchronous and wait on the network when they fetch
+  (`verify_webhook` up to ten seconds for its key set). In an `async` handler,
+  call them with `await asyncio.to_thread(...)`, or from a plain `def` route
+  your framework runs in a thread. `AsyncClient` covers the stake checks only.
 - **Failures.** After a failed fetch each copy waits ten seconds before trying
   again (the key set from 2.10.0), and the last good copy answers meanwhile: the
   key set for up to six hours, the list until it is ten minutes old, the rule

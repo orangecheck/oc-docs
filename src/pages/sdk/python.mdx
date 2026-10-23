@@ -22,8 +22,9 @@ pip install orangecheck
 pip install 'orangecheck[verify]'
 ```
 
-Python 3.9 or later. Runs on Linux, macOS, Windows. The ochk.app functions need
-2.3 or later.
+Python 3.9 or later. Runs on Linux, macOS, Windows. The ochk.app sign-in
+functions need 2.3 or later, Connect 2.13, and refusing a token without `rh`
+3.0.
 
 ## Core exports
 
@@ -54,6 +55,13 @@ from orangecheck import (
     sign_event,
     verify_webhook,
 
+    # OC Connect, for a site with its own login (2.13 or later)
+    connect_provision,
+    connect_claim_link,
+    connect_delete,
+    CONNECT_CONSENT_LABEL,
+    CONNECT_CONSENT_BLURB,
+
     # Clients and types
     Client,
     AsyncClient,
@@ -61,6 +69,10 @@ from orangecheck import (
     VerifyOutcome,
     IdentityBinding,
     Session,
+    ConnectAccount,
+    ConnectClaimLink,
+    ConnectDeleted,
+    ConnectRefusal,
 
     # Errors
     OrangeCheckError,

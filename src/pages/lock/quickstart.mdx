@@ -72,6 +72,8 @@ Seal:
 import { seal } from '@orangecheck/lock-core/seal';
 import { utf8Encode } from '@orangecheck/lock-crypto';
 
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 const envelope = await seal({
     payload: utf8Encode('hi bob'),
     sender: {
@@ -85,7 +87,17 @@ const envelope = await seal({
 Unseal:
 
 ```ts
+import type { LockEnvelope } from '@orangecheck/lock-core';
+
 import { unseal } from '@orangecheck/lock-core/seal';
+
+declare const envelope: LockEnvelope; // as the sender sent it
+declare const localDeviceSecret: Uint8Array; // this device's device_sk
+declare function myVerifier(
+    message: string,
+    signatureB64: string,
+    address: string
+): Promise<boolean>;
 
 const result = await unseal({
     envelope,
@@ -103,6 +115,9 @@ import {
     finalizeDeviceEvent,
     generateDeviceKey,
 } from '@orangecheck/lock-device';
+
+declare const btcAddress: string; // the address the device binds to
+declare const wallet: { signBIP322(message: string): Promise<string> }; // your wallet
 
 const kp = generateDeviceKey();
 const statement = buildBindingStatement({
@@ -128,8 +143,14 @@ const event = finalizeDeviceEvent({
 Need a sybil filter on your inbox? Gate unseal on an orangecheck check:
 
 ```ts
+import type { LockEnvelope, UnsealInput } from '@orangecheck/lock-core';
+
 import { unseal } from '@orangecheck/lock-core/seal';
 import { check } from '@orangecheck/sdk';
+
+// as in Unseal above
+declare const envelope: LockEnvelope, device: UnsealInput['device'];
+declare const verifyBip322: UnsealInput['verifyBip322'];
 
 const ok = await check({
     addr: envelope.from.address,

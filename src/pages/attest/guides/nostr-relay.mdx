@@ -91,8 +91,14 @@ themselves) goes through the gate.
 If you run your own relay in JS:
 
 ```ts
+import type { Event } from 'nostr-tools';
+
 import { filterEvent } from '@orangecheck/relay-filter';
 import { verifyEvent } from 'nostr-tools';
+
+// Yours: the operator's pubkey and the relay's event store.
+declare const OPERATOR_PUBKEY: string;
+declare const store: { put(event: Event): Promise<void> };
 
 async function handleEvent(socket: WebSocket, event: Event) {
     if (!verifyEvent(event)) {

@@ -140,22 +140,28 @@ The existing logout endpoint, now scope-aware:
 [`useOcSession()`](/sdk/auth-client/functions/useOcSession) returns three new
 fields on top of the existing shape:
 
-```ts
+```tsx
 import { useOcSession } from '@orangecheck/auth-client';
 
 function Header() {
-    const { account, roster, switchAccount, addAccountUrl, signOut } = useOcSession();
+    const { account, roster, switchAccount, addAccountUrl, signOut } =
+        useOcSession();
 
     return (
         <nav>
             <span>signed in as {account?.didOc}</span>
             {roster.map((peer) => (
-                <button key={peer.didOc} onClick={() => switchAccount(peer.didOc)}>
+                <button
+                    key={peer.didOc}
+                    onClick={() => switchAccount(peer.didOc)}
+                >
                     switch to {peer.displayName ?? peer.didOc}
                 </button>
             ))}
             <a href={addAccountUrl()}>add another account</a>
-            <button onClick={() => signOut({ scope: 'current' })}>leave this account</button>
+            <button onClick={() => signOut({ scope: 'current' })}>
+                leave this account
+            </button>
             <button onClick={() => signOut()}>sign out of everything</button>
         </nav>
     );

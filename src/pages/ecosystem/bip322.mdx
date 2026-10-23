@@ -108,6 +108,10 @@ whether a 3… address got it depended on the signature's recovery id.
 ```ts
 import { normalizeAddress, verifySignature } from '@orangecheck/bip322';
 
+declare const typed: string; // the address as the person entered it
+declare const canonicalMsg: string;
+declare const signatureBase64: string;
+
 const address = normalizeAddress(typed); // BC1Q… from a QR code becomes bc1q…; null if not an address
 if (!address) throw new Error('Not a Bitcoin address');
 
@@ -128,10 +132,12 @@ tightened PSBT extraction.
 ```python
 from orangecheck import normalize_address, verify_bip322_signature
 
-address = normalize_address(typed)  # None if not an address
-if address is None:
-    raise ValueError("Not a Bitcoin address")
-valid = verify_bip322_signature(address, canonical_msg, signature_base64)
+
+def is_valid(typed: str, canonical_msg: str, signature_base64: str) -> bool:
+    address = normalize_address(typed)  # None if not an address
+    if address is None:
+        raise ValueError("Not a Bitcoin address")
+    return verify_bip322_signature(address, canonical_msg, signature_base64)
 ```
 
 The Python SDK bridges the Rust-backed

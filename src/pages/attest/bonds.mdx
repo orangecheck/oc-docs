@@ -40,6 +40,10 @@ so no signature for one can be replayed as another.
 ```ts
 import { esploraSource, verifyBond } from '@orangecheck/sdk';
 
+declare const message: string; // the bond message above
+declare const signature: string; // its BIP-322 signature
+declare const didOc: string; // the did:oc it backs
+
 const r = await verifyBond({
     message,
     signature,

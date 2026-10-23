@@ -200,8 +200,8 @@ are what readers query, so copy them exactly: the full shapes are on
 import type { NostrEvent } from '@orangecheck/nostr-core';
 import type { Ballot, Poll } from '@orangecheck/vote-core';
 
-import { schnorr, secp256k1 } from '@noble/curves/secp256k1';
-import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
+import { schnorr, secp256k1 } from '@noble/curves/secp256k1.js';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 import { addressFromPrivateKey, signMessage } from '@orangecheck/bip322';
 import {
     getEventHash,
@@ -325,7 +325,10 @@ does in a browser.
 ## gate a Discord bot
 
 ```ts
-// Called from your bot's command handler; reply and grantRole are your bot's.
+declare function reply(text: string): Promise<unknown>; // your bot's
+declare function grantRole(user: string): Promise<void>; // your bot's
+
+// Called from your bot's command handler.
 async function onPollCommand(pollId: string, user: string) {
     const res = await fetch(`https://vote.ochk.io/api/tally?poll=${pollId}`);
     const result = (await res.json()) as {

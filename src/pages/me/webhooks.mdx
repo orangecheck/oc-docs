@@ -25,6 +25,8 @@ one and cache it for an hour.
 import { oc } from '@orangecheck/me-client';
 import express from 'express';
 
+declare function onOcEvent(envelope: unknown): Promise<void>; // your handler
+
 const app = express();
 app.use(express.text({ type: 'application/json' })); // raw body!
 
@@ -57,6 +59,10 @@ from orangecheck import InvalidWebhook, verify_webhook
 
 app = FastAPI()
 seen: set[str] = set()  # use your database in production
+
+
+def on_oc_event(event: dict) -> None: ...  # your handler
+
 
 @app.post("/api/oc/webhook")
 async def oc_webhook(request: Request):
@@ -163,8 +169,17 @@ requeue them.
 ## Handler patterns we recommend
 
 ```ts
+import { oc } from '@orangecheck/me-client';
+import express from 'express';
+import { LRUCache } from 'lru-cache';
+
+declare function onOcEvent(envelope: unknown): Promise<void>; // your handler
+
+const app = express();
+app.use(express.text({ type: 'application/json' })); // raw body!
+
 // Idempotency · keep a small cache of recently seen envelope ids.
-const seen = new LRU<string, true>({ max: 10_000 });
+const seen = new LRUCache<string, true>({ max: 10_000 });
 
 app.post('/api/oc/webhook', async (req, res) => {
     const result = await oc.webhook.verify(

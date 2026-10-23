@@ -65,6 +65,9 @@ import {
     upgradeProof,
 } from '@orangecheck/stamp-ots';
 
+declare const writerAddress: string;
+declare function walletSign(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 const article = await readFile('./post.md');
 const env = await stamp({
     content: article,
@@ -96,6 +99,11 @@ to Bitcoin within the same window. No notary, no centralized service.
 ```ts
 import { stamp } from '@orangecheck/stamp-core';
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
+
+type Wallet = { sign: (message: string) => Promise<string> }; // a BIP-322 signer
+declare const agreementBytes: Uint8Array; // agreement.pdf
+declare const aliceAddr: string, aliceWallet: Wallet;
+declare const bobAddr: string, bobWallet: Wallet;
 
 // Alice signs
 const aliceStamp = await stamp({
@@ -143,6 +151,10 @@ proposer-identity from submitter-identity:
 ```ts
 import { stamp } from '@orangecheck/stamp-core';
 
+declare const proposalBytes: Uint8Array;
+declare const proposerAddr: string;
+declare const proposerWallet: { sign: (message: string) => Promise<string> };
+
 // Proposer signs the proposal content
 const proposalStamp = await stamp({
     content: proposalBytes,
@@ -162,8 +174,16 @@ Embed an OC Attest reference in every Stamp envelope. Feed aggregators can then
 filter posts by signer stake:
 
 ```ts
+import type { StampEnvelope } from '@orangecheck/stamp-core';
+
 import { verifySignature } from '@orangecheck/bip322';
 import { checkStake, parseStamp, stamp, verify } from '@orangecheck/stamp-core';
+
+declare const postBytes: Uint8Array, authorAddr: string;
+declare const authorWallet: { sign: (message: string) => Promise<string> };
+declare const authorAttestationId: string; // the author's OC Attest id
+declare const feed: { content: string; bytes: Uint8Array }[]; // incoming posts
+declare function showPost(env: StampEnvelope, bytes: Uint8Array): void;
 
 const post = await stamp({
     content: postBytes,

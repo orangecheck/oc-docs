@@ -35,6 +35,8 @@ import {
     generateDeviceKey,
 } from '@orangecheck/lock-device';
 
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 const { device_sk, device_pk, device_id, created_at } = generateDeviceKey();
 
 const statement = buildBindingStatement({
@@ -61,6 +63,13 @@ import {
     parseDeviceEvent,
 } from '@orangecheck/lock-device';
 import { queryEvents } from '@orangecheck/nostr-core';
+
+// your BIP-322 verifier, e.g. verifySignature from @orangecheck/bip322
+declare function verifyBip322(
+    message: string,
+    signatureB64: string,
+    address: string
+): Promise<boolean>;
 
 const { events } = await queryEvents({
     kinds: [DEVICE_KIND],
@@ -95,7 +104,12 @@ that already passed that check.
 ## 3. Sender seals
 
 ```ts
+import type { DeviceRecord } from '@orangecheck/lock-core';
+
 import { seal } from '@orangecheck/lock-core';
+
+declare const devices: DeviceRecord[]; // from step 2
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
 
 const envelope = await seal({
     payload: new TextEncoder().encode('hello bob'),
@@ -128,7 +142,17 @@ The result is a self-contained JSON blob. Send it over any transport.
 ## 4. Recipient unseals
 
 ```ts
+import type { LockEnvelope } from '@orangecheck/lock-core';
+
 import { unseal } from '@orangecheck/lock-core';
+
+declare const envelope: LockEnvelope; // as the sender sent it
+declare const device_id: string, device_sk: Uint8Array; // this device's key, from step 1
+declare function walletVerifyBIP322(
+    message: string,
+    signatureB64: string,
+    address: string
+): Promise<boolean>;
 
 const { payload, sender, matchedDeviceId } = await unseal({
     envelope,

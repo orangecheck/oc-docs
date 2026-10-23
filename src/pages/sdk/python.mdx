@@ -77,6 +77,8 @@ from orangecheck import verify_bip322_signature
 ## `check()`
 
 ```python
+from orangecheck import check
+
 result = check(
     addr='bc1q...',
     min_sats=100_000,
@@ -94,15 +96,27 @@ Same return shape as the hosted `/api/check`. The top-level functions are
 synchronous; in async code, use `AsyncClient`:
 
 ```python
+import asyncio
+
 from orangecheck import AsyncClient
 
-async with AsyncClient() as oc:
-    result = await oc.check(addr='bc1q...', min_sats=100_000, min_days=30)
+
+async def main() -> None:
+    async with AsyncClient() as oc:
+        result = await oc.check(addr='bc1q...', min_sats=100_000, min_days=30)
+
+
+asyncio.run(main())
 ```
 
 ## `verify()`
 
 ```python
+from orangecheck import verify
+
+canonical_message: str  # the exact message the wallet signed
+signature_base64: str
+
 outcome = verify(
     addr='bc1q...',
     msg=canonical_message,
@@ -125,6 +139,8 @@ live chain state. To check only a signature on your own machine, install the
 ## Canonical message
 
 ```python
+from orangecheck import IdentityBinding, attestation_id, build_canonical_message
+
 msg = build_canonical_message(
     address='bc1qalice...',
     identities=[
@@ -145,6 +161,8 @@ order, same line endings, same hash.
 ## Scoring
 
 ```python
+from orangecheck import score_v0
+
 score = score_v0(sats_bonded=125_000, days_unspent=47)
 # → 30.12
 ```
@@ -160,6 +178,8 @@ The popup runs in your page; these run on your server.
 
 ```python
 from orangecheck import InvalidSession, verify_session
+
+token: str  # the token the popup returned
 
 try:
     session = verify_session(token, audience='https://your-site.example')
@@ -186,8 +206,14 @@ Who may sign in (`SignInPolicy`, `BondRequired`), sessions ended everywhere
 ### Sign a billable event
 
 ```python
-import json, httpx
-from orangecheck import sign_event
+import json, os
+
+import httpx
+from orangecheck import Session, sign_event
+
+PROJECT_KEY = os.environ['OC_PROJECT_KEY']
+SIGNING_SECRET = os.environ['OC_SIGNING_SECRET']
+session: Session  # from verify_session above
 
 body = json.dumps({
     'project_key': PROJECT_KEY,
@@ -209,9 +235,14 @@ Every answer the endpoint gives is in [signing an event](/me/api#signing-an-even
 ### Check a webhook
 
 ```python
+from typing import Any, Mapping
+
 from orangecheck import InvalidWebhook, verify_webhook
 
-event = verify_webhook(request.headers, raw_body)  # raises InvalidWebhook
+headers: Mapping[str, Any]  # the request's headers
+raw_body: bytes  # the request body, unparsed
+
+event = verify_webhook(headers, raw_body)  # raises InvalidWebhook
 ```
 
 Pass the raw body, before any JSON parsing. The key set is

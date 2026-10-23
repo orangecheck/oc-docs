@@ -150,10 +150,13 @@ import json, os
 import httpx
 from orangecheck import sign_event
 
+did_oc: str  # from verify_session(...).did_oc
+user_id: str  # your own id for the same user
+
 body = json.dumps({
     "project_key": os.environ["OC_PROJECT_KEY"],
     "subtype": "account_creation",
-    "user_address": did_oc,  # from verify_session(...).did_oc
+    "user_address": did_oc,
 })
 r = httpx.post(
     "https://me.ochk.io/api/integrator/event",

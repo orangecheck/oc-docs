@@ -33,6 +33,7 @@ There is no new SDK. A Connect integration is one HTTPS `POST`.
 ```ts
 // Anywhere after your own login succeeds — Auth0, Clerk, Google, your own SSO,
 // it does not matter. Run this from your backend.
+declare const yourUser: { id: string }; // the user who just signed in
 const res = await fetch('https://ochk.io/api/connect/provision', {
     method: 'POST',
     headers: {
@@ -78,6 +79,7 @@ the person claims it into an orangecheck account of their own, at ochk.app.
 backend and send them to it:
 
 ```ts
+declare const yourUser: { id: string }; // the signed-in user asking to claim
 const res = await fetch('https://ochk.io/api/connect/claim-link', {
     method: 'POST',
     headers: {
@@ -116,12 +118,16 @@ signature. Then:
 In Python, the link is one request:
 
 ```python
-import os, httpx
+import os
+
+import httpx
+
+user_id: str  # your own id for the signed-in user asking to claim
 
 r = httpx.post(
     "https://ochk.io/api/connect/claim-link",
     headers={"Authorization": f"Bearer {os.environ['OCHK_CONNECT_KEY']}"},
-    json={"user_id": str(user.id)},
+    json={"user_id": user_id},
 )
 url = r.json()["url"]  # redirect this user to it
 ```

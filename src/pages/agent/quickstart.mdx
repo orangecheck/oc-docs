@@ -33,6 +33,8 @@ issues one in the page.
 ```ts
 import { createDelegation } from '@orangecheck/agent-signer';
 
+declare const wallet: { signMessage(message: string): Promise<string> }; // the person's wallet
+
 const principal = {
     address: 'bc1qprincipal…',
     signMessage: async (msg: string) => wallet.signMessage(msg),
@@ -60,8 +62,13 @@ The agent stores it.
 The agent produces an action envelope citing the delegation.
 
 ```ts
+import type { DelegationEnvelope } from '@orangecheck/agent-signer';
+
 import { signAsAgent } from '@orangecheck/agent-signer';
 import { signMessage } from '@orangecheck/bip322';
+
+declare const delegation: DelegationEnvelope; // from step 1
+declare const agentPrivateKey: string; // hex or WIF
 
 const content = new TextEncoder().encode('hello world');
 
@@ -96,10 +103,16 @@ revocation already in effect refuses it, and `signed_at` must be within 120
 seconds of your clock (`E_STALE` otherwise; set `maxSkewMs` to change it).
 
 ```ts
-import type { RevocationEnvelope } from '@orangecheck/agent-core';
+import type {
+    ActionEnvelope,
+    DelegationEnvelope,
+    RevocationEnvelope,
+} from '@orangecheck/agent-core';
 
 import { createReplayGuard, verifyAction } from '@orangecheck/agent-core';
 import { verifySignature } from '@orangecheck/bip322';
+
+declare const action: ActionEnvelope, delegation: DelegationEnvelope; // from steps 2 and 1
 
 const seen = createReplayGuard(); // one per process; several instances share a store instead
 
@@ -147,8 +160,13 @@ anchor or is only the agent's claim. Never use it to decide whether to act.
 If you need to burn the delegation early:
 
 ```ts
+import type { DelegationEnvelope, SignerRef } from '@orangecheck/agent-signer';
+
 import { revoke } from '@orangecheck/agent-signer';
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots'; // optional anchoring
+
+declare const principal: SignerRef, delegation: DelegationEnvelope; // from step 1
+declare const nostr: { publish(event: object): Promise<void> }; // your Nostr client
 
 const rev = await revoke({
     signer: principal, // or the agent: either may always revoke

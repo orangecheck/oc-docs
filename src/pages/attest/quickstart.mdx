@@ -89,6 +89,8 @@ alone does not:
 This matters more than it looks. The obvious client is wrong:
 
 ```ts
+declare const url: string; // an /api/check URL
+
 // WRONG — throws on a perfectly normal "this address never attested"
 const res = await fetch(url);
 if (!res.ok) throw new Error('check failed');
@@ -96,6 +98,8 @@ const { ok } = await res.json();
 ```
 
 ```ts
+declare const url: string; // an /api/check URL
+
 // Right — 404 is an answer, not a failure.
 const res = await fetch(url);
 if (res.status === 400) throw new Error('bad address');
@@ -171,6 +175,9 @@ reads only the lowercase spelling:
 
 ```ts
 import { normalizeAddress } from '@orangecheck/bip322';
+import { check } from '@orangecheck/sdk';
+
+declare const input: string; // what the person typed or scanned
 
 const addr = normalizeAddress(input); // 'BC1Q…' becomes 'bc1q…'; null if it is not an address
 if (!addr) throw new Error('Not a Bitcoin address');

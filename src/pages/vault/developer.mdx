@@ -103,9 +103,12 @@ The CLI and the Action are thin shells over it.
 ```ts
 import { OcVault, VaultClient } from '@orangecheck/vault-core';
 
+const passphrase = process.env.OCV_PASSPHRASE;
+if (!passphrase) throw new Error('Set OCV_PASSPHRASE');
+
 const vault = await OcVault.open({
     client: new VaultClient({ token: process.env.OCV_TOKEN }),
-    passphrase: process.env.OCV_PASSPHRASE,
+    passphrase,
 });
 
 vault.resolve('ocv://personal/Stripe/key'); // the value
@@ -115,6 +118,15 @@ vault.list(); // metadata only — no secrets
 Offline, from a portable export — no network at all:
 
 ```ts
+import type { WrappedKey } from '@orangecheck/vault-core';
+
+import { OcVault } from '@orangecheck/vault-core';
+
+// The export file, the escrowed key that came with it, and your passphrase.
+declare const exportJson: string;
+declare const escrow: WrappedKey;
+declare const passphrase: string;
+
 const vault = OcVault.fromExport(exportJson, escrow, passphrase);
 ```
 

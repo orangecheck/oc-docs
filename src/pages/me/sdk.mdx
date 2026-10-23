@@ -56,6 +56,8 @@ The first published 0.32 is 0.32.1.
 ```ts
 import { signInWithOc } from '@orangecheck/me-client/popup';
 
+declare const button: HTMLButtonElement; // your "Sign in with orangecheck" button
+
 button.addEventListener('click', async () => {
     const result = await signInWithOc();
     if (!result) return; // closed, blocked, or aborted
@@ -87,6 +89,9 @@ To tell a blocked window from a closed one, use `signInWithOcOutcome()`
 
 ```ts
 import { signInWithOcOutcome } from '@orangecheck/me-client/popup';
+
+declare function showHint(text: string): void;
+declare function keepSession(token: string): Promise<void>; // post it to your session route
 
 const outcome = await signInWithOcOutcome();
 if (outcome.status === 'blocked')
@@ -142,9 +147,11 @@ import { randomBytes } from 'node:crypto';
 
 import { addressFromPrivateKey, signMessage } from '@orangecheck/bip322';
 
+declare const message: string; // the popup's text, exactly
+
 const key = randomBytes(32); // never a key that holds coins
 const address = addressFromPrivateKey(key, 'p2wpkh'); // enter this in the popup
-const signature = signMessage(address, message, key); // message: the popup's text, exactly
+const signature = signMessage(address, message, key);
 ```
 
 Each new key signs in as a new orangecheck account.
@@ -271,9 +278,13 @@ The wrappers all take one options bag:
 `verify_session`:
 
 ```python
+import os
+
 from orangecheck import BondRequired, InvalidSession, SignInPolicy, verify_session
 
-POLICY = SignInPolicy(PROJECT_KEY)  # one per process; reads your project's rule, held a minute
+POLICY = SignInPolicy(os.environ["OC_PROJECT_KEY"])  # one per process; reads your project's rule, held a minute
+
+token: str  # the token your page posted
 
 try:
     session = verify_session(token, audience="https://your-site.example", policy=POLICY)
@@ -371,6 +382,8 @@ The token carries no email address and no name.
 ```python
 from orangecheck import InvalidSession, verify_session
 
+token: str  # the token your page posted
+
 try:
     session = verify_session(token, audience="https://your-site.example")
 except InvalidSession as err:
@@ -455,12 +468,17 @@ while the two variables are unset, is checked by its signature alone.
 process and pass it with the request's method.
 
 ```python
+import os
+
 from orangecheck import RevocationList, SessionEnded, verify_session
 
-REVOCATIONS = RevocationList(PROJECT_KEY, SIGNING_SECRET)
+REVOCATIONS = RevocationList(os.environ["OC_PROJECT_KEY"], os.environ["OC_SIGNING_SECRET"])
+
+token: str  # the request's sign-in token
+method: str  # the request's method: "GET", "POST", …
 
 session = verify_session(token, audience="https://your-site.example",
-                         revocations=REVOCATIONS, method=request.method)
+                         revocations=REVOCATIONS, method=method)
 # SessionEnded (an InvalidSession, reason "ended") when the person ended it.
 ```
 
@@ -554,7 +572,10 @@ import logging
 import threading
 import time
 
-from orangecheck import warm_session
+from orangecheck import RevocationList, SignInPolicy, warm_session
+
+REVOCATIONS: RevocationList  # the ones you pass to verify_session
+POLICY: SignInPolicy
 
 
 def keep_warm() -> None:
@@ -689,6 +710,10 @@ call succeeds with `earned: false` and nothing is recorded or charged.
 
 ```ts
 // server-side only · the secret never reaches a browser
+import { oc } from '@orangecheck/me-client';
+
+declare const user: { did_oc: string }; // your user row
+
 const stamp = await oc.event.fire({
     project_key: process.env.OC_PROJECT_KEY!,
     subtype: 'stamp_signing',
@@ -748,7 +773,7 @@ The same function is also exported as the top-level `validateIntegratorConfig`.
 re-serialize before your handler produce a different byte sequence and the
 signature will not validate.
 
-```ts
+```ts no-check
 const result = await oc.webhook.verify(
     rawBody, // string | Uint8Array
     req.header('OC-Signature'),
@@ -808,6 +833,8 @@ domain, or on a subdomain of it once the domain is verified. Anything else
 leaves the person on ochk.app.
 
 ```ts
+import { oc } from '@orangecheck/me-client';
+
 oc.scope.request(['email', 'display_name'], {
     project_key: 'pk_live_yourapp',
     return_to: window.location.href,
@@ -883,6 +910,12 @@ await oc.session.invalidate(session.id);
 ## `oc.payment.authorize` · a payment (Per action)
 
 ```ts
+import type { OcPopupAccount } from '@orangecheck/me-client/popup';
+
+import { oc } from '@orangecheck/me-client';
+
+declare const account: OcPopupAccount; // from signInWithOc()
+
 const result = await oc.payment.authorize({
     identity: account.did_oc, // the signed-in account's id
     amount_sats: 240_000,
@@ -908,7 +941,7 @@ lifetime_sats, distinct_integrator_count, oldest_event_at, active_days) and a
 24h expiry, signed with the me.ochk.io receipt key, the same key that signs
 every receipt.
 
-```ts
+```ts no-check
 import { oc } from '@orangecheck/me-client';
 
 const result = await oc.identity.verifyActivityAttestation(bundle);

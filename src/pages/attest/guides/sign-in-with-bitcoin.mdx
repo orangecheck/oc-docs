@@ -38,6 +38,14 @@ import { issueChallenge, verifyChallenge } from '@orangecheck/sdk';
 import express from 'express';
 import session from 'express-session';
 
+// What this app keeps in the session.
+declare module 'express-session' {
+    interface SessionData {
+        ocNonce?: string;
+        verifiedAddress?: string;
+    }
+}
+
 const app = express();
 app.use(express.json());
 app.use(
@@ -87,9 +95,10 @@ app.post('/auth/signin', async (req, res) => {
 
 ## Client implementation
 
-With a NIP-07-style Bitcoin wallet extension:
+With a Bitcoin wallet extension, through `@orangecheck/wallet-adapter`:
 
 ```tsx
+import { getSigner } from '@orangecheck/wallet-adapter';
 import { useEffect, useState } from 'react';
 
 export function SignIn({ address }: { address: string }) {
@@ -107,11 +116,8 @@ export function SignIn({ address }: { address: string }) {
 
     async function handleSign() {
         if (!message || !nonce) return;
-        // Use @orangecheck/wallet-adapter for cross-wallet signing
-        const signature = await window.unisat.signMessage(
-            message,
-            'bip322-simple'
-        );
+        // wallet-adapter signs with UniSat here; Xverse, Leather and others work the same way.
+        const signature = await getSigner('unisat', { address })(message);
         const r = await fetch('/auth/signin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

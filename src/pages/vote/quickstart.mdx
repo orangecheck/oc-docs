@@ -50,6 +50,8 @@ same pure function, so disputes are resolvable: see
 <InstallTabs pkg="@orangecheck/vote-core @orangecheck/bip322" />
 
 ```ts
+import type { Ballot, Poll, Utxo } from '@orangecheck/vote-core';
+
 import { verifySignature } from '@orangecheck/bip322';
 import {
     mempoolBlockTimeSource,
@@ -57,7 +59,10 @@ import {
     tally,
 } from '@orangecheck/vote-core';
 
-// poll, ballots: the event contents from Nostr (see Integration for the query).
+// The event contents from Nostr (see Integration for the query).
+declare const poll: Poll, ballots: Ballot[];
+declare function fetchMyUtxos(addr: string, height: number): Promise<Utxo[]>;
+
 const snap = await resolvePollSnapshot(poll, mempoolBlockTimeSource());
 if (!snap.ok) throw new Error(`${snap.code}: ${snap.reason}`);
 

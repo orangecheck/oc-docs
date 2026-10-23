@@ -36,6 +36,10 @@ import {
     deriveNostrKey,
 } from '@orangecheck/lock-device';
 
+declare const device_sk: Uint8Array, device_pk: string; // from Generate
+declare const device_id: string, created_at: string;
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 const statement = buildBindingStatement({
     address: 'bc1qbob...',
     device_pk,
@@ -60,6 +64,9 @@ other key carries the same device (`authorizedDevices`).
 ```ts
 import { finalizeDeviceEvent } from '@orangecheck/lock-device';
 import { DEFAULT_RELAYS, publishEvent } from '@orangecheck/nostr-core';
+
+declare const device_sk: Uint8Array, device_pk: string, device_id: string; // from Generate
+declare const statement: string, signature: string; // from Bind
 
 const event = finalizeDeviceEvent({
     deviceSk: device_sk,
@@ -110,6 +117,8 @@ relays replace a record by `(pubkey, kind, d)`, so it would take that device's
 record's place.
 
 ```ts
+import type { ParsedDeviceEvent } from '@orangecheck/lock-device';
+
 import {
     buildRevocationStatement,
     finalizeDeviceEvent,
@@ -117,8 +126,12 @@ import {
 } from '@orangecheck/lock-device';
 import { publishEvent } from '@orangecheck/nostr-core';
 
+declare const oldDeviceId: string; // the device to retire
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 // records: the verified device records you read for the address. The date is
 // now, or that device's own signed created_at if it is later.
+declare const records: ParsedDeviceEvent[];
 const revocation = buildRevocationStatement({
     address: 'bc1qbob...',
     device_id: oldDeviceId,

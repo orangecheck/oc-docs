@@ -76,6 +76,8 @@ import type { Poll } from '@orangecheck/vote-core';
 
 import { pollId } from '@orangecheck/vote-core';
 
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 const iso = (ms: number) =>
     new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
 const creator = 'bc1qcreator...';

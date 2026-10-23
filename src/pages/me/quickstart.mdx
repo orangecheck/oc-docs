@@ -319,11 +319,13 @@ earns is `user_share_pct` of it.
 ```ts
 import { oc } from '@orangecheck/me-client';
 
+declare const didOc: string; // who earns: req.ocSession.did_oc from step 3 of sign-in
+
 const res = await oc.event.fire({
     project_key: process.env.OC_PROJECT_KEY!,
     subtype: 'account_creation',
     signingSecret: process.env.OC_SIGNING_SECRET,
-    accountId: didOc, // who earns: req.ocSession.did_oc from step 3 of sign-in
+    accountId: didOc,
 });
 if (!res.earned) {
     // not paying now: nothing recorded or charged

@@ -53,7 +53,7 @@ memberships bound to the old key in the process).
 The portal signs the same `ActionEnvelope` shape the Rust kit produces.
 Canonicalization is field-declaration order over the payload struct:
 
-```ts
+```ts no-check
 const ordered = {
     action, // "program-apply" | "charter-sign" | "alert-publish" | …
     params, // action-specific record

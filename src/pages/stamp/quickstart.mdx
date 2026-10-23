@@ -55,6 +55,9 @@ import { normalizeAddress } from '@orangecheck/bip322';
 import { stamp } from '@orangecheck/stamp-core';
 import { submitToCalendars, toStampOts } from '@orangecheck/stamp-ots';
 
+declare const typed: string; // the address field
+declare function walletSignBIP322(message: string): Promise<string>; // your wallet's BIP-322 signer
+
 // Your address as typed or scanned: 'BC1Q…' from a QR code becomes 'bc1q…'.
 const address = normalizeAddress(typed);
 if (!address) throw new Error('Not a Bitcoin address');
@@ -113,11 +116,15 @@ characters and `length` is the size in bytes. A bare hex digest, or uppercase
 hex, is rejected with `E_MALFORMED`. In Node, hash the file as a stream:
 
 ```ts
+import type { StampInput } from '@orangecheck/stamp-core';
+
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 
 import { stamp } from '@orangecheck/stamp-core';
+
+declare const signer: StampInput['signer']; // the signer from above
 
 const path = 'release.tar.zst';
 const sha = createHash('sha256');
@@ -148,6 +155,8 @@ returns the envelope typed, or throws `StampError` with `E_MALFORMED` (or
 ```ts
 import { verifySignature } from '@orangecheck/bip322';
 import { parseStamp, verify } from '@orangecheck/stamp-core';
+
+declare const text: string;
 
 const received = parseStamp(text); // the .stamp file or JSON you were sent
 

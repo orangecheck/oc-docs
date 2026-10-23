@@ -67,6 +67,8 @@ dashboard record either way and say whether you are paying now.
 ```ts
 import { oc } from '@orangecheck/me-client';
 
+declare const didOc: string; // who earns: the signed-in person's did:oc
+
 const res = await oc.event.fire({
     project_key: process.env.OC_PROJECT_KEY!,
     subtype: 'account_creation',
@@ -87,7 +89,12 @@ project's `pay_periods`, past ones included. Because started periods never
 change, anyone can check that a receipt was billed while the project was paying:
 
 ```ts
+import type { BillableEvent } from '@orangecheck/me-client';
+
 import { oc, payingAt } from '@orangecheck/me-client';
+
+declare const envelope: BillableEvent; // the receipt you are checking
+declare const PROJECT_KEY: string; // the project that billed it
 
 const { config, pay_periods } = await fetch(
     `https://me.ochk.io/api/integrator/config?project_key=${PROJECT_KEY}`

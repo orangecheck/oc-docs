@@ -550,10 +550,13 @@ by one configuration: each token is looked up for its own origin. If the list
 can't be read, or is more than ten minutes old by its own clock, reads go on and
 writes are refused until it can: the wrappers answer such a write
 `503 revocations_unavailable` (me-client 0.38.0), not as signed out, so your
-page retries instead of sending the person to sign in. In your own code,
+page retries instead of sending the person to sign in. The same goes for
+ochk.io's key set: while it can't be read (and no copy younger than six hours is
+held), a request that carries a token gets `503 key_set_unavailable`, reads and
+writes alike (me-client 0.41.0). In your own code,
 `checkOcSession(headers, options)` tells the cases apart: `signed_in` with the
-session, `signed_out`, or `unavailable`. Every token while the two variables are
-unset is checked by its signature alone.
+session, `signed_out`, or `unavailable` with its `reason`. Every token while the
+two variables are unset is checked by its signature alone.
 
 **While you build.** A sign-in on `http://localhost:<port>` or
 `http://127.0.0.1:<port>` gets a token for that origin, and no domain proves it.

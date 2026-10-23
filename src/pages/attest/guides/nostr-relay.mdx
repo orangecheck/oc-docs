@@ -46,16 +46,16 @@ ExecStart=/usr/bin/strfry relay
 
 ### Full env var reference
 
-| Env var            | Default      | Purpose                                                 |
-| ------------------ | ------------ | ------------------------------------------------------- |
-| `OC_MIN_SATS`      | `0`          | Minimum bonded sats                                     |
-| `OC_MIN_DAYS`      | `0`          | Minimum days unspent                                    |
-| `OC_ALLOW_KINDS`   | `0,3,10002`  | Kinds that bypass (profile, contacts, relay list)       |
-| `OC_ALLOW_PUBKEYS` | _none_       | Comma-separated hex pubkeys that bypass (e.g. operator) |
-| `OC_RELAYS`        | SDK defaults | Discovery relays for lookups                            |
-| `OC_FAIL_OPEN`     | `false`      | `true` to allow on lookup failure                       |
-| `OC_CACHE_TTL_MS`  | `60000`      | In-process cache TTL                                    |
-| `OC_LOG`           | `true`       | Emit one decision per line on stderr                    |
+| Env var            | Default      | Purpose                                                                                                     |
+| ------------------ | ------------ | ----------------------------------------------------------------------------------------------------------- |
+| `OC_MIN_SATS`      | `0`          | Minimum bonded sats                                                                                         |
+| `OC_MIN_DAYS`      | `0`          | Minimum days unspent                                                                                        |
+| `OC_ALLOW_KINDS`   | `0,3,10002`  | Kinds that bypass (profile, contacts, relay list)                                                           |
+| `OC_ALLOW_PUBKEYS` | _none_       | Comma-separated hex pubkeys that bypass (e.g. operator)                                                     |
+| `OC_RELAYS`        | SDK defaults | Discovery relays for lookups                                                                                |
+| `OC_FAIL_OPEN`     | `false`      | `true` accepts a verified signature whose bond the chain API cannot read; never a signature not yet checked |
+| `OC_REFRESH_MS`    | `600000`     | How often each bond is re-read from the chain. A spent bond keeps passing for at most this long             |
+| `OC_LOG`           | `true`       | Emit one decision per line on stderr                                                                        |
 
 ### Docker compose
 
@@ -127,8 +127,10 @@ async function handleEvent(socket: WebSocket, event: Event) {
 
 ## Tuning
 
-- **Cache TTL** — default 60 s, matches `/api/check`. Increase to 5 minutes for
-  busy relays; the tradeoff is slightly stale bond state.
+- **Bond refresh** — the Strfry plugin re-reads every bond each `OC_REFRESH_MS`
+  (10 minutes by default). A shorter interval drops a spent bond sooner, for
+  more chain reads. In your own relay, `filterEvent` caches each pubkey for
+  `cacheTtlMs` (60 s by default, at most 10 minutes).
 - **Concurrency** — the filter runs serialised per inbound event. If events are
   backing up, consider horizontal-scaling the relay rather than parallelising
   the filter.

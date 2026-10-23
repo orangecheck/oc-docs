@@ -77,6 +77,11 @@ export const DOCS_NAV: DocsSection[] = [
                 label: 'OC Connect',
                 blurb: 'Give each user an orangecheck account on top of Google, Auth0, email/password — any login.',
             },
+            {
+                href: '/integration/reference',
+                label: 'Run the whole funnel',
+                blurb: 'Open example sites in Node and Python: your own login, Connect, claiming and sign in with orangecheck.',
+            },
         ],
     },
     {
@@ -958,6 +963,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/reference/error-codes',
                 label: 'Status & error codes',
                 blurb: 'Every reason string `/api/check`, `/api/verify`, and the SDKs can return.',
+            },
+            {
+                href: '/reference/examples',
+                label: 'Examples',
+                blurb: 'Every runnable example, by protocol: onboarding, OC Agent, OC Vote.',
             },
             {
                 href: '/reference/multi-account',

@@ -1,0 +1,42 @@
+export const metadata = {
+    title: 'Examples',
+    description:
+        'Every runnable orangecheck example in one place: the onboarding funnel in Node and Python, OC Agent integrations, OC Vote integrations, and the hosted demo.',
+};
+
+# Examples
+
+Every example below is open source under MIT, standalone and meant to be forked.
+Each folder has its own README with how to install, run and verify it.
+
+## Sign-in and accounts
+
+| Example                                                                                                                   | What it shows                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`oc-onboarding-examples/node-next`](https://github.com/orangecheck/oc-onboarding-examples/tree/main/node-next)           | A site with its own login, Connect, claiming at ochk.app and sign in with orangecheck, in Next.js. Runs offline with no account. [More](/integration/reference) |
+| [`oc-onboarding-examples/python-fastapi`](https://github.com/orangecheck/oc-onboarding-examples/tree/main/python-fastapi) | The same site in Python, on FastAPI and the `orangecheck` package.                                                                                              |
+| [me-demo.ochk.io](https://me-demo.ochk.io)                                                                                | A hosted demo (Lumen Notes) with the sign-in popup. It runs on an `ochk.io` subdomain, so it uses orangecheck's own session; your site takes the path above.    |
+
+## OC Agent
+
+[`oc-agent-examples`](https://github.com/orangecheck/oc-agent-examples) wraps
+tool calls from agent frameworks in signed `agent-action` envelopes, and checks
+them on the receiving side:
+
+- `mcp-wrap` and `verifying-mcp-server`: an MCP client and a server that refuses
+  any call without a valid delegation and action.
+- `anthropic-tool-use`, `openai-function-call`, `vercel-ai-tool` and
+  `langgraph-tool-node`: one adapter each.
+
+See [OC Agent](/agent).
+
+## OC Vote
+
+[`oc-vote-examples`](https://github.com/orangecheck/oc-vote-examples) puts poll
+tallies where people already are:
+
+- `discord-bot`: tallies as Discord embeds.
+- `github-action-gate`: a GitHub Action that gates a job on a poll's result.
+- `shell`: one-line `oc-vote` and `jq` recipes.
+
+See [OC Vote](/vote).

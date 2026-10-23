@@ -544,6 +544,14 @@
             "tests": []
         },
         {
+            "id": "page:/integration/reference",
+            "kind": "page",
+            "entry": "src/pages/integration/reference.mdx",
+            "reach": "https://ochk.io/docs/integration/reference",
+            "area": "integration",
+            "tests": []
+        },
+        {
             "id": "page:/lock",
             "kind": "page",
             "entry": "src/pages/lock/index.mdx",
@@ -852,6 +860,14 @@
             "kind": "page",
             "entry": "src/pages/reference/error-codes.mdx",
             "reach": "https://ochk.io/docs/reference/error-codes",
+            "area": "reference",
+            "tests": []
+        },
+        {
+            "id": "page:/reference/examples",
+            "kind": "page",
+            "entry": "src/pages/reference/examples.mdx",
+            "reach": "https://ochk.io/docs/reference/examples",
             "area": "reference",
             "tests": []
         },
@@ -6048,6 +6064,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/lock-device/interfaces/AuthorizeOptions",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/interfaces/AuthorizeOptions.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/interfaces/AuthorizeOptions",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/lock-device/interfaces/DeviceKeyPair",
             "kind": "page",
             "entry": "src/pages/sdk/lock-device/interfaces/DeviceKeyPair.mdx",
@@ -6108,6 +6132,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/lock-device/variables/DEVICE_KIND.mdx",
             "reach": "https://ochk.io/docs/sdk/lock-device/variables/DEVICE_KIND",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/lock-device/variables/V2_INBOX_SUNSET",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/variables/V2_INBOX_SUNSET.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/variables/V2_INBOX_SUNSET",
             "area": "sdk",
             "tests": []
         },
@@ -6724,6 +6756,22 @@
             "kind": "page",
             "entry": "src/pages/sdk/me-client/variables/ARCHETYPE_TEMPLATES.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/variables/ARCHETYPE_TEMPLATES",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/variables/CONNECT_CONSENT_BLURB",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/variables/CONNECT_CONSENT_BLURB.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/variables/CONNECT_CONSENT_BLURB",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/variables/CONNECT_CONSENT_LABEL",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/variables/CONNECT_CONSENT_LABEL.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/variables/CONNECT_CONSENT_LABEL",
             "area": "sdk",
             "tests": []
         },

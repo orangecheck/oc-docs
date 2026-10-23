@@ -65,6 +65,7 @@ const PUBLIC_REPOS = new Set([
     'oc-load-vault-secrets-action',
     'oc-lock-protocol',
     'oc-media-kit',
+    'oc-onboarding-examples',
     'oc-packages',
     'oc-pledge-protocol',
     'oc-portal-web',

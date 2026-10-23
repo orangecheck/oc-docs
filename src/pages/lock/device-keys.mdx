@@ -56,8 +56,9 @@ The statement is a [canonical message](/ecosystem/canonical-message) with header
 together — a verifier who sees the signature and the statement knows that
 `bc1qbob…` has attested that this device_pk is theirs, and which Nostr key may
 publish it. Omitting `nostr_pk` produces the older `v2` statement, which does
-not sign the publishing key; readers trust a v2 record's author only while no
-other key carries the same device (`authorizedDevices`).
+not sign the publishing key. Readers still seal to a v2 device, but from
+2027-01-21 a v2 record names no inbox key (`authorizedDevices`, spec §3.4); to
+keep one, re-bind the device as v3 with the v2 statement's `created_at`.
 
 ## Publish to the Nostr directory
 

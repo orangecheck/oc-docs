@@ -6,7 +6,7 @@ export const metadata = {
 
 # Specification
 
-**Status:** stable · **Version:** 2.2 · **Supersedes:** LOCK v1.0 (adaptor
+**Status:** stable · **Version:** 2.3 · **Supersedes:** LOCK v1.0 (adaptor
 signatures), v1.1 (Proof-of-Access)
 
 This page is the normative OC Lock specification. Where this document and the
@@ -79,7 +79,8 @@ Each line terminated with LF (`\n`).
 
 Publishers MUST emit v3. A verifier MUST reject a v3 record whose `event.pubkey`
 differs from the signed `nostr_pk`. Readers still accept v2 records, which lack
-the `nostr_pk` line, for sealing to `device_pk`.
+the `nostr_pk` line, for sealing to `device_pk`; from 2027-01-21 a v2 record
+names no inbox key (§3.4).
 
 ### §3.3 Publication
 
@@ -109,6 +110,20 @@ deterministically from the device secret:
 ```
 nostr_sk := HKDF(ikm=device_sk, salt="oc-lock/v2/nostr-key", info="nostr-sk", L=32)
 ```
+
+**Which key is a device's inbox.** A v3 record authorizes its signed `nostr_pk`.
+From **2027-01-21T00:00:00Z** by the verifier's clock, a v2 record authorizes no
+Nostr key. Before then, a v2 record authorizes its `event.pubkey` only while no
+v3 record of the same device exists and exactly one key carries it. A v2 bind
+stays live for sealing to `device_pk`, so a device whose binds are all v2 still
+receives envelopes, by link rather than at a Nostr inbox.
+
+**Re-binding a v2 device.** A client holding a live v2 device's secret SHOULD
+publish a v3 statement for the same address, `device_id` and `device_pk`, under
+the key derived from the device secret. The re-bind MUST carry the v2
+statement's `created_at`, so a revocation of the device retires it too. A client
+SHOULD offer the re-bind for its own v2 devices and say when v2 stops naming an
+inbox.
 
 ### §3.5 Rotation and revocation
 

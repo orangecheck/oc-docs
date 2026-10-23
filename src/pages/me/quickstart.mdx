@@ -249,7 +249,9 @@ Each line is a way an integration has gone wrong, with why it matters.
       without either, and your domain is verified. _Without them, "sign out
       everywhere" never reaches your site._
 - [ ] A session someone ended everywhere is refused within about two minutes,
-      and a token without `rh` is refused. _Nothing could ever end it._
+      and a token without `rh` is refused: me-client 0.40.0 and `orangecheck`
+      3.0.0 do this unless you pass `requireHandle: false`
+      (`require_handle=False`). _Nothing could ever end it._
 - [ ] Anything you mint while someone is signed in (your session, a provider
       session, API keys, OAuth grants, refresh tokens) ends when their session
       ends everywhere. _Otherwise sign-out ends the cookie and leaves a key

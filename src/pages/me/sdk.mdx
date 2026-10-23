@@ -461,8 +461,17 @@ writes are refused until it can: the wrappers answer such a write
 `503 revocations_unavailable` (me-client 0.38.0), not as signed out, so your
 page retries instead of sending the person to sign in. In your own code,
 `checkOcSession(headers, options)` tells the cases apart: `signed_in` with the
-session, `signed_out`, or `unavailable`. A token without `rh`, and every token
-while the two variables are unset, is checked by its signature alone.
+session, `signed_out`, or `unavailable`. Every token while the two variables are
+unset is checked by its signature alone.
+
+A token bound to your site without `rh` is refused, reason `no_session_handle`
+(me-client 0.40.0, `orangecheck` 3.0.0): nothing could end it. Every token from
+the sign-in popup carries one. `requireHandle: false` (Python
+`require_handle=False`) accepts one minted some other way, and then sign out
+everywhere doesn't end it. `checkOcSession` answers it `signed_out` with that
+`reason`, and a wrapper with `required` answers `401 no_session_handle`. A site
+that sets `audience: '*'` also accepts family sessions, which carry no `rh`:
+your project's list can't end them. Name your own origin as `audience` instead.
 
 **Python** ([`orangecheck`](/sdk/python) 2.8.0 or later): keep one list per
 process and pass it with the request's method.
@@ -487,7 +496,7 @@ session = verify_session(token, audience="https://your-site.example",
 
 | `status`       | Means                                                                                                                                                                      | `verify_session` with `revocations=`                                                                                              |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `"live"`       | Not ended. Also every token without `rh`.                                                                                                                                  | Returns the session.                                                                                                              |
+| `"live"`       | Not ended. Also a token without `rh`, which `verify_session` refuses first unless `require_handle=False`.                                                                  | Returns the session.                                                                                                              |
 | `"revoked"`    | The person ended it: its `rh` is in the list and its `iat` is before the cutoff.                                                                                           | Raises `SessionEnded` (reason `ended`).                                                                                           |
 | `"unverified"` | No list for that origin younger than ten minutes (by its own `at`) could be read: me.ochk.io unreachable, or the list refused (domain not verified, an origin outside it). | Returns the session for `GET`, `HEAD` or `OPTIONS`; raises `InvalidSession` (reason `revocations_unavailable`) for anything else. |
 
@@ -509,8 +518,10 @@ and don't store it:
   a second call: it could bind another token's handle, or none.
 - Spend its `jti` in a store all your servers share, until `exp`, so the same
   token can't start a second session on another instance.
-- Refuse a token without `rh`: nothing could end the session it starts. Refuse
-  to start a deployment that is missing `OC_PROJECT_KEY` or `OC_SIGNING_SECRET`.
+- A token without `rh` is refused before it gets here (me-client 0.40.0,
+  `orangecheck` 3.0.0): nothing could end the session it starts. Don't turn that
+  off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or
+  `OC_SIGNING_SECRET`.
 - Ask the list about the session on each request. In Node, keep one
   `integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later
   per process and `await check.status({ rh, aud, iat })`; in Python,

@@ -15,14 +15,14 @@ The old host's 308s, moved pages, SDK aliases, the share card and the error page
   pages go to the docs home; symbols that moved packages go to their new page.
 - sdk-package: `/sdk/<package>` goes to `/sdk/<package>/README`. The old `/sdks/*`
   group goes to `/sdk/*` and `/reference/error-codes`.
-- og: `GET /docs/api/og?title=…`, the share card PNG.
+- og: `GET /docs/api/og?page=<path>`, the share card PNG with that docs page's own title (from the nav, section above it). A path the docs do not have, and any `?title=`, gets the default card, so a card never carries a caller's text (`src/lib/seo/og-card.ts`; every page's `og:image` names its path).
 - 404 and 500: the error pages.
 
 ## How to reach it
 
 - Any URL on `https://docs.ochk.io`.
 - Any retired path under `https://ochk.io/docs`.
-- `https://ochk.io/docs/api/og?title=Lock`
+- `https://ochk.io/docs/api/og?page=%2Flock%2Fspec`
 
 ## How to check it
 
@@ -39,7 +39,8 @@ B=https://ochk.io/docs
 for p in /sdks /sdks/javascript /sdk/lock-core /fleet /api; do
   printf '%-18s ' "$p"; curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' "$B$p"
 done
-curl -s -o /dev/null -w '%{http_code} %{content_type}\n' "$B/api/og?title=Lock"   # 200 image/png
+curl -s -o /dev/null -w '%{http_code} %{content_type}\n' "$B/api/og?page=%2Flock%2Fspec"   # 200 image/png
+curl -s "$B/api/og" | sha256sum; curl -s "$B/api/og?title=Probe" | sha256sum   # the same hash: caller text is ignored
 curl -s -o /dev/null -w '%{http_code}\n' "$B/nope"                                # 404
 curl -s -o /dev/null -w '%{http_code}\n' "$B/500"                                 # 500
 # On a local build the old-host rules answer to the Host header:

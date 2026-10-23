@@ -53,7 +53,7 @@
             "entry": "src/pages/api/[...unknown].ts",
             "reach": "https://ochk.io/docs/api/[...unknown]",
             "area": "home",
-            "tests": ["src/lib/unknown-api-route.test.ts"]
+            "tests": ["src/lib/seo/og-card.test.ts", "src/lib/unknown-api-route.test.ts"]
         },
         {
             "id": "api:ANY /api/og",
@@ -61,7 +61,7 @@
             "entry": "src/pages/api/og.tsx",
             "reach": "https://ochk.io/docs/api/og",
             "area": "og",
-            "tests": []
+            "tests": ["src/lib/seo/og-card.test.ts"]
         },
         {
             "id": "page:/",
@@ -765,7 +765,7 @@
             "entry": "src/pages/pledge/index.mdx",
             "reach": "https://ochk.io/docs/pledge",
             "area": "pledge",
-            "tests": []
+            "tests": ["src/lib/seo/og-card.test.ts"]
         },
         {
             "id": "page:/pledge/composition",
@@ -773,7 +773,7 @@
             "entry": "src/pages/pledge/composition.mdx",
             "reach": "https://ochk.io/docs/pledge/composition",
             "area": "pledge",
-            "tests": []
+            "tests": ["src/lib/seo/og-card.test.ts"]
         },
         {
             "id": "page:/pledge/enforcement-by-exposure",
@@ -7408,6 +7408,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/pledge-core/interfaces/CreateDelegatedPledgeInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/pledge-core/interfaces/CreateDelegatedPledgeInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/interfaces/CreateDelegatedPledgeInput",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/pledge-core/interfaces/CreateDirectPledgeInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/pledge-core/interfaces/CreateDirectPledgeInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/interfaces/CreateDirectPledgeInput",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/pledge-core/interfaces/CreateOutcomeInput",
             "kind": "page",
             "entry": "src/pages/sdk/pledge-core/interfaces/CreateOutcomeInput.mdx",
@@ -7416,10 +7432,10 @@
             "tests": []
         },
         {
-            "id": "page:/sdk/pledge-core/interfaces/CreatePledgeInput",
+            "id": "page:/sdk/pledge-core/interfaces/CreatePledgeTerms",
             "kind": "page",
-            "entry": "src/pages/sdk/pledge-core/interfaces/CreatePledgeInput.mdx",
-            "reach": "https://ochk.io/docs/sdk/pledge-core/interfaces/CreatePledgeInput",
+            "entry": "src/pages/sdk/pledge-core/interfaces/CreatePledgeTerms.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/interfaces/CreatePledgeTerms",
             "area": "sdk",
             "tests": []
         },
@@ -7604,6 +7620,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/pledge-core/type-aliases/AttestationLookup.mdx",
             "reach": "https://ochk.io/docs/sdk/pledge-core/type-aliases/AttestationLookup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/pledge-core/type-aliases/CreatePledgeInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/pledge-core/type-aliases/CreatePledgeInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/type-aliases/CreatePledgeInput",
             "area": "sdk",
             "tests": []
         },

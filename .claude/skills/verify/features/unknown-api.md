@@ -22,7 +22,7 @@ Runtime:
 ```sh
 for m in POST GET PUT; do curl -s -X $m -w " %{http_code} %{content_type}\n" https://ochk.io/docs/api/zz-no-such-route; done
 curl -s -D - -o /dev/null https://ochk.io/docs/api/zz-no-such-route | grep -i '^cache-control'
-curl -s -o /dev/null -w 'existing route: %{http_code} %{content_type}\n' 'https://ochk.io/docs/api/og?title=hello'
+curl -s -o /dev/null -w 'existing route: %{http_code} %{content_type}\n' 'https://ochk.io/docs/api/og?page=%2Flock%2Fspec'
 ```
 
 Proves it when every method answers `{"ok":false,"error":"not_found"} 404 application/json` with `cache-control: no-store`, and the existing route still answers as it did, here `/api/og`, the site's only other API route, with `200 image/png`.

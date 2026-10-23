@@ -2,9 +2,9 @@
  * SEO utilities for ochk.io/docs — mirrors ochk.io's shape so tooling and
  * social-card tests work identically.
  */
-import { cardTitle } from '@orangecheck/site-kit/seo';
-
 import { SITE_CONFIG } from '@/lib/site.config';
+
+import { docsCard } from './og-card';
 
 export interface SEOConfig {
     title?: string;
@@ -23,16 +23,18 @@ const DEFAULT_TITLE = 'orangecheck documentation';
 const DEFAULT_DESCRIPTION =
     'The orangecheck handbook. Six verbs — am, whisper, decide, declare, delegate, swear — mapped to identity, confidentiality, legitimacy, provenance, authority, commitment. Six composable protocols on Bitcoin: OC Attest, OC Lock, OC Vote, OC Stamp, OC Agent, OC Pledge. BIP-322 + Nostr kind-30078 + OpenTimestamps. Every artifact verifies offline, forever.';
 
-/** The docs card with this page's title; the card already shows the site's name. */
-const ogCard = (title: string) =>
-    `${SITE_URL}/api/og?title=${encodeURIComponent(cardTitle({ name: SITE_NAME }, title))}`;
+/** A docs page shares its own card, named by its path; any other page the default card. */
+const ogCard = (canonical: string | null) =>
+    docsCard(canonical)
+        ? `${SITE_URL}/api/og?page=${encodeURIComponent(canonical!)}`
+        : `${SITE_URL}/api/og`;
 
 export function generateMetaTags(config: SEOConfig) {
     const {
         title = DEFAULT_TITLE,
         description = DEFAULT_DESCRIPTION,
         canonical,
-        ogImage = ogCard(title),
+        ogImage = ogCard(canonical),
         ogType = 'website',
         noindex = false,
         keywords = [],

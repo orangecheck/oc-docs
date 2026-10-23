@@ -130,7 +130,23 @@ A billable event arrives as the event itself plus three fields:
 | `id`, `subtype`, … | The event: `id`, `occurred_at`, `class`, `subtype`, `site`, the fee split, `context`, `verify_url`                                |
 
 A project notice (`OC-Class: system`) is
-`{ kind: 'oc-system-event', subtype, project_key, … }` and names no person.
+`{ kind: 'oc-system-event', subtype, project_key, … }` and names no person. A
+webhook gets every notice through `*`, or only the ones it names in
+`subscribed`:
+
+| Subtype                          | When                                                                                                                                                                                                                                           |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `escrow.low`                     | Your balance fell below its floor                                                                                                                                                                                                              |
+| `escrow.depleted`                | Nothing is left to spend: billable events are refused until you top up                                                                                                                                                                         |
+| `escrow.recovered`               | Your balance is back above its floor                                                                                                                                                                                                           |
+| `drop.closed`                    | A drop window closed: see [Drops](/me/drops)                                                                                                                                                                                                   |
+| `connect.claimed`                | A person claimed the account your Connect app made for them                                                                                                                                                                                    |
+| `federation.migrating`           | Your project's federation is being replaced. Top-ups pause now; events and sign-in carry on. The project and its balance move no sooner than `flip_not_before`. `successor` names the new federation, its threshold, charter and guardian keys |
+| `federation.migration_cancelled` | That move is off, and top-ups work again                                                                                                                                                                                                       |
+
+Both federation notices carry `migration_id`, `from` and `to`. The project's
+owner also sees each one in their ochk.app notifications, and by email when
+their account has one.
 
 ## Delivery semantics
 

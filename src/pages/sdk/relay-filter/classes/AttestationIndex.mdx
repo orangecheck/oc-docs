@@ -11,7 +11,7 @@ export const metadata = {
 
 # Class: AttestationIndex
 
-Defined in: [attestation-index.ts:113](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L113)
+Defined in: [attestation-index.ts:114](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L114)
 
 @orangecheck/relay-filter
 
@@ -46,7 +46,7 @@ from `@orangecheck/relay-filter/strfry`.
 new AttestationIndex(options?: IndexOptions): AttestationIndex;
 ```
 
-Defined in: [attestation-index.ts:129](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L129)
+Defined in: [attestation-index.ts:130](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L130)
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: [attestation-index.ts:129](https://github.com/orangecheck/oc-package
 get size(): number;
 ```
 
-Defined in: [attestation-index.ts:249](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L249)
+Defined in: [attestation-index.ts:252](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L252)
 
 Attestations held, for logging.
 
@@ -84,7 +84,7 @@ Attestations held, for logging.
 decide(event: MinimalNostrEvent, opts?: FilterOptions): FilterDecision;
 ```
 
-Defined in: [attestation-index.ts:167](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L167)
+Defined in: [attestation-index.ts:169](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L169)
 
 #### Parameters
 
@@ -108,7 +108,7 @@ ingest(event: {
 }): boolean;
 ```
 
-Defined in: [attestation-index.ts:147](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L147)
+Defined in: [attestation-index.ts:149](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L149)
 
 Add one attestation event. Returns true if it was new and sound.
 
@@ -132,7 +132,7 @@ Add one attestation event. Returns true if it was new and sound.
 markSynced(): void;
 ```
 
-Defined in: [attestation-index.ts:163](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L163)
+Defined in: [attestation-index.ts:165](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L165)
 
 Mark the initial backlog as loaded; before this, unknown keys are "not yet", not "no".
 
@@ -148,7 +148,7 @@ Mark the initial backlog as loaded; before this, unknown keys are "not yet", not
 start(): void;
 ```
 
-Defined in: [attestation-index.ts:133](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L133)
+Defined in: [attestation-index.ts:135](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L135)
 
 #### Returns
 
@@ -162,7 +162,7 @@ Defined in: [attestation-index.ts:133](https://github.com/orangecheck/oc-package
 stop(): void;
 ```
 
-Defined in: [attestation-index.ts:140](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L140)
+Defined in: [attestation-index.ts:142](https://github.com/orangecheck/oc-packages/blob/main/relay-filter/src/attestation-index.ts#L142)
 
 #### Returns
 

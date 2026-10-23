@@ -18,20 +18,21 @@ description: Verify the orangecheck docs (ochk.io/docs, Next.js Pages Router wit
 
 ## Static checks
 
-| Check          | Command                     | Proves                                                                       | Baseline (2026-10-22, 5b46e02) |
-| -------------- | --------------------------- | ---------------------------------------------------------------------------- | ------------------------------ |
-| typecheck      | `yarn type-check`           | the design-system guard (`pretype-check`), then `tsc`                        | passes                         |
-| lint           | `yarn lint`                 | the family eslint rules, `.claude/**` included                               | passes                         |
-| format         | `yarn format:check`         | prettier over the whole tree, `.claude/**` and Markdown included             | passes                         |
-| test           | `yarn test:run`             | moved pages, MDX table of contents, error-body and revocation guards         | passes, 75 tests               |
-| build          | `yarn build`                | doc sources, search index, sitemap, then `next build --webpack` of all pages | passes, 265 s                  |
-| verify         | `yarn check`                | typecheck, lint and format in one                                            | passes                         |
-| internal links | `yarn check:internal-links` | every `/…` link in the pages resolves to a page or a redirect                | passes                         |
-| kinds          | `yarn check:kinds`          | prose that names an artifact uses its Nostr kind from the registry page      | passes                         |
-| sample imports | `yarn check:sample-imports` | every `@orangecheck/*` import in a sample is a published export (network)    | passes                         |
-| live links     | `yarn check:links`          | every concrete ochk.io URL a page hands a reader answers (network)           | not in CI; run before a push   |
+| Check          | Command                     | Proves                                                                                        | Baseline (2026-10-22, 5b46e02)             |
+| -------------- | --------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| typecheck      | `yarn type-check`           | the design-system guard (`pretype-check`), then `tsc`                                         | passes                                     |
+| lint           | `yarn lint`                 | the family eslint rules, `.claude/**` included                                                | passes                                     |
+| format         | `yarn format:check`         | prettier over the whole tree, `.claude/**` and Markdown included                              | passes                                     |
+| test           | `yarn test:run`             | moved pages, MDX table of contents, error-body and revocation guards                          | passes, 75 tests                           |
+| build          | `yarn build`                | doc sources, search index, sitemap, then `next build --webpack` of all pages                  | passes, 265 s                              |
+| verify         | `yarn check`                | typecheck, lint and format in one                                                             | passes                                     |
+| internal links | `yarn check:internal-links` | every `/…` link in the pages resolves to a page or a redirect                                 | passes                                     |
+| kinds          | `yarn check:kinds`          | prose that names an artifact uses its Nostr kind from the registry page                       | passes                                     |
+| sample imports | `yarn check:sample-imports` | every `@orangecheck/*` import in a sample is a published export (network)                     | passes                                     |
+| snippets       | `yarn check:snippets`       | every code block not marked `no-check` compiles against published packages (network, python3) | passes, 132 checked, 6 marked (2026-10-23) |
+| live links     | `yarn check:links`          | every concrete ochk.io URL a page hands a reader answers (network)                            | not in CI; run before a push               |
 
-CI (free: the repo is public) runs type-check, format, lint, test, the three
+CI (free: the repo is public) runs type-check, format, lint, test, the four
 content checks and, in a second job, the build, on every push. It also fails on an absolute home-directory path in any tracked file, so never
 write one here.
 

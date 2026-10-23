@@ -3248,6 +3248,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-core/variables/SAFE_METHODS",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/variables/SAFE_METHODS.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/variables/SAFE_METHODS",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-core/variables/SESSION_COOKIE",
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/variables/SESSION_COOKIE.mdx",

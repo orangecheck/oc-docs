@@ -26,7 +26,7 @@ two charters.
 
 ## How to check it
 
-Static: `yarn check:internal-links`, `yarn check:sample-imports`, `yarn build`.
+Static: `yarn check:internal-links`, `yarn check:sample-imports`, `yarn check:snippets`, `yarn build`.
 
 Runtime:
 

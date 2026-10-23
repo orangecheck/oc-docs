@@ -25,7 +25,7 @@ OC Pledge, and OC Chat (a mode of OC Lock).
 ## How to check it
 
 Static: `yarn check:internal-links`, `yarn check:kinds`, `yarn check:sample-imports`,
-`yarn build`.
+`yarn check:snippets`, `yarn build`.
 
 Runtime:
 
@@ -47,5 +47,9 @@ Proves it when: every page is 200, the title names the page, no link drops the
 - A link written as `/lock/spec` in MDX gets `/docs` from `next/link`. A raw `<a>` or
   a link inside a code block does not. `check:internal-links` catches the first kind;
   grep the rendered HTML for the second.
+- Every ts/tsx/js/python block compiles as a file of its own (`check:snippets`).
+  Declare placeholder inputs in the block (`declare const env: StampEnvelope; // from
+step 1`); mark a true fragment with `no-check` on the fence (` ```ts no-check `).
+  `--page <path part>` and `--only ts|python` narrow a run.
 - A page added without a sidebar entry is reachable but hard to find. Check
   `nav.ts` when you add one.

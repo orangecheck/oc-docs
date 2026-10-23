@@ -25,7 +25,9 @@ language.
 ## How it works
 
 1. Open your project at [ochk.app/me/projects](https://ochk.app/me/projects) and
-   choose **Your own login** under **Sign-in**: you get an **API key**.
+   turn on **Your own login** on its **Sign-in** page: you get an **API key**.
+   **orangecheck sign-in** is a separate switch beside it, so a project can
+   offer both (see [Both on one project](#both-on-one-project)).
 2. Your user signs in however they already do. Nothing changes.
 3. Right after, your backend calls `connectProvision` (it posts to
    `https://ochk.io/api/connect/provision`) with your API key and your own id
@@ -231,12 +233,35 @@ accrues to it. Federation custody, then the user's own keys, is where that goes
 [federation custody](/me/federation). You now know "my user ↔ this orangecheck
 account" and can show it, or call other orangecheck APIs on their behalf.
 
+## Both on one project
+
+A project can offer orangecheck sign-in and keep your own login at the same
+time. They are two switches on the project, and turning one on never turns the
+other off. The two meet in one place:
+
+- **Someone who signs in with orangecheck already has an account.** Store the
+  `did:oc` their sign-in gave you on your user record, and do not call
+  `connectProvision` for them. Provisioning them as well would make them a
+  second account.
+- **Call provision only for people who come in through your own login.**
+
+Turning on your own login changes nothing for orangecheck sign-in: its sign-in
+rule and revocation list work as before, and your project's webhooks hear about
+people from both.
+
 ## Paying your users, and how they claim it
 
 Fire [billable events](/me/api#signing-an-event) for a provisioned user with
 their `did_oc` as `user_address`, signed with your project's secret. What they
 earn waits in that account. Nobody can sign in to it, so to see and cash it out
 the person claims it into an orangecheck account of their own, at ochk.app.
+
+Only an account whose person agreed can earn: one you provisioned with
+`consent: true`, or one they claimed. An event naming any other is refused with
+`403 connect_consent_required`, and nothing is recorded or charged. me.ochk.io
+checks consent with ochk.io, at most once a month for an account that has it. If
+that check cannot be made, the event gets `503 connect_state_unavailable`, also
+with nothing recorded, so retry it later.
 
 **A claim link.** When your signed-in user asks to claim, mint a link from your
 backend and send them to it:
@@ -263,8 +288,11 @@ never provisioned answers `404 unknown_user`; an account already claimed answers
 **A verified email.** Pass `email_verified: true` with `email` when you checked
 the address yourself (a code or a link the user answered). Someone who signs in
 to ochk.app with that address, verified, is offered the claim on their account
-page. Without `email_verified`, an email proves nothing, because it could be
-anyone's, and only a claim link works.
+page, under your project's domain. That offer needs your domain verified and
+your Connect app linked to the project (both on the project's sign-in page),
+because an app's own name is whatever its maker typed. Without `email_verified`,
+an email proves nothing, because it could be anyone's, and only a claim link
+works.
 
 Either way, ochk.app shows the person what the account holds before anything
 changes, and they confirm with a passkey tap or an emailed code or wallet

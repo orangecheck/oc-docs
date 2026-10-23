@@ -96,7 +96,7 @@ Highlights:
 - **Envelope tampering in transit** — _mitigated_. Envelope id is
   `H(canonical)`, committed to by `sig.value`. `stake`, `ots` and `content.ref`
   are outside it: `ots` is checked against Bitcoin, and `stake` against
-  OrangeCheck and `signer.address`.
+  orangecheck and `signer.address`.
 - **Signature replay across canonical messages** — _mitigated_. `oc-stamp:v1`
   domain separator prevents replay against other orangecheck protocols.
 - **Fraudulent OTS proof claiming earlier block** — _mitigated_. Verifiers walk

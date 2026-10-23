@@ -38,36 +38,31 @@ What happens on a request:
 
 1. The middleware extracts the address from wherever you pointed it (a header, a
    cookie, a session, a query param — your call).
-2. It calls out to `/api/check?addr=<addr>&min_sats=100000&min_days=30` (or a
-   local verifier if you configured one).
+2. It runs the SDK's `check()` in-process: it finds the attestation on Nostr
+   relays, verifies its BIP-322 signature and reads the bonded coins from
+   Esplora. No orangecheck server sits in the path.
 3. On pass: request proceeds to your handler.
-4. On fail: returns `403` with a JSON body explaining which threshold didn't
-   meet.
+4. On fail: returns `403` with a JSON body whose `reason` says why
+   (`below_threshold`, `not_found`, …).
 
 ## Address sources
 
 Pick one based on your trust model:
 
 ```ts
-// From a header (cheap, trust the client)
-address: {
-    from: (req) => req.get('x-bitcoin-address') ?? '';
-}
+import { ocGate } from '@orangecheck/gate';
 
-// From a signed session cookie (trustworthy, uses /api/auth/signin)
-address: {
-    from: (req) => req.session?.verifiedAddress ?? '';
-}
+// From a header (cheap, trust the client)
+ocGate({ address: { from: 'header', name: 'x-bitcoin-address' } });
+
+// From a signed session (trustworthy, set by your sign-in route)
+ocGate({ address: { from: (req) => req.session?.verifiedAddress } });
 
 // From the query string
-address: {
-    from: (req) => String(req.query.addr ?? '');
-}
+ocGate({ address: { from: 'query', name: 'addr' } });
 
-// From the body
-address: {
-    from: (req) => String(req.body?.addr ?? '');
-}
+// From the JSON body (a dot-path)
+ocGate({ address: { from: 'body', path: 'addr' } });
 ```
 
 > **Warning.** Reading the address from a header / cookie / query without a
@@ -80,50 +75,68 @@ address: {
 ## Custom rejection response
 
 ```ts
+import { ocGate } from '@orangecheck/gate';
+import express from 'express';
+
+const app = express();
+
 app.post(
     '/post',
     ocGate({
         minSats: 100_000,
         minDays: 30,
         address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
-        onBlocked: (req, res, result) => {
+        onBlocked: (req, res, decision) => {
             res.status(403).json({
                 error: 'not enough stake',
+                reason: decision.reason,
                 requires: { sats: 100_000, days: 30 },
-                you_have: { sats: result.sats, days: result.days },
+                you_have: {
+                    sats: decision.check?.sats ?? 0,
+                    days: decision.check?.days ?? 0,
+                },
             });
         },
     }),
-    handler
+    (_req, res) => res.json({ ok: true, posted: true })
 );
 ```
 
-`result` is the full `/api/check` response, so you can tailor the error body to
+`decision.reason` says why the gate blocked, and `decision.check` is the SDK's
+`check()` result whenever a lookup happened, so you can tailor the error body to
 your use case (redirect to a "how to bond" page, send back a call-to-action,
 etc.).
 
 ## Caching
 
-`ocGate` respects the hosted API's 60-second cache by default. For busier
-deployments, pass `cacheTtl: <ms>` to memoize verifier results in-process so
-rapid retries don't hit the upstream API.
+`ocGate` keeps each lookup in an in-process cache for 60 seconds by default, so
+rapid retries don't repeat the relay and Esplora reads. Tune it with
+`cacheTtlMs` (capped at 10 minutes) and `cacheMax`. An option the gate does not
+read throws when the middleware is built.
 
-## Self-hosted verifier
+## Your own relays
 
-Point the gate at your own verifier:
+The gate reads attestations from public Nostr relays. Point it at relays you
+run:
 
 ```ts
+import { ocGate } from '@orangecheck/gate';
+
 ocGate({
     minSats: 100_000,
-    address: { from: (req) => req.get('x-bitcoin-address') ?? '' },
-    apiBase: 'https://attest.internal.example',
+    address: { from: 'header', name: 'x-bitcoin-address' },
+    relays: ['wss://relay.internal.example'],
 });
 ```
 
-Or skip the HTTP hop entirely and use the local SDK:
+Or call the SDK's `check()` yourself, when your handler needs the result rather
+than a 403:
 
 ```ts
 import { check } from '@orangecheck/sdk';
+import express from 'express';
+
+const app = express();
 
 app.post('/post', async (req, res, next) => {
     const addr = req.get('x-bitcoin-address') ?? '';
@@ -143,7 +156,7 @@ server.
 
 ## See also
 
-- [**HTTP API — `/api/check`**](/attest/api) — what the gate calls
+- [**HTTP API — `/api/check`**](/attest/api) — the same check over HTTP
 - [**Sign in with Bitcoin**](/attest/guides/sign-in-with-bitcoin) — for when you
   need a trusted address, not a self-reported one
 - [**`@orangecheck/gate`**](/sdk/gate/README) — full package reference with Next

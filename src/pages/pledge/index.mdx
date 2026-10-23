@@ -88,19 +88,14 @@ Read this list twice. These are the things the protocol _visibly refuses_ to be.
   — TypeScript core (npm). `createPledge` / `wrapPledgeEnvelope`,
   `verifyPledge`, `createOutcome`, `createAbandonment`, `classifyState`,
   `verifyBond`, `validateResolutionQuery`, the `pledge:create` scope-grammar
-  utilities. v1.0 is current.
+  utilities.
 - [`orangecheck`](https://pypi.org/project/orangecheck/) — Python SDK (PyPI).
   The OC Pledge surface ships under `from orangecheck import pledge`;
   byte-identical conformance with the TypeScript core via the cross-impl harness
   in oc-packages CI.
 
-Existing packages also gain a Pledge surface:
-
-- `@orangecheck/gate` — new `pledgeHistory` predicate (`minKept`,
-  `maxBrokenSince`, `minBondInFlight`, `minBondKeptLifetime`).
-- `@orangecheck/react` — `<OcPledgeBadge>`, `<OcAddressPledgeHistory>`,
-  `<OcPledgeComposer>`.
-- `@orangecheck/cli` — `oc pledge {create,resolve,verify,history}`.
+Gating on pledge history is done in your own code with pledge-core, next to
+`ocGate`: see [Composition with the family](/pledge/composition).
 
 See [SDK overview](/sdk).
 

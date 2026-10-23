@@ -46,10 +46,10 @@ The teeth are not in losing the bond. The teeth are in:
    address whose `sats × days` Continues to age. Honest signers accumulate
    kept-pledge history alongside their stake. A new address has no history; an
    old address with broken pledges has worse-than-no history.
-3. **The composition surface.** The [orangecheck gate](/sdk/gate/README)
-   `pledgeHistory` predicate makes "no broken pledges in the last 180 days" a
-   one-line gate config. Once that's deployed at scale, breaking a pledge has a
-   real cost — _not_ in seized sats, but in lost access to gated surfaces.
+3. **The composition surface.** A site that puts a pledge-history check next to
+   [ocGate](/sdk/gate/README) can require "no broken pledges" before it lets
+   someone in ([how](/pledge/composition)). Where sites do, breaking a pledge
+   has a real cost — _not_ in seized sats, but in lost access to gated surfaces.
 
 ## Why this is sufficient teeth
 
@@ -100,5 +100,5 @@ slashing infrastructure would just add custody risk for the addresses that do.
 
 - [Why OC Pledge](/pledge/why) — the design rejections in detail
 - [Security posture](/pledge/security) — bond-draining attacks, dispute-gaming
-- [Composition with the family](/pledge/composition) — how `pledgeHistory`
-  predicates compose with `ocGate`
+- [Composition with the family](/pledge/composition) — a pledge-history check
+  next to `ocGate`

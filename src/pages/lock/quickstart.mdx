@@ -112,6 +112,7 @@ Device-key lifecycle:
 ```ts
 import {
     buildBindingStatement,
+    deriveNostrKey,
     finalizeDeviceEvent,
     generateDeviceKey,
 } from '@orangecheck/lock-device';
@@ -120,9 +121,12 @@ declare const btcAddress: string; // the address the device binds to
 declare const wallet: { signBIP322(message: string): Promise<string> }; // your wallet
 
 const kp = generateDeviceKey();
+// nostr_pk makes this the v3 statement publishers must emit: it signs the one
+// Nostr key that may publish the record, the key finalizeDeviceEvent signs with.
 const statement = buildBindingStatement({
     address: btcAddress,
     device_pk: kp.device_pk,
+    nostr_pk: deriveNostrKey(kp.device_sk).nostrPk,
     device_id: kp.device_id,
     created_at: kp.created_at,
 });

@@ -120,6 +120,10 @@ async function checkTs(list) {
         if (!res.ok) throw new Error(`registry ${res.status} for ${p}`);
         specs.push(`${p}@${(await res.json())['dist-tags'].latest}`);
     }
+    // A local build's own local dependencies (an unpublished auth-core under a
+    // local me-client) go in too, so npm resolves them from the same place.
+    for (const [name, spec] of Object.entries(USE))
+        if (name.startsWith('@') && !pkgs.has(name)) specs.push(spec);
     console.log(`npm: ${specs.join(' ')}`);
     const ts_dir = join(dir, 'ts');
     mkdirSync(join(ts_dir, 'blocks'), { recursive: true });

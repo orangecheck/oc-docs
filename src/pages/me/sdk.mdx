@@ -520,8 +520,10 @@ if isinstance(result, RevokeRefusal):
 ```
 
 The reasons are `rate_limited`, `bad_request` and `unavailable` (an outage, a
-timeout or an answer the SDK can't read; the token still ends when it expires).
-Both take `issuer` for another auth host.
+timeout or an answer the SDK can't read). ochk.io takes 60 calls a minute per
+IP, and a token that wasn't ended stays valid until it expires, up to 30 days:
+queue a `rate_limited` or `unavailable` result and try again. Both take `issuer`
+for another auth host, as one origin such as `https://ochk.io`.
 
 ### when someone ends every session
 
@@ -628,7 +630,8 @@ and don't store it:
   false for a repeat or an expired token. The store is yours, anything with an
   atomic `add(jti, exp)` that answers true when it recorded the jti: a unique
   row, or Redis `SET jti 1 NX EXAT exp`. `MemoryJtiStore` is for tests and a
-  single process only.
+  single process only. In an async Python route, `spend_once_async` takes a
+  store whose `add` is a coroutine.
 - A token without `rh` is refused before it gets here (me-client 0.40.0,
   `orangecheck` 3.0.0): nothing could end the session it starts. Don't turn that
   off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or

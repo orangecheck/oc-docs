@@ -58,11 +58,6 @@ export function EmbeddedOpenAPI({ url, caption }: EmbeddedOpenAPIProps) {
                 .swagger-ui .info .title { display: none; }
                 .swagger-ui { margin: 0; }
                 .swagger-ui .scheme-container { background: transparent; }
-                /* Tailwind's preflight zeroes the button padding Swagger relies on. */
-                .swagger-ui :is(.opblock-control-arrow, .expand-operation, .authorization__btn) {
-                    min-width: 24px; min-height: 24px; padding: 2px;
-                }
-                .swagger-ui .info a { display: inline-flex; align-items: center; min-height: 24px; }
             `}</style>
             <SwaggerUI
                 url={url}

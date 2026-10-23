@@ -15,8 +15,9 @@ export default function Document() {
         // suppressHydrationWarning: next-themes sets the mode class before React hydrates.
         <Html lang="en" data-oc-app="ochk" suppressHydrationWarning>
             <Head>
-                {/* Inter, requested before the stylesheet names it; base path and all. */}
-                <FontPreloads />
+                {/* Inter, and the code face every docs page opens on, requested before
+                    the stylesheet names them; base path and all. */}
+                <FontPreloads mono />
                 {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
                     (dist/docs/favicon/*). Regenerate via the kit then
                     `cp ../oc-media-kit/dist/docs/favicon/* public/favicons/`. */}

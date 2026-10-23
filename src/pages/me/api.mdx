@@ -235,17 +235,23 @@ receipts people earned, the escrow ledger, payouts and release records.
 Statements the project made about accounts stay too: a statement outlives the
 project that made it, and still names it.
 
-While the project holds sats or owes a step, the delete answers 409 with a
-`reason` and a `detail` sentence saying what to do first, and deletes nothing:
+While the delete runs, the project is closing: events, top-ups and handovers
+sent to it answer 409 `project_closing`. While the project holds sats or owes a
+step, the delete answers 409 with a `reason` and a `detail` sentence saying what
+to do first, and deletes nothing:
 
 | `reason`             | What to do first                                                                                            |
 | -------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `escrow_balance`     | The project holds sats in escrow (`balance_sats`). Refunds aren't self-serve yet: write to billing@ochk.io. |
 | `escrow_held`        | An event is being charged right now. Wait a minute.                                                         |
 | `escrow_settling`    | An event's charge is still being settled, within the hour.                                                  |
+| `topup_open`         | A top-up invoice can still be paid. Wait until it expires, a little over an hour after it was made.         |
 | `drop_open`          | A release schedule still holds what people earned. Turn it off, which releases what it holds at once.       |
 | `connect_moving`     | Its Connect app is still being handed back after a handover. Try again in an hour.                          |
 | `transfer_accepting` | Someone is accepting the project right now. Reload in a minute: it may already be theirs.                   |
+| `connect_linked`     | A Connect app is linked to the project. Unlink it on the project's Sign-in page, or delete the app.         |
+
+The same rules hold when orangecheck deletes a project.
 
 ## Response shapes
 

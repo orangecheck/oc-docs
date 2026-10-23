@@ -109,8 +109,16 @@ Normative rules a conforming client MUST honor:
 - **At a fork, the founder's live branch wins.** Versions on chains that resolve
   and supersede the same parent, and the geneses of one channel, rank:
   founder-signed with a live binding first, founder-signed with a binding since
-  revoked second, any other third. Branches through a lower rank are overruled;
-  then the longest chain wins, then the freshest `created_at`.
+  revoked second, any other third. Branches through a lower rank are overruled.
+  Among the tips left (a tip is a version nothing supersedes), a closed tip
+  wins, then the longest chain, then the freshest signed `created_at`, then the
+  lowest `descriptor_id`, so every reader holding the same versions shows the
+  same channel (OC Chat 0.3.2).
+- **Close is founder-only and forward-effective.** A close is a version with
+  `status:"closed"`: it stops new posts and erases nothing. Only the founder
+  changes `status` or `successor_channel_id`; an admin's version that changes
+  either is `E_CH_UNAUTHORIZED`. To re-open, the founder supersedes every closed
+  tip.
 - **Revoking a device.** A device that was replaced has the channels it signed
   last re-signed, as they stand, from a live device. A device that may be in
   someone else's hands is never re-signed as it stands: the client shows every

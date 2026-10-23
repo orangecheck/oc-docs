@@ -15,16 +15,17 @@ export const metadata = {
 function createPledge(input: CreatePledgeInput): Promise<PledgeEnvelope>;
 ```
 
-Defined in: [pledge-core/src/pledge.ts:51](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/pledge.ts#L51)
+Defined in: [pledge-core/src/pledge.ts:52](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/pledge.ts#L52)
 
 Build, validate, and sign a pledge envelope.
 
 Two signing paths:
   - Direct (most common): swearer signs themselves. Pass `swearerSigner`
-    whose `address` matches the canonical message's swearer.
+    whose `address` equals `swearer`.
   - Agent (SPEC §7.3): an agent signs on behalf of a principal under an
     OC Agent delegation. Pass `viaDelegation` with the delegation id and
-    the agent's signer. The envelope carries `via_delegation` and
+    the agent's signer; the principal is `swearer`, an address, and no
+    signer of theirs is needed. The envelope carries `via_delegation` and
     `agent_address` but those fields are NOT in the canonical message —
     they're verifier-checked claims, not signed bytes.
 
@@ -35,7 +36,7 @@ failure, never on signature failure (signing is the caller's adapter).
 
 | Parameter | Type |
 | ------ | ------ |
-| `input` | [`CreatePledgeInput`](../interfaces/CreatePledgeInput) |
+| `input` | [`CreatePledgeInput`](../type-aliases/CreatePledgeInput) |
 
 ## Returns
 

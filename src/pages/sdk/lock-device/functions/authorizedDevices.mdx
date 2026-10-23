@@ -12,24 +12,26 @@ export const metadata = {
 # Function: authorizedDevices()
 
 ```ts
-function authorizedDevices(records: readonly ParsedDeviceEvent[]): ParsedDeviceEvent[];
+function authorizedDevices(records: readonly ParsedDeviceEvent[], opts?: AuthorizeOptions): ParsedDeviceEvent[];
 ```
 
-Defined in: [authorize.ts:14](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/authorize.ts#L14)
+Defined in: [authorize.ts:23](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/authorize.ts#L23)
 
 Select the device records whose `nostrPubkey` may act for their address.
 
 `records` MUST already be BIP-322-verified, non-revoked bind records for one
 address. A v3 record signs its Nostr pubkey, so it is always authorized. A v2
-record does not, so its pubkey is only the event author's claim: it is
-authorized only while its `device_id` has no v3 record and appears under
-exactly one Nostr pubkey. Two pubkeys carrying one v2 device authorize neither.
+record does not, so its pubkey is only the event author's claim. Before
+`V2_INBOX_SUNSET` it is authorized only while its `device_id` has no v3 record
+and appears under exactly one Nostr pubkey; from then on it authorizes no key.
+A v2 bind stays live for sealing to its `device_pk` either way (liveDevices).
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `records` | readonly [`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[] |
+| `opts` | [`AuthorizeOptions`](../interfaces/AuthorizeOptions) |
 
 ## Returns
 

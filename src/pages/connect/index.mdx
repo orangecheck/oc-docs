@@ -31,9 +31,9 @@ There is no new SDK. A Connect integration is one HTTPS `POST`.
 ## The whole integration
 
 ```ts
-// Anywhere after your own login succeeds — Auth0, Clerk, Google, your own SSO,
-// it does not matter. Run this from your backend.
-declare const yourUser: { id: string }; // the user who just signed in
+// When you make a user's record, after their first sign-in your own way (or
+// when they tick your consent box). Run this from your backend.
+declare const yourUser: { id: string }; // the user you just made
 const res = await fetch('https://ochk.io/api/connect/provision', {
     method: 'POST',
     headers: {
@@ -50,15 +50,31 @@ const { did_oc, is_new } = await res.json();
 id for the user. That is everything — no token to forward, no provider to name,
 no keypair, no redirect.
 
-The call is **idempotent**: run it on every login if you like — the same user
-always resolves to the same `did:oc` (`is_new` tells you whether this call
-created it).
+Call it **once per user** and keep the `did_oc`; there is no need to call it on
+every sign-in. It is idempotent, so a retry after a timeout is safe: the same
+user always resolves to the same `did:oc` (`is_new` tells you whether this call
+created it). A call makes no record of when your user signed in.
+
+**With or without asking.** Make the account with no prompt, or only for people
+who tick a consent box at sign-up. When they tick it, add `consent: true` to the
+body; it is recorded once. An account made without it is identity only: it can't
+be paid. A site that will pay its users asks first.
 
 ## What you get back
 
 ```json
 { "ok": true, "did_oc": "did:oc:…", "is_new": true }
 ```
+
+Or a refusal, `{ "ok": false, "reason": … }`:
+
+- `410 account_deleted`: this user's account was deleted, by the person or by
+  you (below). Stop. Provision them again only when they have just asked for an
+  orangecheck account again, by ticking your consent box, with `consent: true`.
+- `429 daily_limit`: your app made 1,000 new accounts in the last 24 hours.
+  Existing users still get their `did_oc`. Try a new one later, or write to us
+  to raise it.
+- `429 rate_limited`, `401 invalid_api_key`, `403 app_suspended`: as named.
 
 The provisioned account is **orangecheck-issued**: the user holds no signing key
 of their own on this path, so orangecheck holds the account and anything that
@@ -92,10 +108,11 @@ const { url } = await res.json(); // https://ochk.app/connect/claim#t=…
 // redirect this user, and only this user, to url
 ```
 
-The link works once, for fifteen minutes. Its token is in the URL fragment, so
-it reaches no server log; treat it as a secret anyway, and mint it only for the
-user you have just signed in. A user you never provisioned answers
-`404 unknown_user`; an account already claimed answers `409 already_claimed`.
+The link works once, for fifteen minutes, and a new one closes the one before
+it. Its token is in the URL fragment, so it reaches no server log; treat it as a
+secret anyway, and mint it only for the user you have just signed in. A user you
+never provisioned answers `404 unknown_user`; an account already claimed answers
+`409 already_claimed`.
 
 **A verified email.** Pass `email_verified: true` with `email` when you checked
 the address yourself (a code or a link the user answered). Someone who signs in
@@ -132,11 +149,55 @@ r = httpx.post(
 url = r.json()["url"]  # redirect this user to it
 ```
 
+## When your user deletes their account
+
+Delete the one you made for them, from your backend:
+
+```ts
+declare const yourUser: { id: string }; // the user who is leaving
+const res = await fetch('https://ochk.io/api/connect/delete', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.OCHK_CONNECT_KEY}`,
+    },
+    body: JSON.stringify({ user_id: yourUser.id }),
+});
+const { result } = await res.json(); // 'deleted', 'detached' or 'already_deleted'
+```
+
+- `deleted`: nobody had claimed it, so it is gone.
+- `detached`: the person claimed it, so it is theirs and stays. It is no longer
+  yours: your user id no longer reaches it.
+- `already_deleted`: nothing left to do.
+- `409 holds_earnings`: nobody claimed it, but it earned. That is the person's,
+  so it stays; send them a claim link before they go.
+
+After any of these, `provision` answers `410 account_deleted` for that user. The
+same happens when the person deletes their orangecheck account themselves.
+
+An app can't be deleted while accounts it made are still unclaimed
+(`409 has_unclaimed_accounts`): delete those users first.
+
+## What to tell your users
+
+Your users get an orangecheck account because they use your site. Say so where
+you describe your sign-in, in your words, and keep these facts:
+
+- Signing in to your site makes an orangecheck account for them, or, with a
+  consent box, only when they tick it.
+- orangecheck keeps an id for them made from your user id, and their email only
+  as a keyed hash, if you send it. It keeps no record of when they sign in.
+- You get an id for that account, not anything else about them.
+- They can claim it at ochk.app, from a claim link you give them. When they
+  delete their account with you, you delete this one too (above).
+
 ## Notes
 
-- **Server-to-server only.** Call `/api/connect/provision` and
-  `/api/connect/claim-link` from your backend, never the browser. The API key
-  must stay secret.
+- **Server-to-server only.** Call `/api/connect/provision`,
+  `/api/connect/claim-link` and `/api/connect/delete` from your backend, never
+  the browser. The API key must stay secret.
+- **Limits.** 1,000 new accounts a day per app, and 20 apps per account.
 - **The key is shown once.** Save it when you register the app. Lost it?
   **Replace** it in the console; the old key stops working immediately.
 - **Optional `email` and `email_verified`.** Pass the user's email, and

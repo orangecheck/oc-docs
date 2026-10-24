@@ -18,29 +18,29 @@ export default function Document() {
                 {/* Inter, and the code face every docs page opens on, requested before
                     the stylesheet names them; base path and all. */}
                 <FontPreloads mono />
-                {/* Favicons · sourced from github.com/orangecheck/oc-media-kit
-                    (dist/docs/favicon/*). Regenerate via the kit then
-                    `cp ../oc-media-kit/dist/docs/favicon/* public/favicons/`. */}
-                <link rel="icon" type="image/svg+xml" href={`${BASE}/favicons/favicon.svg`} />
-                <link rel="icon" type="image/x-icon" href={`${BASE}/favicons/favicon.ico`} />
+                {/* Favicons · the orangecheck mark's tile, as on ochk.io, from
+                    @orangecheck/mark (assets/favicon/*, copied into public/favicons/).
+                    /docs/favicons/* is cached as immutable, so a new set bumps ?v=. */}
+                <link rel="icon" type="image/svg+xml" href={`${BASE}/favicons/favicon.svg?v=2`} />
+                <link rel="icon" type="image/x-icon" href={`${BASE}/favicons/favicon.ico?v=2`} />
                 <link
                     rel="icon"
                     type="image/png"
                     sizes="16x16"
-                    href={`${BASE}/favicons/favicon-16x16.png`}
+                    href={`${BASE}/favicons/favicon-16x16.png?v=2`}
                 />
                 <link
                     rel="icon"
                     type="image/png"
                     sizes="32x32"
-                    href={`${BASE}/favicons/favicon-32x32.png`}
+                    href={`${BASE}/favicons/favicon-32x32.png?v=2`}
                 />
                 <link
                     rel="apple-touch-icon"
                     sizes="180x180"
-                    href={`${BASE}/favicons/apple-touch-icon.png`}
+                    href={`${BASE}/favicons/apple-touch-icon.png?v=2`}
                 />
-                <link rel="manifest" href={`${BASE}/favicons/site.webmanifest`} />
+                <link rel="manifest" href={`${BASE}/favicons/site.webmanifest?v=2`} />
                 <meta name="application-name" content="orangecheck docs" />
                 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
                 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />

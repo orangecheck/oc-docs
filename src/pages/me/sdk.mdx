@@ -689,9 +689,40 @@ export default withOcAuth(
 
 The page sends `Authorization: Bearer <token>`. An account below your floor gets
 `403 bond_required`, as on any wrapped route. If you check the token another
-way, read the rule yourself as [who can sign in](/me/require-bond) describes,
-with the same timings: at most once a minute, the last answer for ten minutes,
-then refuse. Then spend the token once and don't store it:
+way, apply the rule with one call:
+[`checkSignInRule`](/sdk/me-client/server/functions/checkSignInRule) (me-client
+0.43.0) reads and holds it as the wrappers do and answers with their status and
+body: `403 bond_required`, `503 bond_policy_unavailable` or
+`500 unknown_project_key`.
+
+```ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { checkOcToken, checkSignInRule } from '@orangecheck/me-client/server';
+
+export default async function exchange(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    const checked = await checkOcToken(String(req.body?.token ?? ''), {
+        audience: 'https://yourapp.example',
+    });
+    if (checked.status === 'unavailable')
+        return res.status(503).json({ ok: false, reason: checked.reason });
+    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    const rule = await checkSignInRule(checked.session, {
+        projectKey: process.env.OC_PROJECT_KEY!,
+    });
+    if (!rule.ok) return res.status(rule.status).json(rule.body);
+    // spend the jti, start your session, end the token (below)
+}
+```
+
+It takes only the session object `verifyOcToken`, `checkOcToken` or
+`getOcSession` returned, and throws for claims read back from your own store. In
+Python, `check_sign_in_rule(session, policy=POLICY)` (`orangecheck` 3.3.0) does
+the same for the `Session` that `verify_session` returned and answers a
+`SessionCheck`. Then spend the token once and don't store it:
 
 - The exchange is a write. While the list of ended sessions can't be read,
   refuse it (`503`, never "signed out"), as the wrapper does for a POST: a

@@ -182,6 +182,12 @@ itself and reports through events, and your own script imports nothing.
 | `oc-signed-in`       | `account`, `token`, and `waitUntil(promise)`: the button stays busy until it settles.   |
 | `oc-sign-in-outcome` | `status`, and `message`: the words to show near the button (empty when there are none). |
 
+Both events are dispatched on the button and bubble, so `event.target` says
+which button it was. Any script on your page can fire them too, and a
+`CustomEvent` is never trusted: never trust `account` from the event in the
+browser. Send only the token to your server, and let its check
+([`withOcAuth` or `checkOcToken`](/me/sdk)) be the only answer.
+
 The button carries its options: `data-mark` (`mono`, `brand`, `tile`, `none`),
 `data-appearance` (`inherit`, `brand`), `data-busy-label`,
 `data-accessible-label` and `data-label="none"`.

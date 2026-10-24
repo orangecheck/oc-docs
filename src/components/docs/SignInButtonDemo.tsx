@@ -32,9 +32,9 @@ const HOST_CSS = `
 
 [data-demo-host='studio'] { background: #ffffff; color: #18181b; font-family: Inter, system-ui, sans-serif; border: 1px solid #e4e4e7; }
 [data-demo-host='studio'] .host-btn { font: 500 14px/1 Inter, system-ui, sans-serif; color: #18181b; background: #ffffff; border: 1px solid #d4d4d8; border-radius: 2px; padding: 0 14px; min-height: 44px; }
-[data-demo-host='studio'] .host-btn:hover { border-color: #0e9fb3; }
-[data-demo-host='studio'] .host-btn:focus-visible { outline: 2px solid #0e9fb3; outline-offset: 1px; }
-[data-demo-host='studio'] .host-btn.solid { background: #0e9fb3; color: #ffffff; border-color: #0e9fb3; }
+[data-demo-host='studio'] .host-btn:hover { border-color: #0a7d8e; }
+[data-demo-host='studio'] .host-btn:focus-visible { outline: 2px solid #0a7d8e; outline-offset: 1px; }
+[data-demo-host='studio'] .host-btn.solid { background: #0a7d8e; color: #ffffff; border-color: #0a7d8e; }
 :is(.dark *) [data-demo-host='studio'] { background: #09090b; color: #fafafa; border-color: #27272a; }
 :is(.dark *) [data-demo-host='studio'] .host-btn { color: #fafafa; background: #09090b; border-color: #3f3f46; }
 :is(.dark *) [data-demo-host='studio'] .host-btn.solid { background: #22c8dd; color: #09090b; border-color: #22c8dd; }

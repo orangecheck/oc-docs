@@ -78,6 +78,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Give each user an orangecheck account on top of Google, Auth0, email/password — any login.',
             },
             {
+                href: '/integration/sign-in-button',
+                label: 'The sign-in button',
+                blurb: 'A sign-in with orangecheck button in your own style, with the mark, for web, native apps and games.',
+            },
+            {
                 href: '/integration/reference',
                 label: 'Run the whole funnel',
                 blurb: 'Open example sites in Node and Python: your own login, Connect, claiming and sign in with orangecheck.',

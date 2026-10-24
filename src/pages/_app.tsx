@@ -14,6 +14,8 @@ import { findDocsMeta } from '@/components/docs/nav';
 import { Seo } from '@/components/layout/Seo';
 
 import '@/styles/globals.css';
+// The sign-in button's optional rules, for the examples on /integration/sign-in-button. Zero specificity.
+import '@orangecheck/me-client/button.css';
 
 /**
  * A page outside the docs' sections (404, 500) sets `bare`. An MDX page

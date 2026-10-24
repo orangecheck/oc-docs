@@ -11,11 +11,18 @@ export const metadata = {
 
 # Interface: ExchangeNativeCodeOptions
 
-Defined in: [me-client/src/native.ts:44](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L44)
+Defined in: [me-client/src/native.ts:46](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L46)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | The auth host. Default https://ochk.io. | [me-client/src/native.ts:46](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L46) |
-| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Answer `unavailable` after this long. Default 5000, at most 30000. | [me-client/src/native.ts:48](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L48) |
+| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | The auth host. Default https://ochk.io. | [me-client/src/native.ts:54](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L54) |
+| &lt;a id="property-meorigin">&lt;/a> `meOrigin?` | `string` | Where the rule and the list of ended sessions are read. Default https://me.ochk.io. | [me-client/src/native.ts:56](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L56) |
+| &lt;a id="property-projectkey">&lt;/a> `projectKey?` | `string` | Your project key, from your own config: default `OC_PROJECT_KEY`. Never one the app sends, since the key decides whose "who can sign in" rule and list of ended sessions apply. | [me-client/src/native.ts:52](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L52) |
+| &lt;a id="property-requirebond">&lt;/a> `requireBond?` | \&#123; `maxAgeSecs?`: `number`; `minDays?`: `number`; `minSats?`: `number`; \&#125; | An explicit floor, which wins over the project's rule, as `withOcAuth` takes it. | [me-client/src/native.ts:66](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L66) |
+| `requireBond.maxAgeSecs?` | `number` | - | [me-client/src/server.ts:478](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L478) |
+| `requireBond.minDays?` | `number` | - | [me-client/src/server.ts:478](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L478) |
+| `requireBond.minSats?` | `number` | - | [me-client/src/server.ts:478](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L478) |
+| &lt;a id="property-revocation">&lt;/a> `revocation?` | `false` \| `RevocationCheck` | The check for sessions the person ended everywhere, as `checkOcSession` takes it. Default: auth-core's `integratorRevocationCheck` with your project key and `OC_SIGNING_SECRET`; none while the secret is unset. The trade counts as a write: a list that can't be read answers `unavailable`. | [me-client/src/native.ts:64](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L64) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Answer `unavailable` after this long. Default 5000, at most 30000. | [me-client/src/native.ts:68](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L68) |

@@ -19,7 +19,7 @@ const read = (
 ) => [state, inQueue, auto, entry, 'SUCCESS', merged, head].join('\t');
 
 /** Runs the script on PR 7 with gh answering `reads` in turn (the last repeats) and `compare` for main...head. */
-function land(reads: string[], compare = 'diverged') {
+function land(reads: string[], compare = 'diverged', timeout = '30') {
     const dir = mkdtempSync(join(tmpdir(), 'land-'));
     writeFileSync(join(dir, 'reads'), reads.join('\n') + '\n');
     writeFileSync(join(dir, 'compare'), compare + '\n');
@@ -39,7 +39,7 @@ esac
     );
     chmodSync(fake, 0o755);
     const r = spawnSync('bash', ['scripts/land.sh'], {
-        env: { ...process.env, LAND_GH: fake, LAND_PR: '7', LAND_POLL: '0', LAND_TIMEOUT: '30' },
+        env: { ...process.env, LAND_GH: fake, LAND_PR: '7', LAND_POLL: '0', LAND_TIMEOUT: timeout },
         encoding: 'utf8',
     });
     return { code: r.status, out: r.stdout + r.stderr };
@@ -58,7 +58,7 @@ describe('scripts/land.sh', () => {
 
     it('reports merged when main already holds the PR head, though the PR still reads open', () => {
         const r = land([read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)], 'behind');
-        expect(r.out).toContain('land: merged; main is now hhhh');
+        expect(r.out).toContain('land: merged; main holds hhhh');
         expect(r.out).toContain("the PR's head (PR #7)");
         expect(r.code).toBe(0);
     });
@@ -69,6 +69,24 @@ describe('scripts/land.sh', () => {
             'land: the queue dropped PR #7: its group run failed or main changed under it'
         );
         expect(r.code).toBe(1);
+    });
+
+    it('fails a dropped PR that main has not caught up with (compare reads "ahead")', () => {
+        const r = land([read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)], 'ahead');
+        expect(r.out).toContain('land: the queue dropped PR #7');
+        expect(r.code).toBe(1);
+    });
+
+    it('re-reads before it reports a timeout', () => {
+        expect(land([read('OPEN', true, true, 'QUEUED')], 'diverged', '0').out).toContain(
+            'land: timed out waiting for the queue to merge PR #7'
+        );
+        const merged = land(
+            [read('OPEN', true, true, 'QUEUED'), read('MERGED', false, false, '-', 'm'.repeat(40))],
+            'diverged',
+            '0'
+        );
+        expect(merged.code).toBe(0);
     });
 
     it('fails a PR the queue cannot merge, unless a fresh read shows it merged', () => {

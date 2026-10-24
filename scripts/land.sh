@@ -50,8 +50,9 @@ read_pr() {
            (.commits.nodes[0].commit.statusCheckRollup.state // "-"), (.mergeCommit.oid // "-"), .headRefOid] | @tsv')
     IFS=$'\t' read -r state in_queue auto entry checks merged head <<< "$line"
 }
+verb='is now'
 finish() {
-    echo "land: merged; main is now $merged (PR #$number)"
+    echo "land: merged; main $verb $merged (PR #$number)"
     exit 0
 }
 # Whether the PR landed after all: merged on a fresh read, or main holds its head.
@@ -63,6 +64,7 @@ landed() {
         status=$(gh api "repos/$repo/compare/main...$head" --jq .status 2> /dev/null || echo unknown)
         if [ "$status" = behind ] || [ "$status" = identical ]; then
             merged="$head, the PR's head"
+            verb=holds
             return 0
         fi
         [ "$i" = 3 ] || sleep "$poll"

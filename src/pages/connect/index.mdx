@@ -349,10 +349,96 @@ In Python, `connect_delete(api_key, user_id)` returns the same.
 - `409 holds_earnings`: nobody claimed it, but it earned. That is the person's,
   so it stays; send them a claim link before they go.
 - `404 unknown_user`: you never provisioned this user.
-- `409 not_deletable`: ochk.io could not erase it just now, so nothing was
-  deleted. Try again later.
+- `409 not_deletable`: orangecheck keeps this account for a reason of its own,
+  so nothing was deleted, and asking again gives the same answer.
 - `429 rate_limited`, `401 invalid_api_key`, `400 bad_request`: as named. The
   SDKs return anything else, an outage or a timeout as `unavailable`.
+
+### When deleting refuses
+
+Your user asked to leave, so what you do next depends only on the kind of answer
+that came back: gone, or one of three refusals.
+
+| Kind                    | What `connectDelete` returned                                                                                                                   | What you do                                                                                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gone                    | `{ ok: true, result: 'deleted' }`, `'detached'` or `'already_deleted'`, or `{ ok: false, reason: 'unknown_user' }`                              | Delete your own account.                                                                                                                                  |
+| It stays at orangecheck | `{ ok: false, reason: 'holds_earnings' }` or `{ ok: false, reason: 'not_deletable' }`                                                           | Delete your own account anyway, and tell them their orangecheck account stays theirs at [ochk.app](https://ochk.app). Asking again gives the same answer. |
+| Try again shortly       | `{ ok: false, reason: 'rate_limited' }` or `{ ok: false, reason: 'unavailable' }` (an outage, a timeout, or `status: 0` when nothing came back) | Delete nothing, and tell them to try again in a few minutes.                                                                                              |
+| Your setup              | `{ ok: false, reason: 'invalid_api_key' }` or `{ ok: false, reason: 'bad_request' }`, or `connectDelete` threw                                  | Delete nothing, say plainly that deleting is paused on your side, and alert yourself. This is your key or your code, not the person.                      |
+
+`connectDelete` never throws for an outage: it throws only for a mistake in your
+call, such as no key (`OCHK_CONNECT_KEY` unset), no user id, or an option it
+does not read. Every refusal also carries `status`, ochk.io's HTTP status.
+
+```ts
+import type { ConnectDeleteResult } from '@orangecheck/me-client/server';
+
+import { connectDelete } from '@orangecheck/me-client/server';
+
+export type DeleteKind =
+    | 'gone'
+    | 'stays_at_orangecheck'
+    | 'try_again'
+    | 'your_setup';
+
+export function deleteKind(r: ConnectDeleteResult): DeleteKind {
+    if (r.ok) return 'gone'; // deleted, detached or already_deleted
+    switch (r.reason) {
+        case 'unknown_user':
+            return 'gone';
+        case 'holds_earnings':
+        case 'not_deletable':
+            return 'stays_at_orangecheck';
+        case 'rate_limited':
+        case 'unavailable':
+            return 'try_again';
+        case 'invalid_api_key':
+        case 'bad_request':
+            return 'your_setup';
+    }
+}
+
+declare function deleteOwnAccount(userId: string): Promise<void>;
+declare function alertYourself(message: string): Promise<void>;
+
+export async function onUserDeletes(userId: string): Promise<string> {
+    let kind: DeleteKind;
+    try {
+        kind = deleteKind(
+            await connectDelete({
+                apiKey: process.env.OCHK_CONNECT_KEY!,
+                userId,
+            })
+        );
+    } catch {
+        kind = 'your_setup';
+    }
+    switch (kind) {
+        case 'gone':
+            await deleteOwnAccount(userId);
+            return 'Your account is deleted.';
+        case 'stays_at_orangecheck':
+            await deleteOwnAccount(userId);
+            return 'Your account here is deleted. Your orangecheck account stays yours at ochk.app.';
+        case 'try_again':
+            return 'We could not delete your account just now. Try again in a few minutes.';
+        case 'your_setup':
+            await alertYourself(
+                'Connect delete refused: check OCHK_CONNECT_KEY'
+            );
+            return 'Deleting accounts is paused on our side. We have been told, and nothing was deleted.';
+    }
+}
+```
+
+In Python, `connect_delete` returns the same `ok`, `result` and `reason` values,
+so the same table applies.
+
+**A daily canary.** Once a day, call `connectDelete` for a user id you never
+provisioned, such as `oc-canary-never-a-user`. It must answer
+`{ ok: false, reason: 'unknown_user' }`; nothing is deleted or recorded.
+Anything else means deleting would fail for real users too: `invalid_api_key` is
+your key, `unavailable` is an outage. Alert yourself on either.
 
 After any of these, `provision` answers `410 account_deleted` for that user. The
 same happens when the person deletes their orangecheck account themselves.

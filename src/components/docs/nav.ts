@@ -83,6 +83,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'A sign-in with orangecheck button in your own style, with the mark, for web, native apps and games.',
             },
             {
+                href: '/integration/native-sign-in',
+                label: 'Apps and games',
+                blurb: 'A desktop build or a game signs the player in through their own browser, with no secret in the app.',
+            },
+            {
                 href: '/integration/reference',
                 label: 'Run the whole funnel',
                 blurb: 'Open example sites in Node and Python: your own login, Connect, claiming and sign in with orangecheck.',

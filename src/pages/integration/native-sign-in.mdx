@@ -1,0 +1,278 @@
+export const metadata = {
+    title: 'Sign in from an app or a game',
+    description:
+        'A desktop build or a game signs the player in through their own browser: a one-time code on a 127.0.0.1 listener, traded by your server for the same token the sign-in popup gives. No secret in the app.',
+};
+
+# Sign in from an app or a game
+
+A desktop build or a game can't open the sign-in popup, and it can't keep a
+secret: anyone can read what ships in it. So it signs the player in through
+their own browser. The app listens on `127.0.0.1`, opens orangecheck, and gets a
+one-time code back. Your server trades the code for the same token the popup
+gives, bound to your site. Nothing secret is in the app.
+
+This is for test projects while we prove it on real builds. It needs
+`@orangecheck/me-client` 0.49.0 or `orangecheck` 3.5.0 on your server.
+
+## How it works
+
+1. The app picks a free port on `127.0.0.1`, makes a random verifier and its
+   SHA-256 challenge (PKCE, RFC 7636), and opens
+   `https://ochk.io/native/authorize` in the player's browser.
+2. The player signs in there as usual. orangecheck asks every time, naming your
+   project and your domain: "Sign in to Brick Co (brick.example) in an app on
+   this device?" A native app can't prove which app it is, so the player is the
+   check.
+3. The browser comes back to `http://127.0.0.1:<port>/<path>?code=…&state=…`.
+   The app checks `state` and shows a page that says to go back to the game.
+4. The app sends the code, its verifier and its redirect to your server. Your
+   server trades them with `exchangeNativeCode` (or `exchange_native_code`) and
+   starts its own session.
+
+A code works once, for a minute, and only with the verifier its challenge was
+made from, for your project and the exact redirect it was sent to. A sign-out
+everywhere ends any code not yet traded.
+
+## Turn it on
+
+On [ochk.app](https://ochk.app/me/projects), open a test project, then **Sign-in
+→ Sign in from apps**. The token is bound to an address the project proves: its
+verified domain, or else its development origin (on the same page). Going live
+turns it off.
+
+## The app: Godot 4
+
+One script, no plugins. Add it as a node, set `project_key`, connect the two
+signals and call `start()`:
+
+```gdscript
+class_name OrangecheckSignIn
+extends Node
+## Sign a player in with orangecheck through their own browser.
+
+## The listener received a code: post all three to your server.
+signal code_received(code: String, code_verifier: String, redirect_uri: String)
+## No code: "access_denied" (the player cancelled), "timeout" or "listen_failed".
+signal failed(reason: String)
+
+@export var project_key := ""
+## One of the addresses your project proves; empty for its verified domain.
+@export var audience := ""
+@export var auth_host := "https://ochk.io"
+@export var timeout_seconds := 300.0
+## False to show the link yourself (a console, a QR code) instead of opening the browser.
+@export var open_browser := true
+
+const CALLBACK_PATH := "/oc/callback"
+
+var _server: TCPServer
+var _peers: Array[StreamPeerTCP] = []
+var _verifier := ""
+var _state := ""
+var _redirect_uri := ""
+var _deadline_ms := 0
+
+
+## Start a sign-in: opens the player's browser at ochk.io. Returns the link, or "" on failure.
+func start() -> String:
+	stop()
+	_server = TCPServer.new()
+	# 127.0.0.1 only, any free port: never "localhost", which a hosts file can move.
+	if _server.listen(0, "127.0.0.1") != OK:
+		failed.emit("listen_failed")
+		return ""
+	_redirect_uri = "http://127.0.0.1:%d%s" % [_server.get_local_port(), CALLBACK_PATH]
+	var crypto := Crypto.new()
+	_verifier = _b64url(crypto.generate_random_bytes(32))
+	_state = _b64url(crypto.generate_random_bytes(16))
+	var sha := HashingContext.new()
+	sha.start(HashingContext.HASH_SHA256)
+	sha.update(_verifier.to_ascii_buffer())
+	var query := {
+		"project": project_key,
+		"redirect_uri": _redirect_uri,
+		"state": _state,
+		"code_challenge": _b64url(sha.finish()),
+		"code_challenge_method": "S256",
+	}
+	if audience != "":
+		query["audience"] = audience
+	_deadline_ms = Time.get_ticks_msec() + int(timeout_seconds * 1000.0)
+	set_process(true)
+	var url := auth_host + "/native/authorize?" + _encode(query)
+	if open_browser:
+		OS.shell_open(url)
+	return url
+
+
+## Stop listening without a result.
+func stop() -> void:
+	set_process(false)
+	for peer in _peers:
+		peer.disconnect_from_host()
+	_peers.clear()
+	if _server:
+		_server.stop()
+		_server = null
+
+
+func _process(_delta: float) -> void:
+	if _server == null:
+		return
+	if Time.get_ticks_msec() > _deadline_ms:
+		stop()
+		failed.emit("timeout")
+		return
+	while _server and _server.is_connection_available():
+		_peers.append(_server.take_connection())
+	for peer: StreamPeerTCP in _peers.duplicate():
+		peer.poll()
+		if peer.get_status() != StreamPeerTCP.STATUS_CONNECTED:
+			_peers.erase(peer)
+			continue
+		var available := peer.get_available_bytes()
+		if available <= 0:
+			continue
+		var head := peer.get_utf8_string(available)
+		_peers.erase(peer)
+		_answer(peer, head)
+		if not is_processing():
+			return
+
+
+func _answer(peer: StreamPeerTCP, head: String) -> void:
+	# The request line: GET /oc/callback?code=…&state=… HTTP/1.1
+	var target := head.get_slice("\r\n", 0).get_slice(" ", 1)
+	var path := target.get_slice("?", 0)
+	var params := _decode(target.get_slice("?", 1) if target.contains("?") else "")
+	# Anything else on this port, or another state, is not this sign-in: keep waiting.
+	if path != CALLBACK_PATH or params.get("state", "") != _state:
+		_reply(peer, 404, "Not found.")
+		return
+	if params.has("code"):
+		_reply(peer, 200, "You're signed in. You can close this tab and go back to the game.")
+		var code: String = params["code"]
+		stop()
+		code_received.emit(code, _verifier, _redirect_uri)
+	else:
+		_reply(peer, 200, "Sign-in cancelled. You can close this tab.")
+		stop()
+		failed.emit(params.get("error", "access_denied"))
+
+
+func _reply(peer: StreamPeerTCP, status: int, text: String) -> void:
+	var body := ("<!doctype html><meta charset=utf-8><title>orangecheck</title>"
+		+ "<p style=\"font:16px system-ui;margin:2em\">%s</p>" % text.xml_escape())
+	var bytes := body.to_utf8_buffer()
+	var head := "HTTP/1.1 %d %s\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: %d\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n" % [
+		status, "OK" if status == 200 else "Not Found", bytes.size()]
+	peer.put_data(head.to_utf8_buffer())
+	peer.put_data(bytes)
+	peer.disconnect_from_host()
+
+
+static func _b64url(bytes: PackedByteArray) -> String:
+	return Marshalls.raw_to_base64(bytes).replace("+", "-").replace("/", "_").replace("=", "")
+
+
+static func _encode(query: Dictionary) -> String:
+	var parts: PackedStringArray = []
+	for key in query:
+		parts.append("%s=%s" % [key, String(query[key]).uri_encode()])
+	return "&".join(parts)
+
+
+static func _decode(query: String) -> Dictionary:
+	var out := {}
+	for pair in query.split("&", false):
+		out[pair.get_slice("=", 0).uri_decode()] = pair.get_slice("=", 1).uri_decode() if pair.contains("=") else ""
+	return out
+```
+
+Then send the three values to your server and keep whatever session it gives
+back:
+
+```gdscript
+func _on_code_received(code: String, code_verifier: String, redirect_uri: String) -> void:
+	var body := JSON.stringify({"code": code, "code_verifier": code_verifier, "redirect_uri": redirect_uri})
+	$HTTPRequest.request("https://your-game.example/api/orangecheck/native", ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+```
+
+## Any other engine
+
+The same five steps, in whatever your engine has:
+
+- Listen on `127.0.0.1`, port 0 (any free port). Not `localhost`, which a hosts
+  file can point anywhere, and not `[::1]`.
+- Make a verifier from 32 random bytes, base64url without padding (43
+  characters). The challenge is base64url(SHA-256(verifier)). Make a `state`
+  from 16 random bytes the same way.
+- Open
+  `https://ochk.io/native/authorize?project=<key>&redirect_uri=<url>&state=<state>&code_challenge=<challenge>&code_challenge_method=S256`
+  in the system browser. `redirect_uri` is `http://127.0.0.1:<port>/<path>`,
+  with no query.
+- Answer only `GET /<path>` whose `state` matches. With `code`, reply with a
+  short page and stop listening. With `error=access_denied`, the player said no.
+- Send `code`, the verifier and the exact `redirect_uri` to your server. Never
+  trade the code in the app: the token is your server's.
+
+## Your server: Node
+
+```ts
+import {
+    exchangeNativeCode,
+    MemoryJtiStore,
+    spendOnce,
+} from '@orangecheck/me-client/server';
+
+declare function startSession(didOc: string): Promise<string>;
+
+// A store every server shares, in production: a unique row, or Redis SET NX.
+const spent = new MemoryJtiStore();
+
+export async function nativeSignIn(body: {
+    code: string;
+    code_verifier: string;
+    redirect_uri: string;
+}): Promise<{ status: number; session?: string }> {
+    const out = await exchangeNativeCode({
+        code: body.code,
+        codeVerifier: body.code_verifier,
+        redirectUri: body.redirect_uri,
+        projectKey: 'pk_test_…',
+        audience: 'https://your-game.example',
+    });
+    if (out.status === 'unavailable') return { status: 503 };
+    if (out.status === 'invalid') return { status: 401 };
+    if (!(await spendOnce(out.session.jti, out.session.exp ?? 0, spent)))
+        return { status: 401 };
+    return { status: 200, session: await startSession(out.session.did_oc) };
+}
+```
+
+## Your server: Python
+
+```python
+from orangecheck import MemoryJtiStore, NativeSignIn, exchange_native_code, spend_once
+
+spent = MemoryJtiStore()  # in production, a store every server shares
+
+
+def native_sign_in(code: str, code_verifier: str, redirect_uri: str) -> tuple[int, str]:
+    got = exchange_native_code(code, code_verifier, redirect_uri, "pk_test_…", "https://your-game.example")
+    if not isinstance(got, NativeSignIn):
+        return (503 if got.status == "unavailable" else 401), ""
+    if not spend_once(got.session.jti, got.session.exp, spent):
+        return 401, ""
+    return 200, got.session.did_oc
+```
+
+## What comes back
+
+The same token as the popup's: bound to your site, with `rh` for sign out
+everywhere, and `azp: "native"` so you can tell how it was made. Verify it, read
+the list of ended sessions and spend its `jti` exactly as you do for the
+popup's. `invalid_grant` means start again: the code was spent, expired, or sent
+with another verifier, redirect or project. `unavailable` is an outage: answer
+it 503 so the app tries again.

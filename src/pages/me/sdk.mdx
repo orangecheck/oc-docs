@@ -429,6 +429,41 @@ with `auth.verifyOtp` as `token_hash`, and check the user id at each step.
   deletes the row and ends the sessions that did started on your site, and any
   grants it approved.
 
+**After someone merges two orangecheck accounts.** The account they stop using
+no longer signs in, so their next sign-in brings a `did_oc` you have no row for.
+To keep their history:
+
+- Keep every `rh` you see with the user it signed in as, in a table of its own
+  (`rh` unique, `user_id`). A handle is for your site only and names nobody, so
+  keeping it links nothing.
+- When a verified token's `did_oc` has no row, look up its `merged_rh` first:
+  your site's handle for each account merged into this one. `matchMergedUser`
+  (me-client 0.45.0) and `match_merged_user` (`orangecheck` 3.4.0) answer
+  `none`, `one` or `conflict`.
+- `none`: create a user, as above. `one`: add this `did_oc` and its `rh` to that
+  user, in one transaction under the same unique rules. `conflict`: the handles
+  name two of your users; pick neither, create nothing and log it.
+- Read `merged_rh` from the verified token only, never from anything the browser
+  sends.
+- It can't help with an account whose `rh` you never stored, and a Connect
+  account claimed by the person is reported by `connect.claimed`, not here.
+- A webhook's `sub` is derived from the `did_oc`, so it changes after a merge.
+  Key your users by `did_oc` and keep `sub` beside it as a lookup.
+
+```ts
+import { matchMergedUser } from '@orangecheck/me-client/server';
+
+declare const session: { did_oc: string; rh?: string; merged_rh?: unknown };
+declare function userForHandle(rh: string): Promise<string | null>;
+
+const match = await matchMergedUser(session, userForHandle);
+if (match.kind === 'one') {
+    // add session.did_oc and session.rh to match.user
+} else if (match.kind === 'conflict') {
+    console.warn('merged handles name more than one user:', match.users);
+}
+```
+
 ## verify without the SDK
 
 A backend in Python, Go or anything else checks the token itself. It is a JWT

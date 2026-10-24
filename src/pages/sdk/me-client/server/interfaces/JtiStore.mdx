@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Interface: JtiStore",
+    description: "Auto-generated API reference for Interface: JtiStore. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / JtiStore
+
+# Interface: JtiStore
+
+Defined in: [me-client/src/tokens.ts:32](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/tokens.ts#L32)
+
+Where you record the jti of each token you accepted, until it expires. Yours
+to provide, shared by every server that accepts sign-ins: a unique row in your
+database, or Redis `SET jti 1 NX EXAT exp`. `add` must be atomic: true when
+it recorded the jti, false when the jti was there already.
+
+## Methods
+
+### add()
+
+```ts
+add(jti: string, exp: number): boolean | Promise<boolean>;
+```
+
+Defined in: [me-client/src/tokens.ts:33](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/tokens.ts#L33)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `jti` | `string` |
+| `exp` | `number` |
+
+#### Returns
+
+`boolean` \| `Promise`\&lt;`boolean`\>

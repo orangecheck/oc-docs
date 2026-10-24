@@ -1,0 +1,84 @@
+export const metadata = {
+    title: "@orangecheck/me-client/server",
+    description: "Auto-generated API reference for @orangecheck/me-client/server. Source: TypeScript types in oc-packages.",
+};
+
+**@orangecheck/me-client/server**
+
+***
+
+# @orangecheck/me-client/server
+
+Server-side helpers: verify a sign-in token (`checkOcToken`,
+`verifyOcToken`), check a request's session (`checkOcSession`, `withOcAuth`,
+`ocAuthExpress`, `ocAuthHono`), end a token (`revokeToken`), spend one once
+(`spendOnce`), and the Connect calls. The rest of the client is in
+[`@orangecheck/me-client`](/sdk/me-client/README), and the popup in
+[`@orangecheck/me-client/popup`](/sdk/me-client/popup/README).
+
+## Classes
+
+- [MemoryJtiStore](classes/MemoryJtiStore)
+
+## Interfaces
+
+- [ActivityAttestation](interfaces/ActivityAttestation)
+- [ActivityAttestationBundle](interfaces/ActivityAttestationBundle)
+- [ActivityVerifyCheck](interfaces/ActivityVerifyCheck)
+- [ActivityVerifyResult](interfaces/ActivityVerifyResult)
+- [BondClaim](interfaces/BondClaim)
+- [ConnectOptions](interfaces/ConnectOptions)
+- [ConnectProvisionOptions](interfaces/ConnectProvisionOptions)
+- [ConnectRefused](interfaces/ConnectRefused)
+- [JtiStore](interfaces/JtiStore)
+- [OcSessionOptions](interfaces/OcSessionOptions)
+- [RevokeTokenOptions](interfaces/RevokeTokenOptions)
+- [SessionPayload](interfaces/SessionPayload)
+- [VerifyActivityOptions](interfaces/VerifyActivityOptions)
+- [VerifyOcOptions](interfaces/VerifyOcOptions)
+- [VerifyOcTokenOptions](interfaces/VerifyOcTokenOptions)
+- [WithOcAuthOptions](interfaces/WithOcAuthOptions)
+
+## Type Aliases
+
+- [ConnectClaimLinkRefusal](type-aliases/ConnectClaimLinkRefusal)
+- [ConnectClaimLinkResult](type-aliases/ConnectClaimLinkResult)
+- [ConnectDeleteRefusal](type-aliases/ConnectDeleteRefusal)
+- [ConnectDeleteResult](type-aliases/ConnectDeleteResult)
+- [ConnectProvisionRefusal](type-aliases/ConnectProvisionRefusal)
+- [ConnectProvisionResult](type-aliases/ConnectProvisionResult)
+- [OcHonoEnv](type-aliases/OcHonoEnv)
+- [OcSessionCheck](type-aliases/OcSessionCheck)
+- [OcSessionRefusal](type-aliases/OcSessionRefusal)
+- [OcSessionUnavailable](type-aliases/OcSessionUnavailable)
+- [OcTokenCheck](type-aliases/OcTokenCheck)
+- [RevokeTokenRefusal](type-aliases/RevokeTokenRefusal)
+- [RevokeTokenResult](type-aliases/RevokeTokenResult)
+- [WithOcSession](type-aliases/WithOcSession)
+
+## Variables
+
+- [BACK\_ACCOUNT\_URL](variables/BACK_ACCOUNT_URL)
+- [CONNECT\_CONSENT\_BLURB](variables/CONNECT_CONSENT_BLURB)
+- [CONNECT\_CONSENT\_LABEL](variables/CONNECT_CONSENT_LABEL)
+- [identity](variables/identity)
+
+## Functions
+
+- [\_resetSessionChecksForTests](functions/resetSessionChecksForTests)
+- [bondMeets](functions/bondMeets)
+- [checkOcSession](functions/checkOcSession)
+- [checkOcToken](functions/checkOcToken)
+- [connectClaimLink](functions/connectClaimLink)
+- [connectDelete](functions/connectDelete)
+- [connectProvision](functions/connectProvision)
+- [getOcSession](functions/getOcSession)
+- [ocAuthExpress](functions/ocAuthExpress)
+- [ocAuthHono](functions/ocAuthHono)
+- [readBondClaim](functions/readBondClaim)
+- [refreshEnvelopeJwks](functions/refreshEnvelopeJwks)
+- [revokeToken](functions/revokeToken)
+- [spendOnce](functions/spendOnce)
+- [verifyActivityAttestation](functions/verifyActivityAttestation)
+- [verifyOcToken](functions/verifyOcToken)
+- [withOcAuth](functions/withOcAuth)

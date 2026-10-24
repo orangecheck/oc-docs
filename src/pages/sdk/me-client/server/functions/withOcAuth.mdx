@@ -1,0 +1,54 @@
+export const metadata = {
+    title: "Function: withOcAuth()",
+    description: "Auto-generated API reference for Function: withOcAuth(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / withOcAuth
+
+# Function: withOcAuth()
+
+```ts
+function withOcAuth<Req, Res>(handler: (req: WithOcSession<Req>, res: Res) => unknown, options?: WithOcAuthOptions): (req: Req, res: Res) => Promise<unknown>;
+```
+
+Defined in: [me-client/src/server.ts:658](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L658)
+
+Wrap a Next.js Pages-Router API route handler. Adds `req.ocSession` —
+the verified SessionPayload, or null when unauthenticated.
+
+  // pages/api/me/profile.ts
+  import &#123; withOcAuth &#125; from '@orangecheck/me-client/server';
+
+  export default withOcAuth(async (req, res) => &#123;
+    if (!req.ocSession) return res.status(401).json(&#123; ok: false &#125;);
+    res.status(200).json(&#123; account: &#123; address: req.ocSession.did_oc &#125; &#125;);
+  &#125;, &#123; required: true, audience: 'https://your-site.example' &#125;);
+
+`audience` is your own origin. The sign-in popup issues each site a token
+bound to it; a site on *.ochk.io that reads the family cookie omits it.
+
+`Cache-Control: no-store, private` and `Vary: Cookie, Authorization`
+are set on every authenticated response — without them a cached 401
+leaks anonymous to authenticated callers.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `Req` *extends* `NextApiRequestLike` | `NextApiRequestLike` |
+| `Res` *extends* `NextApiResponseLike` | `NextApiResponseLike` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `handler` | (`req`: [`WithOcSession`](../type-aliases/WithOcSession)\&lt;`Req`\>, `res`: `Res`) => `unknown` |
+| `options` | [`WithOcAuthOptions`](../interfaces/WithOcAuthOptions) |
+
+## Returns
+
+(`req`: `Req`, `res`: `Res`) => `Promise`\&lt;`unknown`\>

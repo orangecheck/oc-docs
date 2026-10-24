@@ -1,0 +1,42 @@
+export const metadata = {
+    title: "Function: ocAuthHono()",
+    description: "Auto-generated API reference for Function: ocAuthHono(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / ocAuthHono
+
+# Function: ocAuthHono()
+
+```ts
+function ocAuthHono(options?: WithOcAuthOptions): (c: HonoContextLike, next: HonoNextLike) => Promise<unknown>;
+```
+
+Defined in: [me-client/src/server.ts:796](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L796)
+
+Hono middleware. Attaches the verified session at `c.get('ocSession')`.
+
+  import &#123; Hono &#125; from 'hono';
+  import &#123; ocAuthHono, type OcHonoEnv &#125; from '@orangecheck/me-client/server';
+
+  const app = new Hono&lt;OcHonoEnv>();
+  app.use('*', ocAuthHono());
+
+  app.get('/api/profile', (c) => &#123;
+    const session = c.get('ocSession');
+    if (!session) return c.json(&#123; error: 'sign in' &#125;, 401);
+    return c.json(&#123; address: session.did_oc &#125;);
+  &#125;);
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`WithOcAuthOptions`](../interfaces/WithOcAuthOptions) |
+
+## Returns
+
+(`c`: `HonoContextLike`, `next`: `HonoNextLike`) => `Promise`\&lt;`unknown`\>

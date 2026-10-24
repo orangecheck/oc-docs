@@ -31,9 +31,11 @@ paying them. Three entry points:
 
 <InstallTabs pkg="@orangecheck/me-client" />
 
-That is all sign-in needs, in a React app too ([React](#react) below).
-`@orangecheck/auth-client` is for orangecheck's own sites; integrators use
-me-client.
+That is all sign-in needs, in a React app too ([React](#react) below), unless
+your own session replaces the token: then your server also needs
+`@orangecheck/auth-core` 2.12.0 or later, for `integratorRevocationCheck`
+([how](#if-your-own-session-replaces-the-token)). `@orangecheck/auth-client` is
+for orangecheck's own sites; integrators use me-client.
 
 ## What changed in 0.32
 
@@ -166,6 +168,13 @@ const signature = signMessage(address, message, key);
 ```
 
 Each new key signs in as a new orangecheck account.
+
+**Driving the popup in a test.** In a browser with no wallet extension, the
+popup's controls are, in order: the **Bitcoin wallet** tab, the **Bitcoin
+address** field, the **Get the message to sign** button, the read-only **Message
+to sign** box (the text above), the **Signature** box, and **Sign me in**. Find
+them by those labels (a tab, a labelled field, buttons by name). With a wallet
+extension the button reads **Sign in with wallet** instead.
 
 ## the session cookie
 
@@ -396,13 +405,17 @@ sure no one else can create the user a first sign-in is about to create: turn
 public signup off, or create users only through the provider's admin API with a
 call that refuses an existing address or username. When you then mint a provider
 session for the new user, check it is for that user, and refuse it otherwise.
+With Supabase: create the user with the admin API, mint a link for it with
+`auth.admin.generateLink` (type `magiclink`), redeem the link's `hashed_token`
+with `auth.verifyOtp` as `token_hash`, and check the user id at each step.
 
 **Linking orangecheck to an account someone already has.**
 
-- Ask for a fresh sign-in with your own login first (within the last few
-  minutes), then open the popup. Never accept a sign-in the did itself started
-  as that proof: on an account with its own login, a stolen orangecheck session
-  must not be able to attach itself. Unlinking asks the same.
+- Ask for a fresh sign-in with your own login first (within the last five
+  minutes, the window orangecheck uses for its own account changes), then open
+  the popup. Never accept a sign-in the did itself started as that proof: on an
+  account with its own login, a stolen orangecheck session must not be able to
+  attach itself. Unlinking asks the same.
 - Link the did only if no other user has it; otherwise refuse.
 - Keep it to one did per account, enforced by the database (the `UNIQUE` above),
   unless your site has a reason for more.
@@ -416,18 +429,19 @@ session for the new user, check it is for that user, and refuse it otherwise.
 A backend in Python, Go or anything else checks the token itself. It is a JWT
 signed by the auth host, ochk.io:
 
-| Part         | What to check                                                                                                                                                                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Key set      | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
-| `alg`        | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
-| `iss`        | `https://ochk.io`                                                                                                                                                                                                                            |
-| `aud`        | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
-| `exp`, `iat` | Unix seconds. A token lasts as long as the person's ochk.io session, 30 days at most, and is never refreshed.                                                                                                                                |
-| `sub`        | The person's account id.                                                                                                                                                                                                                     |
-| `did_oc`     | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
-| `jti`        | The token's own id.                                                                                                                                                                                                                          |
-| `rh`         | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
-| `oc_bond`    | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
+| Part      | What to check                                                                                                                                                                                                                                |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key set   | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
+| `alg`     | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
+| `iss`     | `https://ochk.io`                                                                                                                                                                                                                            |
+| `aud`     | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
+| `iat`     | Unix seconds: when ochk.io minted this token, at the end of the sign-in in the popup. The popup runs a full sign-in every time, so it is not when the person's ochk.io session began.                                                        |
+| `exp`     | Unix seconds: the earlier of the person's ochk.io session's end and `iat` + 30 days. Never refreshed.                                                                                                                                        |
+| `sub`     | The person's account id.                                                                                                                                                                                                                     |
+| `did_oc`  | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
+| `jti`     | The token's own id.                                                                                                                                                                                                                          |
+| `rh`      | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
+| `oc_bond` | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
 
 The token carries no email address and no name.
 
@@ -527,10 +541,12 @@ for another auth host, as one origin such as `https://ochk.io`.
 
 ### when someone ends every session
 
-A person can end all their sessions at once: "Sign out everywhere", removing a
-passkey, or deleting the account. A token checked only against the key set still
-verifies after that, until it expires. To refuse it on your site too, give your
-server your project key and signing secret (from
+A person can end all their sessions at once: **Sign out everywhere** at the foot
+of [ochk.app/me/account](https://ochk.app/me/account), removing a passkey, or
+deleting the account. A test account does the same, which is how you check the
+two minutes below. A token checked only against the key set still verifies after
+that, until it expires. To refuse it on your site too, give your server your
+project key and signing secret (from
 [ochk.app/me/projects](https://ochk.app/me/projects)), with your domain verified
 there:
 
@@ -548,9 +564,18 @@ variables set, `getOcSession`, `withOcAuth`, `ocAuthExpress` and `ocAuthHono`
 (me-client 0.35.0 or later) look it up in me.ochk.io's list of ended handles for
 that origin, read once a minute per origin and checked from memory, so a refusal
 lands within about two minutes. A site served from `www` and the apex is covered
-by one configuration: each token is looked up for its own origin. If the list
-can't be read, or is more than ten minutes old by its own clock, reads go on and
-writes are refused until it can: the wrappers answer such a write
+by one configuration: each token is looked up for its own origin. `audience` is
+one origin or a list of exact origins (never `'*'`): a token passes when its
+`aud`, always one string, is one of them.
+
+The list is served only for your verified domain, any subdomain of it, and a
+test project's development origin (below). Any other origin, such as a preview
+on `*.vercel.app`, gets `403 audience_not_yours`, so its tokens read
+`unverified` there: sign-in and reads work, writes are refused. To try the whole
+flow before production, serve the preview on a subdomain of your verified domain
+(`staging.yourapp.example`), or run it on localhost with a test project. If the
+list can't be read, or is more than ten minutes old by its own clock, reads go
+on and writes are refused until it can: the wrappers answer such a write
 `503 revocations_unavailable` (me-client 0.38.0), not as signed out, so your
 page retries instead of sending the person to sign in. The same goes for
 ochk.io's key set: while it can't be read (and no copy younger than six hours is
@@ -616,9 +641,56 @@ next try waits ten seconds, and the last copy answers meanwhile. The first
 failure logs one warning on the `orangecheck` logger. To keep the fetch off your
 requests, see [Python: warming](#python-warming).
 
-**If your own session replaces the token**, as when you sign the person into
-your own auth system (or a provider's) after checking it, spend the token once
-and don't store it:
+### if your own session replaces the token
+
+When you sign the person into your own auth system (or a provider's) after
+checking the token, apply **who can sign in** in that exchange. `verifyOcToken`
+and `checkOcToken` check the token, not your project's rule; the wrappers apply
+it. Post the token as a Bearer header to a route inside one, here a Next.js
+Pages route, `pages/api/auth/orangecheck.ts`:
+
+```ts
+import type { JtiStore } from '@orangecheck/me-client/server';
+
+import { spendOnce, withOcAuth } from '@orangecheck/me-client/server';
+
+declare const store: JtiStore; // shared by all your servers, see spendOnce below
+declare function startYourSession(
+    didOc: string,
+    handle: { rh: string; aud: string; iat: number }
+): Promise<void>;
+
+export default withOcAuth(
+    async (req, res) => {
+        const s = req.ocSession;
+        if (req.method !== 'POST' || !s)
+            return res.status(401).json({ ok: false });
+        if (!(await spendOnce(s.jti, s.exp ?? 0, store)))
+            return res.status(409).json({ ok: false, reason: 'token_spent' });
+        await startYourSession(s.did_oc, {
+            rh: s.rh ?? '',
+            aud: String(s.aud),
+            iat: s.iat ?? 0,
+        });
+        res.status(200).json({ ok: true });
+    },
+    {
+        audience: 'https://yourapp.example',
+        projectKey: process.env.OC_PROJECT_KEY!,
+        required: true,
+    }
+);
+```
+
+The page sends `Authorization: Bearer <token>`. An account below your floor gets
+`403 bond_required`, as on any wrapped route. If you check the token another
+way, read the rule yourself as [who can sign in](/me/require-bond) describes,
+with the same timings: at most once a minute, the last answer for ten minutes,
+then refuse. Then spend the token once and don't store it:
+
+- The exchange is a write. While the list of ended sessions can't be read,
+  refuse it (`503`, never "signed out"), as the wrapper does for a POST: a
+  session someone ended everywhere must not start a new one here.
 
 - Keep its `rh`, `aud` and `iat` with that session on your server, written
   before you hand the session to the browser. Never let the browser bind them in
@@ -636,13 +708,24 @@ and don't store it:
   `orangecheck` 3.0.0): nothing could end the session it starts. Don't turn that
   off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or
   `OC_SIGNING_SECRET`.
+- End the token right after the exchange (`revokeToken`): you never store it, so
+  nothing could end it at sign-out. This ends that one token at orangecheck; it
+  adds nothing to your list of ended sessions and doesn't touch the session you
+  just started, which the list holds to its `rh` and `iat`. Your list doesn't
+  carry single ended tokens, so spending the `jti` once is what stops a replay
+  at your server.
 - Ask the list about the session on each request. In Node, keep one
   `integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later
   per process and `await check.status({ rh, aud, iat })`; in Python,
   `REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session;
   `"unverified"` means reads go on and writes wait (answer `503`, never "signed
   out"). If your own table of handles can't be read, treat only sessions
-  orangecheck started as unverified; your other logins carry on.
+  orangecheck started as unverified; your other logins carry on. To tell them
+  apart, mark a session orangecheck started where the mark travels with it: a
+  claim in your own session token, or a column on your session row. Where every
+  session looks alike (Supabase's `amr` reads `otp` however a session began),
+  mark the user instead, say in Supabase's `app_metadata`, which rides in its
+  JWT.
 
 **Anything you mint during that session ends with it.** Your own session cookie,
 API keys, OAuth grants to other apps, refresh tokens, long-lived links: if your
@@ -653,8 +736,10 @@ ends the cookie and leaves an API key working. While the list answers
 `"unverified"`, the same rule as for your session applies to them: reads go on,
 and writes made with them wait.
 
-**Anything else.** Sign a GET with your secret over its method, path and query,
-URI-encoding the key and the audience:
+### the list of ended sessions, without an SDK
+
+Sign a GET with your secret over its method, path and query, URI-encoding the
+key and the audience:
 
 ```
 GET https://me.ochk.io/api/integrator/revocations?project_key=<key>&aud=<aud>
@@ -663,10 +748,20 @@ X-OC-Signature: t=<unix>,v1=hmac_sha256(signing_secret, "<t>.GET /api/integrator
 
 `aud` is the token's `aud` exactly as it is, and must be your verified domain, a
 subdomain of it, or your test project's development origin. The answer is
-`{ "v": 1, "at": …, "tokens": [], "accounts": {}, "handles": { "<rh>": <cutoff> } }`.
+`{ "v": 1, "at": …, "tokens": [], "accounts": {}, "handles": { "<rh>": <cutoff> } }`:
+
+| Field      | Holds                                                                                                                                                                       |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `at`       | Unix seconds: when ochk.io read its store of ended sessions for this copy. A list built in milliseconds reads as stale.                                                     |
+| `tokens`   | Always empty here. orangecheck's own sites read ended single tokens from it in their own feed; it stays so older SDKs can read this answer.                                 |
+| `accounts` | Always empty here, for the same reason.                                                                                                                                     |
+| `handles`  | Each ended `rh` and its cutoff, in Unix seconds: the first whole second after the person ended their sessions. A sign-in after it has a later `iat` and is not ended by it. |
+
 A session is ended when `handles` holds its `rh` and its `iat` is before that
 cutoff, or it has no `iat`. Fetch it at most once a minute per origin, and don't
-trust a list whose `at` is more than ten minutes old.
+trust a list whose `at` is more than ten minutes old, or more than a minute in
+the future. me.ochk.io answers `503 revocations_unavailable` rather than serve a
+copy older than ten minutes.
 
 **Who you trust, and what it tells you.** The list comes from ochk.io, the auth
 host, and me.ochk.io serves it; both are orangecheck. A handle is an HMAC under

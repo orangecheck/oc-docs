@@ -20,7 +20,19 @@ orangecheck sign-in**. That is the project's **Sign-in** tab: **How people sign
 in**, then **Who can sign in** below it. Pick a minimum amount and age, for
 example 100,000 sats unspent 30 days. The lowest floor is 1,000 sats: ochk.io
 won't take a smaller coin. The floor is saved in the project and served,
-uncached, at `GET https://me.ochk.io/api/integrator/<project_key>/sign-in`.
+uncached, at `GET https://me.ochk.io/api/integrator/<project_key>/sign-in`:
+
+```text
+{"ok":true,"require_bond":null}                                  Everyone
+{"ok":true,"require_bond":{"min_sats":100000,"min_days":30}}     Backed by bitcoin
+404 {"ok":false,"reason":"project_not_found"}                    no such project
+```
+
+`min_sats` is one of 1000, 10000, 100000, 1000000 or 10000000, and `min_days`
+one of 0, 7, 30, 90 or 365. Those two are the whole floor: there is no age limit
+in it (`maxAgeSecs`, below, is set only in code). Read any other key as unknown
+and ignore it. The wrappers read it for you; read it yourself only where no
+wrapper runs.
 
 ## 2. Enforce it on your server
 

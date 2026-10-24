@@ -36,7 +36,10 @@ verified. You verify it for two things:
   ([when someone ends every session](/me/sdk#when-someone-ends-every-session)).
   Once your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, verify the
   domain before you deploy: until it is verified the list is refused, and the
-  SDKs then refuse writes from signed-in sessions (reads go on).
+  SDKs then refuse writes from signed-in sessions (reads go on). The same holds
+  on any host outside the domain, such as a `*.vercel.app` preview: test the
+  whole flow on a subdomain of your domain, or on localhost with a test project
+  ([previews](/me/sdk#when-someone-ends-every-session)).
 - **[Going live](#5--go-live) with paying.**
 
 For a project that only signs people in, verifying changes nothing else: no
@@ -55,8 +58,10 @@ Call `signInWithOc()` inside a click handler, or the browser blocks the popup.
 The person signs in on orangecheck's page with email, Google, GitHub or a
 Bitcoin wallet, and the popup hands your page a token bound to your origin. A
 page served with `Cross-Origin-Opener-Policy: same-origin` never gets it back;
-send `same-origin-allow-popups`, or no such header. Post the token to your own
-server:
+send `same-origin-allow-popups`, or no such header. Under a Content Security
+Policy the popup needs no orangecheck origin in `connect-src` or `frame-src`: it
+opens a window and takes one message from it. Only `script-src` must allow
+wherever you serve the module. Post the token to your own server:
 
 ```ts
 import { signInWithOc } from '@orangecheck/me-client/popup';
@@ -102,13 +107,20 @@ export default async function session(
 ```
 
 On Express or Hono it is the same three moves: verify with `verifyOcToken`, set
-the cookie, answer `ok`. A backend in Python or another language checks the
-token itself: see [verify without the SDK](/me/sdk#verify-without-the-sdk).
+the cookie, answer `ok`. `verifyOcToken` checks the token, not who can sign in
+(step 4): the wrapper in step 3 applies that on every request that reads the
+cookie. If your own session replaces the token, run the exchange inside the
+wrapper instead
+([if your own session replaces the token](/me/sdk#if-your-own-session-replaces-the-token)).
+A backend in Python or another language checks the token itself: see
+[verify without the SDK](/me/sdk#verify-without-the-sdk).
 
 The token lasts as long as the person's ochk.io session, 30 days at most, and is
 never refreshed: when it expires, they sign in again. To sign someone out, clear
-the cookie and [end the token](/me/sdk#ending-a-session), so me.ochk.io refuses
-it too. Signing out of ochk.io does not sign them out of your site; signing out
+the cookie and [end the token](/me/sdk#ending-a-session), so orangecheck refuses
+it too. Clearing the cookie is what signs them out of your site: your server's
+list of ended sessions carries what someone ended everywhere, not single ended
+tokens. Signing out of ochk.io does not sign them out of your site; signing out
 everywhere does, once your server has your project key and signing secret (see
 [when someone ends every session](/me/sdk#when-someone-ends-every-session)).
 
@@ -239,13 +251,19 @@ Each line is a way an integration has gone wrong, with why it matters.
     - [ ] its `rh`, `aud` and `iat` go with your session on the server, before
           you hand the session out, never in a second call from the browser.
           _The browser could bind another token's handle, or none._
+    - [ ] the exchange applies who can sign in (inside `withOcAuth`, or with the
+          rule read as [who can sign in](/me/require-bond) says) and waits while
+          the list of ended sessions can't be read. _`verifyOcToken` alone lets
+          in an account below your floor._
+    - [ ] the token is ended right after the exchange. _You don't keep it, so
+          sign-out can't end it later._
 
 **Ending sessions**
 ([when someone ends every session](/me/sdk#when-someone-ends-every-session))
 
-- [ ] Signing out clears your session and
-      [ends the token](/me/sdk#ending-a-session). _Otherwise the token stays
-      good until it expires._
+- [ ] Signing out clears your session and, where the token is your session,
+      [ends the token](/me/sdk#ending-a-session). _Otherwise orangecheck goes on
+      accepting the token until it expires._
 - [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, refuses to start
       without either, and your domain is verified. _Without them, "sign out
       everywhere" never reaches your site._
@@ -279,9 +297,10 @@ Each line is a way an integration has gone wrong, with why it matters.
 
 **Linking and unlinking** ([linking](/me/sdk#your-own-accounts))
 
-- [ ] Link and unlink each ask for a fresh sign-in with your own login, never
-      one the did itself started, on accounts that have their own login. _A
-      stolen orangecheck session must not attach or detach itself._
+- [ ] Link and unlink each ask for a sign-in with your own login from the last
+      five minutes, never one the did itself started, on accounts that have
+      their own login. _A stolen orangecheck session must not attach or detach
+      itself._
 - [ ] A did another user already has is refused. _One person, one account._
 - [ ] The account's own email address is told on link and unlink. _The owner
       learns of a change they didn't make._

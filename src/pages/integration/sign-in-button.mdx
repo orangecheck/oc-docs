@@ -190,7 +190,11 @@ browser. Send only the token to your server, and let its check
 
 The button carries its options: `data-mark` (`mono`, `brand`, `tile`, `none`),
 `data-appearance` (`inherit`, `brand`), `data-busy-label`,
-`data-accessible-label` and `data-label="none"`.
+`data-accessible-label` and `data-label="none"`. It takes no popup address, on
+purpose: any script on your page could set one and point your button at a
+look-alike sign-in. To test against a stand-in popup, use `button.mjs` and pass
+`popup: { popupOrigin, popupPath }` from your own code, as the
+[examples' offline mode](/integration/reference#run-it-with-no-account) does.
 
 The hashes above are me-client 0.48.0's files as npm publishes them. A new
 version has new hashes: your project's HTML snippet on ochk.app always shows the

@@ -30,39 +30,44 @@ your site takes.
 ## Beside your other providers
 
 ```tsx
-import { signInWithOc } from '@orangecheck/me-client/popup';
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import type { ReactElement } from 'react';
 
-export function SignInOptions() {
-    const [busy, setBusy] = useState(false);
-    async function onOc() {
-        setBusy(true);
-        const result = await signInWithOc();
-        setBusy(false);
-        if (!result) return;
-        // Your server verifies the token and keeps it in its own cookie.
-        const r = await fetch('/api/auth/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: result.token }),
-        });
-        if (r.ok) location.assign('/dashboard');
-    }
+import { SignInWithOrangecheck } from '@orangecheck/me-client/react';
+import { signIn } from 'next-auth/react';
+
+export function SignInOptions(): ReactElement {
     return (
         <div className="auth-options">
-            <button onClick={() => signIn('google')}>
-                continue with google
+            <button className="auth-button" onClick={() => signIn('google')}>
+                Continue with Google
             </button>
-            <button onClick={() => signIn('apple')}>continue with apple</button>
-            <button onClick={() => signIn('email')}>email magic link</button>
-            <button onClick={onOc} disabled={busy}>
-                {busy ? 'opening…' : 'sign in with orangecheck'}
+            <button className="auth-button" onClick={() => signIn('apple')}>
+                Continue with Apple
             </button>
+            <button className="auth-button" onClick={() => signIn('email')}>
+                Email me a link
+            </button>
+            {/* Your button class; it brings the orangecheck mark, the words and the window. */}
+            <SignInWithOrangecheck
+                className="auth-button"
+                onSignedIn={async ({ token }) => {
+                    // Your server verifies the token and keeps it in its own cookie.
+                    const r = await fetch('/api/auth/session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token }),
+                    });
+                    if (r.ok) location.assign('/dashboard');
+                }}
+            />
         </div>
     );
 }
 ```
+
+The orangecheck button takes your button's class and draws nothing of its own.
+[The sign-in button](/integration/sign-in-button) has the props, the rules and a
+plain-HTML version.
 
 | What your user sees                     | What your user does NOT see  |
 | --------------------------------------- | ---------------------------- |

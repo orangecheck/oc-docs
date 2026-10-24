@@ -844,7 +844,14 @@ the limits below.
 - **Failures.** After a failed fetch each copy waits ten seconds before trying
   again (the key set from 2.10.0), and the last good copy answers meanwhile: the
   key set for up to six hours, the list until it is ten minutes old, the rule
-  for ten minutes (from 2.10.1).
+  for ten minutes (from 2.10.1). A key set with no key the SDK can use counts as
+  a failed fetch (from 3.2.1; Node from auth-core 2.17.0).
+- **Tests.** Pass `jwks=` with your own key set: `verify_session` and
+  `check_oc_session` then never touch the cached ochk.io one, so no case leaks
+  keys into the next. A stand-in for `RevocationList` implements
+  `status_for(claims)`, which `verify_session` calls with the token's claims:
+  `"live"` for a token with no `rh` key, otherwise what `status(rh, aud, iat)`
+  answers (an `rh` that is not a string is `"revoked"`).
 
 ## React
 

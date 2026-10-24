@@ -541,6 +541,14 @@
             "entry": "src/pages/integration/index.mdx",
             "reach": "https://ochk.io/docs/integration",
             "area": "integration",
+            "tests": ["src/__tests__/sign-in-button-sri.test.ts"]
+        },
+        {
+            "id": "page:/integration/native-sign-in",
+            "kind": "page",
+            "entry": "src/pages/integration/native-sign-in.mdx",
+            "reach": "https://ochk.io/docs/integration/native-sign-in",
+            "area": "integration",
             "tests": []
         },
         {

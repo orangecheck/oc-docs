@@ -13,8 +13,8 @@ export const metadata = {
 
 ```ts
 type VerifyDelegationResult = 
-  | VerifyOk<DelegationEnvelope>
+  | VerifyOk<DelegationEnvelope> & RevocationsRead
   | VerifyErr;
 ```
 
-Defined in: [agent-core/src/types.ts:279](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L279)
+Defined in: [agent-core/src/types.ts:289](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L289)

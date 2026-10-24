@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Interface: RevocationsRead",
+    description: "Auto-generated API reference for Interface: RevocationsRead. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README)
+
+***
+
+[@orangecheck/agent-core](../README) / RevocationsRead
+
+# Interface: RevocationsRead
+
+Defined in: [agent-core/src/types.ts:280](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L280)
+
+On a verdict that read revocations: how many were skipped as revoking nothing.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-revocationsskipped">&lt;/a> `revocationsSkipped?` | `number` | Revocations passed in that were not objects, or that cited this delegation (or a link of the chain) and failed their own check. They revoke nothing; a high count says a relay is serving junk. | [agent-core/src/types.ts:286](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/types.ts#L286) |

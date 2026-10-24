@@ -131,6 +131,66 @@ Types. Load it before the click: a window opened after an await is blocked.
 
 `enhanceSignInButton` returns a function that puts the button back as it was.
 
+### From a CDN
+
+To load it from jsDelivr, pin the exact version and let the browser check every
+byte with Subresource Integrity, so a changed file is refused rather than run on
+your page. Integrity covers a `<script src>`, not an `import` in an inline
+script, so load `button-auto.mjs`: it enhances every `[data-oc-sign-in]` button
+itself and reports through events, and your own script imports nothing.
+
+```html
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@orangecheck/me-client@0.48.0/dist/button.css"
+    integrity="sha384-gfzUacSwvkf2ls9b6CLLW8yMUz1VNIrCvGFLsyknbCc2X0i9Ey63C+y13T6VeSTx"
+    crossorigin="anonymous"
+/>
+
+<button class="cta ghost" data-oc-sign-in>
+    <span data-oc-mark></span>Sign in with orangecheck
+</button>
+<p id="oc-note" role="status"></p>
+
+<script
+    type="module"
+    src="https://cdn.jsdelivr.net/npm/@orangecheck/me-client@0.48.0/dist/button-auto.mjs"
+    integrity="sha384-56N4iJCuEcF8FKyiJSP7Z2xqHPFw59nFT/Mc6siqQHMm3ju1kN7U+XiWjJKQixV0"
+    crossorigin="anonymous"
+></script>
+<script>
+    document.addEventListener('oc-signed-in', (event) => {
+        const { token, waitUntil } = event.detail;
+        waitUntil(
+            fetch('/api/auth/session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token }),
+            }).then((r) => {
+                if (r.ok) location.assign('/dashboard');
+            })
+        );
+    });
+    document.addEventListener('oc-sign-in-outcome', (event) => {
+        document.getElementById('oc-note').textContent = event.detail.message;
+    });
+</script>
+```
+
+| Event                | `detail`                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `oc-signed-in`       | `account`, `token`, and `waitUntil(promise)`: the button stays busy until it settles.   |
+| `oc-sign-in-outcome` | `status`, and `message`: the words to show near the button (empty when there are none). |
+
+The button carries its options: `data-mark` (`mono`, `brand`, `tile`, `none`),
+`data-appearance` (`inherit`, `brand`), `data-busy-label`,
+`data-accessible-label` and `data-label="none"`.
+
+The hashes above are me-client 0.48.0's files as npm publishes them. A new
+version has new hashes: your project's HTML snippet on ochk.app always shows the
+current pair. Under a strict Content-Security-Policy, copy
+`dist/button-auto.mjs` and `dist/button.css` onto your own origin instead.
+
 ## orangecheck's own button
 
 If you would rather not style it, `appearance="brand"` is orangecheck's button:

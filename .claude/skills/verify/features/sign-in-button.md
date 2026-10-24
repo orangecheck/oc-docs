@@ -13,6 +13,9 @@ sites draw it in their own style, plus orangecheck's own button and the mark.
   `@orangecheck/me-client/react`; the sites are `src/components/docs/SignInButtonDemo.tsx`.
 - orangecheck's own button (`appearance="brand"`), plain and themed.
 - The mark's variants (mono on light, mono on dark, brand, tile).
+- The plain-HTML recipe, and its CDN form: me-client pinned to an exact version on
+  jsDelivr with Subresource Integrity hashes. `src/__tests__/sign-in-button-sri.test.ts`
+  holds the version and hashes to the installed package's files.
 - Signing in from the page opens the real me.ochk.io window. The recipe below
   replaces `window.open`, so it opens none.
 
@@ -33,6 +36,7 @@ Runtime:
 B=https://ochk.io/docs
 curl -s -o /dev/null -w '%{http_code}\n' "$B/integration/sign-in-button"            # 200
 curl -s "$B/integration/sign-in-button" | grep -c 'Se connecter avec orangecheck'    # 1: the words section is live
+curl -s "$B/integration/sign-in-button" | grep -o 'sha384-[A-Za-z0-9+/=]\{64\}' | sort -u | wc -l   # 2: both files carry their hash
 node .claude/skills/verify/scripts/sign-in-button.mjs --base "$B"
 ```
 

@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: checkOcToken()",
+    description: "Auto-generated API reference for Function: checkOcToken(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / checkOcToken
+
+# Function: checkOcToken()
+
+```ts
+function checkOcToken(token: string, options?: VerifyOcTokenOptions): Promise<OcTokenCheck>;
+```
+
+Defined in: [me-client/src/server.ts:163](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L163)
+
+[verifyOcToken](verifyOcToken), telling a token that fails from a key set that can't
+be read (see [OcTokenCheck](../type-aliases/OcTokenCheck)). For the route that receives the token
+from the sign-in popup. Throws on an option it does not read, or an issuer it
+may not fetch from.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `token` | `string` |
+| `options` | [`VerifyOcTokenOptions`](../interfaces/VerifyOcTokenOptions) |
+
+## Returns
+
+`Promise`\&lt;[`OcTokenCheck`](../type-aliases/OcTokenCheck)\>

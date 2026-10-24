@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: checkOcSession()",
+    description: "Auto-generated API reference for Function: checkOcSession(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / checkOcSession
+
+# Function: checkOcSession()
+
+```ts
+function checkOcSession(headers: SessionRequestHeaders | Headers, options?: OcSessionOptions): Promise<OcSessionCheck>;
+```
+
+Defined in: [me-client/src/server.ts:323](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L323)
+
+`getOcSession`, telling "signed out" from "can't tell right now".
+`unavailable` with `reason: 'key_set_unavailable'` when the request carries a
+token and ochk.io's key set can't be read (with auth-core 2.16.0 or later),
+and `'revocations_unavailable'` when the token verifies but me.ochk.io's list
+of ended sessions can't vouch for this request (a write while the list can't
+be read). A token the person ended is `signed_out`, and so is one bound to
+your site with no revocation handle (`reason: 'no_session_handle'`, unless
+`requireHandle: false`). The adapters answer `unavailable` with 503 and that
+reason, so a client retries instead of signing the person out.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `headers` | `SessionRequestHeaders` \| `Headers` |
+| `options` | [`OcSessionOptions`](../interfaces/OcSessionOptions) |
+
+## Returns
+
+`Promise`\&lt;[`OcSessionCheck`](../type-aliases/OcSessionCheck)\>

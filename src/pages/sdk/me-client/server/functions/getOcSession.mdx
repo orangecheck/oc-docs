@@ -1,0 +1,45 @@
+export const metadata = {
+    title: "Function: getOcSession()",
+    description: "Auto-generated API reference for Function: getOcSession(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / getOcSession
+
+# Function: getOcSession()
+
+```ts
+function getOcSession(headers: SessionRequestHeaders | Headers, options?: OcSessionOptions): Promise<SessionPayload | null>;
+```
+
+Defined in: [me-client/src/server.ts:291](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L291)
+
+Verify the OC session for a request. Accepts either:
+
+  - A Web Headers object (Hono / edge / Fetch API): `c.req.raw.headers`
+  - A plain `{ cookie, authorization }` object (Express / Next.js Pages /
+    Fastify / etc.): `{ cookie: req.headers.cookie, authorization: req.headers.authorization }`
+
+Reads the `oc_session` cookie first; falls back to
+`Authorization: Bearer <token>` so cross-domain integrators (no
+.ochk.io cookie reach) verify the same way.
+
+A session the person ended everywhere is refused once `OC_PROJECT_KEY` and
+`OC_SIGNING_SECRET` are set (see [OcSessionOptions.revocation](../interfaces/OcSessionOptions#property-revocation)).
+
+Returns `null` for unauthenticated requests. Throws only on an option it
+does not read.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `headers` | `SessionRequestHeaders` \| `Headers` |
+| `options` | [`OcSessionOptions`](../interfaces/OcSessionOptions) |
+
+## Returns
+
+`Promise`\&lt;[`SessionPayload`](../interfaces/SessionPayload) \| `null`\>

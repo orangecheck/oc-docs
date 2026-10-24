@@ -1,0 +1,29 @@
+export const metadata = {
+    title: "Interface: OcPopupAccount",
+    description: "Auto-generated API reference for Interface: OcPopupAccount. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/popup**](../README)
+
+***
+
+[@orangecheck/me-client/popup](../README) / OcPopupAccount
+
+# Interface: OcPopupAccount
+
+Defined in: [popup.ts:40](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L40)
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-address">&lt;/a> `address?` | `string` | Legacy fields kept for back-compat with pre-refactor consumers. Prefer did_oc + primary_btc. Removed in a future major. | [popup.ts:55](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L55) |
+| &lt;a id="property-btc_address">&lt;/a> `btc_address?` | `string` | - | [popup.ts:56](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L56) |
+| &lt;a id="property-did_oc">&lt;/a> `did_oc?` | `string` | Opaque public identity · `did:oc:<32-hex>`. Stable across linking events. The canonical identifier post auth-refactor (Dec 2025 +). | [popup.ts:45](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L45) |
+| &lt;a id="property-display_name">&lt;/a> `display_name?` | `string` \| `null` | - | [popup.ts:57](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L57) |
+| &lt;a id="property-email">&lt;/a> `email?` | `string` | - | [popup.ts:60](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L60) |
+| &lt;a id="property-has_email">&lt;/a> `has_email?` | `boolean` | Whether the user has a primary email linked (plaintext stays on auth host; only the boolean reaches integrators). | [popup.ts:52](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L52) |
+| &lt;a id="property-id">&lt;/a> `id?` | `string` | - | [popup.ts:41](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L41) |
+| &lt;a id="property-nostr_npub">&lt;/a> `nostr_npub?` | `string` \| `null` | - | [popup.ts:58](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L58) |
+| &lt;a id="property-primary_btc">&lt;/a> `primary_btc?` | `string` \| `null` | Primary linked Bitcoin address, if the user has one and is surfacing it (same-origin family integrators get it inline; cross-domain integrators need the bitcoin_address scope). | [popup.ts:49](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L49) |
+| &lt;a id="property-wallet_provisioned">&lt;/a> `wallet_provisioned?` | `boolean` | - | [popup.ts:59](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L59) |

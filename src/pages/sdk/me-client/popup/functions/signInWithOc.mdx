@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: signInWithOc()",
+    description: "Auto-generated API reference for Function: signInWithOc(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/popup**](../README)
+
+***
+
+[@orangecheck/me-client/popup](../README) / signInWithOc
+
+# Function: signInWithOc()
+
+```ts
+function signInWithOc(options?: SignInWithOcOptions): Promise<OcPopupResult | null>;
+```
+
+Defined in: [popup.ts:199](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L199)
+
+Open the OC signin popup and resolve with the session result. Returns
+`null` if the user closed the popup without completing signin, if the
+browser blocked it, or if the AbortSignal fired. To tell those apart,
+use signInWithOcOutcome.
+
+MUST be called inside a user-gesture handler (e.g. a button onClick).
+Browsers block `window.open` outside of user gestures.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`SignInWithOcOptions`](../interfaces/SignInWithOcOptions) |
+
+## Returns
+
+`Promise`\&lt;[`OcPopupResult`](../interfaces/OcPopupResult) \| `null`\>

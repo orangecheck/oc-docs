@@ -1,0 +1,31 @@
+export const metadata = {
+    title: "Type Alias: RevokeTokenResult",
+    description: "Auto-generated API reference for Type Alias: RevokeTokenResult. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / RevokeTokenResult
+
+# Type Alias: RevokeTokenResult
+
+```ts
+type RevokeTokenResult = 
+  | {
+  ok: true;
+  revoked: number;
+}
+  | {
+  ok: false;
+  reason: RevokeTokenRefusal;
+  status: number;
+};
+```
+
+Defined in: [me-client/src/tokens.ts:95](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/tokens.ts#L95)
+
+`revoked` counts the tokens ochk.io ended: 0 when it could not read one as
+its own (expired already, or signed elsewhere). A refusal's `status` is
+ochk.io's HTTP status, 0 when nothing came back.

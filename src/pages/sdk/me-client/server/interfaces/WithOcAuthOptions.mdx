@@ -1,0 +1,37 @@
+export const metadata = {
+    title: "Interface: WithOcAuthOptions",
+    description: "Auto-generated API reference for Interface: WithOcAuthOptions. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / WithOcAuthOptions
+
+# Interface: WithOcAuthOptions
+
+Defined in: [me-client/src/server.ts:417](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L417)
+
+## Extends
+
+- [`OcSessionOptions`](OcSessionOptions)
+
+## Properties
+
+| Property | Type | Description | Overrides | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-audience">&lt;/a> `audience?` | `AudienceRule` | Accepted `aud` · see AudienceRule. An integrator verifying tokens from the sign-in popup sets this to its own origin, e.g. `"https://example.com"`, so a token issued to another site is refused. | - | [`OcSessionOptions`](OcSessionOptions).[`audience`](OcSessionOptions#property-audience) | [auth-core/src/index.ts:828](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L828) |
+| &lt;a id="property-issuer">&lt;/a> `issuer?` | `string` | Auth host issuer. Defaults to https://ochk.io. | - | [`OcSessionOptions`](OcSessionOptions).[`issuer`](OcSessionOptions#property-issuer) | [auth-core/src/index.ts:818](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L818) |
+| &lt;a id="property-jwkscachettlms">&lt;/a> `jwksCacheTtlMs?` | `number` | JWKS cache TTL in ms. Defaults to 1 hour. Stale-on-error: if the cache exists, verification still works during a transient outage. | - | [`OcSessionOptions`](OcSessionOptions).[`jwksCacheTtlMs`](OcSessionOptions#property-jwkscachettlms) | [auth-core/src/index.ts:821](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L821) |
+| &lt;a id="property-jwksmaxstalems">&lt;/a> `jwksMaxStaleMs?` | `number` | How old a cached JWKS may be and still stand in during an outage. Defaults to 6 hours; past it, verification fails closed. | - | [`OcSessionOptions`](OcSessionOptions).[`jwksMaxStaleMs`](OcSessionOptions#property-jwksmaxstalems) | [auth-core/src/index.ts:824](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L824) |
+| &lt;a id="property-meorigin">&lt;/a> `meOrigin?` | `string` | Where me.ochk.io is: the project's sign-in rule and its list of ended sessions are read there. Default https://me.ochk.io (`OC_ME_ORIGIN` for the list). | - | [`OcSessionOptions`](OcSessionOptions).[`meOrigin`](OcSessionOptions#property-meorigin) | [me-client/src/server.ts:227](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L227) |
+| &lt;a id="property-method">&lt;/a> `method?` | `string` | The request's method. While me.ochk.io's list of ended sessions can't be read, reads go on and writes are refused; with no method, a request counts as a write. The adapters pass it for you. | - | [`OcSessionOptions`](OcSessionOptions).[`method`](OcSessionOptions#property-method) | [me-client/src/server.ts:219](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L219) |
+| &lt;a id="property-projectkey">&lt;/a> `projectKey?` | `string` | Your project key. The requirement you set in the project's settings ("who can sign in") is read from me.ochk.io within a minute of a change and holds every signed-in account like `requireBond`, so you change it there, not in code. A request with no session is not held to it and never waits on reading it: pass `required` to answer it 401. An explicit `requireBond` wins over it. Default `OC_PROJECT_KEY` for the ended-session check only. | [`OcSessionOptions`](OcSessionOptions).[`projectKey`](OcSessionOptions#property-projectkey) | - | [me-client/src/server.ts:440](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L440) |
+| &lt;a id="property-requirebond">&lt;/a> `requireBond?` | \&#123; `maxAgeSecs?`: `number`; `minDays?`: `number`; `minSats?`: `number`; \&#125; | Refuse a signed-in account (403, `reason: 'bond_required'`) unless a bond backs it: one unspent coin of at least `minSats`, unspent at least `minDays` days, checked within `maxAgeSecs`. The app never learns the coin; `req.ocSession.oc_bond.nullifier` is the same for the same coin at your site, so ban that to ban the coin. Implies `required`. | - | - | [me-client/src/server.ts:430](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L430) |
+| `requireBond.maxAgeSecs?` | `number` | - | - | - | [me-client/src/server.ts:430](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L430) |
+| `requireBond.minDays?` | `number` | - | - | - | [me-client/src/server.ts:430](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L430) |
+| `requireBond.minSats?` | `number` | - | - | - | [me-client/src/server.ts:430](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L430) |
+| &lt;a id="property-required">&lt;/a> `required?` | `boolean` | When true, unauthenticated requests get a 401 + `{ok:false}` response before the wrapped handler runs. Default: false — handler runs and receives `req.ocSession === null`, useful when the route serves both signed-in and anonymous users. | - | - | [me-client/src/server.ts:422](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L422) |
+| &lt;a id="property-requirehandle">&lt;/a> `requireHandle?` | `boolean` | Refuse a token bound to your site (one with `aud`) that carries no `rh`, its handle on your project's list of ended sessions. Without it "sign out everywhere" can't reach the session, so it is refused by default. Every token ochk.app's sign-in popup issues carries one; `false` accepts one minted some other way, and then sign out everywhere does not end it. A family session (no `aud`, on *.ochk.io) is not held to this: the family's own feed ends it. `audience: '*'` admits family sessions too, so keep it for routes that receive tokens forwarded from *.ochk.io. Default: true. | - | [`OcSessionOptions`](OcSessionOptions).[`requireHandle`](OcSessionOptions#property-requirehandle) | [me-client/src/server.ts:91](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L91) |
+| &lt;a id="property-revocation">&lt;/a> `revocation?` | `false` \| `RevocationCheck` | The check for sessions the person ended everywhere (sign out everywhere, a passkey removed, the account deleted). Default: auth-core's `integratorRevocationCheck`, from `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`; none when they are unset. `false` turns it off. | - | [`OcSessionOptions`](OcSessionOptions).[`revocation`](OcSessionOptions#property-revocation) | [me-client/src/server.ts:234](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L234) |

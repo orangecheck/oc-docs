@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: spendOnce()",
+    description: "Auto-generated API reference for Function: spendOnce(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / spendOnce
+
+# Function: spendOnce()
+
+```ts
+function spendOnce(
+   jti: string, 
+   exp: number, 
+store: JtiStore): Promise<boolean>;
+```
+
+Defined in: [me-client/src/tokens.ts:60](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/tokens.ts#L60)
+
+Spend a verified token's `jti` so it starts one session: true the first time,
+false for a repeat or a token that has expired (`exp`, in seconds, at or
+before now). Call it after verifying the token and before starting your own
+session; on false, refuse the sign-in. A store that fails throws, so the
+sign-in fails closed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `jti` | `string` |
+| `exp` | `number` |
+| `store` | [`JtiStore`](../interfaces/JtiStore) |
+
+## Returns
+
+`Promise`\&lt;`boolean`\>

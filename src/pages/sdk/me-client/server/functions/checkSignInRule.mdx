@@ -1,0 +1,46 @@
+export const metadata = {
+    title: "Function: checkSignInRule()",
+    description: "Auto-generated API reference for Function: checkSignInRule(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / checkSignInRule
+
+# Function: checkSignInRule()
+
+```ts
+function checkSignInRule(session: SessionPayload, options: SignInRuleOptions): Promise<SignInRuleCheck>;
+```
+
+Defined in: [me-client/src/server.ts:688](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L688)
+
+Apply your project's "who can sign in" rule to a session you have already
+verified, for a site whose own session replaces the token: `checkOcToken`
+and `verifyOcToken` check the token, not the rule. It reads the rule with the
+same one-minute cache and ten-minute stand-in as `withOcAuth`, and refuses
+rather than lets in when no rule could be read.
+
+`session` is the object `verifyOcToken`, `checkOcToken`, `getOcSession` or
+an adapter (`req.ocSession`) returned, as is. Anything else throws, a copy or
+claims read back from your own store included: apply the rule in the route
+that starts your session, where you hold the verified one. It also throws
+on a missing rule or an option it does not read.
+
+  const session = await verifyOcToken(token, &#123; audience: 'https://your-site.example' &#125;);
+  if (!session) return res.status(401).json(&#123; ok: false &#125;);
+  const checked = await checkSignInRule(session, &#123; projectKey: process.env.OC_PROJECT_KEY! &#125;);
+  if (!checked.ok) return res.status(checked.status).json(checked.body);
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `session` | [`SessionPayload`](../interfaces/SessionPayload) |
+| `options` | [`SignInRuleOptions`](../interfaces/SignInRuleOptions) |
+
+## Returns
+
+`Promise`\&lt;[`SignInRuleCheck`](../type-aliases/SignInRuleCheck)\>

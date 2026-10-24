@@ -1,0 +1,41 @@
+export const metadata = {
+    title: "Interface: FederationMigratingWebhookPayload",
+    description: "Auto-generated API reference for Interface: FederationMigratingWebhookPayload. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README)
+
+***
+
+[@orangecheck/me-client](../README) / FederationMigratingWebhookPayload
+
+# Interface: FederationMigratingWebhookPayload
+
+Defined in: [me-client/src/types.ts:460](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L460)
+
+`federation.migrating`: your project's federation is being replaced. Top-ups
+pause now; events and sign-in carry on. The project and its balance move no
+sooner than `flip_not_before`.
+
+## Extends
+
+- [`SystemWebhookPayload`](SystemWebhookPayload)
+
+## Indexable
+
+```ts
+[extra: string]: unknown
+```
+
+## Properties
+
+| Property | Type | Description | Overrides | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-flip_not_before">&lt;/a> `flip_not_before` | `string` | ISO time: the earliest the move can happen. | - | - | [me-client/src/types.ts:468](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L468) |
+| &lt;a id="property-from">&lt;/a> `from` | `string` | The federation the project is on now (its slug). | - | - | [me-client/src/types.ts:464](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L464) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"oc-system-event"` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`kind`](SystemWebhookPayload#property-kind) | [me-client/src/types.ts:416](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L416) |
+| &lt;a id="property-migration_id">&lt;/a> `migration_id` | `string` | - | - | - | [me-client/src/types.ts:462](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L462) |
+| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`project_key`](SystemWebhookPayload#property-project_key) | [me-client/src/types.ts:418](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L418) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | `"federation.migrating"` | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`subtype`](SystemWebhookPayload#property-subtype) | - | [me-client/src/types.ts:461](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L461) |
+| &lt;a id="property-successor">&lt;/a> `successor` | [`FederationSuccessor`](FederationSuccessor) | - | - | - | [me-client/src/types.ts:469](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L469) |
+| &lt;a id="property-to">&lt;/a> `to` | `string` | The federation it moves to (its slug). | - | - | [me-client/src/types.ts:466](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L466) |

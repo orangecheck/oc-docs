@@ -113,6 +113,14 @@ Outside the project's [pay periods](/me/paying-users) both answer `200` with
 `earned: false` (`not_paying` per event in a batch) and record nothing. Paying
 users is optional.
 
+A test project records events for the account that owns it and nobody else, so
+you can try your integration on yourself. An event or batch naming anyone else,
+by `user_address` or by session, answers `403 earner_not_project_owner` and
+records nothing. A test project records at most 1,000 events a UTC day across
+`/event`, `/event/batch` and the test-fire button, then
+`429 test_project_daily_cap`. To record events for your users, verify your
+domain and go live.
+
 `/event/batch` takes the person's own session, not `user_address`: the cookie,
 or the token from the sign-in popup as `Authorization: Bearer`. Every event in a
 batch earns for that person. A backend that names who earns fires
@@ -128,7 +136,8 @@ The request body is JSON. The fields, in any order:
 | `subtype`             | yes      | An event your project defined and enabled, built-in or your own                      |
 | `user_address`        | backend  | Who earns: the person's `did_oc` from their sign-in token. Accepted only when signed |
 | `payment_amount_sats` | some     | The payment, for an event priced as a share of one                                   |
-| `action_label`        | no       | A short label shown on the receipt                                                   |
+| `action_label`        | no       | A short label shown on the receipt: up to 280 characters of plain text               |
+| `note`                | no       | A note shown to the person: up to 280 characters of plain text                       |
 | `is_agent`            | no       | `true` when an AI agent acted for the person                                         |
 
 Sign the exact bytes you send, in one header:
@@ -185,17 +194,23 @@ Without the SDK, the header is
 | 401    | `earner_requires_signature`                              | `user_address` on an unsigned request                                                          |
 | 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                     |
 | 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                    |
+| 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                      |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                         |
 | 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                 |
 | 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                               |
+| 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text          |
 | 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                             |
+| 429    | `test_project_daily_cap`                                 | A test project's 1,000 events for the UTC day are used                                         |
+
+The per-person cap on class A events counts only events billed against live
+escrow. A preview event spends nobody's allowance.
 
 ## Authenticated · integrator project lifecycle
 
 | Method   | Path                                | Purpose                                                                                                                   |
 | -------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `GET`    | `/api/me/projects`                  | list every project owned by your identity                                                                                 |
-| `POST`   | `/api/me/projects`                  | create a project, rate-limited 5/min. Pays nobody unless `pay: { action: 'add', … }` asks it to                           |
+| `POST`   | `/api/me/projects`                  | create a project, rate-limited 5/min, at most 25 per account. Pays nobody unless `pay: { action: 'add', … }` asks it to   |
 | `GET`    | `/api/me/projects/[id]`             | per-project state · owner-gated                                                                                           |
 | `POST`   | `/api/me/projects/[id]`             | update IntegratorPriceConfig (prices only; a name or domain in the body is ignored) · owner-gated, validates              |
 | `PATCH`  | `/api/me/projects/[id]`             | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
@@ -210,6 +225,13 @@ Without the SDK, the header is
 | `GET`    | `/api/me/projects/[id]/webhooks`    | list registered webhooks · owner-gated                                                                                    |
 | `POST`   | `/api/me/projects/[id]/webhooks`    | register a webhook URL · owner-gated                                                                                      |
 | `POST`   | `/api/developer/webhook-test`       | test-fire a synthetic envelope at a registered webhook                                                                    |
+
+A project's name, a custom event's label, a drop's label and a directory tagline
+are text people read, so one rule applies to all of them: no character that
+hides or reorders text, and never orangecheck's own name (`orangecheck`, `ochk`,
+`ochk.io`, `ochk.app`, in any case, width or spacing). A name breaking it
+answers `409 name_reserved` at create and rename; a label, a `422` naming it. An
+account holds at most 25 projects (`409 project_limit_reached`).
 
 ### Moving a verified domain
 

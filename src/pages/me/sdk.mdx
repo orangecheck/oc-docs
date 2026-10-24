@@ -314,14 +314,16 @@ The wrappers all take one options bag,
 ```python
 import os
 
-from orangecheck import BondRequired, InvalidSession, SignInPolicy, verify_session
+from orangecheck import BondRequired, InvalidSession, RevocationList, SignInPolicy, verify_session
 
 POLICY = SignInPolicy(os.environ["OC_PROJECT_KEY"])  # one per process; reads your project's rule, held a minute
+REVOCATIONS = RevocationList(os.environ["OC_PROJECT_KEY"], os.environ["OC_SIGNING_SECRET"])  # one per process
 
 token: str  # the token your page posted
 
 try:
-    session = verify_session(token, audience="https://your-site.example", policy=POLICY)
+    session = verify_session(token, audience="https://your-site.example", policy=POLICY,
+                             revocations=REVOCATIONS, method="POST")  # the request's method
 except BondRequired as err:  # before InvalidSession: it is one
     ...  # 403: err.need, err.have (the account's floors, or None), err.back_url
 except InvalidSession as err:
@@ -342,13 +344,17 @@ ended; 401 `no_session_handle`; 403 `bond_required` with `need`, `have` and
 same vectors.
 
 ```python
+import os
 from typing import Optional
 
-from orangecheck import check_oc_session
+from orangecheck import RevocationList, check_oc_session
+
+REVOCATIONS = RevocationList(os.environ["OC_PROJECT_KEY"], os.environ["OC_SIGNING_SECRET"])  # one per process
 
 bearer: Optional[str]  # the token the request brought, or None
 
-checked = check_oc_session(bearer, "https://your-site.example", method="POST")
+checked = check_oc_session(bearer, "https://your-site.example",
+                           revocations=REVOCATIONS, method="POST")  # the request's method
 if checked.ok:
     session = checked.session  # signed in
 else:
@@ -695,13 +701,13 @@ session = verify_session(token, audience="https://your-site.example",
 # SessionEnded (an InvalidSession, reason "ended") when the person ended it.
 ```
 
-`REVOCATIONS.status(rh, aud, iat)` answers one of three things, and
-`verify_session` acts on it:
+`REVOCATIONS.status(rh, aud, iat, jti=None)` answers one of three things, and
+`verify_session` acts on it, asking with the token's `jti` too:
 
 | `status`       | Means                                                                                                                                                                      | `verify_session` with `revocations=`                                                                                              |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `"live"`       | Not ended. Also a token without `rh`, which `verify_session` refuses first unless `require_handle=False`.                                                                  | Returns the session.                                                                                                              |
-| `"revoked"`    | The person ended it: its `rh` is in the list and its `iat` is before the cutoff.                                                                                           | Raises `SessionEnded` (reason `ended`).                                                                                           |
+| `"revoked"`    | The person ended it: its `rh` is in the list and its `iat` is before the cutoff, or, asked with a `jti`, that token was ended on its own.                                  | Raises `SessionEnded` (reason `ended`).                                                                                           |
 | `"unverified"` | No list for that origin younger than ten minutes (by its own `at`) could be read: me.ochk.io unreachable, or the list refused (domain not verified, an origin outside it). | Returns the session for `GET`, `HEAD` or `OPTIONS`; raises `InvalidSession` (reason `revocations_unavailable`) for anything else. |
 
 That is the Node rule too: while the list can't be read, reads go on and writes
@@ -760,12 +766,18 @@ way, apply the rule with one call:
 [`checkSignInRule`](/sdk/me-client/server/functions/checkSignInRule) (me-client
 0.43.0) reads and holds it as the wrappers do and answers with their status and
 body: `403 bond_required`, `503 bond_policy_unavailable` or
-`500 unknown_project_key`.
+`500 unknown_project_key`. Then ask the list of ended sessions about the whole
+session, `jti` included, as the wrappers do: a token the person ended on its own
+is in the list by its `jti` alone.
 
 ```ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { integratorRevocationCheck } from '@orangecheck/auth-core';
 import { checkOcToken, checkSignInRule } from '@orangecheck/me-client/server';
+
+// One per process. It reads OC_PROJECT_KEY and OC_SIGNING_SECRET; null without them.
+const revocations = integratorRevocationCheck();
 
 export default async function exchange(
     req: NextApiRequest,
@@ -781,6 +793,15 @@ export default async function exchange(
         projectKey: process.env.OC_PROJECT_KEY!,
     });
     if (!rule.ok) return res.status(rule.status).json(rule.body);
+    const ended = revocations
+        ? await revocations.status(checked.session)
+        : 'unverified';
+    if (ended === 'revoked')
+        return res.status(401).json({ ok: false, reason: 'ended' });
+    if (ended !== 'live')
+        return res
+            .status(503)
+            .json({ ok: false, reason: 'revocations_unavailable' });
     // spend the jti, start your session, end the token (below)
 }
 ```
@@ -791,9 +812,11 @@ Python, `check_sign_in_rule(session, policy=POLICY)` (`orangecheck` 3.3.0) does
 the same for the `Session` that `verify_session` returned and answers a
 `SessionCheck`. Then spend the token once and don't store it:
 
-- The exchange is a write. While the list of ended sessions can't be read,
-  refuse it (`503`, never "signed out"), as the wrapper does for a POST: a
-  session someone ended everywhere must not start a new one here.
+- The exchange is a write. Ask the list of ended sessions about the whole token,
+  `jti` included (Node: `status(checked.session)`; Python:
+  `revocations=REVOCATIONS, method="POST"`), and refuse it while the list can't
+  be read (`503`, never "signed out"), as the wrapper does for a POST: a token
+  someone ended, on its own or everywhere, must not start a new session here.
 
 - Keep its `rh`, `aud` and `iat` with that session on your server, written
   before you hand the session to the browser. Never let the browser bind them in
@@ -812,12 +835,13 @@ the same for the `Session` that `verify_session` returned and answers a
   off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or
   `OC_SIGNING_SECRET`.
 - End the token right after the exchange (`revokeToken`): you never store it, so
-  nothing could end it at sign-out. This ends that one token at orangecheck; it
-  adds nothing to your list of ended sessions and doesn't touch the session you
-  just started, which the list holds to its `rh` and `iat`. Your list doesn't
-  carry single ended tokens, so spending the `jti` once is what stops a replay
-  at your server.
-- Ask the list about the session on each request. In Node, keep one
+  nothing could end it at sign-out. This puts that one token's `jti` in your
+  list of ended sessions; it doesn't touch the session you just started, which
+  the list holds to its `rh` and `iat`. Spending the `jti` once still stops a
+  replay at your server while the list is a minute behind.
+- Ask the list about the session on each request with its `rh`, `aud` and `iat`
+  only, never the `jti`: you ended that token yourself after the exchange, so
+  asking with its `jti` would end every session you start. In Node, keep one
   `integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later
   per process and `await check.status({ rh, aud, iat })`; in Python,
   `REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session;
@@ -948,8 +972,9 @@ the limits below.
   `check_oc_session` then never touch the cached ochk.io one, so no case leaks
   keys into the next. A stand-in for `RevocationList` implements
   `status_for(claims)`, which `verify_session` calls with the token's claims:
-  `"live"` for a token with no `rh` key, otherwise what `status(rh, aud, iat)`
-  answers (an `rh` that is not a string is `"revoked"`).
+  `"live"` for a token with no `rh` key, otherwise what
+  `status(rh, aud, iat, jti)` answers (an `rh` that is not a string is
+  `"revoked"`).
 
 ## React
 

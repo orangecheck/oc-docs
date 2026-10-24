@@ -299,9 +299,16 @@ because an app's own name is whatever its maker typed. Without `email_verified`,
 an email proves nothing, because it could be anyone's, and only a claim link
 works.
 
+An address verified once may be someone else's today, so the offer names only
+the address, masked, until the person enters a code we email to it. Only then do
+they see your site and what the account holds. A call that names no email leaves
+the offer as it was. Send `email: null`, or the address without
+`email_verified: true`, when it is no longer this user's, and the offer is
+withdrawn.
+
 Either way, ochk.app shows the person what the account holds before anything
-changes, and they confirm with a passkey tap or an emailed code or wallet
-signature. Then:
+changes. A link claim then asks for a passkey tap or an ochk.io confirmation; an
+email claim has the code. Then:
 
 - `/api/connect/provision` keeps returning the **same** `did_oc` for that user.
   Keep firing events for it; they land with the person.
@@ -495,7 +502,8 @@ you describe your sign-in, in your words, and keep these facts:
 - **Optional `email` and `email_verified`.** Pass the user's email, and
   `email_verified: true` only when you verified it, to let them claim by signing
   in with it (above). We keep only a keyed hash of the address, never the
-  address. The base call needs neither.
+  address. The base call needs neither. Leave `email` out and the last offer
+  stands; `email: null` takes it back.
 - An integrator can only ever create and manage **its own** users' orangecheck
   accounts — a Connect key can never reach into anyone else's account.
 

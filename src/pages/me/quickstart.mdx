@@ -85,7 +85,7 @@ scripts:
 // Next.js Pages · pages/api/auth/session.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { verifyOcToken } from '@orangecheck/me-client/server';
+import { checkOcToken } from '@orangecheck/me-client/server';
 
 export default async function session(
     req: NextApiRequest,
@@ -93,10 +93,15 @@ export default async function session(
 ) {
     if (req.method !== 'POST') return res.status(405).end();
     const token = String(req.body?.token ?? '');
-    const s = await verifyOcToken(token, {
+    const checked = await checkOcToken(token, {
         audience: 'https://yourapp.example',
     });
-    if (!s) return res.status(401).json({ ok: false });
+    // ochk.io's keys can't be read right now: the page can try again.
+    if (checked.status === 'unavailable') {
+        return res.status(503).json({ ok: false, reason: checked.reason });
+    }
+    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    const s = checked.session;
     const maxAge = (s.exp ?? 0) - Math.floor(Date.now() / 1000);
     res.setHeader(
         'Set-Cookie',
@@ -106,10 +111,11 @@ export default async function session(
 }
 ```
 
-On Express or Hono it is the same three moves: verify with `verifyOcToken`, set
-the cookie, answer `ok`. `verifyOcToken` checks the token, not who can sign in
-(step 4): the wrapper in step 3 applies that on every request that reads the
-cookie. If your own session replaces the token, run the exchange inside the
+On Express or Hono it is the same three moves: check with `checkOcToken`, set
+the cookie, answer `ok`. A 503 means ochk.io's keys could not be read, not a bad
+token, so the page can try again. `checkOcToken` checks the token, not who can
+sign in (step 4): the wrapper in step 3 applies that on every request that reads
+the cookie. If your own session replaces the token, run the exchange inside the
 wrapper instead
 ([if your own session replaces the token](/me/sdk#if-your-own-session-replaces-the-token)).
 A backend in Python or another language checks the token itself: see

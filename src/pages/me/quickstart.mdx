@@ -54,14 +54,15 @@ no imports of its own. Copy it from the version you install to your own origin,
 say as `/js/oc-popup.mjs`, import `signInWithOc` from that path in a
 `<script type="module">`, and copy it again when you upgrade.
 
-Call `signInWithOc()` inside a click handler, or the browser blocks the popup.
-The person signs in on orangecheck's page with email, Google, GitHub or a
-Bitcoin wallet, and the popup hands your page a token bound to your origin. A
-page served with `Cross-Origin-Opener-Policy: same-origin` never gets it back;
-send `same-origin-allow-popups`, or no such header. Under a Content Security
-Policy the popup needs no orangecheck origin in `connect-src` or `frame-src`: it
-opens a window and takes one message from it. Only `script-src` must allow
-wherever you serve the module. Post the token to your own server:
+Call [`signInWithOc()`](/sdk/me-client/popup/functions/signInWithOc) inside a
+click handler, or the browser blocks the popup. The person signs in on
+orangecheck's page with email, Google, GitHub or a Bitcoin wallet, and the popup
+hands your page a token bound to your origin. A page served with
+`Cross-Origin-Opener-Policy: same-origin` never gets it back; send
+`same-origin-allow-popups`, or no such header. Under a Content Security Policy
+the popup needs no orangecheck origin in `connect-src` or `frame-src`: it opens
+a window and takes one message from it. Only `script-src` must allow wherever
+you serve the module. Post the token to your own server:
 
 ```ts
 import { signInWithOc } from '@orangecheck/me-client/popup';
@@ -137,7 +138,8 @@ and read your own session in React as [React](/me/sdk#react) shows.
 
 ### 3 · check the session on your server
 
-The wrapper reads the `oc_session` cookie from step 2.
+The wrapper, [`withOcAuth`](/sdk/me-client/server/functions/withOcAuth), reads
+the `oc_session` cookie from step 2.
 
 ```ts
 // Next.js Pages · pages/api/auth/me.ts

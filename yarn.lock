@@ -805,10 +805,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/app-design@^1.18.0":
-  version "1.18.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/app-design/-/app-design-1.18.0.tgz#8a98d7989f4f8ec587621d3c5de95572260a00a6"
-  integrity sha512-EJKcX0YkzEuJGX+2nU8+jCg3vpEhtMKb9q5NJx3+i/QaRONB7aFi1DovqfqLvjxZK0e60bhcZP2Z4eFPC42coQ==
+"@orangecheck/app-design@^1.18.1":
+  version "1.18.1"
+  resolved "https://registry.yarnpkg.com/@orangecheck/app-design/-/app-design-1.18.1.tgz#89d9f39f8edd1aa58e5b5174db652de52cac56cf"
+  integrity sha512-IGqlDW8TWGh/a9Or43juaCSXrSAn6FPTvDiGx1drbPDmOrLmzkmvIec4oWsf6jYGHQnuDYzWjEEL/e6iqKx2KA==
   dependencies:
     "@radix-ui/react-checkbox" "^1.3.3"
     "@radix-ui/react-dialog" "^1.1.15"

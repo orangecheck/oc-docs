@@ -127,6 +127,15 @@ Brief threshold pause during the swap — federations tolerate up to 30s under
 §6.1 of the charter, but coordinate via the federation channel so multiple
 guardians don't upgrade simultaneously.
 
+## 06 · Leaving or replacing a guardian
+
+Until a key ceremony completes, the roster can still change, and a guardian who
+exits frees the seat for a replacement. After it completes, the seat roster is
+locked, a ceremony reset included: every guardian holds a key share bound to it.
+A guardian then leaves by an exit, and the trust posture keeps counting the
+share it still holds. A failed guardian is replaced by moving to a successor
+federation.
+
 ## Troubleshooting
 
 | Symptom                                           | Likely cause                     | Fix                                          |

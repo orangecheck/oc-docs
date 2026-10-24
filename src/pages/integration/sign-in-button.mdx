@@ -1,0 +1,228 @@
+import {
+    MarkVariants,
+    SignInButtonBrand,
+    SignInButtonHosts,
+} from '@/components/docs/SignInButtonDemo';
+
+export const metadata = {
+    title: 'The sign-in button',
+    description:
+        'A "Sign in with orangecheck" button that keeps your site\'s font, colour, radius, size, hover and focus, and carries the orangecheck mark: React, plain HTML, and files for native apps and games.',
+};
+
+# The sign-in button
+
+Your sign-in button already has a look. Keep it. The orangecheck button takes
+your button's class and draws nothing of its own: it brings the orangecheck
+mark, the words, the popup and the busy state. Install `@orangecheck/me-client`
+0.46.0 or later.
+
+## In three different sites
+
+Three made-up sites, each with its own buttons. Beside each site's own button is
+the orangecheck button, given the same class. Switch the docs between light and
+dark to see both. Signing in here opens the real orangecheck window.
+
+<SignInButtonHosts />
+
+Studio's buttons are 40px tall, so it sets `--oc-target: 40px`; without it the
+button keeps a 44px target.
+
+## React
+
+```tsx
+import type { ReactElement } from 'react';
+
+import { SignInWithOrangecheck } from '@orangecheck/me-client/react';
+
+import '@orangecheck/me-client/button.css';
+
+declare function keepSession(token: string): Promise<void>;
+
+export function SignIn(): ReactElement {
+    return (
+        <SignInWithOrangecheck
+            className="btn btn-outline"
+            onSignedIn={({ token }) => keepSession(token)}
+        />
+    );
+}
+```
+
+`keepSession` posts the token to your server, which verifies it with
+[`withOcAuth`](/me/sdk) and keeps it in an httpOnly cookie. Import `button.css`
+once; it is optional and has zero specificity, so every rule of yours wins over
+it. Without it the button is yours with the mark in it.
+
+| Prop         | Default                    |                                                                                              |
+| ------------ | -------------------------- | -------------------------------------------------------------------------------------------- |
+| `onSignedIn` | required                   | Called with `{ account, token }`. The button stays busy until it settles.                    |
+| `onOutcome`  | none                       | Called with how every window ended: `signed_in`, `blocked`, `closed`, `aborted` or `failed`. |
+| `appearance` | `inherit`                  | `inherit` adds no colour, font, border or radius. `brand` is orangecheck's button.           |
+| `mark`       | `mono`                     | `mono`, `brand`, `tile`, or `false` for none. See [the mark](#the-mark).                     |
+| `label`      | "Sign in with orangecheck" | One of `SIGN_IN_LABELS`. See [the words](#the-words).                                        |
+| `popup`      | none                       | Popup options, such as a preview `popupOrigin`.                                              |
+
+Everything else (`className`, `style`, `id`, `aria-describedby`, `disabled`)
+goes to the native `<button>`.
+
+## Plain HTML and JavaScript
+
+No framework, no bundler. Write the button as you write every other one, and add
+`data-oc-sign-in`:
+
+```html
+<button class="cta ghost" data-oc-sign-in>Sign in with orangecheck</button>
+<p id="oc-note" role="status"></p>
+```
+
+Then enhance it:
+
+```js
+import {
+    enhanceSignInButton,
+    OUTCOME_COPY,
+} from '@orangecheck/me-client/button';
+
+const button = /** @type {HTMLButtonElement} */ (
+    document.querySelector('[data-oc-sign-in]')
+);
+const note = /** @type {HTMLElement} */ (document.querySelector('#oc-note'));
+
+enhanceSignInButton(button, {
+    onSignedIn: async ({ token }) => {
+        const r = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token }),
+        });
+        if (r.ok) location.assign('/dashboard');
+    },
+    onOutcome: (outcome) => {
+        if (
+            outcome.status === 'blocked' ||
+            outcome.status === 'closed' ||
+            outcome.status === 'failed'
+        ) {
+            note.textContent = OUTCOME_COPY[outcome.status];
+        }
+    },
+});
+```
+
+Under a strict Content-Security-Policy (`script-src 'self'`), copy
+`node_modules/@orangecheck/me-client/dist/button.mjs` and `dist/button.css` onto
+your own origin and import them from there. `button.mjs` has no imports, and it
+builds the mark node by node, so it needs no `innerHTML` and works with Trusted
+Types. Load it before the click: a window opened after an await is blocked.
+
+`enhanceSignInButton` returns a function that puts the button back as it was.
+
+## orangecheck's own button
+
+If you would rather not style it, `appearance="brand"` is orangecheck's button:
+ink, with the mark as drawn. Theme it with custom properties.
+
+<SignInButtonBrand />
+
+| Property               | Default                                       |
+| ---------------------- | --------------------------------------------- |
+| `--oc-button-bg`       | `#0a0a0a`                                     |
+| `--oc-button-fg`       | `#fafafa`                                     |
+| `--oc-button-border`   | `#262626`                                     |
+| `--oc-button-hover-bg` | `#262626`                                     |
+| `--oc-button-radius`   | `10px`                                        |
+| `--oc-button-font`     | your font                                     |
+| `--oc-button-size`     | `1rem`                                        |
+| `--oc-button-weight`   | `600`                                         |
+| `--oc-button-pad`      | `1.25em`                                      |
+| `--oc-focus`           | `#fb933c` (brand), your text colour (inherit) |
+
+Both appearances read `--oc-mark-gap` (`0.5em`), `--oc-mark-size` (`1.5em`) and
+`--oc-target` (`44px`).
+
+## While it works
+
+- Clicking opens the orangecheck window inside the click, before anything is
+  awaited, so browsers do not block it.
+- While the window is open the button says "Signing in…", and is `aria-busy` and
+  `aria-disabled`. It keeps focus and opens no second window.
+- When the window closes, the button is ready again, and `onOutcome` says why:
+  show `OUTCOME_COPY.blocked`, `.closed` or `.failed` near it.
+- A button you set `disabled` never opens a window.
+
+## The mark
+
+The orangecheck mark is an isometric check. It ships with no dependencies in
+[`@orangecheck/mark`](https://www.npmjs.com/package/@orangecheck/mark), and
+inside the button.
+
+<MarkVariants />
+
+| Variant | Use it                                                                                             |
+| ------- | -------------------------------------------------------------------------------------------------- |
+| `mono`  | Anywhere your button's text has 3:1 contrast with its background. It is drawn in your text colour. |
+| `brand` | On dark backgrounds only. Its lightest face is about 1.3:1 on white.                               |
+| `tile`  | On any background: the brand mark on its own ink tile.                                             |
+
+```ts
+import { markSvg } from '@orangecheck/mark';
+
+declare const slot: HTMLElement;
+
+slot.insertAdjacentHTML('afterbegin', markSvg({ variant: 'mono' }));
+```
+
+## Native apps and games
+
+`@orangecheck/mark/assets/` has every variant as SVG and as PNG at 16, 24, 32,
+48, 64, 96, 128 and 256 px wide (`orangecheck-mark-mono-white-32.png`, and so
+on). Godot 4 imports the SVG directly:
+
+```gdscript
+var button := Button.new()
+button.text = "Sign in with orangecheck"
+button.icon = preload("res://ui/orangecheck-mark-mono-white.svg")
+button.expand_icon = true
+```
+
+Keep your theme's font, colours and focus style; give the button 44px of height.
+
+Download them from npm, or straight from
+[jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark@0.1/assets/).
+
+## The rules
+
+### The words
+
+| Use                              | Words                     |
+| -------------------------------- | ------------------------- |
+| Default                          | Sign in with orangecheck  |
+| A flow that continues an account | Continue with orangecheck |
+| A sign-up form                   | Sign up with orangecheck  |
+| While the window is open         | Signing in…               |
+
+"orangecheck" is always lowercase, and never "OC" or "OrangeCheck" on a button.
+The button refuses any other label. If you need these in another language,
+[ask](https://github.com/orangecheck/oc-packages/issues).
+
+### Size and space
+
+- The mark is at least 16px wide. At the default size it is 1.5em, so 16px text
+  gives a 24px mark.
+- Leave clear space around the mark of at least a quarter of its width. The
+  default gap to the words is 0.5em.
+- Keep the button at least 44px tall, or as tall as your own buttons with
+  `--oc-target`.
+
+### Never
+
+- Recolour the mark other than mono in your text colour, or put the brand mark
+  on a light background.
+- Stretch it, rotate it, split its faces, crop it or outline it.
+- Show it larger than your own brand. It says the sign-in goes through
+  orangecheck; it does not stand for your site.
+
+The code and files are MIT. The mark is orangecheck's trademark, and
+[the trademark policy](https://github.com/orangecheck/oc-packages/blob/main/TRADEMARK.md)
+says how it may be used. Using it in a sign-in button, as above, is fine.

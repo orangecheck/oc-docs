@@ -837,6 +837,13 @@
     "@orangecheck/wallet-adapter" "^0.7.0"
     "@simplewebauthn/browser" "^13.3.0"
 
+"@orangecheck/auth-core@^2.17.0":
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.18.0.tgz#08ff04ebf8bfc7da5fce8173f182de792b9948e7"
+  integrity sha512-/isxk8cCCr3mHiIZ0nruFYTKLTWIujiEI3SEQmrMdhP88uhzHMdjfEf6kHkWYEvZkuLBHqwXa2/ypkIhNd9t9g==
+  dependencies:
+    jose "^6.2.2"
+
 "@orangecheck/bip322@^1.1.0", "@orangecheck/bip322@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.1.2.tgz#13eb134e3f8426fa47d6de902b75fe9071bd0c96"
@@ -845,6 +852,18 @@
     "@noble/curves" "^1.9.7"
     "@noble/hashes" "^1.8.0"
     "@scure/base" "^1.2.6"
+
+"@orangecheck/mark@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/mark/-/mark-0.1.0.tgz#6b5fcef88f2893888589933ea856ceb7c1a7be5e"
+  integrity sha512-2PBA4sMt0g3lGSvmWLXZIVU2cTEcgwbzZdH2PtRlr1wk6pcaVrZjsTnRY39yc3CBQ8isJ4ggKOyAPG4b6ICIBw==
+
+"@orangecheck/me-client@^0.46.0":
+  version "0.46.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.46.0.tgz#12b4f8047c894718596f090361727ff5094db188"
+  integrity sha512-JhGT+LZ8XCrdLzwA7Ttfo1Naitw3Ce+bxqTImkpjnecszgK5y1xLLTTpdp8e/5EUKDq47r7DBvqCatzIspK6qg==
+  dependencies:
+    "@orangecheck/auth-core" "^2.17.0"
 
 "@orangecheck/site-kit@^0.5.1":
   version "0.5.2"
@@ -4997,6 +5016,11 @@ jiti@^2.7.0:
   version "2.7.0"
   resolved "https://registry.npmjs.org/jiti/-/jiti-2.7.0.tgz#974228f2f4ca2bc21885a1797b45fea68e950c64"
   integrity sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==
+
+jose@^6.2.2:
+  version "6.2.13"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-6.2.13.tgz#4e16bf3cc81b5641ef5025cb2c9f61edfa92572f"
+  integrity sha512-7TIg10ZE1x82YediN+lcrPNvGMKge9yFHQD+Qho/b8y2adfugU3AsvvHfxV0fzyFllT6l9xCjf4RWY9g/Z9PJQ==
 
 js-file-download@^0.4.12:
   version "0.4.12"

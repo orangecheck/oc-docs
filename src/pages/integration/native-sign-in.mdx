@@ -13,7 +13,7 @@ one-time code back. Your server trades the code for the same token the popup
 gives, bound to your site. Nothing secret is in the app.
 
 This is for test projects while we prove it on real builds. It needs
-`@orangecheck/me-client` 0.49.0 or `orangecheck` 3.5.0 on your server.
+`@orangecheck/me-client` 0.50.0 or `orangecheck` 3.6.0 on your server.
 
 ## How it works
 
@@ -27,8 +27,9 @@ This is for test projects while we prove it on real builds. It needs
 3. The browser comes back to `http://127.0.0.1:<port>/<path>?code=…&state=…`.
    The app checks `state` and shows a page that says to go back to the game.
 4. The app sends the code, its verifier and its redirect to your server. Your
-   server trades them with `exchangeNativeCode` (or `exchange_native_code`) and
-   starts its own session.
+   server trades them with `exchangeNativeCode` (or `exchange_native_code`),
+   which checks the token as your popup route does, and starts its own session
+   only on `valid`.
 
 A code works once, for a minute, and only with the verifier its challenge was
 made from, for your project and the exact redirect it was sent to. A sign-out
@@ -219,6 +220,10 @@ The same five steps, in whatever your engine has:
 
 ## Your server: Node
 
+Set `OC_PROJECT_KEY` and `OC_SIGNING_SECRET` on your server, as for the popup.
+The project key comes from your config, never from the app's request: it decides
+whose sign-in rule and list of ended sessions apply.
+
 ```ts
 import {
     exchangeNativeCode,
@@ -235,16 +240,22 @@ export async function nativeSignIn(body: {
     code: string;
     code_verifier: string;
     redirect_uri: string;
-}): Promise<{ status: number; session?: string }> {
-    const out = await exchangeNativeCode({
-        code: body.code,
-        codeVerifier: body.code_verifier,
-        redirectUri: body.redirect_uri,
-        projectKey: 'pk_test_…',
-        audience: 'https://your-game.example',
-    });
+}): Promise<{ status: number; session?: string; back_url?: string }> {
+    const out = await exchangeNativeCode(
+        {
+            code: body.code,
+            codeVerifier: body.code_verifier,
+            redirectUri: body.redirect_uri,
+            audience: 'https://your-game.example',
+        },
+        { projectKey: process.env.OC_PROJECT_KEY }
+    );
     if (out.status === 'unavailable') return { status: 503 };
-    if (out.status === 'invalid') return { status: 401 };
+    if (out.status === 'invalid') {
+        return out.reason === 'bond_required'
+            ? { status: 403, back_url: out.back_url }
+            : { status: 401 };
+    }
     if (!(await spendOnce(out.session.jti, out.session.exp ?? 0, spent)))
         return { status: 401 };
     return { status: 200, session: await startSession(out.session.did_oc) };
@@ -254,15 +265,27 @@ export async function nativeSignIn(body: {
 ## Your server: Python
 
 ```python
-from orangecheck import MemoryJtiStore, NativeSignIn, exchange_native_code, spend_once
+import os
+
+from orangecheck import MemoryJtiStore, NativeSignIn, RevocationList, exchange_native_code, spend_once
 
 spent = MemoryJtiStore()  # in production, a store every server shares
+revocations = RevocationList(os.environ["OC_PROJECT_KEY"], os.environ["OC_SIGNING_SECRET"])
 
 
 def native_sign_in(code: str, code_verifier: str, redirect_uri: str) -> tuple[int, str]:
-    got = exchange_native_code(code, code_verifier, redirect_uri, "pk_test_…", "https://your-game.example")
+    got = exchange_native_code(
+        code,
+        code_verifier,
+        redirect_uri,
+        "https://your-game.example",
+        project_key=os.environ["OC_PROJECT_KEY"],
+        revocations=revocations,
+    )
     if not isinstance(got, NativeSignIn):
-        return (503 if got.status == "unavailable" else 401), ""
+        if got.status == "unavailable":
+            return 503, ""
+        return (403, got.back_url or "") if got.reason == "bond_required" else (401, "")
     if not spend_once(got.session.jti, got.session.exp, spent):
         return 401, ""
     return 200, got.session.did_oc
@@ -270,9 +293,17 @@ def native_sign_in(code: str, code_verifier: str, redirect_uri: str) -> tuple[in
 
 ## What comes back
 
-The same token as the popup's: bound to your site, with `rh` for sign out
-everywhere, and `azp: "native"` so you can tell how it was made. Verify it, read
-the list of ended sessions and spend its `jti` exactly as you do for the
-popup's. `invalid_grant` means start again: the code was spent, expired, or sent
-with another verifier, redirect or project. `unavailable` is an outage: answer
-it 503 so the app tries again.
+Start a session only from `valid`. By then the helper has done everything your
+popup route does: verified the token for your site, checked it against the list
+of ended sessions, and applied your project's "who can sign in" rule. All that
+is left is to spend its `jti` once. Don't verify the token again by hand
+instead: a hand-rolled check skips the rule and the list.
+
+The token is the popup's: bound to your site, with `rh` for sign out everywhere,
+and `azp: "native"` so you can tell how it was made. `invalid_grant` means start
+again: the code was spent, expired, or sent with another verifier, redirect or
+project. `session_ended` means the player ended their sessions everywhere.
+`bond_required` means the account doesn't meet your rule: `back_url` is where
+the player backs it, so show it in the game. `unavailable` is an outage, an
+unreadable list of ended sessions or rule among them: answer it 503 so the app
+tries again.

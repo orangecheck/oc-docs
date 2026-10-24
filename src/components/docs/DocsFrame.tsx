@@ -66,10 +66,8 @@ function pagerFor(path: string): { prev?: PagerLink; next?: PagerLink } {
     return { prev: prev ? link(prev) : undefined, next: next ? link(next) : undefined };
 }
 
-// Signed out, the family's one account phrase and address, drawn as ochk.io draws it; signed in, the account menu.
-const actions = (
-    <SessionAccount signInLabel={GET_AN_ACCOUNT.label} signInHref={GET_AN_ACCOUNT.href} />
-);
+// Signed out, the family's account phrase to ochk.io's sign-in, which returns to this page; signed in, the account menu.
+const actions = <SessionAccount signInLabel={GET_AN_ACCOUNT.label} />;
 const search = <DocsSearch />;
 
 /**

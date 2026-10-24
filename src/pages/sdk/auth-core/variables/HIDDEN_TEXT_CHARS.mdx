@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Variable: HIDDENTEXTCHARS",
+    description: "Auto-generated API reference for Variable: HIDDENTEXTCHARS. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / HIDDEN\_TEXT\_CHARS
+
+# Variable: HIDDEN\_TEXT\_CHARS
+
+```ts
+const HIDDEN_TEXT_CHARS: RegExp;
+```
+
+Defined in: [display-name.ts:14](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L14)
+
+What can hide or reorder part of a text on a consent screen or in a notice:
+control and format characters (bidi embeddings, overrides and isolates,
+zero-width marks, soft hyphens, tags), lone surrogates, and the fillers that
+render as nothing. Variation selectors stay: they only pick a glyph.

@@ -56,10 +56,10 @@ ballot was dated by its voter's own clock.
 2026-11-15T00:00:00Z is anchored
 ([anchoring](/vote/spec#3-anchoring-a-ballot-spec-46)). Bob's client also stamps
 his ballot with OC Stamp and sends the stamp id to OpenTimestamps calendars;
-vote.ochk.io's anchorer stamps every ballot it sees as a fallback. The tally
-checks each ballot's anchor against Bitcoin block headers and counts only
-ballots anchored at or below `H_close + G` (`G` = 36 blocks). Until the
-tallier's chain tip reaches `H_close + G + 6` the result says
+vote.ochk.io's anchorer stamps the ballots it sees, within its limits, as a
+fallback. The tally checks each ballot's anchor against Bitcoin block headers
+and counts only ballots anchored at or below `H_close + G` (`G` = 36 blocks).
+Until the tallier's chain tip reaches `H_close + G + 6` the result says
 `"state": "provisional"` and how many counted ballots are not yet anchored;
 after that it is `"tallied"` with `"basis": "anchored"`.
 

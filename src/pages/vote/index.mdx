@@ -51,8 +51,9 @@ rules.
 
 Anyone can anchor a ballot: the voter's own client, or anyone else who sees it.
 A tally reads the anchors, not who made them. vote.ochk.io runs a convenience
-anchorer that stamps every ballot it sees in an open anchored poll. It is never
-required, and anyone can run another.
+anchorer that stamps the ballots it sees in open anchored polls, within
+published limits: per run, 300 new stamps shared across polls, 50 a poll, and 50
+polls read. It is never required, and anyone can run another.
 
 - **vote.ochk.io anchorer:** `bc1qqcnk97s4este4ul5n5fl4srp0gshhcr8gegf8e`
   (liveness only; replaceable; its signature carries no authority)

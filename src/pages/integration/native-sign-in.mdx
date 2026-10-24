@@ -305,5 +305,5 @@ again: the code was spent, expired, or sent with another verifier, redirect or
 project. `session_ended` means the player ended their sessions everywhere.
 `bond_required` means the account doesn't meet your rule: `back_url` is where
 the player backs it, so show it in the game. `unavailable` is an outage, an
-unreadable list of ended sessions or rule among them: answer it 503 so the app
-tries again.
+unreadable list of ended sessions or rule among them: answer it 503, and have
+the app start the sign-in again, since the code may already be spent.

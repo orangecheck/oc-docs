@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'ochk.app · SDK reference',
     description:
-        '@orangecheck/me-client SDK reference. Three entry points: the main one (oc.* calls and types, no React), /server (withOcAuth for Next.js, ocAuthExpress, ocAuthHono, verifyOcToken) and /popup (signInWithOc, browser only). Sign-in, events, webhooks, price configs, what users share, and other signals.',
+        '@orangecheck/me-client SDK reference. Three entry points: the main one (oc.* calls and types, no React), /server (withOcAuth for Next.js, ocAuthExpress, ocAuthHono, checkOcToken, verifyOcToken) and /popup (signInWithOc, browser only). Sign-in, events, webhooks, price configs, what users share, and other signals.',
 };
 
 # `@orangecheck/me-client` · SDK reference
@@ -19,9 +19,9 @@ paying them. Three entry points:
   imports it as it is.
 - **`@orangecheck/me-client/server`**: checks the session on your server.
   `withOcAuth` (Next.js Pages), `ocAuthExpress`, `ocAuthHono`,
-  `getOcSession(headers)`, `verifyOcToken(token)`. You never fetch or handle a
-  JWK: the SDK does that and caches it. A backend in Python or any other
-  language checks the token itself: see
+  `getOcSession(headers)`, `checkOcToken(token)`, `verifyOcToken(token)`. You
+  never fetch or handle a JWK: the SDK does that and caches it. A backend in
+  Python or any other language checks the token itself: see
   [verify without the SDK](#verify-without-the-sdk).
 - **`@orangecheck/me-client/popup`**: browser only. `signInWithOc()` opens the
   orangecheck sign-in popup and resolves with a token bound to your origin, the
@@ -177,7 +177,7 @@ token and nothing sends a Bearer header.
 // Next.js Pages · pages/api/auth/session.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { verifyOcToken } from '@orangecheck/me-client/server';
+import { checkOcToken } from '@orangecheck/me-client/server';
 
 export default async function session(
     req: NextApiRequest,
@@ -185,10 +185,15 @@ export default async function session(
 ) {
     if (req.method !== 'POST') return res.status(405).end();
     const token = String(req.body?.token ?? '');
-    const s = await verifyOcToken(token, {
+    const checked = await checkOcToken(token, {
         audience: 'https://yourapp.example',
     });
-    if (!s) return res.status(401).json({ ok: false });
+    // ochk.io's keys can't be read right now: the page can try again.
+    if (checked.status === 'unavailable') {
+        return res.status(503).json({ ok: false, reason: checked.reason });
+    }
+    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    const s = checked.session;
     const maxAge = (s.exp ?? 0) - Math.floor(Date.now() / 1000);
     res.setHeader(
         'Set-Cookie',

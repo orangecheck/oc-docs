@@ -94,7 +94,7 @@ function Host({
 /** The three made-up sites, side by side. */
 export function SignInButtonHosts() {
     return (
-        <div data-demo="hosts" className="not-prose my-6 grid gap-4 lg:grid-cols-3">
+        <div data-demo="hosts" className="not-prose my-6 grid gap-4">
             <style>{HOST_CSS}</style>
             <Host id="ledger" name="Ledger" own="Email me a code" ownClass="host-btn solid" />
             <Host id="studio" name="Studio" own="Continue with email" ownClass="host-btn solid" />

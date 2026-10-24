@@ -9,13 +9,17 @@ import { useState } from 'react';
  * Three made-up sites, each with its own button style, light and dark. The
  * orangecheck button takes the same class as the site's own button and draws
  * nothing of its own: font, colour, radius, height, hover and focus are the
- * site's. Signing in here opens the real orangecheck window.
+ * site's. Each shows it with words and as the mark alone (the site's icon
+ * button: no padding, a 44px square). Signing in here opens the real
+ * orangecheck window.
  */
 const HOST_CSS = `
-[data-demo-host] { border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-[data-demo-host] .demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-[data-demo-host] .demo-name { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
-[data-demo-host] .demo-note { font-size: 13px; min-height: 1.4em; margin: 0; }
+[data-demo-host] { border-radius: 14px; padding: 20px; }
+[data-demo-host] .demo-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+[data-demo-host] .demo-name { display: block; font-size: 12px; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+[data-demo-host] .demo-note { font-size: 13px; margin: 0; }
+[data-demo-host] .demo-note:not(:empty) { margin-top: 12px; }
+[data-demo-host] .host-btn.host-icon { padding: 0; min-width: 44px; }
 
 [data-demo-host='ledger'] { background: #fbfaf7; color: #1c1917; font-family: system-ui, sans-serif; border: 1px solid #e7e5e4; }
 [data-demo-host='ledger'] .host-btn { font: 640 16px/1.2 system-ui, sans-serif; color: #1c1917; background: transparent; border: 1px solid #d6d3d1; border-radius: 10px; padding: 9px 20px; min-height: 44px; }
@@ -26,8 +30,8 @@ const HOST_CSS = `
 :is(.dark *) [data-demo-host='ledger'] .host-btn:hover { background: #292524; }
 :is(.dark *) [data-demo-host='ledger'] .host-btn.solid { background: #fafaf9; color: #1c1917; border-color: #fafaf9; }
 
-[data-demo-host='studio'] { background: #ffffff; color: #18181b; font-family: Inter, system-ui, sans-serif; border: 1px solid #e4e4e7; --oc-target: 40px; }
-[data-demo-host='studio'] .host-btn { font: 500 14px/1 Inter, system-ui, sans-serif; color: #18181b; background: #ffffff; border: 1px solid #d4d4d8; border-radius: 2px; padding: 0 14px; height: 40px; }
+[data-demo-host='studio'] { background: #ffffff; color: #18181b; font-family: Inter, system-ui, sans-serif; border: 1px solid #e4e4e7; }
+[data-demo-host='studio'] .host-btn { font: 500 14px/1 Inter, system-ui, sans-serif; color: #18181b; background: #ffffff; border: 1px solid #d4d4d8; border-radius: 2px; padding: 0 14px; min-height: 44px; }
 [data-demo-host='studio'] .host-btn:hover { border-color: #0e9fb3; }
 [data-demo-host='studio'] .host-btn:focus-visible { outline: 2px solid #0e9fb3; outline-offset: 1px; }
 [data-demo-host='studio'] .host-btn.solid { background: #0e9fb3; color: #ffffff; border-color: #0e9fb3; }
@@ -39,6 +43,7 @@ const HOST_CSS = `
 [data-demo-host='lantern'] .host-btn { font: 600 15px/1.2 Inter, system-ui, sans-serif; color: #2b1d05; background: #f2b04a; border: 0; border-radius: 11px; padding: 12px 18px; min-height: 46px; }
 [data-demo-host='lantern'] .host-btn:hover { filter: brightness(1.06); }
 [data-demo-host='lantern'] .host-btn.quiet { background: transparent; box-shadow: inset 0 0 0 1px #e8c27a; }
+[data-demo-host='lantern'] .host-btn.host-icon { min-width: 46px; }
 :is(.dark *) [data-demo-host='lantern'] { background: #17120a; color: #f8ecd6; border-color: #3a2c12; }
 :is(.dark *) [data-demo-host='lantern'] .host-btn.quiet { color: #f8ecd6; box-shadow: inset 0 0 0 1px #6b5023; }
 `;
@@ -83,6 +88,13 @@ function Host({
                     onSignedIn={onSignedIn}
                     onOutcome={onOutcome}
                 />
+                <SignInWithOrangecheck
+                    className="host-btn host-icon"
+                    label={false}
+                    mark={mark}
+                    onSignedIn={onSignedIn}
+                    onOutcome={onOutcome}
+                />
             </div>
             <p className="demo-note" role="status">
                 {note}
@@ -91,7 +103,7 @@ function Host({
     );
 }
 
-/** The three made-up sites, side by side. */
+/** The three made-up sites, one above another. */
 export function SignInButtonHosts() {
     return (
         <div data-demo="hosts" className="not-prose my-6 grid gap-4">

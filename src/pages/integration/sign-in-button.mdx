@@ -15,18 +15,16 @@ export const metadata = {
 Your sign-in button already has a look. Keep it. The orangecheck button takes
 your button's class and draws nothing of its own: it brings the orangecheck
 mark, the words, the popup and the busy state. Install `@orangecheck/me-client`
-0.46.0 or later.
+0.47.0 or later.
 
 ## In three different sites
 
 Three made-up sites, each with its own buttons. Beside each site's own button is
-the orangecheck button, given the same class. Switch the docs between light and
-dark to see both. Signing in here opens the real orangecheck window.
+the orangecheck button, given the same class, then the mark alone in the site's
+icon button. Switch the docs between light and dark to see both. Signing in here
+opens the real orangecheck window.
 
 <SignInButtonHosts />
-
-Studio's buttons are 40px tall, so it sets `--oc-target: 40px`; without it the
-button keeps a 44px target.
 
 ## React
 
@@ -54,14 +52,16 @@ export function SignIn(): ReactElement {
 once; it is optional and has zero specificity, so every rule of yours wins over
 it. Without it the button is yours with the mark in it.
 
-| Prop         | Default                    |                                                                                              |
-| ------------ | -------------------------- | -------------------------------------------------------------------------------------------- |
-| `onSignedIn` | required                   | Called with `{ account, token }`. The button stays busy until it settles.                    |
-| `onOutcome`  | none                       | Called with how every window ended: `signed_in`, `blocked`, `closed`, `aborted` or `failed`. |
-| `appearance` | `inherit`                  | `inherit` adds no colour, font, border or radius. `brand` is orangecheck's button.           |
-| `mark`       | `mono`                     | `mono`, `brand`, `tile`, or `false` for none. See [the mark](#the-mark).                     |
-| `label`      | "Sign in with orangecheck" | One of `SIGN_IN_LABELS`. See [the words](#the-words).                                        |
-| `popup`      | none                       | Popup options, such as a preview `popupOrigin`.                                              |
+| Prop              | Default                    |                                                                                                                            |
+| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `onSignedIn`      | required                   | Called with `{ account, token }`. The button stays busy until it settles.                                                  |
+| `onOutcome`       | none                       | Called with how every window ended: `signed_in`, `blocked`, `closed`, `aborted` or `failed`.                               |
+| `appearance`      | `inherit`                  | `inherit` adds no colour, font, border, radius or focus ring. `brand` is orangecheck's button.                             |
+| `mark`            | `mono`                     | `mono`, `brand`, `tile`, or `false` for none. See [the mark](#the-mark).                                                   |
+| `label`           | "Sign in with orangecheck" | The words, in your language if you like, keeping "orangecheck". `false` draws the mark alone. See [the words](#the-words). |
+| `busyLabel`       | "Signing in…"              | What it says while the window is open.                                                                                     |
+| `accessibleLabel` | "Sign in with orangecheck" | What a screen reader says for the mark alone.                                                                              |
+| `popup`           | none                       | Popup options, such as a preview `popupOrigin`.                                                                            |
 
 Everything else (`className`, `style`, `id`, `aria-describedby`, `disabled`)
 goes to the native `<button>`.
@@ -69,11 +69,24 @@ goes to the native `<button>`.
 ## Plain HTML and JavaScript
 
 No framework, no bundler. Write the button as you write every other one, and add
-`data-oc-sign-in`:
+`data-oc-sign-in`, with an empty `<span data-oc-mark>` where the mark goes:
 
 ```html
-<button class="cta ghost" data-oc-sign-in>Sign in with orangecheck</button>
+<button class="cta ghost" data-oc-sign-in>
+    <span data-oc-mark></span>Sign in with orangecheck
+</button>
 <p id="oc-note" role="status"></p>
+```
+
+`button.css` gives the empty span the mark's size, so the button is its final
+width before the script runs, and drawing the mark moves nothing. Words already
+in the button are kept if they say "orangecheck". For the mark alone, leave the
+words out and add `data-label="none"`:
+
+```html
+<button class="icon-button" data-oc-sign-in data-label="none">
+    <span data-oc-mark></span>
+</button>
 ```
 
 Then enhance it:
@@ -125,31 +138,51 @@ ink, with the mark as drawn. Theme it with custom properties.
 
 <SignInButtonBrand />
 
-| Property               | Default                                       |
-| ---------------------- | --------------------------------------------- |
-| `--oc-button-bg`       | `#0a0a0a`                                     |
-| `--oc-button-fg`       | `#fafafa`                                     |
-| `--oc-button-border`   | `#262626`                                     |
-| `--oc-button-hover-bg` | `#262626`                                     |
-| `--oc-button-radius`   | `10px`                                        |
-| `--oc-button-font`     | your font                                     |
-| `--oc-button-size`     | `1rem`                                        |
-| `--oc-button-weight`   | `600`                                         |
-| `--oc-button-pad`      | `1.25em`                                      |
-| `--oc-focus`           | `#fb933c` (brand), your text colour (inherit) |
+| Property               | Default   |
+| ---------------------- | --------- |
+| `--oc-button-bg`       | `#0a0a0a` |
+| `--oc-button-fg`       | `#fafafa` |
+| `--oc-button-border`   | `#262626` |
+| `--oc-button-hover-bg` | `#262626` |
+| `--oc-button-radius`   | `10px`    |
+| `--oc-button-font`     | your font |
+| `--oc-button-size`     | `1rem`    |
+| `--oc-button-weight`   | `600`     |
+| `--oc-button-pad`      | `1.25em`  |
+| `--oc-focus`           | `#fb933c` |
 
-Both appearances read `--oc-mark-gap` (`0.5em`), `--oc-mark-size` (`1.5em`) and
-`--oc-target` (`44px`).
+Both appearances read these:
+
+| Property         | Default  |                                                                                                                                                          |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--oc-mark-gap`  | `0.5em`  | The space between the mark and the words.                                                                                                                |
+| `--oc-mark-size` | `1.75em` | The mark's width; its height is half that. The tile is `1.25em` square.                                                                                  |
+| `--oc-target`    | `44px`   | The smallest height, and the mark alone's smallest width. 44px is the rule. Lower it only if your own buttons already give a 44px target some other way. |
 
 ## While it works
 
 - Clicking opens the orangecheck window inside the click, before anything is
   awaited, so browsers do not block it.
-- While the window is open the button says "Signing in…", and is `aria-busy` and
-  `aria-disabled`. It keeps focus and opens no second window.
+- While the window is open the button says "Signing in…" (or your `busyLabel`),
+  and is `aria-busy` and `aria-disabled`. It keeps focus, keeps its width so
+  nothing beside it moves, and opens no second window.
 - When the window closes, the button is ready again, and `onOutcome` says why:
   show `OUTCOME_COPY.blocked`, `.closed` or `.failed` near it.
 - A button you set `disabled` never opens a window.
+
+## For everyone
+
+- Inside a button with words, the mark is decoration: `aria-hidden`, never
+  focused. The words name the button.
+- The mark alone is named by `aria-label`, "Sign in with orangecheck" or your
+  `accessibleLabel`, and is at least 44px each way.
+- `inherit` draws no focus ring of its own, so your site's ring shows, as on
+  your other buttons. If your buttons have no visible focus style, give them
+  one. `brand` has its own ring.
+- When the system forces its own colours (Windows contrast themes), the mark
+  becomes one flat shape in the button's text colour, the tile loses its ink
+  square, and `brand`'s edge and ring take the system colours.
+- The words stay on one line, and the mark has its size before it is drawn.
 
 ## The mark
 
@@ -159,11 +192,11 @@ inside the button.
 
 <MarkVariants />
 
-| Variant | Use it                                                                                             |
-| ------- | -------------------------------------------------------------------------------------------------- |
-| `mono`  | Anywhere your button's text has 3:1 contrast with its background. It is drawn in your text colour. |
-| `brand` | On dark backgrounds only. Its lightest face is about 1.3:1 on white.                               |
-| `tile`  | On any background: the brand mark on its own ink tile.                                             |
+| Variant | Use it                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mono`  | Anywhere your button's text has 3:1 contrast with its background. It is drawn in your text colour: its three faces at full, 60% and 30% strength. |
+| `brand` | On dark backgrounds only. Its lightest face is about 1.3:1 on white.                                                                              |
+| `tile`  | On any background: the brand mark on its own ink tile.                                                                                            |
 
 ```ts
 import { markSvg } from '@orangecheck/mark';
@@ -176,20 +209,28 @@ slot.insertAdjacentHTML('afterbegin', markSvg({ variant: 'mono' }));
 ## Native apps and games
 
 `@orangecheck/mark/assets/` has every variant as SVG and as PNG at 16, 24, 32,
-48, 64, 96, 128 and 256 px wide (`orangecheck-mark-mono-white-32.png`, and so
-on). Godot 4 imports the SVG directly:
+40, 48, 64, 80, 96, 128 and 256 px wide (`orangecheck-mark-mono-white-40.png`,
+and so on). The mark is twice as wide as it is tall, so the 40px file is 20px
+tall, the size beside 16px words, and the 80px file is the same mark for a 2x
+screen. `mono-white` reads on a dark theme, `mono-black` on a light one, and
+`tile` on either. In Godot 4:
 
 ```gdscript
 var button := Button.new()
 button.text = "Sign in with orangecheck"
-button.icon = preload("res://ui/orangecheck-mark-mono-white.svg")
-button.expand_icon = true
+button.icon = preload("res://ui/orangecheck-mark-mono-white-80.png")
+button.add_theme_constant_override("icon_max_width", 40)
+button.custom_minimum_size.y = 44
 ```
 
-Keep your theme's font, colours and focus style; give the button 44px of height.
+The words are plain text. Keep your theme's font, colours and focus style.
+
+Signing in from a game works in a web export only, for now: the page that hosts
+the game opens the orangecheck window, as in
+[plain HTML](#plain-html-and-javascript). A native build cannot sign in yet.
 
 Download them from npm, or straight from
-[jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark@0.1/assets/).
+[jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark@0.2/assets/).
 
 ## The rules
 
@@ -202,18 +243,38 @@ Download them from npm, or straight from
 | A sign-up form                   | Sign up with orangecheck  |
 | While the window is open         | Signing in…               |
 
-"orangecheck" is always lowercase, and never "OC" or "OrangeCheck" on a button.
-The button refuses any other label. If you need these in another language,
-[ask](https://github.com/orangecheck/oc-packages/issues).
+These are the defaults (`SIGN_IN_LABELS`). In another language, write your own,
+and keep the name as it is: "orangecheck", lowercase, a word of its own.
+
+```tsx
+import type { ReactElement } from 'react';
+
+import { SignInWithOrangecheck } from '@orangecheck/me-client/react';
+
+declare function keepSession(token: string): Promise<void>;
+
+export function Connexion(): ReactElement {
+    return (
+        <SignInWithOrangecheck
+            className="btn"
+            label="Se connecter avec orangecheck"
+            busyLabel="Connexion…"
+            onSignedIn={({ token }) => keepSession(token)}
+        />
+    );
+}
+```
+
+The button refuses words without "orangecheck" in them, and "OC" or
+"OrangeCheck" in its place.
 
 ### Size and space
 
-- The mark is at least 16px wide. At the default size it is 1.5em, so 16px text
-  gives a 24px mark.
+- The mark is at least 16px wide. At the default size it is 1.75em, so 16px text
+  gives a 28px mark, 14px tall.
 - Leave clear space around the mark of at least a quarter of its width. The
   default gap to the words is 0.5em.
-- Keep the button at least 44px tall, or as tall as your own buttons with
-  `--oc-target`.
+- Keep the button at least 44px tall.
 
 ### Never
 

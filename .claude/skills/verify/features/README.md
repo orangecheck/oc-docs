@@ -33,6 +33,8 @@ recipe covers an id that no longer exists.
   charter and the docs charter.
 - [reference](reference.md): the home page, getting started, ecosystem, reference,
   integration, infrastructure and the OpenAPI references.
+- [sign-in-button](sign-in-button.md): the sign-in button page, in three made-up
+  sites' styles.
 - [sdk](sdk.md): the generated TypeDoc reference under `/sdk`.
 - [search](search.md): the search dialog.
 - [site](site.md): docs.ochk.io's 308s, moved pages, SDK aliases, `/api/og`, `/404`,

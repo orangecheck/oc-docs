@@ -3,7 +3,7 @@
 The docs home, getting started, the ecosystem pages, reference pages and the API
 references.
 
-<!-- covers: page:/, page:/getting-started/*, page:/ecosystem*, page:/reference/*, page:/integration*, page:/infrastructure/relay, page:/api-reference* -->
+<!-- covers: page:/, page:/getting-started/*, page:/ecosystem*, page:/reference/*, page:/integration, page:/integration/reference, page:/infrastructure/relay, page:/api-reference* -->
 
 ## Sub-features
 

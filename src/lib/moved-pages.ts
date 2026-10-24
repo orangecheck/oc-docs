@@ -3,7 +3,8 @@
  * the docs home when the content went with its product. Recovered from every
  * page this repo ever had (git history and old sitemaps), and from the family
  * sites whose old addresses land here, that answered 404 on 2026-10-20. Exact
- * paths only: a wildcard here would catch live pages.
+ * paths only: a wildcard here would catch live pages. A page removed later
+ * needs its entry too: the test compares each change's pages with main's.
  * docs.ochk.io/<path> reaches these through the old-host rule, one hop more.
  * The fixture in src/__tests__ writes each one out again.
  */
@@ -87,4 +88,7 @@ export const MOVED_PAGES: Readonly<Record<string, string>> = {
     '/sdk/react/type-aliases/Network': '/sdk/sdk/type-aliases/Network',
     '/sdk/react/type-aliases/Scheme': '/sdk/sdk/type-aliases/Scheme',
     '/sdk/react/type-aliases/ScoringAlgorithm': '/sdk/sdk/type-aliases/ScoringAlgorithm',
+    // pledge-core 3.3.0: the input is a type alias over the direct and delegated shapes.
+    '/sdk/pledge-core/interfaces/CreatePledgeInput':
+        '/sdk/pledge-core/type-aliases/CreatePledgeInput',
 };

@@ -4,6 +4,7 @@
  * through Next's own matcher over the real next.config, so a rule widened to a
  * wildcard catches a live page and turns this red.
  */
+import { execFileSync } from 'node:child_process';
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
@@ -18,6 +19,7 @@ import { MOVED_PAGES } from '../lib/moved-pages';
 import moved from './fixtures/moved-pages.json';
 
 const HOST = 'https://ochk.io';
+const ROOT = resolve(__dirname, '../..');
 const PAGES = resolve(__dirname, '../pages');
 
 const answer = (url: string) => unstable_getResponseFromNextConfig({ url, nextConfig });
@@ -29,15 +31,19 @@ function walk(dir: string): string[] {
     });
 }
 
-/** Every page on disk as its route: index → its folder; no API routes, no dynamic segments. */
-const live = walk(PAGES)
-    .map((f) => relative(PAGES, f))
-    .filter((f) => /\.(mdx|md|tsx)$/.test(f) && !/^(_|api\/)/.test(f) && !f.includes('['))
-    .map(
-        (f) =>
-            `/${f.replace(/\.(mdx|md|tsx)$/, '').replace(/(^|\/)index$/, '')}`.replace(/\/$/, '') ||
-            '/'
-    );
+/** Page files under src/pages as routes: index → its folder; no API routes, no dynamic segments. */
+const routes = (files: string[]) =>
+    files
+        .filter((f) => /\.(mdx|md|tsx)$/.test(f) && !/^(_|api\/)/.test(f) && !f.includes('['))
+        .map(
+            (f) =>
+                `/${f.replace(/\.(mdx|md|tsx)$/, '').replace(/(^|\/)index$/, '')}`.replace(
+                    /\/$/,
+                    ''
+                ) || '/'
+        );
+
+const live = routes(walk(PAGES).map((f) => relative(PAGES, f)));
 
 describe('moved docs pages', () => {
     it('are written out in the fixture, one for one', () => {
@@ -68,5 +74,27 @@ describe('moved docs pages', () => {
             if (getRedirectUrl(res) && !/^\/sdk\/[^/]+$/.test(route)) redirected.push(route);
         }
         expect(redirected).toEqual([]);
+    });
+
+    // A TypeDoc sync drops the page of a renamed or reshaped export. CI names the
+    // commit main was at (DOCS_BASE_SHA); locally it is where this branch left origin/main.
+    it('include every page the base commit had that is gone now', async () => {
+        const git = (...args: string[]) =>
+            execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' });
+        const base = process.env.DOCS_BASE_SHA || git('merge-base', 'HEAD', 'origin/main').trim();
+        const before = routes(
+            git('ls-tree', '-r', '-z', '--name-only', base, '--', 'src/pages/')
+                .split('\0')
+                .filter(Boolean)
+                .map((f) => f.slice('src/pages/'.length))
+        );
+        expect(before.length).toBeGreaterThan(1000);
+        const stranded: string[] = [];
+        for (const route of before.filter((r) => !live.includes(r))) {
+            const location = getRedirectUrl(await answer(`${HOST}/docs${route}`));
+            const lands = location && (new URL(location).pathname.replace(/^\/docs/, '') || '/');
+            if (!lands || !live.includes(lands)) stranded.push(route);
+        }
+        expect(stranded, `gone since ${base}: add each to MOVED_PAGES and the fixture`).toEqual([]);
     });
 });

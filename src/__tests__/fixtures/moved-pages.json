@@ -1,5 +1,5 @@
 {
-    "source": "Every docs page this repo ever had that answered 404 on 2026-10-20, and where it lands now (src/lib/moved-pages.ts). Locations are the full address a browser lands on.",
+    "source": "Every docs page this repo has removed, and where it lands now (src/lib/moved-pages.ts). Locations are the full address a browser lands on.",
     "routes": [
         {
             "path": "/docs/api",
@@ -264,6 +264,10 @@
         {
             "path": "/docs/sdk/react/type-aliases/ScoringAlgorithm",
             "location": "https://ochk.io/docs/sdk/sdk/type-aliases/ScoringAlgorithm"
+        },
+        {
+            "path": "/docs/sdk/pledge-core/interfaces/CreatePledgeInput",
+            "location": "https://ochk.io/docs/sdk/pledge-core/type-aliases/CreatePledgeInput"
         }
     ]
 }

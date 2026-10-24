@@ -269,7 +269,8 @@ Each line is a way an integration has gone wrong, with why it matters.
 
 - [ ] Signing out clears your session and, where the token is your session,
       [ends the token](/me/sdk#ending-a-session). _Otherwise orangecheck goes on
-      accepting the token until it expires._
+      accepting the token until it expires; once ended, your own server refuses
+      it within about two minutes too._
 - [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, refuses to start
       without either, and your domain is verified. _Without them, "sign out
       everywhere" never reaches your site._

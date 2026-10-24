@@ -508,6 +508,28 @@ curl -X POST https://ochk.io/api/auth/revoke \
 Up to 8 tokens per call, from your server. Holding a token is the authority to
 end it, so no other credential is asked for.
 
+What an ended token reaches, and when:
+
+- ochk.io, me.ochk.io and the family sites refuse it within a minute.
+- Your own server refuses it within about two minutes, wherever it checks
+  sessions against
+  [the list of ended sessions](#when-someone-ends-every-session) (`withOcAuth`
+  or `checkOcSession` in me-client; `verify_session` with a `RevocationList` in
+  `orangecheck` 3.3.1 or later). me.ochk.io lists the token for your origin
+  within a minute, and your server reads that list at most once a minute. A
+  copied cookie that holds it stops working there too.
+- Clearing your own cookie is what ends the session on your site at once; do
+  both.
+- Tokens ended before 2026-10-24 are not on your list. They expire within 30
+  days of sign-in.
+- One account's ended tokens at your origin fold after 16: the list then holds a
+  single cutoff for that account there, which ends every token of that account
+  at your origin issued up to its newest ended one, including a session still
+  live on another device. Other people's sessions are untouched. The list is
+  capped at 20,000 entries per origin; past that me.ochk.io answers 503
+  `revocations_unavailable` rather than send part of it, and your writes wait as
+  for any outage.
+
 `revokeToken` (me-client 0.41.0 or later) and `revoke_token` (`orangecheck`
 3.2.0 or later) make that call. A call that can't be valid throws before
 anything is sent; an outage or a refusal is a result, never a throw, so it can't
@@ -753,20 +775,20 @@ X-OC-Signature: t=<unix>,v1=hmac_sha256(signing_secret, "<t>.GET /api/integrator
 
 `aud` is the token's `aud` exactly as it is, and must be your verified domain, a
 subdomain of it, or your test project's development origin. The answer is
-`{ "v": 1, "at": …, "tokens": [], "accounts": {}, "handles": { "<rh>": <cutoff> } }`:
+`{ "v": 1, "at": …, "tokens": ["<key>"], "accounts": {}, "handles": { "<rh>": <cutoff> } }`:
 
 | Field      | Holds                                                                                                                                                                       |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `at`       | Unix seconds: when ochk.io read its store of ended sessions for this copy. A list built in milliseconds reads as stale.                                                     |
-| `tokens`   | Always empty here. orangecheck's own sites read ended single tokens from it in their own feed; it stays so older SDKs can read this answer.                                 |
-| `accounts` | Always empty here, for the same reason.                                                                                                                                     |
+| `tokens`   | The key of each token ended on its own for this origin, until it expires: base64url of the first 16 bytes of sha256(`"ocrev1:jti:" + jti`).                                 |
+| `accounts` | Always empty here: an account ended everywhere, or one whose tokens at your origin folded, is in `handles` under its handle for your origin.                                |
 | `handles`  | Each ended `rh` and its cutoff, in Unix seconds: the first whole second after the person ended their sessions. A sign-in after it has a later `iat` and is not ended by it. |
 
-A session is ended when `handles` holds its `rh` and its `iat` is before that
-cutoff, or it has no `iat`. Fetch it at most once a minute per origin, and don't
-trust a list whose `at` is more than ten minutes old, or more than a minute in
-the future. me.ochk.io answers `503 revocations_unavailable` rather than serve a
-copy older than ten minutes.
+A session is ended when `tokens` holds the key of its `jti`, or when `handles`
+holds its `rh` and its `iat` is before that cutoff, or it has no `iat`. Fetch it
+at most once a minute per origin, and don't trust a list whose `at` is more than
+ten minutes old, or more than a minute in the future. me.ochk.io answers
+`503 revocations_unavailable` rather than serve a copy older than ten minutes.
 
 **Who you trust, and what it tells you.** The list comes from ochk.io, the auth
 host, and me.ochk.io serves it; both are orangecheck. A handle is an HMAC under

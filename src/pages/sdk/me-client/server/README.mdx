@@ -12,7 +12,8 @@ export const metadata = {
 Server-side helpers: verify a sign-in token (`checkOcToken`,
 `verifyOcToken`), check a request's session (`checkOcSession`, `withOcAuth`,
 `ocAuthExpress`, `ocAuthHono`), end a token (`revokeToken`), spend one once
-(`spendOnce`), and the Connect calls. The rest of the client is in
+(`spendOnce`), trade a native app's sign-in code (`exchangeNativeCode`), and
+the Connect calls. The rest of the client is in
 [`@orangecheck/me-client`](/sdk/me-client/README), and the popup in
 [`@orangecheck/me-client/popup`](/sdk/me-client/popup/README).
 
@@ -30,6 +31,8 @@ Server-side helpers: verify a sign-in token (`checkOcToken`,
 - [ConnectOptions](interfaces/ConnectOptions)
 - [ConnectProvisionOptions](interfaces/ConnectProvisionOptions)
 - [ConnectRefused](interfaces/ConnectRefused)
+- [ExchangeNativeCodeInput](interfaces/ExchangeNativeCodeInput)
+- [ExchangeNativeCodeOptions](interfaces/ExchangeNativeCodeOptions)
 - [JtiStore](interfaces/JtiStore)
 - [OcSessionOptions](interfaces/OcSessionOptions)
 - [RevokeTokenOptions](interfaces/RevokeTokenOptions)
@@ -48,6 +51,8 @@ Server-side helpers: verify a sign-in token (`checkOcToken`,
 - [ConnectDeleteResult](type-aliases/ConnectDeleteResult)
 - [ConnectProvisionRefusal](type-aliases/ConnectProvisionRefusal)
 - [ConnectProvisionResult](type-aliases/ConnectProvisionResult)
+- [ExchangeNativeCodeRefusal](type-aliases/ExchangeNativeCodeRefusal)
+- [ExchangeNativeCodeResult](type-aliases/ExchangeNativeCodeResult)
 - [MergedUserMatch](type-aliases/MergedUserMatch)
 - [OcHonoEnv](type-aliases/OcHonoEnv)
 - [OcSessionCheck](type-aliases/OcSessionCheck)
@@ -76,6 +81,7 @@ Server-side helpers: verify a sign-in token (`checkOcToken`,
 - [connectClaimLink](functions/connectClaimLink)
 - [connectDelete](functions/connectDelete)
 - [connectProvision](functions/connectProvision)
+- [exchangeNativeCode](functions/exchangeNativeCode)
 - [getOcSession](functions/getOcSession)
 - [matchMergedUser](functions/matchMergedUser)
 - [mergedHandles](functions/mergedHandles)

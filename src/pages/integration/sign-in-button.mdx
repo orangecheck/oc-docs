@@ -312,6 +312,18 @@ Download them from npm, or straight from
 These are the defaults (`SIGN_IN_LABELS`). In another language, write your own,
 and keep the name as it is: "orangecheck", lowercase, a word of its own.
 
+For an action other than signing in, these words are approved too. Use them only
+when the button does exactly that.
+
+| Action                                                    | Words                                |
+| --------------------------------------------------------- | ------------------------------------ |
+| Connect an account on your site to an orangecheck account | Link orangecheck                     |
+| Remove that connection                                    | Unlink orangecheck                   |
+| Confirm a sensitive action by signing in again            | Sign in with orangecheck to `action` |
+
+For example, "Sign in with orangecheck to delete" on the button that confirms
+deleting an account.
+
 ```tsx
 import type { ReactElement } from 'react';
 

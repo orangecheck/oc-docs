@@ -356,77 +356,88 @@ In Python, `connect_delete(api_key, user_id)` returns the same.
 
 ### When deleting refuses
 
-Your user asked to leave, so what you do next depends only on the kind of answer
-that came back: gone, or one of three refusals.
+Delete your own account for this user only when `connectDelete` returned one of
+these. Every other answer pauses deleting, with nothing deleted.
 
-| Kind                    | What `connectDelete` returned                                                                                                                   | What you do                                                                                                                                               |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Gone                    | `{ ok: true, result: 'deleted' }`, `'detached'` or `'already_deleted'`, or `{ ok: false, reason: 'unknown_user' }`                              | Delete your own account.                                                                                                                                  |
-| It stays at orangecheck | `{ ok: false, reason: 'holds_earnings' }` or `{ ok: false, reason: 'not_deletable' }`                                                           | Delete your own account anyway, and tell them their orangecheck account stays theirs at [ochk.app](https://ochk.app). Asking again gives the same answer. |
-| Try again shortly       | `{ ok: false, reason: 'rate_limited' }` or `{ ok: false, reason: 'unavailable' }` (an outage, a timeout, or `status: 0` when nothing came back) | Delete nothing, and tell them to try again in a few minutes.                                                                                              |
-| Your setup              | `{ ok: false, reason: 'invalid_api_key' }` or `{ ok: false, reason: 'bad_request' }`, or `connectDelete` threw                                  | Delete nothing, say plainly that deleting is paused on your side, and alert yourself. This is your key or your code, not the person.                      |
+**Delete your own account** on exactly these:
 
-`connectDelete` never throws for an outage: it throws only for a mistake in your
-call, such as no key (`OCHK_CONNECT_KEY` unset), no user id, or an option it
-does not read. Every refusal also carries `status`, ochk.io's HTTP status.
+| `connectDelete` returned                                                              | Meaning                      | Tell them                                                                                                                                          |
+| ------------------------------------------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{ ok: true, result: 'deleted' }`                                                     | Gone.                        | Their account is deleted.                                                                                                                          |
+| `{ ok: true, result: 'detached' }` or `{ ok: true, result: 'already_deleted' }`       | Already gone from your side. | Their account is deleted.                                                                                                                          |
+| `{ ok: false, reason: 'unknown_user' }`                                               | You never provisioned them.  | Their account is deleted.                                                                                                                          |
+| `{ ok: false, reason: 'holds_earnings' }` or `{ ok: false, reason: 'not_deletable' }` | It stays theirs.             | Their account with you is deleted, and their orangecheck account stays theirs at [ochk.app](https://ochk.app). Asking again gives the same answer. |
+
+**Pause, with nothing deleted,** on everything else:
+
+| `connectDelete` returned or did                                                                                                                            | Tell them                                            | You                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| `{ ok: false, reason: 'unavailable' }` (an outage, a timeout, or `status: 0` when nothing came back), `{ ok: false, reason: 'rate_limited' }`, or it threw | Try again in a few minutes.                          | Nothing to fix.                                              |
+| No key to call it with, `{ ok: false, reason: 'invalid_api_key' }` or `{ ok: false, reason: 'bad_request' }`                                               | Deleting is paused on our side; nothing was deleted. | Alert yourself: it is your key or your code, not the person. |
+| Any `result` or `reason` your code does not know                                                                                                           | Try again in a few minutes.                          | Read the newer SDK before you add it to the list above.      |
+
+Every refusal also carries `status`, ochk.io's HTTP status. `connectDelete`
+throws only for a mistake in your call, so check the key yourself before you
+call it, as below.
 
 ```ts
 import type { ConnectDeleteResult } from '@orangecheck/me-client/server';
 
 import { connectDelete } from '@orangecheck/me-client/server';
 
-export type DeleteKind =
-    | 'gone'
-    | 'stays_at_orangecheck'
+export type AfterDelete =
+    | 'delete'
+    | 'delete_stays_at_ochk_app'
     | 'try_again'
-    | 'your_setup';
+    | 'setup';
 
-export function deleteKind(r: ConnectDeleteResult): DeleteKind {
-    if (r.ok) return 'gone'; // deleted, detached or already_deleted
-    switch (r.reason) {
-        case 'unknown_user':
-            return 'gone';
-        case 'holds_earnings':
-        case 'not_deletable':
-            return 'stays_at_orangecheck';
-        case 'rate_limited':
-        case 'unavailable':
-            return 'try_again';
-        case 'invalid_api_key':
-        case 'bad_request':
-            return 'your_setup';
+// An allow-list: anything not named here deletes nothing.
+export function afterConnectDelete(r: ConnectDeleteResult): AfterDelete {
+    if (r.ok) {
+        const gone =
+            r.result === 'deleted' ||
+            r.result === 'detached' ||
+            r.result === 'already_deleted';
+        return gone ? 'delete' : 'try_again';
     }
+    if (r.reason === 'unknown_user') return 'delete';
+    if (r.reason === 'holds_earnings' || r.reason === 'not_deletable') {
+        return 'delete_stays_at_ochk_app';
+    }
+    if (r.reason === 'invalid_api_key' || r.reason === 'bad_request')
+        return 'setup';
+    return 'try_again'; // unavailable, rate_limited, and any reason added later
 }
 
 declare function deleteOwnAccount(userId: string): Promise<void>;
 declare function alertYourself(message: string): Promise<void>;
 
 export async function onUserDeletes(userId: string): Promise<string> {
-    let kind: DeleteKind;
-    try {
-        kind = deleteKind(
-            await connectDelete({
-                apiKey: process.env.OCHK_CONNECT_KEY!,
-                userId,
-            })
-        );
-    } catch {
-        kind = 'your_setup';
+    const apiKey = process.env.OCHK_CONNECT_KEY;
+    let next: AfterDelete;
+    if (!apiKey) {
+        next = 'setup';
+    } else {
+        try {
+            next = afterConnectDelete(await connectDelete({ apiKey, userId }));
+        } catch {
+            next = 'try_again';
+        }
     }
-    switch (kind) {
-        case 'gone':
+    switch (next) {
+        case 'delete':
             await deleteOwnAccount(userId);
             return 'Your account is deleted.';
-        case 'stays_at_orangecheck':
+        case 'delete_stays_at_ochk_app':
             await deleteOwnAccount(userId);
             return 'Your account here is deleted. Your orangecheck account stays yours at ochk.app.';
         case 'try_again':
             return 'We could not delete your account just now. Try again in a few minutes.';
-        case 'your_setup':
+        case 'setup':
             await alertYourself(
                 'Connect delete refused: check OCHK_CONNECT_KEY'
             );
-            return 'Deleting accounts is paused on our side. We have been told, and nothing was deleted.';
+            return 'Deleting accounts is paused on our side. Nothing was deleted.';
     }
 }
 ```

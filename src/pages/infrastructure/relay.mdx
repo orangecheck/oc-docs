@@ -33,21 +33,21 @@ decides what it stores. It applies two gates:
    rejected with
    `blocked: d tag '<d>' is not an oc namespace prefix for kind <n>`.
 
-| kind  | sub-protocol                              | accepted `d` tag                                                                                                                            |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 30078 | OC Attest / OC Lock / OC Pledge / OC Chat | an attestation's bare id (64 lowercase hex), or `oc-lock:`, `oc-pledge:`, `oc-pledge-outcome:`, `oc-pledge-abandonment:`, `oc-chat:device:` |
-| 30080 | OC Vote · poll                            | `oc-vote:poll:`                                                                                                                             |
-| 30081 | OC Vote · ballot                          | `oc-vote:ballot:`                                                                                                                           |
-| 30082 | OC Vote · reveal                          | `oc-vote:reveal:`                                                                                                                           |
-| 30083 | OC Stamp · stamp / OC Agent · delegation  | `oc-stamp:` or `oc-agent-del:`                                                                                                              |
-| 30084 | OC Agent · action                         | `oc-agent-act:`                                                                                                                             |
-| 30085 | OC Agent · revocation                     | `oc-agent-rev:`                                                                                                                             |
-| 30086 | OC Agent · sub-delegation                 | `oc-agent-sub:`                                                                                                                             |
-| 30087 | OC Me (ochk.app)                          | `oc-me-event:`, `oc-me-payment:`, `oc-me-rebind:`, `oc-me-trust:`, `oc-me-payout-binding:`, `oc-me-distribution:`, `oc-me-drop:`            |
-| 30110 | OC Chat · channel descriptor              | `oc-lock-chat-ch:`                                                                                                                          |
-| 30111 | OC Chat · channel post                    | `oc-lock-chat-msg:`                                                                                                                         |
-| 30112 | OC Chat · seal                            | `oc-lock-chat-seal:`                                                                                                                        |
-| 30114 | OC Chat · directory                       | `oc-lock-chat-dir:` or `oc-lock-chat-chdir:`                                                                                                |
+| kind  | sub-protocol                              | accepted `d` tag                                                                                                                                             |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 30078 | OC Attest / OC Lock / OC Pledge / OC Chat | an attestation's bare id (64 lowercase hex), or `oc-lock:`, `oc-pledge:`, `oc-pledge-outcome:`, `oc-pledge-abandonment:`, `oc-chat:device:`                  |
+| 30080 | OC Vote · poll                            | `oc-vote:poll:`                                                                                                                                              |
+| 30081 | OC Vote · ballot                          | `oc-vote:ballot:`                                                                                                                                            |
+| 30082 | OC Vote · reveal                          | `oc-vote:reveal:`                                                                                                                                            |
+| 30083 | OC Stamp · stamp / OC Agent · delegation  | `oc-stamp:` or `oc-agent-del:`                                                                                                                               |
+| 30084 | OC Agent · action                         | `oc-agent-act:`                                                                                                                                              |
+| 30085 | OC Agent · revocation                     | `oc-agent-rev:`                                                                                                                                              |
+| 30086 | OC Agent · sub-delegation                 | `oc-agent-sub:`                                                                                                                                              |
+| 30087 | OC Me (ochk.app)                          | `oc-me-event:`, `oc-me-payment:`, `oc-me-rebind:`, `oc-me-trust:`, `oc-me-payout-binding:`, `oc-me-distribution:`, `oc-me-distribution-void:`, `oc-me-drop:` |
+| 30110 | OC Chat · channel descriptor              | `oc-lock-chat-ch:`                                                                                                                                           |
+| 30111 | OC Chat · channel post                    | `oc-lock-chat-msg:`                                                                                                                                          |
+| 30112 | OC Chat · seal                            | `oc-lock-chat-seal:`                                                                                                                                         |
+| 30114 | OC Chat · directory                       | `oc-lock-chat-dir:` or `oc-lock-chat-chdir:`                                                                                                                 |
 
 Together, those two gates mean **every event served from relay.ochk.io is by
 construction an orangecheck family event**. Spam is structurally impossible

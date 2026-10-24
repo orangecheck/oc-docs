@@ -20,30 +20,30 @@ public roll-up.
 
 ## Kind registry
 
-| Kind            | Owner     | Purpose                                                                                           |
-| --------------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `30078`         | OC Attest | Attestation envelope (the original family event kind)                                             |
-| `30078`         | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                   |
-| `30078`         | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                |
-| `30078`         | OC Chat   | Device record (`oc-chat:device:`)                                                                 |
-| `30079`         | —         | Archived; do not use                                                                              |
-| `30080`         | OC Vote   | Poll                                                                                              |
-| `30081`         | OC Vote   | Ballot                                                                                            |
-| `30082`         | OC Vote   | Reveal (secret-mode tally)                                                                        |
-| `30083`         | OC Stamp  | Stamp envelope                                                                                    |
-| `30083`         | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)             |
-| `30084`         | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind) |
-| `30085`         | OC Agent  | Agent revocation                                                                                  |
-| `30086`         | OC Agent  | Agent sub-delegation _(v1.1)_ — chained narrowing of authority                                    |
-| `30087`         | OC Me     | me.ochk.io billable-event, payment, rebind, payout-binding, distribution and drop envelopes       |
-| `30088`–`30093` | —         | Free                                                                                              |
-| `30094`–`30109` | —         | Reserved, unratified (OC Find, an unbuilt research idea)                                          |
-| `30110`         | OC Chat   | Channel descriptor                                                                                |
-| `30111`         | OC Chat   | Channel post                                                                                      |
-| `30112`         | OC Chat   | Seal / block-height anchor                                                                        |
-| `30113`         | OC Chat   | Reserved (group-key rotation, private channels)                                                   |
-| `30114`         | OC Chat   | Discoverability directory                                                                         |
-| `30115`         | OC Chat   | Reserved (`pay-to-post` postage policy)                                                           |
+| Kind            | Owner     | Purpose                                                                                                        |
+| --------------- | --------- | -------------------------------------------------------------------------------------------------------------- |
+| `30078`         | OC Attest | Attestation envelope (the original family event kind)                                                          |
+| `30078`         | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                                |
+| `30078`         | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                             |
+| `30078`         | OC Chat   | Device record (`oc-chat:device:`)                                                                              |
+| `30079`         | —         | Archived; do not use                                                                                           |
+| `30080`         | OC Vote   | Poll                                                                                                           |
+| `30081`         | OC Vote   | Ballot                                                                                                         |
+| `30082`         | OC Vote   | Reveal (secret-mode tally)                                                                                     |
+| `30083`         | OC Stamp  | Stamp envelope                                                                                                 |
+| `30083`         | OC Agent  | Agent delegation (co-claim with OC Stamp; disambiguated by disjoint `d`-tag prefixes)                          |
+| `30084`         | OC Agent  | Agent action (claimed exclusively; reuses OC Stamp envelope **structure** but on a distinct kind)              |
+| `30085`         | OC Agent  | Agent revocation                                                                                               |
+| `30086`         | OC Agent  | Agent sub-delegation _(v1.1)_ — chained narrowing of authority                                                 |
+| `30087`         | OC Me     | me.ochk.io billable-event, payment, rebind, payout-binding, distribution, distribution-void and drop envelopes |
+| `30088`–`30093` | —         | Free                                                                                                           |
+| `30094`–`30109` | —         | Reserved, unratified (OC Find, an unbuilt research idea)                                                       |
+| `30110`         | OC Chat   | Channel descriptor                                                                                             |
+| `30111`         | OC Chat   | Channel post                                                                                                   |
+| `30112`         | OC Chat   | Seal / block-height anchor                                                                                     |
+| `30113`         | OC Chat   | Reserved (group-key rotation, private channels)                                                                |
+| `30114`         | OC Chat   | Discoverability directory                                                                                      |
+| `30115`         | OC Chat   | Reserved (`pay-to-post` postage policy)                                                                        |
 
 OC Chat direct messages travel as NIP-59 gift wraps (kind 1059), a standard
 Nostr kind rather than a family allocation.

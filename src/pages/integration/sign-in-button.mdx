@@ -15,7 +15,7 @@ export const metadata = {
 Your sign-in button already has a look. Keep it. The orangecheck button takes
 your button's class and draws nothing of its own: it brings the orangecheck
 mark, the words, the popup and the busy state. Install `@orangecheck/me-client`
-0.47.0 or later.
+0.47.0 or later; [what changed](#versions) says what each version added.
 
 ## In three different sites
 
@@ -52,16 +52,39 @@ export function SignIn(): ReactElement {
 once; it is optional and has zero specificity, so every rule of yours wins over
 it. Without it the button is yours with the mark in it.
 
-| Prop              | Default                    |                                                                                                                            |
-| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `onSignedIn`      | required                   | Called with `{ account, token }`. The button stays busy until it settles.                                                  |
-| `onOutcome`       | none                       | Called with how every window ended: `signed_in`, `blocked`, `closed`, `aborted` or `failed`.                               |
-| `appearance`      | `inherit`                  | `inherit` adds no colour, font, border, radius or focus ring. `brand` is orangecheck's button.                             |
-| `mark`            | `mono`                     | `mono`, `brand`, `tile`, or `false` for none. See [the mark](#the-mark).                                                   |
-| `label`           | "Sign in with orangecheck" | The words, in your language if you like, keeping "orangecheck". `false` draws the mark alone. See [the words](#the-words). |
-| `busyLabel`       | "Signing in…"              | What it says while the window is open.                                                                                     |
-| `accessibleLabel` | "Sign in with orangecheck" | What a screen reader says for the mark alone.                                                                              |
-| `popup`           | none                       | Popup options, such as a preview `popupOrigin`.                                                                            |
+| Prop              | Type                                               | Default                    |                                                                                                                            |
+| ----------------- | -------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `onSignedIn`      | `(result: OcPopupResult) => void \| Promise<void>` | required                   | Called with `{ account, token }`. The button stays busy until it settles.                                                  |
+| `onOutcome`       | `(outcome: OcPopupOutcome) => void`                | none                       | Called with how every window ended, an object with a `status`. See [when it doesn't sign in](#when-it-doesnt-sign-in).     |
+| `appearance`      | `'inherit' \| 'brand'`                             | `inherit`                  | `inherit` adds no colour, font, border, radius or focus ring. `brand` is orangecheck's button.                             |
+| `mark`            | `'mono' \| 'brand' \| 'tile' \| false`             | `mono`                     | `false` for none. See [the mark](#the-mark).                                                                               |
+| `label`           | `string \| false`                                  | "Sign in with orangecheck" | The words, in your language if you like, keeping "orangecheck". `false` draws the mark alone. See [the words](#the-words). |
+| `busyLabel`       | `string`                                           | "Signing in…"              | What it says while the window is open.                                                                                     |
+| `accessibleLabel` | `string`                                           | "Sign in with orangecheck" | What a screen reader says for the mark alone.                                                                              |
+| `popup`           | `{ popupOrigin?, popupPath?, features? }`          | none                       | Popup options, such as a preview `popupOrigin`.                                                                            |
+
+`enhanceSignInButton(button, options)` takes the same options
+(`EnhanceSignInButtonOptions`). The types come with the package:
+
+```ts
+import type {
+    OcPopupOutcome,
+    OcPopupResult,
+} from '@orangecheck/me-client/button';
+
+// OcPopupResult is { account, token }: account.did_oc names the person, and
+// the token goes to your server, which verifies it.
+export function didOf(result: OcPopupResult): string | undefined {
+    return result.account.did_oc;
+}
+
+// OcPopupOutcome is one of { status: 'signed_in', account, token },
+// { status: 'blocked' }, { status: 'closed' }, { status: 'aborted' } or
+// { status: 'failed' }.
+export function signedIn(outcome: OcPopupOutcome): boolean {
+    return outcome.status === 'signed_in';
+}
+```
 
 Everything else (`className`, `style`, `id`, `aria-describedby`, `disabled`)
 goes to the native `<button>`.
@@ -234,11 +257,49 @@ Both appearances read these:
 - Clicking opens the orangecheck window inside the click, before anything is
   awaited, so browsers do not block it.
 - While the window is open the button says "Signing in…" (or your `busyLabel`),
-  and is `aria-busy` and `aria-disabled`. It keeps focus, keeps its width so
-  nothing beside it moves, and opens no second window.
-- When the window closes, the button is ready again, and `onOutcome` says why:
-  show `OUTCOME_COPY.blocked`, `.closed` or `.failed` near it.
+  and has `aria-busy="true"` and `aria-disabled="true"`. It keeps focus, keeps
+  its width so nothing beside it moves, and opens no second window.
+- Its accessible name follows the words it shows, so a screen reader hears
+  "Signing in…" while the window is open, as everyone else reads it. In a test
+  or a script, find the button by `[data-oc-sign-in]`, never by its name: the
+  name changes while it works.
+- When the window closes, the button is ready again, and `onOutcome` says why.
+  See [when it doesn't sign in](#when-it-doesnt-sign-in).
 - A button you set `disabled` never opens a window.
+
+## When it doesn't sign in
+
+`onOutcome` gets an object, and its `status` says how the window ended. For
+three of them, `OUTCOME_COPY` has the words to show near the button:
+
+| `status`    | When                                                                                      | What to tell the person (`OUTCOME_COPY`)                                                           |
+| ----------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `signed_in` | The person signed in. `onSignedIn` runs next.                                             | Nothing.                                                                                           |
+| `blocked`   | The browser refused to open the window, usually a pop-up blocker.                         | `blocked`: "Your browser blocked the sign-in window. Allow pop-ups for this site, then try again." |
+| `closed`    | The person closed the window before finishing. Their choice, not an error.                | `closed`: "The sign-in window closed before you finished."                                         |
+| `failed`    | The window ended without a usable answer: it reported a sign-in with no account or token. | `failed`: "Sign-in didn't finish. Try again."                                                      |
+| `aborted`   | Your own code cancelled the wait, which the button never does.                            | Nothing.                                                                                           |
+
+```ts
+import type { OcPopupOutcome } from '@orangecheck/me-client/button';
+
+import { OUTCOME_COPY } from '@orangecheck/me-client/button';
+
+// The words to show near the button, or '' when there is nothing to say.
+export function noteFor(outcome: OcPopupOutcome): string {
+    if (
+        outcome.status === 'blocked' ||
+        outcome.status === 'closed' ||
+        outcome.status === 'failed'
+    ) {
+        return OUTCOME_COPY[outcome.status];
+    }
+    return '';
+}
+```
+
+The tag-loaded button reports the same through its `oc-sign-in-outcome` event,
+whose `detail` is `{ status, message }`, with these words already in `message`.
 
 ## For everyone
 
@@ -301,6 +362,18 @@ through their own browser: see [apps and games](/integration/native-sign-in).
 
 Download them from npm, or straight from
 [jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark@0.2/assets/).
+
+## Versions
+
+Each row is what that version added to the button. The full history is
+me-client's
+[CHANGELOG](https://github.com/orangecheck/oc-packages/blob/main/me-client/CHANGELOG.md).
+
+| Version | What changed                                                                                                                                                                                                             |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0.46.0  | The button: `/button` (`enhanceSignInButton`), `/react` (`SignInWithOrangecheck`) and `button.css`.                                                                                                                      |
+| 0.47.0  | Words in any language that keep "orangecheck"; `busyLabel`; the mark alone (`label: false`); the `[data-oc-mark]` placeholder; the width held while busy; `inherit` drops its own focus ring, so your site's ring shows. |
+| 0.48.0  | `button-auto.mjs`: a `<script src>` that enhances every `button[data-oc-sign-in]` and reports through `oc-signed-in` and `oc-sign-in-outcome` events.                                                                    |
 
 ## The rules
 

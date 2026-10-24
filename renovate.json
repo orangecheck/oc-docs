@@ -11,13 +11,14 @@
             "enabled": false
         },
         {
-            "description": "@orangecheck/* patch + minor, bundled into one PR per consumer after a 1-day stability window. Renovate does not merge it: its fine-grained token cannot read GitHub Actions check runs, so it would merge on Vercel's status alone. This repo's own CI merges the PR once its gating jobs pass (merge-renovate).",
+            "description": "@orangecheck/* patch + minor, bundled into one PR per consumer after a 1-day stability window. Renovate turns on GitHub's auto-merge when it opens the PR, so the merge queue takes it once the required checks pass. Renovate never merges on the checks it can read itself (only Vercel's).",
             "matchPackageNames": ["/^@orangecheck//"],
             "matchUpdateTypes": ["patch", "minor"],
             "enabled": true,
             "groupName": "@orangecheck/* (family)",
-            "automerge": false,
+            "automerge": true,
             "automergeType": "pr",
+            "platformAutomerge": true,
             "minimumReleaseAge": "1 day"
         },
         {

@@ -6,11 +6,12 @@ name: CI
 # Phase 3.5 auto-PRs from oc-packages release tags land MDX changes
 # here that should pass type-check + build before merging.
 
+# main takes changes only through its merge queue, which runs these jobs on
+# the exact commit main then moves to, so a push to main needs no run of its own.
 on:
-    push:
-        branches: [main]
     pull_request:
         branches: [main]
+    merge_group:
 
 concurrency:
     group: ci-${{ github.ref }}
@@ -93,19 +94,3 @@ jobs:
 
             - name: Build
               run: yarn build
-
-    # Renovate cannot read check runs, so it cannot tell whether CI passed.
-    # This job can: it runs only after the gating jobs above succeed.
-    merge-renovate:
-        name: Merge family bump
-        needs: [quality, build]
-        if: github.event_name == 'pull_request' && github.head_ref == 'renovate/@orangecheck-(family)'
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-            pull-requests: write
-        steps:
-            - name: Rebase-merge the PR
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: gh pr merge ${{ github.event.pull_request.number }} --rebase --repo ${{ github.repository }}

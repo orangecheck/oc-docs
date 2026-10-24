@@ -60,8 +60,11 @@ jobs:
             - name: Lint
               run: yarn lint
 
+            # moved-pages.test.ts compares the pages with the commit main was at.
             - name: Test
               run: yarn test:run
+              env:
+                  DOCS_BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
 
             - name: Internal links
               run: yarn check:internal-links

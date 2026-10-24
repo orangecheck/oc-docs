@@ -6,10 +6,11 @@ export const metadata = {
 
 # `@orangecheck/me-client` · SDK reference
 
-> **Full reference:** [ochk.io/docs/sdk/me-client](/sdk/me-client/README),
-> generated from the TypeScript source on every release. This page is the
-> curated overview; the generated reference is the source of truth for every
-> export, type and signature.
+> **Full reference:** [ochk.io/docs/sdk/me-client](/sdk/me-client/README), with
+> its own index for [`/server`](/sdk/me-client/server/README) and
+> [`/popup`](/sdk/me-client/popup/README), generated from the TypeScript source
+> on every release. This page is the curated overview; the generated reference
+> is the source of truth for every export, type and signature.
 
 **MIT.** One package for signing people in with orangecheck and, if you choose,
 paying them. Three entry points:
@@ -18,12 +19,17 @@ paying them. Three entry points:
   scope, session, payment, identity) and every type. No React, so a Node backend
   imports it as it is.
 - **`@orangecheck/me-client/server`**: checks the session on your server.
-  `withOcAuth` (Next.js Pages), `ocAuthExpress`, `ocAuthHono`,
-  `getOcSession(headers)`, `checkOcToken(token)`, `verifyOcToken(token)`. You
+  [`withOcAuth`](/sdk/me-client/server/functions/withOcAuth) (Next.js Pages),
+  [`ocAuthExpress`](/sdk/me-client/server/functions/ocAuthExpress),
+  [`ocAuthHono`](/sdk/me-client/server/functions/ocAuthHono),
+  [`getOcSession(headers)`](/sdk/me-client/server/functions/getOcSession),
+  [`checkOcToken(token)`](/sdk/me-client/server/functions/checkOcToken),
+  [`verifyOcToken(token)`](/sdk/me-client/server/functions/verifyOcToken). You
   never fetch or handle a JWK: the SDK does that and caches it. A backend in
   Python or any other language checks the token itself: see
   [verify without the SDK](#verify-without-the-sdk).
-- **`@orangecheck/me-client/popup`**: browser only. `signInWithOc()` opens the
+- **`@orangecheck/me-client/popup`**: browser only.
+  [`signInWithOc()`](/sdk/me-client/popup/functions/signInWithOc) opens the
   orangecheck sign-in popup and resolves with a token bound to your origin, the
   way Google's and GitHub's popups do.
 
@@ -101,7 +107,9 @@ if (outcome.status === 'blocked')
 if (outcome.status === 'signed_in') await keepSession(outcome.token);
 ```
 
-Both take `{ signal, popupOrigin, popupPath, features }`. `popupOrigin` (default
+Both take
+[`SignInWithOcOptions`](/sdk/me-client/popup/interfaces/SignInWithOcOptions):
+`{ signal, popupOrigin, popupPath, features }`. `popupOrigin` (default
 `https://me.ochk.io`) and `popupPath` (default `/popup/signin`) point the popup
 somewhere else, such as a stand-in of your own while you test; the answer is
 accepted only from exactly `popupOrigin`, so give it with no trailing slash.
@@ -289,7 +297,8 @@ app.get('/api/profile', (c) => {
 `oc_session` cookie (or, failing that, a Bearer token), and returns the verified
 `SessionPayload` or `null`.
 
-The wrappers all take one options bag:
+The wrappers all take one options bag,
+[`WithOcAuthOptions`](/sdk/me-client/server/interfaces/WithOcAuthOptions):
 
 | Option        | What it does                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -432,21 +441,22 @@ with `auth.verifyOtp` as `token_hash`, and check the user id at each step.
 ## verify without the SDK
 
 A backend in Python, Go or anything else checks the token itself. It is a JWT
-signed by the auth host, ochk.io:
+signed by the auth host, ochk.io. Its claims are
+[`SessionPayload`](/sdk/auth-core/interfaces/SessionPayload) in the reference:
 
-| Part      | What to check                                                                                                                                                                                                                                |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Key set   | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
-| `alg`     | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
-| `iss`     | `https://ochk.io`                                                                                                                                                                                                                            |
-| `aud`     | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
-| `iat`     | Unix seconds: when ochk.io minted this token, at the end of the sign-in in the popup. The popup runs a full sign-in every time, so it is not when the person's ochk.io session began.                                                        |
-| `exp`     | Unix seconds: the earlier of the person's ochk.io session's end and `iat` + 30 days. Never refreshed.                                                                                                                                        |
-| `sub`     | The person's account id.                                                                                                                                                                                                                     |
-| `did_oc`  | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
-| `jti`     | The token's own id.                                                                                                                                                                                                                          |
-| `rh`      | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
-| `oc_bond` | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
+| Part                                                           | What to check                                                                                                                                                                                                                                |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key set                                                        | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
+| `alg`                                                          | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
+| `iss`                                                          | `https://ochk.io`                                                                                                                                                                                                                            |
+| [`aud`](/sdk/auth-core/interfaces/SessionPayload#property-aud) | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
+| [`iat`](/sdk/auth-core/interfaces/SessionPayload#property-iat) | Unix seconds: when ochk.io minted this token, at the end of the sign-in in the popup. The popup runs a full sign-in every time, so it is not when the person's ochk.io session began.                                                        |
+| [`exp`](/sdk/auth-core/interfaces/SessionPayload#property-exp) | Unix seconds: the earlier of the person's ochk.io session's end and `iat` + 30 days. Never refreshed.                                                                                                                                        |
+| `sub`                                                          | The person's account id.                                                                                                                                                                                                                     |
+| `did_oc`                                                       | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
+| `jti`                                                          | The token's own id.                                                                                                                                                                                                                          |
+| [`rh`](/sdk/auth-core/interfaces/SessionPayload#property-rh)   | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
+| `oc_bond`                                                      | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
 
 The token carries no email address and no name.
 
@@ -530,11 +540,11 @@ What an ended token reaches, and when:
   `revocations_unavailable` rather than send part of it, and your writes wait as
   for any outage.
 
-`revokeToken` (me-client 0.41.0 or later) and `revoke_token` (`orangecheck`
-3.2.0 or later) make that call. A call that can't be valid throws before
-anything is sent; an outage or a refusal is a result, never a throw, so it can't
-break a sign-out. `revoked` is 0 when ochk.io could not read the token as its
-own, as when it has expired already.
+[`revokeToken`](/sdk/me-client/server/functions/revokeToken) (me-client 0.41.0
+or later) and `revoke_token` (`orangecheck` 3.2.0 or later) make that call. A
+call that can't be valid throws before anything is sent; an outage or a refusal
+is a result, never a throw, so it can't break a sign-out. `revoked` is 0 when
+ochk.io could not read the token as its own, as when it has expired already.
 
 ```ts
 import { revokeToken } from '@orangecheck/me-client/server';
@@ -755,13 +765,13 @@ the same for the `Session` that `verify_session` returned and answers a
   a second call: it could bind another token's handle, or none.
 - Spend its `jti` in a store all your servers share, until `exp`, so the same
   token can't start a second session on another instance:
-  `spendOnce(jti, exp, store)` (me-client 0.41.0) or
-  `spend_once(jti, exp, store)` (`orangecheck` 3.2.0). True the first time,
-  false for a repeat or an expired token. The store is yours, anything with an
-  atomic `add(jti, exp)` that answers true when it recorded the jti: a unique
-  row, or Redis `SET jti 1 NX EXAT exp`. `MemoryJtiStore` is for tests and a
-  single process only. In an async Python route, `spend_once_async` takes a
-  store whose `add` is a coroutine.
+  [`spendOnce(jti, exp, store)`](/sdk/me-client/server/functions/spendOnce)
+  (me-client 0.41.0) or `spend_once(jti, exp, store)` (`orangecheck` 3.2.0).
+  True the first time, false for a repeat or an expired token. The store is
+  yours, anything with an atomic `add(jti, exp)` that answers true when it
+  recorded the jti: a unique row, or Redis `SET jti 1 NX EXAT exp`.
+  `MemoryJtiStore` is for tests and a single process only. In an async Python
+  route, `spend_once_async` takes a store whose `add` is a coroutine.
 - A token without `rh` is refused before it gets here (me-client 0.40.0,
   `orangecheck` 3.0.0): nothing could end the session it starts. Don't turn that
   off. Refuse to start a deployment that is missing `OC_PROJECT_KEY` or
@@ -1279,9 +1289,12 @@ FireEventOptions · FireEventResult · OcPublicJwk · VerifyOptions · VerifyRes
 Scope · GrantedOptions · GrantedResult · RequestOptions
 ```
 
-`/server` adds `SessionPayload`, `BondClaim`, `VerifyOcOptions`,
-`WithOcAuthOptions` and `OcHonoEnv`. The class names (`ClassASubtype` and so on)
-are the API's names for the three groups: One-time, Per action and Per session.
+`/server` adds
+[`SessionPayload`](/sdk/me-client/server/interfaces/SessionPayload),
+`BondClaim`, `VerifyOcOptions`,
+[`WithOcAuthOptions`](/sdk/me-client/server/interfaces/WithOcAuthOptions) and
+`OcHonoEnv`. The class names (`ClassASubtype` and so on) are the API's names for
+the three groups: One-time, Per action and Per session.
 
 ## Constants and helpers
 

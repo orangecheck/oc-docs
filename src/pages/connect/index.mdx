@@ -370,11 +370,10 @@ these. Every other answer pauses deleting, with nothing deleted.
 
 **Pause, with nothing deleted,** on everything else:
 
-| `connectDelete` returned or did                                                                                                                            | Tell them                                            | You                                                          |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
-| `{ ok: false, reason: 'unavailable' }` (an outage, a timeout, or `status: 0` when nothing came back), `{ ok: false, reason: 'rate_limited' }`, or it threw | Try again in a few minutes.                          | Nothing to fix.                                              |
-| No key to call it with, `{ ok: false, reason: 'invalid_api_key' }` or `{ ok: false, reason: 'bad_request' }`                                               | Deleting is paused on our side; nothing was deleted. | Alert yourself: it is your key or your code, not the person. |
-| Any `result` or `reason` your code does not know                                                                                                           | Try again in a few minutes.                          | Read the newer SDK before you add it to the list above.      |
+| `connectDelete` returned or did                                                                                                                                                         | Tell them                                            | You                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `{ ok: false, reason: 'unavailable' }` (an outage, a timeout, or `status: 0` when nothing came back), `{ ok: false, reason: 'rate_limited' }`, or it threw                              | Try again in a few minutes.                          | Nothing to fix.                                                                            |
+| No key to call it with, `{ ok: false, reason: 'invalid_api_key' }`, `{ ok: false, reason: 'bad_request' }`, or any `result` or `reason` your code does not know, a later SDK's included | Deleting is paused on our side; nothing was deleted. | Alert yourself: it is your key, your code, or an SDK newer than your code, not the person. |
 
 Every refusal also carries `status`, ochk.io's HTTP status. `connectDelete`
 throws only for a mistake in your call, so check the key yourself before you
@@ -398,15 +397,15 @@ export function afterConnectDelete(r: ConnectDeleteResult): AfterDelete {
             r.result === 'deleted' ||
             r.result === 'detached' ||
             r.result === 'already_deleted';
-        return gone ? 'delete' : 'try_again';
+        return gone ? 'delete' : 'setup';
     }
     if (r.reason === 'unknown_user') return 'delete';
     if (r.reason === 'holds_earnings' || r.reason === 'not_deletable') {
         return 'delete_stays_at_ochk_app';
     }
-    if (r.reason === 'invalid_api_key' || r.reason === 'bad_request')
-        return 'setup';
-    return 'try_again'; // unavailable, rate_limited, and any reason added later
+    if (r.reason === 'unavailable' || r.reason === 'rate_limited')
+        return 'try_again';
+    return 'setup'; // invalid_api_key, bad_request, and any reason added later
 }
 
 declare function deleteOwnAccount(userId: string): Promise<void>;
@@ -435,7 +434,7 @@ export async function onUserDeletes(userId: string): Promise<string> {
             return 'We could not delete your account just now. Try again in a few minutes.';
         case 'setup':
             await alertYourself(
-                'Connect delete refused: check OCHK_CONNECT_KEY'
+                'Connect delete paused: check OCHK_CONNECT_KEY and the me-client version'
             );
             return 'Deleting accounts is paused on our side. Nothing was deleted.';
     }

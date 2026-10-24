@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: readOcSessionToken()",
+    description: "Auto-generated API reference for Function: readOcSessionToken(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / readOcSessionToken
+
+# Function: readOcSessionToken()
+
+```ts
+function readOcSessionToken(headers: 
+  | Headers
+  | SessionRequestHeaders): string | null;
+```
+
+Defined in: [index.ts:966](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L966)
+
+The token a request carries, as [getOcSession](getOcSession) reads it: the
+`oc_session` cookie first, then `Authorization: Bearer <token>`. Null when
+it carries neither. Pure: verifies nothing.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `headers` | \| `Headers` \| [`SessionRequestHeaders`](../interfaces/SessionRequestHeaders) |
+
+## Returns
+
+`string` \| `null`

@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: readBondNeed()",
+    description: "Auto-generated API reference for Function: readBondNeed(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client/server**](../README)
+
+***
+
+[@orangecheck/me-client/server](../README) / readBondNeed
+
+# Function: readBondNeed()
+
+```ts
+function readBondNeed(need: unknown): BondNeed | null;
+```
+
+Defined in: [auth-core/src/index.ts:252](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L252)
+
+`need` when it is a floor `bondMeets` can apply, else null: an object of
+`minSats`, `minDays` and `maxAgeSecs` only, each left out or a whole number
+of 0 or more (a safe integer). NaN, a string, a fraction or a misspelt key
+is no floor at all, so it never reads as 0.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `need` | `unknown` |
+
+## Returns
+
+`BondNeed` \| `null`

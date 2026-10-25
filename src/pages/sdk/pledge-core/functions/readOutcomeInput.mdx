@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: readOutcomeInput()",
+    description: "Auto-generated API reference for Function: readOutcomeInput(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README)
+
+***
+
+[@orangecheck/pledge-core](../README) / readOutcomeInput
+
+# Function: readOutcomeInput()
+
+```ts
+function readOutcomeInput(input: OutcomeCanonicalInput): ValidateResult;
+```
+
+Defined in: [pledge-core/src/canonical.ts:322](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/canonical.ts#L322)
+
+What a verifier refuses in an outcome (SPEC §4.1, §11.13). Evidence grants
+nothing, so its length and its line breaks are not refused, with one
+exception: a line feed in `result` would let another envelope give the same
+bytes (result "r\n  witness: a" with witness "b" is result "r" with witness
+"a\n  witness: b"). Every field after `witness` is strict, so it may hold one.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`OutcomeCanonicalInput`](../interfaces/OutcomeCanonicalInput) |
+
+## Returns
+
+[`ValidateResult`](../type-aliases/ValidateResult)

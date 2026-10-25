@@ -109,6 +109,16 @@ nothing. To retry, resend the same bytes, or sign again with the same
 `Idempotency-Key`. Two identical bodies signed in the same second are one
 request.
 
+A live project names only someone who has acted toward it as its earner. That
+means a person who signed in on your verified domain with orangecheck, signed in
+from your app, granted your project a scope, or agreed to earn on an account
+your site made for them through Connect (`consent: true`). It also means the
+project's owner. A `user_address` naming anyone else answers
+`403 earner_not_member` and records nothing, and charges nothing. The person
+becomes one the first time they sign in on your site, so name people who have
+signed in there. A request carrying the person's own sign-in token for your
+origin needs nothing more.
+
 | Method | Path                          | Purpose                                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------------------------------------- |
 | `POST` | `/api/integrator/event`       | fire a billable event under a project_key (live mode requires domain verification) |
@@ -204,6 +214,8 @@ Without the SDK, the header is
 | 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                     |
 | 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                    |
 | 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                      |
+| 403    | `earner_not_member`                                      | A live project's event names someone who never signed in to it or granted it anything          |
+| 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again         |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                         |
 | 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                 |
 | 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                               |

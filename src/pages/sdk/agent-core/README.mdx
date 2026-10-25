@@ -61,9 +61,11 @@ export const metadata = {
 ## Type Aliases
 
 - [AgentErrorCode](type-aliases/AgentErrorCode)
+- [AuthoredReasonProblem](type-aliases/AuthoredReasonProblem)
 - [ChainLink](type-aliases/ChainLink)
 - [EnvelopeKind](type-aliases/EnvelopeKind)
 - [FederationVerifyResult](type-aliases/FederationVerifyResult)
+- [RevocationFlag](type-aliases/RevocationFlag)
 - [RevocationHolder](type-aliases/RevocationHolder)
 - [ScopeOp](type-aliases/ScopeOp)
 - [VerifyActionAsOfSignedAtInput](type-aliases/VerifyActionAsOfSignedAtInput)
@@ -79,12 +81,14 @@ export const metadata = {
 - [DEFAULT\_MAX\_SKEW\_MS](variables/DEFAULT_MAX_SKEW_MS)
 - [ENVELOPE\_VERSION](variables/ENVELOPE_VERSION)
 - [REGISTERED\_SCOPES](variables/REGISTERED_SCOPES)
+- [REVOCATION\_REASON\_MAX\_BYTES](variables/REVOCATION_REASON_MAX_BYTES)
 
 ## Functions
 
 - [actionCanonicalBytes](functions/actionCanonicalBytes)
 - [actionCanonicalMessage](functions/actionCanonicalMessage)
 - [assertScopeGranted](functions/assertScopeGranted)
+- [authoredReasonProblem](functions/authoredReasonProblem)
 - [canonicalActionBytes](functions/canonicalActionBytes)
 - [canonicalDelegationBytes](functions/canonicalDelegationBytes)
 - [canonicalizeAction](functions/canonicalizeAction)
@@ -113,6 +117,7 @@ export const metadata = {
 - [revocationCanonicalMessage](functions/revocationCanonicalMessage)
 - [sealScopes](functions/sealScopes)
 - [sha256Hex](functions/sha256Hex)
+- [shownReason](functions/shownReason)
 - [subdelegationCanonicalBytes](functions/subdelegationCanonicalBytes)
 - [subdelegationCanonicalMessage](functions/subdelegationCanonicalMessage)
 - [unsealScopes](functions/unsealScopes)

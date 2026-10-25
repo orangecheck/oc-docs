@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: authoredReasonProblem()",
+    description: "Auto-generated API reference for Function: authoredReasonProblem(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README)
+
+***
+
+[@orangecheck/agent-core](../README) / authoredReasonProblem
+
+# Function: authoredReasonProblem()
+
+```ts
+function authoredReasonProblem(reason: unknown): 
+  | AuthoredReasonProblem
+  | null;
+```
+
+Defined in: [agent-core/src/reason.ts:16](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/reason.ts#L16)
+
+Why `reason` is not one to sign, or null when it is. Signers use this; verifiers never do. "" is a reason.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `reason` | `unknown` |
+
+## Returns
+
+  \| [`AuthoredReasonProblem`](../type-aliases/AuthoredReasonProblem)
+  \| `null`

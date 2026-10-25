@@ -12,29 +12,23 @@ export const metadata = {
 # Function: bondMeets()
 
 ```ts
-function bondMeets(payload: SessionPayload, need: {
-  maxAgeSecs?: number;
-  minDays?: number;
-  minSats?: number;
-}): boolean;
+function bondMeets(payload: SessionPayload, need: BondNeed): boolean;
 ```
 
-Defined in: [index.ts:243](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L243)
+Defined in: [index.ts:268](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L268)
 
 True when the account is backed by a coin whose floors reach `minSats`
 and `minDays`, and the issuer checked it within
 `maxAgeSecs` (default: no limit). Compare against the floor ladder: a
-`minSats` of 50000 is met by a `sats_floor` of 100000, not 10000.
+`minSats` of 50000 is met by a `sats_floor` of 100000, not 10000. A `need`
+that `readBondNeed` refuses is never met.
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `payload` | [`SessionPayload`](../interfaces/SessionPayload) |
-| `need` | \&#123; `maxAgeSecs?`: `number`; `minDays?`: `number`; `minSats?`: `number`; \&#125; |
-| `need.maxAgeSecs?` | `number` |
-| `need.minDays?` | `number` |
-| `need.minSats?` | `number` |
+| `need` | [`BondNeed`](../interfaces/BondNeed) |
 
 ## Returns
 

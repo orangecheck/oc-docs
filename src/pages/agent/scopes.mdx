@@ -67,12 +67,13 @@ To make sub-scope comparison deterministic, scopes are canonicalized before use:
 1. Constraints sorted lexicographically by key.
 2. Values kept exactly as written, case included, and compared byte for byte.
 3. No whitespace.
-4. The value of an integer key (`kind` and the `max_*` keys) is a decimal
-   integer, and a `method` value has no lower-case letter. Hex (`node`,
-   `poll_id`, `content_hash_prefix`), MIME types and bech32 addresses (`bc1…`,
-   `tb1…`, `bcrt1…`) have no upper-case letter; a base58 address keeps its case.
-   A URL (`origin`, `server`, `relay`) has its scheme and host in lower case;
-   its path keeps its case. Any other value makes the scope malformed
+4. Typed values have one spelling, in ASCII: an integer key (`kind`, the `max_*`
+   keys) takes a decimal integer; `method` an ASCII token with no lower-case
+   letter; `node`, `poll_id` and `content_hash_prefix` lower-case hex; `mime` a
+   lower-case type/subtype with no parameters; a bech32 address (`bc1…`, `tb1…`,
+   `bcrt1…`) lower case, while a base58 address keeps its case; a URL (`origin`,
+   `server`, `relay`) no backslash and a lower-case scheme and authority, its
+   path as written. Any other value makes the scope malformed
    (`E_BAD_SCOPE_GRAMMAR`) in either mode.
 
 `ln:send(node=03abc,max_sats<=1000)` canonicalizes to
@@ -88,9 +89,11 @@ An exercised scope `S_x` is a sub-scope of a granted scope `S_g` iff:
     - `op = *` — no requirement on `S_x`.
     - `op = =` — `S_x` must contain `(k, =, v)` exactly.
     - `op = !=` — `S_x` must contain a value that isn't `v` (via `=` or another
-      `!=`). Integer keys compare as integers, so `kind=00` is still `0`. Other
-      values compare byte for byte: for a key whose values can still be spelled
-      two ways, such as a URL with and without its default port, grant with `=`.
+      `!=`). Integer keys compare as integers, so `kind=00` is still `0`.
+      `content_hash_prefix!=ab` withholds every hash that starts with `ab`, so
+      `=abc` does not meet it. Other values compare byte for byte: for a key
+      whose values can still be spelled two ways, such as a URL with and without
+      its default port, grant with `=`.
     - Ordered ops (`<`, `<=`, `>`, `>=`) — `S_x`'s implied numeric range must be
       a subset of `S_g`'s.
 3. `S_x` may add constraints on keys not present in `S_g`, as long as they're
@@ -98,19 +101,20 @@ An exercised scope `S_x` is a sub-scope of a granted scope `S_g` iff:
 
 ### Examples
 
-| Granted                                        | Exercised                                   | Result                       |
-| ---------------------------------------------- | ------------------------------------------- | ---------------------------- |
-| `lock:seal(recipient=bc1qalice)`               | `lock:seal(recipient=bc1qalice)`            | ✓ exact match                |
-| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=500,node=03abc)`          | ✓ tighter bound + extra key  |
-| `stamp:sign(mime=text/markdown)`               | `stamp:sign(mime=application/pdf)`          | ✗ `=` value mismatch         |
-| `http:request(origin=https://api.example.com)` | `http:request(origin=https://api.evil.com)` | ✗ `=` value mismatch         |
-| `http:request(method!=POST)`                   | `http:request(method=GET)`                  | ✓ admissible under `!=`      |
-| `http:request(method!=POST)`                   | `http:request(method=POST)`                 | ✗ disallowed under `!=`      |
-| `http:request(method!=POST)`                   | `http:request(method=post)`                 | ✗ malformed method           |
-| `http:request(origin!=https://evil.example)`   | `http:request(origin=https://EVIL.example)` | ✗ malformed host             |
-| `nostr:publish(kind!=0)`                       | `nostr:publish(kind=00)`                    | ✗ `00` is `0`                |
-| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=5000)`                    | ✗ wider range                |
-| `http:request(origin=*)`                       | `http:request(origin=https://anything)`     | ✓ wildcard grants everything |
+| Granted                                        | Exercised                                    | Result                       |
+| ---------------------------------------------- | -------------------------------------------- | ---------------------------- |
+| `lock:seal(recipient=bc1qalice)`               | `lock:seal(recipient=bc1qalice)`             | ✓ exact match                |
+| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=500,node=03abc)`           | ✓ tighter bound + extra key  |
+| `stamp:sign(mime=text/markdown)`               | `stamp:sign(mime=application/pdf)`           | ✗ `=` value mismatch         |
+| `http:request(origin=https://api.example.com)` | `http:request(origin=https://api.evil.com)`  | ✗ `=` value mismatch         |
+| `http:request(method!=POST)`                   | `http:request(method=GET)`                   | ✓ admissible under `!=`      |
+| `http:request(method!=POST)`                   | `http:request(method=POST)`                  | ✗ disallowed under `!=`      |
+| `http:request(method!=POST)`                   | `http:request(method=post)`                  | ✗ malformed method           |
+| `stamp:sign(mime!=text/html)`                  | `stamp:sign(mime="text/html;charset=utf-8")` | ✗ MIME parameters            |
+| `stamp:sign(content_hash_prefix!=ab)`          | `stamp:sign(content_hash_prefix=abc)`        | ✗ starts with `ab`           |
+| `nostr:publish(kind!=0)`                       | `nostr:publish(kind=00)`                     | ✗ `00` is `0`                |
+| `ln:send(max_sats<=1000)`                      | `ln:send(max_sats=5000)`                     | ✗ wider range                |
+| `http:request(origin=*)`                       | `http:request(origin=https://anything)`      | ✓ wildcard grants everything |
 
 ## Wildcards
 

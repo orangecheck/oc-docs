@@ -82,7 +82,10 @@ every claim says when that was (`oc_bond.checked_at`). You can't ask for a fresh
 check, but you can refuse a stale one with `maxAgeSecs`, which only code sets.
 
 In code, `requireBond: { minSats, minDays, maxAgeSecs }` does the same as the
-project setting and wins over `projectKey`. `readBondClaim(session)` and
+project setting and wins over `projectKey`. Each value is left out or a whole
+number of 0 or more; anything else, such as `NaN` from an unset environment
+variable, a string or a fraction, throws when the adapter is made (me-client
+0.53.0), and `bondMeets` is false for it. `readBondClaim(session)` and
 `bondMeets(session, { minSats, minDays, maxAgeSecs })` come from
 `@orangecheck/me-client/server` (or `@orangecheck/auth-core`) for your own
 checks: a fast lane, a higher free tier, a ban list.

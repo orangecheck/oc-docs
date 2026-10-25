@@ -15,9 +15,13 @@ export const metadata = {
 function isReservedName(value: string): boolean;
 ```
 
-Defined in: [display-name.ts:21](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L21)
+Defined in: [display-name.ts:57](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L57)
 
-True when a name reads as one of orangecheck's own, whatever its case, width, spacing or variation selectors.
+True when a name reads as one of orangecheck's own, whatever its case,
+width, spacing or variation selectors, or when it is drawn with letters
+from another script or digits that look like ours: Cyrillic or Greek o, a,
+e, c, 0 for o. Read a character at a time, so one script's capitals and
+another's small letters cannot hide a name between them.
 
 ## Parameters
 

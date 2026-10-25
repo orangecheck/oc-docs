@@ -12,14 +12,19 @@ export const metadata = {
 # Function: nameProblem()
 
 ```ts
-function nameProblem(value: string, max: number): NameProblem | null;
+function nameProblem(
+   value: string, 
+   max: number, 
+   options?: NameRuleOptions): NameProblem | null;
 ```
 
-Defined in: [display-name.ts:76](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L76)
+Defined in: [display-name.ts:104](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L104)
 
 Why a name (already trimmed) cannot be stored, or null when it can. `max`
 counts code points, as a reader counts characters and Postgres counts a
-text column: an emoji is one, not two UTF-16 units.
+text column: an emoji is one, not two UTF-16 units. With `allowReserved`
+(orangecheck's own record), one of our names is not a problem; every other
+check still applies.
 
 ## Parameters
 
@@ -27,6 +32,7 @@ text column: an emoji is one, not two UTF-16 units.
 | ------ | ------ |
 | `value` | `string` |
 | `max` | `number` |
+| `options?` | [`NameRuleOptions`](../interfaces/NameRuleOptions) |
 
 ## Returns
 

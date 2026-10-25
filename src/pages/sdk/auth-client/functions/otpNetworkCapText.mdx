@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: otpNetworkCapText()",
+    description: "Auto-generated API reference for Function: otpNetworkCapText(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / otpNetworkCapText
+
+# Function: otpNetworkCapText()
+
+```ts
+function otpNetworkCapText(retryAt: unknown, instead?: string): string;
+```
+
+Defined in: [caps.ts:27](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/caps.ts#L27)
+
+A network past its hour of sign-in codes (`otp_network_cap`, #344): its
+next code frees only as the hour rolls, so "wait a minute" would be false.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `retryAt` | `unknown` | `undefined` |
+| `instead` | `string` | `'Sign in another way'` |
+
+## Returns
+
+`string`

@@ -15,9 +15,11 @@ export const metadata = {
 function nameProblem(value: string, max: number): NameProblem | null;
 ```
 
-Defined in: [display-name.ts:33](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L33)
+Defined in: [display-name.ts:37](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/display-name.ts#L37)
 
-Why a name (already trimmed) cannot be stored, or null when it can.
+Why a name (already trimmed) cannot be stored, or null when it can. `max`
+counts code points, as a reader counts characters and Postgres counts a
+text column: an emoji is one, not two UTF-16 units.
 
 ## Parameters
 

@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: normalizeEmail()",
+    description: "Auto-generated API reference for Function: normalizeEmail(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / normalizeEmail
+
+# Function: normalizeEmail()
+
+```ts
+function normalizeEmail(raw: string): string;
+```
+
+Defined in: [identifiers.ts:26](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/identifiers.ts#L26)
+
+The form an email address is stored, hashed and looked up in: trimmed of
+surrounding whitespace, then lower-cased. Every sign-in code, linked address
+and Connect claim uses it, so a change here moves every stored lookup.
+Lower-casing follows the runtime's Unicode version: a letter cased only in a
+newer Unicode lowers here before it does in an older Node or Python.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `raw` | `string` |
+
+## Returns
+
+`string`

@@ -12,18 +12,21 @@ their own browser. The app listens on `127.0.0.1`, opens orangecheck, and gets a
 one-time code back. Your server trades the code for the same token the popup
 gives, bound to your site. Nothing secret is in the app.
 
-This is for test projects while we prove it on real builds. It needs
-`@orangecheck/me-client` 0.50.0 or `orangecheck` 3.6.0 on your server.
+It works for live projects and test projects. A test project signs in its own
+developer and nobody else. It needs `@orangecheck/me-client` 0.50.0 or
+`orangecheck` 3.6.0 on your server.
 
 ## How it works
 
 1. The app picks a free port on `127.0.0.1`, makes a random verifier and its
    SHA-256 challenge (PKCE, RFC 7636), and opens
    `https://ochk.io/native/authorize` in the player's browser.
-2. The player signs in there as usual. orangecheck asks every time, naming your
-   project and your domain: "Sign in to Brick Co (brick.example) in an app on
-   this device?" A native app can't prove which app it is, so the player is the
-   check.
+2. The player signs in there as usual. orangecheck asks every time, "Sign in to
+   an app on this device?", and names your project, the website the sign-in is
+   for and the player's account. A native app can't prove which app it is, so
+   the player is the check. On a test project anyone but its developer is told
+   "This app is in testing. Only its developer can sign in to it." and gets no
+   code.
 3. The browser comes back to `http://127.0.0.1:<port>/<path>?code=…&state=…`.
    The app checks `state` and shows a page that says to go back to the game.
 4. The app sends the code, its verifier and its redirect to your server. Your
@@ -37,10 +40,16 @@ everywhere ends any code not yet traded.
 
 ## Turn it on
 
-On [ochk.app](https://ochk.app/me/projects), open a test project, then **Sign-in
-→ Sign in from apps**. The token is bound to an address the project proves: its
-verified domain, or else its development origin (on the same page). Going live
-turns it off.
+On [ochk.app](https://ochk.app/me/projects), open the project, then **Sign-in →
+Sign in from apps**. The token is bound to an address the project proves:
+
+- A live project needs a verified domain, and signs in for it alone.
+- A test project uses its verified domain, or else its development origin (on
+  the same page).
+
+Going live keeps it on when the domain is verified, and turns it off otherwise.
+It works only while the project's orangecheck sign-in is on; turning that off
+pauses it, and turning it back on brings it back.
 
 ## The app: Godot 4
 

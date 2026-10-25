@@ -15,7 +15,7 @@ export const metadata = {
 function verifyPoll(poll: Poll, verify: SignatureVerifier): Promise<VerifyResult>;
 ```
 
-Defined in: [vote-core/src/verify.ts:66](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/verify.ts#L66)
+Defined in: [vote-core/src/verify.ts:67](https://github.com/orangecheck/oc-packages/blob/main/vote-core/src/verify.ts#L67)
 
 Structural checks from SPEC §3.3 plus the creator's BIP-322 signature over
 `poll_id` (§10.1). A poll that fails MUST be rejected.

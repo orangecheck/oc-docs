@@ -64,7 +64,7 @@ establishes:
 | T9a | Repeated action              | A verifier that acts on actions acts on each action id once                                                               |
 | T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                                                                     |
 | T11 | Unregistered scope confusion | Strict mode rejects unknown; permissive never inflates to wildcard                                                        |
-| T12 | Scope-key confusion          | Strict mode rejects unknown keys; permissive ignores as constraint                                                        |
+| T12 | Scope-key confusion          | Strict mode rejects unknown keys; permissive accepts them and they still bind                                             |
 | T13 | Malicious relay              | Authenticity is BIP-322 in envelope; relays cannot forge                                                                  |
 
 ## Trust assumptions
@@ -88,8 +88,8 @@ Compliant implementations MUST:
    compare the hash to the declared id before trusting any field.
 3. Verify the BIP-322 signature before evaluating scopes, bonds, or any
    semantically-weighted field.
-4. Reject envelopes with unknown scope products or verbs in strict mode; ignore
-   (without widening) in permissive mode.
+4. Reject envelopes with unknown scope products or verbs in strict mode; in
+   permissive mode, accept them and apply every constraint as written.
 5. Compute the sub-scope relation deterministically.
 6. Cross-reference `A.delegation_id` with `D.id`, `A.signer.address` with
    `D.agent.address`, `A.signed_at` with `D`'s window. When the result decides

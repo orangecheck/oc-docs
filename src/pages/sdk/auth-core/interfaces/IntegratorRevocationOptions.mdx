@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: IntegratorRevocationOptions
 
-Defined in: [revocation.ts:306](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L306)
+Defined in: [revocation.ts:327](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L327)
 
 ## Extends
 
@@ -24,11 +24,11 @@ Defined in: [revocation.ts:306](https://github.com/orangecheck/oc-packages/blob/
 | &lt;a id="property-clock">&lt;/a> `clock?` | () => `number` | A clock that never steps back, ms. A copy's age and the wait after a failed fetch are the longer of the time on it and on the wall clock, so neither a wall clock set back nor a pause this clock slept through (a suspended host) can extend them. Default `performance.now()`; when only `now` is given, `now`. | [`RevocationCheckOptions`](RevocationCheckOptions).[`clock`](RevocationCheckOptions#property-clock) | [revocation.ts:87](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L87) |
 | &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | - | [`RevocationCheckOptions`](RevocationCheckOptions).[`fetch`](RevocationCheckOptions#property-fetch) | [revocation.ts:77](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L77) |
 | &lt;a id="property-maxstalems">&lt;/a> `maxStaleMs?` | `number` | Past this age a copy cannot vouch for a write. Default 10 min. | [`RevocationCheckOptions`](RevocationCheckOptions).[`maxStaleMs`](RevocationCheckOptions#property-maxstalems) | [revocation.ts:57](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L57) |
-| &lt;a id="property-meorigin">&lt;/a> `meOrigin?` | `string` | Default `OC_ME_ORIGIN`, else `https://me.ochk.io`. | - | [revocation.ts:313](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L313) |
+| &lt;a id="property-meorigin">&lt;/a> `meOrigin?` | `string` | Default `OC_ME_ORIGIN`, else `https://me.ochk.io`. | - | [revocation.ts:334](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L334) |
 | &lt;a id="property-now">&lt;/a> `now?` | () => `number` | The wall clock, ms: what the list's own `at` is read against. Default `Date.now`. | [`RevocationCheckOptions`](RevocationCheckOptions).[`now`](RevocationCheckOptions#property-now) | [revocation.ts:79](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L79) |
-| &lt;a id="property-projectkey">&lt;/a> `projectKey?` | `string` | Default `OC_PROJECT_KEY`. | - | [revocation.ts:309](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L309) |
+| &lt;a id="property-projectkey">&lt;/a> `projectKey?` | `string` | Default `OC_PROJECT_KEY`. | - | [revocation.ts:330](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L330) |
 | &lt;a id="property-retryms">&lt;/a> `retryMs?` | `number` | After a failed fetch, how long to wait before the next. Default 10 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`retryMs`](RevocationCheckOptions#property-retryms) | [revocation.ts:70](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L70) |
-| &lt;a id="property-signingsecret">&lt;/a> `signingSecret?` | `string` | Default `OC_SIGNING_SECRET`. | - | [revocation.ts:311](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L311) |
+| &lt;a id="property-signingsecret">&lt;/a> `signingSecret?` | `string` | Default `OC_SIGNING_SECRET`. | - | [revocation.ts:332](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L332) |
 | &lt;a id="property-skewms">&lt;/a> `skewMs?` | `number` | Clock difference tolerated between the list's `at` and this host. Default 60 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`skewMs`](RevocationCheckOptions#property-skewms) | [revocation.ts:66](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L66) |
 | &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | One fetch's time limit. Default 3 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`timeoutMs`](RevocationCheckOptions#property-timeoutms) | [revocation.ts:68](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L68) |
 | &lt;a id="property-ttlms">&lt;/a> `ttlMs?` | `number` | How long a copy is used before fetching again. Default 60 s. | [`RevocationCheckOptions`](RevocationCheckOptions).[`ttlMs`](RevocationCheckOptions#property-ttlms) | [revocation.ts:55](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L55) |

@@ -15,7 +15,7 @@ export const metadata = {
 function verifyBond(input: VerifyBondInput): Promise<VerifyBondResult>;
 ```
 
-Defined in: [pledge-core/src/bond.ts:34](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/bond.ts#L34)
+Defined in: [pledge-core/src/bond.ts:37](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/bond.ts#L37)
 
 Run §8 verifyBond against a caller-supplied attestation lookup.
 
@@ -28,6 +28,9 @@ Returns:
     - E_BOND_SPENT              utxo spent at or before `now`
     - E_BOND_INSUFFICIENT_SATS  sats_bonded &lt; pledge.bond.min_sats
     - E_BOND_INSUFFICIENT_DAYS  days_unspent &lt; pledge.bond.min_days
+
+A `min_sats` or `min_days` that is not a non-negative integer cannot be
+shown to be met, so it fails with E_BOND_INSUFFICIENT_SATS or _DAYS.
 
 The lookup receives `pledge.bond.min_sats` and must return the age of the
 coins that cover it (SPEC §8), not the age of the oldest coin.

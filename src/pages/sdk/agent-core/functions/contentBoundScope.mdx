@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: contentBoundScope()",
+    description: "Auto-generated API reference for Function: contentBoundScope(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/agent-core**](../README)
+
+***
+
+[@orangecheck/agent-core](../README) / contentBoundScope
+
+# Function: contentBoundScope()
+
+```ts
+function contentBoundScope(exercised: Scope, content: ActionContentFacts): Scope;
+```
+
+Defined in: [agent-core/src/scope.ts:448](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/scope.ts#L448)
+
+`exercised` with each content-bound key (SPEC §7.6) set from the action's own
+signed content instead of the agent's claim: `mime` to its type/subtype in
+lower case, `max_bytes` to its length, `content_hash_prefix` to the hex of
+its hash. A scope with no content-bound keys comes back unchanged.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `exercised` | [`Scope`](../interfaces/Scope) |
+| `content` | [`ActionContentFacts`](../interfaces/ActionContentFacts) |
+
+## Returns
+
+[`Scope`](../interfaces/Scope)

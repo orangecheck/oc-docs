@@ -79,9 +79,14 @@ keeps the token they return in its own cookie.
 
 ## Authenticated · payment authorization (Per action)
 
-| Method | Path                     | Purpose                                                      |
-| ------ | ------------------------ | ------------------------------------------------------------ |
-| `POST` | `/api/payment/authorize` | authorize a payment, rate-limited 30/min · moves no sats yet |
+| Method | Path                     | Purpose                                                                   |
+| ------ | ------------------------ | ------------------------------------------------------------------------- |
+| `POST` | `/api/payment/authorize` | authorize a payment, at most 20 per account a UTC day · moves no sats yet |
+
+The body takes `amount_sats` (or `usd_cents`) and a `description` of up to 280
+characters of text. The description is yours: it stays on the record, and is
+never signed, published or served by `GET /api/payment/[id]`. A 21st
+authorization in a UTC day answers `429 payment_daily_cap`.
 
 ## Authenticated · integrator event ingestion
 
@@ -210,6 +215,139 @@ Without the SDK, the header is
 
 The per-person cap on class A events counts only events billed against live
 escrow. A preview event spends nobody's allowance.
+
+## Integrator · trust statements
+
+A live project can say where someone stands on its site: `good`, `caution` or
+`block`. The statement is yours, not orangecheck's. Your server signs it with
+your project's Ed25519 key, and me.ochk.io checks that signature, records the
+statement, anchors it and serves it, but never signs it. Anyone can check it
+offline against the key that signed it.
+
+It needs no user session: your project's two signatures are what authenticate
+it. You can attest only someone who has granted your project a scope, and only
+from a live project with a verified domain.
+
+Before the first statement, make an Ed25519 key pair, keep the private half on
+your server, and register the public half on your project
+(`POST /api/me/projects/[id]/jwk` with `{ jwk }`, or the keys page on ochk.app).
+
+| Method   | Path                                     | Purpose                                                         |
+| -------- | ---------------------------------------- | --------------------------------------------------------------- |
+| `POST`   | `/api/integrator/trust-attestation`      | publish a statement your server signed · no session             |
+| `DELETE` | `/api/integrator/trust-attestation/[id]` | revoke one, from the project owner's session                    |
+| `GET`    | `/api/envelope/[id]?format=wrapped`      | the statement's bytes, its signature and the key that signed it |
+
+### What you sign
+
+The signature covers exactly these bytes: this object, with its keys in this
+order, as `JSON.stringify` writes it.
+
+```json
+{
+    "v": 1,
+    "kind": "oc-me-trust",
+    "issuer_project_key": "pk_live_…",
+    "subject_address": "did:oc:…",
+    "status": "good",
+    "note": null,
+    "expires_at": "2027-04-25T12:00:00.000Z",
+    "occurred_at": "2026-10-25T12:00:00.000Z"
+}
+```
+
+| Field                | Required | Meaning                                                                               |
+| -------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `issuer_project_key` | yes      | Your live project. Sent as `project_key` in the body                                  |
+| `subject_address`    | yes      | The person's `did_oc`, exactly as issued                                              |
+| `status`             | yes      | `good`, `caution` or `block`                                                          |
+| `note`               | no       | Public text, trimmed, at most 280 characters; `null` for none                         |
+| `expires_at`         | yes      | When the statement lapses, at most a year ahead, exactly as `toISOString()` writes it |
+| `occurred_at`        | yes      | Now, as `toISOString()` writes it; it must arrive within 5 minutes                    |
+
+The body is those fields plus `sig`: the Ed25519 signature over the bytes, as
+128 lowercase hex characters. Sign the body too, with your signing secret in
+`X-OC-Signature`, exactly as for [events](#signing-an-event).
+
+```ts
+import { createHmac, createPrivateKey, sign } from 'node:crypto';
+
+type Status = 'good' | 'caution' | 'block';
+
+export async function attest(
+    projectKey: string,
+    subject: string,
+    status: Status
+) {
+    const key = createPrivateKey({
+        key: JSON.parse(process.env.OC_TRUST_PRIVATE_JWK ?? ''),
+        format: 'jwk',
+    });
+    const statement = {
+        v: 1,
+        kind: 'oc-me-trust',
+        issuer_project_key: projectKey,
+        subject_address: subject,
+        status,
+        note: null,
+        expires_at: new Date(Date.now() + 90 * 86_400_000).toISOString(),
+        occurred_at: new Date().toISOString(),
+    };
+    // The keys stay in this order: the signature covers these exact bytes.
+    const sig = sign(
+        null,
+        Buffer.from(JSON.stringify(statement)),
+        key
+    ).toString('hex');
+    const { subject_address, note, expires_at, occurred_at } = statement;
+    const body = JSON.stringify({
+        project_key: projectKey,
+        subject_address,
+        status,
+        note,
+        expires_at,
+        occurred_at,
+        sig,
+    });
+    const t = Math.floor(Date.now() / 1000);
+    const mac = createHmac('sha256', process.env.OC_SIGNING_SECRET ?? '')
+        .update(`${t}.${body}`)
+        .digest('hex');
+    return fetch('https://me.ochk.io/api/integrator/trust-attestation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-OC-Signature': `t=${t},v1=${mac}`,
+        },
+        body, // the same string you signed, byte for byte
+        signal: AbortSignal.timeout(10_000),
+    });
+}
+```
+
+Sending the same statement again answers the stored one with `reused: true`. A
+revoked statement stays revoked.
+
+### What the trust endpoint answers
+
+| Status | `error`                                                         | Meaning                                                                     |
+| ------ | --------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 200    |                                                                 | Recorded: `{ attestation, reused, verify_url }`                             |
+| 400    | `expires_at_required`, `expires_at_out_of_range`                | No expiry, or one in the past or more than a year ahead                     |
+| 400    | `invalid_did`, a malformed `occurred_at`, `expires_at` or `sig` | Not in the one form it is signed in                                         |
+| 401    | `issuer_signature_invalid`                                      | `sig` does not verify under your project's registered key over these fields |
+| 401    | `signature_required`, `invalid_signature`                       | `X-OC-Signature` is missing or does not verify                              |
+| 403    | `test_project_cannot_attest`                                    | A test project publishes no statements                                      |
+| 403    | `domain_unverified`, `project_frozen`                           | Your domain is not verified, or the project is frozen                       |
+| 403    | `subject_not_linked`                                            | That person never granted your project a scope                              |
+| 404    | `project not found`                                             | No project has this key                                                     |
+| 409    | `issuer_key_required`                                           | Your project has registered no public key                                   |
+| 422    | `invalid_status`, `note_*`, `occurred_at_not_now`               | A status outside the three, a note breaking the rules, or a stale time      |
+| 429    | rate limits                                                     | Too many requests                                                           |
+
+The wrapped envelope names who signed (`signature.signer: "issuer"`), the key it
+was signed with (`signature.issuer_jwk`, kept on the record so it still checks
+after you rotate) and your project's key set (`issuer_jwks_url`).
 
 ## Authenticated · integrator project lifecycle
 

@@ -13,7 +13,7 @@ export const metadata = {
 
 Defined in: [agent-core/src/assert-scope.ts:16](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L16)
 
-Distinguishes the three reasons a stamp can be refused.
+Distinguishes the reasons a stamp can be refused.
 
 ## Extends
 
@@ -24,7 +24,7 @@ Distinguishes the three reasons a stamp can be refused.
 ### Constructor
 
 ```ts
-new ScopeNotGrantedError(reason: "not_subscope" | "scopes_encrypted" | "no_scopes", message: string): ScopeNotGrantedError;
+new ScopeNotGrantedError(reason: "not_subscope" | "scopes_encrypted" | "no_scopes" | "malformed", message: string): ScopeNotGrantedError;
 ```
 
 Defined in: [agent-core/src/assert-scope.ts:18](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L18)
@@ -33,7 +33,7 @@ Defined in: [agent-core/src/assert-scope.ts:18](https://github.com/orangecheck/o
 
 | Parameter | Type |
 | ------ | ------ |
-| `reason` | `"not_subscope"` \| `"scopes_encrypted"` \| `"no_scopes"` |
+| `reason` | `"not_subscope"` \| `"scopes_encrypted"` \| `"no_scopes"` \| `"malformed"` |
 | `message` | `string` |
 
 #### Returns
@@ -52,5 +52,5 @@ Error.constructor
 | ------ | ------ | ------ | ------ | ------ |
 | &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
-| &lt;a id="property-reason">&lt;/a> `reason` | `readonly` | `"not_subscope"` \| `"scopes_encrypted"` \| `"no_scopes"` | - | [agent-core/src/assert-scope.ts:17](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L17) |
+| &lt;a id="property-reason">&lt;/a> `reason` | `readonly` | `"not_subscope"` \| `"scopes_encrypted"` \| `"no_scopes"` \| `"malformed"` | - | [agent-core/src/assert-scope.ts:17](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/assert-scope.ts#L17) |
 | &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

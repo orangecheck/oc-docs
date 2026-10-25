@@ -93,6 +93,7 @@ import type {
     ActionEnvelope,
     DelegationEnvelope,
     RevocationEnvelope,
+    Scope,
 } from '@orangecheck/agent-core';
 
 import {
@@ -142,9 +143,16 @@ async function admit(params: ToolCall) {
     });
     if (!r.ok) return r.code;
 
-    const here = parseScope(
-        `mcp:invoke(server=${ENDPOINT},tool=${params.name})`
-    );
+    // The tool name is the caller's text: pin it as a value, never as scope
+    // syntax, so a call named "*" is the tool called "*", not every tool.
+    const here: Scope = {
+        product: 'mcp',
+        verb: 'invoke',
+        constraints: [
+            { key: 'server', op: '=', value: ENDPOINT, quoted: true },
+            { key: 'tool', op: '=', value: params.name, quoted: true },
+        ],
+    };
     if (!isSubScope(parseScope(action.scope_exercised), here))
         return 'E_SCOPE_DENIED';
 

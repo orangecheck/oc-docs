@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: readAbandonmentInput()",
+    description: "Auto-generated API reference for Function: readAbandonmentInput(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/pledge-core**](../README)
+
+***
+
+[@orangecheck/pledge-core](../README) / readAbandonmentInput
+
+# Function: readAbandonmentInput()
+
+```ts
+function readAbandonmentInput(input: AbandonmentCanonicalInput): ValidateResult;
+```
+
+Defined in: [pledge-core/src/canonical.ts:373](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/canonical.ts#L373)
+
+What a verifier refuses in an abandonment (SPEC §5.1, §11.13). The reason
+grants nothing and is the last line, after fields that are all strict, so a
+line break in it cannot make another abandonment's bytes: only a reason that
+is not a string is refused.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | [`AbandonmentCanonicalInput`](../interfaces/AbandonmentCanonicalInput) |
+
+## Returns
+
+[`ValidateResult`](../type-aliases/ValidateResult)

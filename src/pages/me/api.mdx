@@ -116,11 +116,11 @@ users is optional.
 A test project records events for the account that owns it and nobody else, so
 you can try your integration on yourself. An event or batch naming anyone else,
 by `user_address` or by session, answers `403 earner_not_project_owner` and
-records nothing. A test project records at most 1,000 events a UTC day across
-`/event`, `/event/batch` and the test-fire button, then
-`429 test_project_daily_cap`, and at most 5,000 in all, then
-`429 test_project_event_cap`. Every test project together records at most 2,000
-events a UTC day, then `429 test_events_ceiling` until midnight UTC; live
+records nothing. Your test projects record at most 500 events a UTC day between
+them, across `/event`, `/event/batch` and the test-fire button, then
+`429 test_project_daily_cap`. Each test project records at most 5,000 in all,
+then `429 test_project_event_cap`. Every test project together records at most
+2,000 events a UTC day, then `429 test_events_ceiling` until midnight UTC; live
 projects never count toward it. A refused event records nothing and counts
 toward none of these. To record events for your users, verify your domain and go
 live.
@@ -204,7 +204,7 @@ Without the SDK, the header is
 | 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                               |
 | 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text          |
 | 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                             |
-| 429    | `test_project_daily_cap`                                 | A test project's 1,000 events for the UTC day are used                                         |
+| 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                        |
 | 429    | `test_project_event_cap`                                 | A test project's 5,000 events in all are used                                                  |
 | 429    | `test_events_ceiling`                                    | Every test project together used the 2,000 test events of the UTC day                          |
 

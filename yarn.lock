@@ -837,10 +837,10 @@
     "@orangecheck/wallet-adapter" "^0.7.0"
     "@simplewebauthn/browser" "^13.3.0"
 
-"@orangecheck/auth-core@^2.17.0":
-  version "2.18.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.18.0.tgz#08ff04ebf8bfc7da5fce8173f182de792b9948e7"
-  integrity sha512-/isxk8cCCr3mHiIZ0nruFYTKLTWIujiEI3SEQmrMdhP88uhzHMdjfEf6kHkWYEvZkuLBHqwXa2/ypkIhNd9t9g==
+"@orangecheck/auth-core@^2.24.0":
+  version "2.25.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.25.0.tgz#8a3a2cfe5b2b25d222cbdbbe81c42ea3e0e6ee4d"
+  integrity sha512-qwgZvW/Y5edPsMBcHrv4f2rfRjkDFGVq2XVUVDxmN6veLRWYivOhZoOE6G6L8gWALzlnZnVH7/IwVY76d7diKA==
   dependencies:
     jose "^6.2.2"
 
@@ -853,17 +853,17 @@
     "@noble/hashes" "^1.8.0"
     "@scure/base" "^1.2.6"
 
-"@orangecheck/mark@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/mark/-/mark-0.2.0.tgz#62bf96dd0e1d1f031e8b657d3c6bc119424fc633"
-  integrity sha512-AfoqWFr5t9RACmYRQ1SWUkc/X0ztjAYncYDb0P3T5tmObrjapIpbQRMcGP4K79GObwv8hpsKEdkhaiLHUZEMbw==
+"@orangecheck/mark@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/mark/-/mark-0.3.0.tgz#ce818f7370b83e1c085766d4926fde2a757f9e84"
+  integrity sha512-CaDeuDSoxMFawdGLQR9C4tiY3gUze/fsX25g56FJu20Z0Y2GeU+9g6Y5zFpAP1N91XbR9rpUGe7wsBF/hy/3gA==
 
-"@orangecheck/me-client@^0.48.0":
-  version "0.48.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.48.0.tgz#c01d5701c6a5407bfb0e5ae4bda2df3d042aa933"
-  integrity sha512-QUBUcF0unEnhELib2r/kTS/TgDRA30ygkkJgcRT6NPofff6sXPqG3GAMtwXKtgG/D1FZSPJfqaRe7mQgCqwlxg==
+"@orangecheck/me-client@^0.53.0":
+  version "0.53.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.53.0.tgz#3c2d67f87bb8d2d57d95024a05c5311762ff234d"
+  integrity sha512-9I3deXQIIn77A0eaYj3bnyTSI5Kc26K9TTDBLiTKmPCRPEX5LQYIFKqdO7KIF/PbRU21JsvB0zVobYFwmS9b0A==
   dependencies:
-    "@orangecheck/auth-core" "^2.17.0"
+    "@orangecheck/auth-core" "^2.24.0"
 
 "@orangecheck/site-kit@^0.5.1":
   version "0.5.3"

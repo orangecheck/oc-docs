@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: isDidOc()",
+    description: "Auto-generated API reference for Function: isDidOc(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / isDidOc
+
+# Function: isDidOc()
+
+```ts
+function isDidOc(value: unknown): value is `did:oc:${string}`;
+```
+
+Defined in: [identifiers.ts:15](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/identifiers.ts#L15)
+
+Is `value` a did:oc: `did:oc:` and 32 lowercase hex digits, with nothing
+before or after it? Upper case, surrounding space and a trailing newline are
+all refused; trim or lower-case first only where you mean to.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `unknown` |
+
+## Returns
+
+`` value is `did:oc:${string}` ``

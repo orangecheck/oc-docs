@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: safeReturnPath()",
+    description: "Auto-generated API reference for Function: safeReturnPath(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/me-client**](../README)
+
+***
+
+[@orangecheck/me-client](../README) / safeReturnPath
+
+# Function: safeReturnPath()
+
+```ts
+function safeReturnPath(raw: unknown, fallback?: string): string;
+```
+
+Defined in: [me-client/src/return-path.ts:11](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/return-path.ts#L11)
+
+Where to send someone back to after they sign in or prove it is them again: a
+path on your own site, or `fallback`. Refuses anything a browser would take
+to another site (`//evil.com`, `/\evil.com`, a scheme), a backslash anywhere,
+control characters (browsers drop some: `/\t/evil.com` becomes `//evil.com`),
+a percent that does not decode, and dot segments, plain or percent-encoded,
+which can collapse into `//`. sdk-py's
+`safe_return_path` answers the same for every input in
+test-vectors/return-path.json.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `raw` | `unknown` | `undefined` |
+| `fallback` | `string` | `'/'` |
+
+## Returns
+
+`string`

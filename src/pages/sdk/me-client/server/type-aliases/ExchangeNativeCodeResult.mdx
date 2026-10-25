@@ -23,9 +23,24 @@ type ExchangeNativeCodeResult =
   status: "invalid";
 }
   | {
-  reason: "auth_host_unavailable" | "rate_limited" | "key_set_unavailable";
+  back_url: string;
+  have:   | {
+     days_floor: number;
+     sats_floor: number;
+   }
+     | null;
+  need: {
+     max_age_secs?: number;
+     min_days: number;
+     min_sats: number;
+  };
+  reason: "bond_required";
+  status: "invalid";
+}
+  | {
+  reason: ExchangeNativeCodeUnavailable;
   status: "unavailable";
 };
 ```
 
-Defined in: [me-client/src/native.ts:67](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L67)
+Defined in: [me-client/src/native.ts:106](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L106)

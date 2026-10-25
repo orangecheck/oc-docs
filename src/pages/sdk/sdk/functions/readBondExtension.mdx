@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: readBondExtension()",
+    description: "Auto-generated API reference for Function: readBondExtension(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README)
+
+***
+
+[@orangecheck/sdk](../README) / readBondExtension
+
+# Function: readBondExtension()
+
+```ts
+function readBondExtension(value: string): number | null;
+```
+
+Defined in: [canonical.ts:159](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/canonical.ts#L159)
+
+The amount a `bond:` value gives, or null when SPEC §2.2 does not allow it:
+base-10 ASCII digits only, at most 2^53 - 1. parseInt would read "5000abc"
+as 5000 and "1e9" as 1.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `string` |
+
+## Returns
+
+`number` \| `null`

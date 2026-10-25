@@ -11,17 +11,17 @@ export const metadata = {
 
 # Interface: VerifyChallengeOptions
 
-Defined in: [challenge.ts:178](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L178)
+Defined in: [challenge.ts:180](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L180)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-clockskewms">&lt;/a> `clockSkewMs?` | `number` | Tolerance on expiry check in ms. Default 0. | [challenge.ts:197](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L197) |
-| &lt;a id="property-expectedaudience">&lt;/a> `expectedAudience?` | `string` | If set, require the challenge's `audience:` extension to match. | [challenge.ts:187](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L187) |
-| &lt;a id="property-expectednonce">&lt;/a> `expectedNonce?` | `string` | If set, require the challenge's `nonce:` to match. Use this to defeat replay — pair with server-side nonce storage (Redis / signed cookie). | [challenge.ts:194](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L194) |
-| &lt;a id="property-expectedpurpose">&lt;/a> `expectedPurpose?` | `string` | If set, require the challenge's `purpose:` extension to match. | [challenge.ts:189](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L189) |
-| &lt;a id="property-message">&lt;/a> `message` | `string` | The signed canonical challenge text, exactly as issued. | [challenge.ts:180](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L180) |
-| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Freeze `now` for tests. | [challenge.ts:199](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L199) |
-| &lt;a id="property-scheme">&lt;/a> ~~`scheme?`~~ | [`Scheme`](../type-aliases/Scheme) | **Deprecated** Ignored: the signature's own bytes decide the scheme. | [challenge.ts:184](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L184) |
-| &lt;a id="property-signature">&lt;/a> `signature` | `string` | BIP-322 or legacy signature, base64 or hex. | [challenge.ts:182](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L182) |
+| &lt;a id="property-clockskewms">&lt;/a> `clockSkewMs?` | `number` | Tolerance on expiry check in ms. Default 0. | [challenge.ts:199](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L199) |
+| &lt;a id="property-expectedaudience">&lt;/a> `expectedAudience?` | `string` | If set, require the challenge's `audience:` extension to match. | [challenge.ts:189](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L189) |
+| &lt;a id="property-expectednonce">&lt;/a> `expectedNonce?` | `string` | If set, require the challenge's `nonce:` to match. Use this to defeat replay — pair with server-side nonce storage (Redis / signed cookie). | [challenge.ts:196](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L196) |
+| &lt;a id="property-expectedpurpose">&lt;/a> `expectedPurpose?` | `string` | If set, require the challenge's `purpose:` extension to match. | [challenge.ts:191](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L191) |
+| &lt;a id="property-message">&lt;/a> `message` | `string` | The signed canonical challenge text, exactly as issued. | [challenge.ts:182](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L182) |
+| &lt;a id="property-now">&lt;/a> `now?` | `Date` | Freeze `now` for tests. | [challenge.ts:201](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L201) |
+| &lt;a id="property-scheme">&lt;/a> ~~`scheme?`~~ | [`Scheme`](../type-aliases/Scheme) | **Deprecated** Ignored: the signature's own bytes decide the scheme. | [challenge.ts:186](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L186) |
+| &lt;a id="property-signature">&lt;/a> `signature` | `string` | BIP-322 or legacy signature, base64 or hex. | [challenge.ts:184](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/challenge.ts#L184) |

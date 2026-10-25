@@ -67,9 +67,17 @@ authorship and priority; authority verification is additive.
 oc-agent:revocation:v1
 address: <signer_btc_address>
 delegation_id: <64-hex>
-reason: <ASCII, max 128 bytes, "" if omitted>
+reason: <printable ASCII, at most 128 bytes, "" if omitted>
 signed_at: <ISO 8601 UTC>
 ```
+
+A signer writes the reason as printable ASCII of at most 128 bytes. A verifier
+decides a revocation on its signed bytes only: it computes the id from the
+signed fields and checks the signature against that id and `signer.address`. The
+reason's content and the envelope's `v`, `id`, `kind`, `sig.pubkey` and
+`sig.alg` never stop a validly signed revocation from revoking; a reason left
+out or `null` is `""`. A reason shown to a person has its control, bidi and
+invisible characters escaped (agent-core `shownReason`).
 
 ## Signing
 

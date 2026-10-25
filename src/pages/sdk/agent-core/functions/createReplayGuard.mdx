@@ -17,7 +17,7 @@ function createReplayGuard(maxSkewMs?: number): {
 };
 ```
 
-Defined in: [agent-core/src/verify.ts:674](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L674)
+Defined in: [agent-core/src/verify.ts:675](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L675)
 
 Remembers the ids of accepted actions, so one signed action is acted on
 once. An action passes the freshness bound for `maxSkewMs` either side of
@@ -41,4 +41,4 @@ shared store. Two identical calls signed in the same second share an id.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `firstUse()` | (`action`: `Pick`\&lt;[`ActionEnvelope`](../interfaces/ActionEnvelope), `"id"` \| `"signed_at"`\>, `now?`: `Date`) => `boolean` | [agent-core/src/verify.ts:675](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L675) |
+| `firstUse()` | (`action`: `Pick`\&lt;[`ActionEnvelope`](../interfaces/ActionEnvelope), `"id"` \| `"signed_at"`\>, `now?`: `Date`) => `boolean` | [agent-core/src/verify.ts:676](https://github.com/orangecheck/oc-packages/blob/main/agent-core/src/verify.ts#L676) |

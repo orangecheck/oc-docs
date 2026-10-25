@@ -75,8 +75,9 @@ To make sub-scope comparison deterministic, scopes are canonicalized before use:
    `server`, `relay`) no backslash and a lower-case scheme and authority, its
    path as written. Any other value makes the scope malformed
    (`E_BAD_SCOPE_GRAMMAR`) in either mode.
-5. A `*_prefix` key is written with `=`, meaning "starts with"; `!=` on one is
-   malformed in either mode.
+5. A registered prefix key, `content_hash_prefix` of `stamp:sign`, is written
+   with `=`, meaning "starts with"; `!=` on it is malformed in either mode. A
+   key is a prefix key by registration, not by its name.
 
 `ln:send(node=03abc,max_sats<=1000)` canonicalizes to
 `ln:send(max_sats<=1000,node=03abc)`. The canonical form is what gets written to
@@ -89,8 +90,8 @@ An exercised scope `S_x` is a sub-scope of a granted scope `S_g` iff:
 1. `product` and `verb` are identical.
 2. For every constraint `(k, op, v)` in `S_g`:
     - `op = *` — no requirement on `S_x`.
-    - `op = =` — `S_x` must contain `(k, =, v)` exactly. A `*_prefix` key such
-      as `content_hash_prefix` means "starts with": `=abc` meets `=ab`.
+    - `op = =` — `S_x` must contain `(k, =, v)` exactly. The prefix key
+      `content_hash_prefix` means "starts with": `=abc` meets `=ab`.
     - `op = !=` — `S_x` must contain a value that isn't `v` (via `=` or another
       `!=`). Integer keys compare as integers, so `kind=00` is still `0`. Other
       values compare byte for byte: for a key whose values can still be spelled
@@ -99,6 +100,18 @@ An exercised scope `S_x` is a sub-scope of a granted scope `S_g` iff:
       a subset of `S_g`'s.
 3. `S_x` may add constraints on keys not present in `S_g`, as long as they're
    registered for that `product:verb`.
+
+### Keys read from the content
+
+For `stamp:sign`, three keys describe the action's own content, so a verifier
+reads them from the signed `content` and never from the agent's claim: `mime`
+from `content.mime` (its type/subtype, lower case), `max_bytes` from
+`content.length`, and `content_hash_prefix` from the hex of `content.hash`.
+Those values must meet the grant that admits `scope_exercised`, else
+`E_SCOPE_DENIED`; `agent-signer` refuses to sign content its own claim does not
+cover. No other registered scope has a key the action's signed fields describe:
+a recipient, poll, kind or tool sits inside the content bytes, and the product's
+own verifier reads it there.
 
 ### Examples
 

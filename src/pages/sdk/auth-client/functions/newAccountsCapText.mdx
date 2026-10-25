@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: newAccountsCapText()",
+    description: "Auto-generated API reference for Function: newAccountsCapText(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / newAccountsCapText
+
+# Function: newAccountsCapText()
+
+```ts
+function newAccountsCapText(retryAt: unknown): string;
+```
+
+Defined in: [caps.ts:37](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/caps.ts#L37)
+
+A network past its count of new accounts (`new_accounts_capped`, #345).
+Every way of signing in counts toward it, so another way would not help; an
+account that already exists always signs in.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `retryAt` | `unknown` |
+
+## Returns
+
+`string`

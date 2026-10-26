@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Function: retiredKeyVouches()",
+    description: "Auto-generated API reference for Function: retiredKeyVouches(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / retiredKeyVouches
+
+# Function: retiredKeyVouches()
+
+```ts
+function retiredKeyVouches(claims: {
+  exp?: unknown;
+  iat?: unknown;
+}, retiredAt: number): boolean;
+```
+
+Defined in: [retired-key.ts:11](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/retired-key.ts#L11)
+
+Does a key retired at `retiredAt` (unix seconds) still vouch for a token with
+these claims? Only for one it signed before it retired, valid for no longer
+than ochk.io lets any token live. `iat` and `exp` are both the signer's own
+word, so the lifetime bound is what ends a retired key's tokens:
+none outlives `retiredAt + TOKEN_MAX_LIFETIME_SEC`.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `claims` | \&#123; `exp?`: `unknown`; `iat?`: `unknown`; \&#125; |
+| `claims.exp?` | `unknown` |
+| `claims.iat?` | `unknown` |
+| `retiredAt` | `number` |
+
+## Returns
+
+`boolean`

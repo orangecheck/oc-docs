@@ -29,9 +29,10 @@ option it does not read.
 Integrators don't need to handle JWKs, env vars, or rotation — the
 cache picks up new keys automatically when they appear in the JWKS
 response. A key published with `status: "retired"` verifies only tokens
-issued before its `retired_at`; a key removed from the JWKS stops
-verifying once the cache refreshes, and an unreachable JWKS is stood in
-for by the last one fetched for at most `jwksMaxStaleMs`.
+issued before its `retired_at` and valid for at most 30 days
+([retiredKeyVouches](retiredKeyVouches)); a key removed from the JWKS stops verifying
+once the cache refreshes, and an unreachable JWKS is stood in for by the
+last one fetched for at most `jwksMaxStaleMs`.
 
 ## Parameters
 

@@ -51,6 +51,11 @@ jobs:
             - name: Install
               run: yarn install --frozen-lockfile
 
+            # The sign-in button page's SRI pin is written from the installed
+            # me-client; jsDelivr must serve those same bytes, or browsers refuse them.
+            - name: me-client on jsDelivr matches npm
+              run: node scripts/me-client-sri.mjs --check-cdn
+
             - name: Type check
               run: yarn type-check
 

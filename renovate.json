@@ -1,33 +1,16 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": ["config:recommended", ":dependencyDashboard", ":semanticCommits"],
+    "extends": [
+        "config:recommended",
+        ":dependencyDashboard",
+        ":semanticCommits",
+        "github>orangecheck/oc-packages:renovate-family"
+    ],
+    "description": "Renovate turns on GitHub's auto-merge when it opens the family PR, so the merge queue takes it once the required checks pass; it never merges on the checks it can read itself (only Vercel's). The family rule leaves automerge unset, so this applies to the family PR alone: a major or a 0.x minor sets it false and waits for a person.",
     "labels": ["renovate"],
     "prConcurrentLimit": 5,
     "prHourlyLimit": 10,
-    "packageRules": [
-        {
-            "description": "Disabled by default — this Renovate config is scoped to the @orangecheck/* family ONLY. Third-party deps (next, react, tailwind, etc.) are NOT auto-tracked here; bump them by hand when you choose to.",
-            "matchUpdateTypes": ["patch", "minor", "major"],
-            "enabled": false
-        },
-        {
-            "description": "@orangecheck/* patch + minor, bundled into one PR per consumer after a 1-day stability window. Renovate turns on GitHub's auto-merge when it opens the PR, so the merge queue takes it once the required checks pass. Renovate never merges on the checks it can read itself (only Vercel's).",
-            "matchPackageNames": ["/^@orangecheck//"],
-            "matchUpdateTypes": ["patch", "minor"],
-            "enabled": true,
-            "groupName": "@orangecheck/* (family)",
-            "automerge": true,
-            "automergeType": "pr",
-            "platformAutomerge": true,
-            "minimumReleaseAge": "1 day"
-        },
-        {
-            "description": "Human-review @orangecheck/* major bumps — these change wire shape.",
-            "matchPackageNames": ["/^@orangecheck//"],
-            "matchUpdateTypes": ["major"],
-            "enabled": true,
-            "automerge": false,
-            "labels": ["renovate", "major-bump"]
-        }
-    ]
+    "automerge": true,
+    "automergeType": "pr",
+    "platformAutomerge": true
 }

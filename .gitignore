@@ -14,3 +14,5 @@ tsconfig.tsbuildinfo
 # The search index. Written by scripts/gen-search-index.mjs on every
 # prebuild and predev, from the pages themselves.
 public/search-index.json
+# written by scripts/me-client-sri.mjs before dev, test and build
+src/generated/me-client-cdn.mdx

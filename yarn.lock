@@ -872,9 +872,9 @@
     "@orangecheck/auth-core" "^2.24.0"
 
 "@orangecheck/site-kit@^0.5.1":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.5.3.tgz#9f825a1331350402fe342a124a25226c7a66574a"
-  integrity sha512-sPflxMOnKdREYoZjImngv2j95lu/nak1P45b5v1DZx2nLjf+eme00TghpOGd7O6yuCt8rwmrKSUo6rvb1BfoTQ==
+  version "0.5.4"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.5.4.tgz#411f39d7d9c4017e1cc28114123949ff182a0f27"
+  integrity sha512-8rUg2PlUbT/XmM23ichvIzwMr1vz4dLq+zsJhCzh9pUpIpYxwSQn8Hst96ADmXluQ+FF/fy3qC3SH5j607qmLg==
 
 "@orangecheck/wallet-adapter@^0.7.0":
   version "0.7.2"

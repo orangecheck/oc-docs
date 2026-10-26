@@ -1,3 +1,5 @@
+import MeClientCdn from '@/generated/me-client-cdn.mdx';
+
 import {
     MarkVariants,
     SignInButtonBrand,
@@ -162,43 +164,9 @@ your page. Integrity covers a `<script src>`, not an `import` in an inline
 script, so load `button-auto.mjs`: it enhances every `[data-oc-sign-in]` button
 itself and reports through events, and your own script imports nothing.
 
-```html
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@orangecheck/me-client@0.53.0/dist/button.css"
-    integrity="sha384-gfzUacSwvkf2ls9b6CLLW8yMUz1VNIrCvGFLsyknbCc2X0i9Ey63C+y13T6VeSTx"
-    crossorigin="anonymous"
-/>
+{/* Written from the installed me-client before dev, test and build: scripts/me-client-sri.mjs. */}
 
-<button class="cta ghost" data-oc-sign-in>
-    <span data-oc-mark></span>Sign in with orangecheck
-</button>
-<p id="oc-note" role="status"></p>
-
-<script
-    type="module"
-    src="https://cdn.jsdelivr.net/npm/@orangecheck/me-client@0.53.0/dist/button-auto.mjs"
-    integrity="sha384-56N4iJCuEcF8FKyiJSP7Z2xqHPFw59nFT/Mc6siqQHMm3ju1kN7U+XiWjJKQixV0"
-    crossorigin="anonymous"
-></script>
-<script>
-    document.addEventListener('oc-signed-in', (event) => {
-        const { token, waitUntil } = event.detail;
-        waitUntil(
-            fetch('/api/auth/session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token }),
-            }).then((r) => {
-                if (r.ok) location.assign('/dashboard');
-            })
-        );
-    });
-    document.addEventListener('oc-sign-in-outcome', (event) => {
-        document.getElementById('oc-note').textContent = event.detail.message;
-    });
-</script>
-```
+<MeClientCdn />
 
 | Event                | `detail`                                                                                |
 | -------------------- | --------------------------------------------------------------------------------------- |

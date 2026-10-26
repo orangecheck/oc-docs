@@ -1,0 +1,35 @@
+<link
+    rel="stylesheet"
+    href="{{base}}/button.css"
+    integrity="{{integrity:button.css}}"
+    crossorigin="anonymous"
+/>
+
+<button class="cta ghost" data-oc-sign-in>
+    <span data-oc-mark></span>Sign in with orangecheck
+</button>
+<p id="oc-note" role="status"></p>
+
+<script
+    type="module"
+    src="{{base}}/button-auto.mjs"
+    integrity="{{integrity:button-auto.mjs}}"
+    crossorigin="anonymous"
+></script>
+<script>
+    document.addEventListener('oc-signed-in', (event) => {
+        const { token, waitUntil } = event.detail;
+        waitUntil(
+            fetch('/api/auth/session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token }),
+            }).then((r) => {
+                if (r.ok) location.assign('/dashboard');
+            })
+        );
+    });
+    document.addEventListener('oc-sign-in-outcome', (event) => {
+        document.getElementById('oc-note').textContent = event.detail.message;
+    });
+</script>

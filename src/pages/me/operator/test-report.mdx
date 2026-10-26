@@ -63,7 +63,7 @@ decodes to mutinynet, whose block 1 is
 
 ## Limits this run found
 
-These are stated plainly because they are true today.
+The first two are true today. The third was fixed the same day.
 
 1. **Fedimint Lightning addresses cannot be paid out to today.** The executor
    pays a Lightning address only when its invoice commits to the address's
@@ -78,10 +78,11 @@ These are stated plainly because they are true today.
    to the payer. Paid again, it settled. C05 ran twice on 2026-10-26: in the
    first run the first attempt was refused this way; in the passing run the
    top-up settled on its first attempt.
-3. **A project's limit of three open top-ups counted paid ones.** Each top-up
-   invoice counted toward the limit until 15 minutes after it expired, paid or
-   not, so a fourth top-up within about an hour was refused. A fix is being
-   made.
+3. **A project's limit of three open top-ups counted paid ones.** During this
+   run each top-up invoice counted toward the limit until 15 minutes after it
+   expired, paid or not, so a fourth top-up within about an hour was refused.
+   Fixed on 2026-10-26: a credited top-up no longer counts, and an unpaid one
+   still counts until it lapses.
 
 ## Still open: C07
 

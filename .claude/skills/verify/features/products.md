@@ -9,7 +9,8 @@ two charters.
 
 - me: ochk.app and the me.ochk.io API: quickstart, SDK (`@orangecheck/me-client`),
   API, webhooks, custody, federation, operator pages (charter, runbook, in-browser
-  operator), paying users, drops, require-bond, glossary, integrations.
+  operator, the operator suite test report), paying users, drops, require-bond,
+  glossary, integrations.
 - vault, cosign, connect: each product's guide pages.
 - federation/oc-me-v1: the signed federation charter. Its URL is quoted in signed
   material, so it must never move. Its old address on docs.ochk.io must keep landing
@@ -32,7 +33,7 @@ Runtime:
 
 ```sh
 B=https://ochk.io/docs
-for p in me me/quickstart me/sdk me/operator/charter vault cosign connect federation/oc-me-v1 charter; do
+for p in me me/quickstart me/sdk me/operator/charter me/operator/test-report vault cosign connect federation/oc-me-v1 charter; do
   printf '%-22s ' $p; curl -s -o /dev/null -w '%{http_code}\n' "$B/$p"
 done                                                                    # every one 200
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://docs.ochk.io/federation/oc-me-v1
@@ -43,7 +44,9 @@ curl -s "$B/vault/protocol" | grep -oE 'id="(signed-lock-export|the-bitcoin-devi
 
 Proves it when: every page is 200, the charter's old address is one 308 to its
 new one, and the vault protocol page carries the `.lock` export and the Bitcoin
-device tier sections.
+device tier sections. The test report is also linked from the docs navigation
+(Operator suite test report, under ochk.app): `grep -c "me/operator/test-report"
+src/components/docs/nav.ts` is 1.
 
 ## Gotchas
 

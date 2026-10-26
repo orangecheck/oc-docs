@@ -1,0 +1,92 @@
+export const metadata = {
+    title: 'ochk.app · Operator suite test report',
+    description:
+        'Phase C of the operator suite on mutinynet: a four-guardian federation operated through ochk.app, money in and out through its gateway, guardian loss, operator duties, halt and simulation. What passed, what is still open, and the limits the run found.',
+};
+
+# ochk.app · Operator suite test report
+
+> **Draft, not final.** One step, C07 (moving a running federation to its
+> successor), is still open. This page changes when it closes.
+
+**What this is.** A federation run end to end through ochk.app: operators take
+seats, four guardians run on hosted machines, a key ceremony runs through the
+portal, a gateway is funded, and orangecheck's executor settles top-ups and
+payouts through it. Each step runs twice: as a script against the API, and in a
+browser on the app, with screenshots at 1440 and 390 pixels wide. A step passes
+only when both do.
+
+**What it is not.**
+
+- **Test coins only.** Everything ran on mutinynet, a public test signet.
+  Nothing here moved real value.
+- **Not operator independence.** Every operator identity in this test is held by
+  orangecheck. It tests the machinery with distinct keys and machines. The
+  federation's trust tier stays bootstrap.
+- **Not a separate product.** It is the same code as ochk.app and its API, run
+  on an isolated test deployment with its own databases and keys. Production
+  never sees the test federation.
+
+## The federation under test
+
+- `oc-mutiny-v1`: four guardians, threshold 3 of 4, on mutinynet, live since
+  2026-10-22. The guardians run fedimintd 0.11.4 on hosted machines in four
+  regions (Frankfurt, Ashburn, Singapore, São Paulo).
+- Charter signed by all four seats; key ceremony run through the portal.
+- One Lightning gateway (gatewayd 0.11.4, LDK) funded on mutinynet.
+- orangecheck's executor, at the same commit production's executor runs, holds
+  the float and signs every settlement.
+
+## Results
+
+Run on 2026-10-26 on the test stack, against the code then on `main`: the API
+and executor at oc-me-web `af20fcc5` (the executor is the same commit production
+runs), the sign-in host at oc-www `e925449`, the app at oc-app-web `33b1a7f`.
+
+| Step | What it proves                                                                                                                                                                                                                        | Result   |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| C01  | The registry lists the test federation as live on signet and as a test network; production does not list it                                                                                                                           | Pass     |
+| C02  | Anyone can check it without orangecheck: the invite decodes to mutinynet's chain, a client outside orangecheck joins and sees the four guardians and the federation's block count follows mutinynet, each guardian's status is signed | Pass     |
+| C03  | Money in: a 25,000-sat top-up is credited net of fees (24,920), once, and sha256 of its preimage equals the invoice's payment hash                                                                                                    | Pass     |
+| C04  | Money out: a 1,200-sat payout reaches a wallet orangecheck does not hold, through the gateway                                                                                                                                         | Pass     |
+| C05  | Guardian loss: with one of four down, a top-up and a payout settle; with two down, a top-up is refused before any invoice and the ledger does not change; both restart and a fresh top-up settles once                                | Pass     |
+| C06  | Operator duties: four signed attestations, an alert on the public incidents feed, a payout claim paid once, and a claim over the share refused                                                                                        | Pass     |
+| C07  | Moving a running federation to its successor                                                                                                                                                                                          | **Open** |
+| C08  | A halt holds a payout; on resume it settles once; in simulation a top-up creates no invoice and never reaches the live balance                                                                                                        | Pass     |
+| C09  | The run's signed artifacts are saved: the charter and its four signatures, the invite, the attestations, 32 signed settlements                                                                                                        | Pass     |
+| C10  | The executor restarts and reports to the portal before it settles anything                                                                                                                                                            | Pass     |
+
+The test federation's id is
+`49a3e8647708603ba20f4eb5e249d393f8e4ae80963b65bd0344f78806b9785e`. Its invite
+decodes to mutinynet, whose block 1 is
+`000002855893a0a9b24eaffc5efc770558a326fee4fc10c9da22fc19cd2954f9`.
+
+## Limits this run found
+
+These are stated plainly because they are true today.
+
+1. **Fedimint Lightning addresses cannot be paid out to today.** The executor
+   pays a Lightning address only when its invoice commits to the address's
+   metadata (LUD-06). Upstream Fedimint's own Lightning address server issues
+   invoices that do not, so payouts to a Fedimint-backed Lightning address are
+   refused. The test's own wallet was built to commit to its metadata. A safe
+   relaxation is being assessed.
+2. **With one guardian down, a payment in can need a second try.** Before it
+   accepts an incoming payment, the gateway (gatewayd 0.11.4) asks the
+   federation for its block count and gives up after 10 seconds. With only three
+   guardians up, they did not always answer in time, and the payment failed back
+   to the payer. Paid again, it settled. C05 ran twice on 2026-10-26: in the
+   first run the first attempt was refused this way; in the passing run the
+   top-up settled on its first attempt.
+3. **A project's limit of three open top-ups counted paid ones.** Each top-up
+   invoice counted toward the limit until 15 minutes after it expired, paid or
+   not, so a fourth top-up within about an hour was refused. A fix is being
+   made.
+
+## Still open: C07
+
+Guardians are fixed at a federation's key ceremony, so when an operator leaves,
+the federation moves to a successor with the new operator in the seat. The
+portal's steps for that move are built. The executor's half and the last step
+are being finished. The move gives integrators 14 days' notice before the
+switch, so C07 runs in two sittings, two weeks apart.

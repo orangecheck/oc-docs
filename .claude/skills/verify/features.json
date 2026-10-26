@@ -744,6 +744,14 @@
             "tests": []
         },
         {
+            "id": "page:/me/operator/test-report",
+            "kind": "page",
+            "entry": "src/pages/me/operator/test-report.mdx",
+            "reach": "https://ochk.io/docs/me/operator/test-report",
+            "area": "me",
+            "tests": []
+        },
+        {
             "id": "page:/me/paying-users",
             "kind": "page",
             "entry": "src/pages/me/paying-users.mdx",

@@ -69,8 +69,10 @@ The first two are true today. The third was fixed the same day.
    pays a Lightning address only when its invoice commits to the address's
    metadata (LUD-06). Upstream Fedimint's own Lightning address server issues
    invoices that do not, so payouts to a Fedimint-backed Lightning address are
-   refused. The test's own wallet was built to commit to its metadata. A safe
-   relaxation is being assessed.
+   refused. The test's own wallet was built to commit to its metadata. The rule
+   is being relaxed: an invoice with no description hash will be accepted when
+   the address's own host serves it, and one that carries a hash must still
+   match.
 2. **With one guardian down, a payment in can need a second try.** Before it
    accepts an incoming payment, the gateway (gatewayd 0.11.4) asks the
    federation for its block count and gives up after 10 seconds. With only three

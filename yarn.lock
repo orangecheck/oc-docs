@@ -871,10 +871,10 @@
   dependencies:
     "@orangecheck/auth-core" "^2.24.0"
 
-"@orangecheck/site-kit@^0.5.1":
-  version "0.5.4"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.5.4.tgz#411f39d7d9c4017e1cc28114123949ff182a0f27"
-  integrity sha512-8rUg2PlUbT/XmM23ichvIzwMr1vz4dLq+zsJhCzh9pUpIpYxwSQn8Hst96ADmXluQ+FF/fy3qC3SH5j607qmLg==
+"@orangecheck/site-kit@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.6.0.tgz#b2e29b6ad905f3123a11781f3db26973af27b7d0"
+  integrity sha512-AFlt+nsk6E+xm+KF2mQBmAY9CfE3xQRvOBOIVtYoAAOp/PwcAnyrhjEreq0Kgap/fCc/0izfcEE/Yef0ds2rRw==
 
 "@orangecheck/wallet-adapter@^0.7.0":
   version "0.7.2"

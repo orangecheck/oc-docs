@@ -1,0 +1,35 @@
+export const metadata = {
+    title: "Function: boundNostrKeys()",
+    description: "Auto-generated API reference for Function: boundNostrKeys(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / boundNostrKeys
+
+# Function: boundNostrKeys()
+
+```ts
+function boundNostrKeys(verified: readonly ParsedDeviceEvent[], opts?: {
+  now?: Date;
+}): string[];
+```
+
+Defined in: [verify.ts:67](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L67)
+
+The Nostr keys verified records bind for their address at `now`: live after
+revocations (liveDevices), then authorized (authorizedDevices).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `verified` | readonly [`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[] |
+| `opts` | \&#123; `now?`: `Date`; \&#125; |
+| `opts.now?` | `Date` |
+
+## Returns
+
+`string`[]

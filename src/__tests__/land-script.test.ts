@@ -4,7 +4,7 @@
 import { spawnSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
@@ -17,6 +17,21 @@ const read = (
     merged = '-',
     head = 'h'.repeat(40)
 ) => [state, inQueue, auto, entry, 'SUCCESS', merged, head].join('\t');
+
+/** A scratch git checkout whose origin is on GitHub: the script reads its repository from origin. */
+function checkout() {
+    const dir = mkdtempSync(join(tmpdir(), 'land-origin-'));
+    spawnSync('git', ['init', '-q', dir]);
+    spawnSync('git', [
+        '-C',
+        dir,
+        'remote',
+        'add',
+        'origin',
+        'git@github.com:orangecheck/oc-docs.git',
+    ]);
+    return dir;
+}
 
 /** Runs the script on PR 7 with gh answering `reads` in turn (the last repeats) and `compare` for main...head. */
 function land(reads: string[], compare = 'diverged', timeout = '30') {
@@ -38,7 +53,8 @@ esac
 `
     );
     chmodSync(fake, 0o755);
-    const r = spawnSync('bash', ['scripts/land.sh'], {
+    const r = spawnSync('bash', [resolve('scripts/land.sh')], {
+        cwd: checkout(),
         env: { ...process.env, LAND_GH: fake, LAND_PR: '7', LAND_POLL: '0', LAND_TIMEOUT: timeout },
         encoding: 'utf8',
     });

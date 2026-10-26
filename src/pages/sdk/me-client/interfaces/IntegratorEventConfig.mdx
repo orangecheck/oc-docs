@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: IntegratorEventConfig
 
-Defined in: [me-client/src/types.ts:126](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L126)
+Defined in: [me-client/src/types.ts:149](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L149)
 
 What an integrator declares for a single event subtype.
 
@@ -19,7 +19,10 @@ What an integrator declares for a single event subtype.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-agent">&lt;/a> `agent?` | [`AgentClassOverride`](AgentClassOverride) | Optional per-agent-class pricing override applied when an event fires with is_agent=true. | [me-client/src/types.ts:137](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L137) |
-| &lt;a id="property-enabled">&lt;/a> `enabled` | `boolean` | Whether this site bills this event subtype at all. | [me-client/src/types.ts:128](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L128) |
-| &lt;a id="property-site_pays">&lt;/a> `site_pays` | [`SiteFeeShape`](../type-aliases/SiteFeeShape) | The per-event fee the site pays. | [me-client/src/types.ts:130](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L130) |
-| &lt;a id="property-user_share_pct">&lt;/a> `user_share_pct` | `number` | Fraction of GROSS that flows to the user (0–0.8 since the platform fee is 20%). The remainder is a rebate to the site's OC project balance. | [me-client/src/types.ts:134](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L134) |
+| &lt;a id="property-agent">&lt;/a> `agent?` | [`AgentClassOverride`](AgentClassOverride) | Optional per-agent-class pricing override applied when an event fires with is_agent=true. | [me-client/src/types.ts:160](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L160) |
+| &lt;a id="property-class">&lt;/a> `class?` | [`EventClass`](../type-aliases/EventClass) | Custom events only: A, B or C. Built-ins take their class from the taxonomy; a custom event without one is billed as class B. | [me-client/src/types.ts:167](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L167) |
+| &lt;a id="property-description">&lt;/a> `description?` | `string` | Custom events only: a description for the dashboard and docs. | [me-client/src/types.ts:164](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L164) |
+| &lt;a id="property-enabled">&lt;/a> `enabled` | `boolean` | Whether this site bills this event subtype at all. | [me-client/src/types.ts:151](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L151) |
+| &lt;a id="property-label">&lt;/a> `label?` | `string` | Custom events only: a human-readable label. Built-ins ignore it. | [me-client/src/types.ts:162](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L162) |
+| &lt;a id="property-site_pays">&lt;/a> `site_pays` | [`SiteFeeShape`](../type-aliases/SiteFeeShape) | The per-event fee the site pays. | [me-client/src/types.ts:153](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L153) |
+| &lt;a id="property-user_share_pct">&lt;/a> `user_share_pct` | `number` | Fraction of GROSS that flows to the user (0–0.8 since the platform fee is 20%). The remainder is a rebate to the site's OC project balance. | [me-client/src/types.ts:157](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L157) |

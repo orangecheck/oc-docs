@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: WebhookHeaders
 
-Defined in: [me-client/src/types.ts:484](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L484)
+Defined in: [me-client/src/types.ts:532](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L532)
 
 HTTP headers OC sends with every webhook delivery. Capture these in
 the receive handler · `OC-Signature` is what verifies the body.
@@ -20,9 +20,9 @@ the receive handler · `OC-Signature` is what verifies the body.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-oc-class">&lt;/a> `OC-Class` | [`EventClass`](../type-aliases/EventClass) | Class · matches payload.class; `system` for a system notice. | [me-client/src/types.ts:500](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L500) |
-| &lt;a id="property-oc-delivery-attempt">&lt;/a> `OC-Delivery-Attempt` | `string` | 1-indexed delivery attempt count. >1 means the prior attempt did not return a 2xx within the timeout · idempotency key on payload.id is critical. | [me-client/src/types.ts:504](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L504) |
-| &lt;a id="property-oc-envelope-id">&lt;/a> `OC-Envelope-Id` | `string` | For a billable event, its `id`, the same as `payload.id`. A system notice (`OC-Class: system`) has no `id` in its body: this header is its only id, the delivery's own. Not signed. Deduplicate on `payload.id` when there is one, else on this. | [me-client/src/types.ts:494](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L494) |
-| &lt;a id="property-oc-key-id">&lt;/a> `OC-Key-Id` | `string` | kid of the key that signed it, published by me.ochk.io at https://me.ochk.io/api/dev-jwks (not ochk.io's sign-in keys). | [me-client/src/types.ts:489](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L489) |
-| &lt;a id="property-oc-signature">&lt;/a> `OC-Signature` | `string` | Ed25519 signature over the raw request body, hex-encoded. | [me-client/src/types.ts:486](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L486) |
-| &lt;a id="property-oc-subtype">&lt;/a> `OC-Subtype` | [`EventKey`](../type-aliases/EventKey) | Subtype · matches payload.subtype (built-in or a custom event key, or a system notice's subtype); lets routers branch on the header before parsing. | [me-client/src/types.ts:498](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L498) |
+| &lt;a id="property-oc-class">&lt;/a> `OC-Class` | [`EventClass`](../type-aliases/EventClass) | Class · matches payload.class; `system` for a system notice. | [me-client/src/types.ts:548](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L548) |
+| &lt;a id="property-oc-delivery-attempt">&lt;/a> `OC-Delivery-Attempt` | `string` | 1-indexed delivery attempt count. >1 means the prior attempt did not return a 2xx within the timeout · idempotency key on payload.id is critical. | [me-client/src/types.ts:552](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L552) |
+| &lt;a id="property-oc-envelope-id">&lt;/a> `OC-Envelope-Id` | `string` | For a billable event, its `id`, the same as `payload.id`. A system notice (`OC-Class: system`) has no `id` in its body: this header is its only id, the delivery's own. Not signed. Deduplicate on `payload.id` when there is one, else on this. | [me-client/src/types.ts:542](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L542) |
+| &lt;a id="property-oc-key-id">&lt;/a> `OC-Key-Id` | `string` | kid of the key that signed it, published by me.ochk.io at https://me.ochk.io/api/dev-jwks (not ochk.io's sign-in keys). | [me-client/src/types.ts:537](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L537) |
+| &lt;a id="property-oc-signature">&lt;/a> `OC-Signature` | `string` | Ed25519 signature over the raw request body, hex-encoded. | [me-client/src/types.ts:534](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L534) |
+| &lt;a id="property-oc-subtype">&lt;/a> `OC-Subtype` | [`EventKey`](../type-aliases/EventKey) | Subtype · matches payload.subtype (built-in or a custom event key, or a system notice's subtype); lets routers branch on the header before parsing. | [me-client/src/types.ts:546](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L546) |

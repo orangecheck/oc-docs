@@ -15,13 +15,14 @@ export const metadata = {
 function decodeAddress(address: string): DecodedAddress | null;
 ```
 
-Defined in: [index.ts:85](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L85)
+Defined in: [index.ts:90](https://github.com/orangecheck/oc-packages/blob/main/bip322/src/index.ts#L90)
 
 Decode a mainnet, testnet/signet or regtest address in its canonical
 spelling: bech32 lowercase only, so one key never has two addresses that
 verify. Null for anything else, including uppercase bech32 (pass what a
 person typed or scanned through `normalizeAddress` first) and witness
-versions other than 0 and 1.
+versions other than 0 and 1. Text longer than any address is refused before
+it is decoded, so the time this takes does not grow with the input.
 
 ## Parameters
 

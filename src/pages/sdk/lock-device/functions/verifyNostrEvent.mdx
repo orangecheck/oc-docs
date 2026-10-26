@@ -1,0 +1,30 @@
+export const metadata = {
+    title: "Function: verifyNostrEvent()",
+    description: "Auto-generated API reference for Function: verifyNostrEvent(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / verifyNostrEvent
+
+# Function: verifyNostrEvent()
+
+```ts
+function verifyNostrEvent(event: NostrEvent): boolean;
+```
+
+Defined in: [verify.ts:12](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L12)
+
+NIP-01: the id is the hash of the event's own fields and the signature verifies against its pubkey.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | [`NostrEvent`](../interfaces/NostrEvent) |
+
+## Returns
+
+`boolean`

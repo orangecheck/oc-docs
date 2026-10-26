@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: verifyDeviceRecords()",
+    description: "Auto-generated API reference for Function: verifyDeviceRecords(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / verifyDeviceRecords
+
+# Function: verifyDeviceRecords()
+
+```ts
+function verifyDeviceRecords(
+   events: readonly NostrEvent[], 
+   address: string, 
+opts: VerifyDeviceRecordsOptions): Promise<ParsedDeviceEvent[]>;
+```
+
+Defined in: [verify.ts:33](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L33)
+
+The device records among `events` that count for `address`: binds and
+revocations alike, each with a valid Nostr event, a statement that names
+`address` itself, and a BIP-322 signature by `address` over that statement.
+A record filed under the address's slot that names another address is dropped.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `events` | readonly [`NostrEvent`](../interfaces/NostrEvent)[] |
+| `address` | `string` |
+| `opts` | [`VerifyDeviceRecordsOptions`](../interfaces/VerifyDeviceRecordsOptions) |
+
+## Returns
+
+`Promise`\&lt;[`ParsedDeviceEvent`](../interfaces/ParsedDeviceEvent)[]\>

@@ -577,6 +577,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, healthz.',
             },
             {
+                href: '/me/operator/test-report',
+                label: 'Operator suite test report',
+                blurb: 'A four-guardian federation run through ochk.app on mutinynet: what passed, what is open, the limits found.',
+            },
+            {
                 href: '/me/operator/in-browser',
                 label: 'In-browser flow',
                 blurb: 'How the portal runs the entire operator lifecycle without a CLI. Storage, round-trip, recovery.',

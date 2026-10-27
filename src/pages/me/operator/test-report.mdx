@@ -56,6 +56,12 @@ runs), the sign-in host at oc-www `e925449`, the app at oc-app-web `33b1a7f`.
 | C09  | The run's signed artifacts are saved: the charter and its four signatures, the invite, the attestations, 32 signed settlements                                                                                                        | Pass     |
 | C10  | The executor restarts and reports to the portal before it settles anything                                                                                                                                                            | Pass     |
 
+Later on 2026-10-26 the API and executor moved to oc-me-web `2fc3a6fd`, which
+production's executor took that evening. C03, C04, C05, C08 and C10 ran again on
+it and passed. C11 ran too and passed: a payout to an invoice with no
+description hash, served from the address's own host, settled, and the executor
+logged it.
+
 The test federation's id is
 `49a3e8647708603ba20f4eb5e249d393f8e4ae80963b65bd0344f78806b9785e`. Its invite
 decodes to mutinynet, whose block 1 is
@@ -63,16 +69,16 @@ decodes to mutinynet, whose block 1 is
 
 ## Limits this run found
 
-The first two are true today. The third was fixed the same day.
+The second is true today. The first and third were fixed the same day.
 
-1. **Fedimint Lightning addresses cannot be paid out to today.** The executor
-   pays a Lightning address only when its invoice commits to the address's
-   metadata (LUD-06). Upstream Fedimint's own Lightning address server issues
-   invoices that do not, so payouts to a Fedimint-backed Lightning address are
-   refused. The test's own wallet was built to commit to its metadata. The rule
-   is being relaxed: an invoice with no description hash will be accepted when
-   the address's own host serves it, and one that carries a hash must still
-   match.
+1. **Fedimint Lightning addresses could not be paid out to.** During this run
+   the executor paid a Lightning address only when its invoice committed to the
+   address's metadata (LUD-06). Upstream Fedimint's own Lightning address server
+   issues invoices that do not, so payouts to a Fedimint-backed Lightning
+   address were refused. The test's own wallet was built to commit to its
+   metadata. Relaxed on 2026-10-26: an invoice with no description hash is
+   accepted when the address's own host serves it, and one that carries a hash
+   must still match. C11, above, paid such an invoice.
 2. **With one guardian down, a payment in can need a second try.** Before it
    accepts an incoming payment, the gateway (gatewayd 0.11.4) asks the
    federation for its block count and gives up after 10 seconds. With only three

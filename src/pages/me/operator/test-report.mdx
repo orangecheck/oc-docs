@@ -7,7 +7,8 @@ export const metadata = {
 # ochk.app · Operator suite test report
 
 > **Draft, not final.** One step, C07 (moving a running federation to its
-> successor), is still open. This page changes when it closes.
+> successor), is half done: its first sitting passed on 2026-10-27, and its
+> second can run from 2026-11-10 04:20 UTC. This page changes when it closes.
 
 **What this is.** A federation run end to end through ochk.app: operators take
 seats, four guardians run on hosted machines, a key ceremony runs through the
@@ -51,7 +52,7 @@ runs), the sign-in host at oc-www `e925449`, the app at oc-app-web `33b1a7f`.
 | C04  | Money out: a 1,200-sat payout reaches a wallet orangecheck does not hold, through the gateway                                                                                                                                         | Pass     |
 | C05  | Guardian loss: with one of four down, a top-up and a payout settle; with two down, a top-up is refused before any invoice and the ledger does not change; both restart and a fresh top-up settles once                                | Pass     |
 | C06  | Operator duties: four signed attestations, an alert on the public incidents feed, a payout claim paid once, and a claim over the share refused                                                                                        | Pass     |
-| C07  | Moving a running federation to its successor                                                                                                                                                                                          | **Open** |
+| C07  | Moving a running federation to its successor: the first of two sittings passed                                                                                                                                                        | **Open** |
 | C08  | A halt holds a payout; on resume it settles once; in simulation a top-up creates no invoice and never reaches the live balance                                                                                                        | Pass     |
 | C09  | The run's signed artifacts are saved: the charter and its four signatures, the invite, the attestations, 32 signed settlements                                                                                                        | Pass     |
 | C10  | The executor restarts and reports to the portal before it settles anything                                                                                                                                                            | Pass     |
@@ -92,14 +93,45 @@ The second is true today. The first and third were fixed the same day.
    Fixed on 2026-10-26: a credited top-up no longer counts, and an unpaid one
    still counts until it lapses.
 
-## Still open: C07
+## C07: moving to a successor
 
 Guardians are fixed at a federation's key ceremony, so when an operator leaves,
-the federation moves to a successor with the new operator in the seat. The
-portal's steps for that move are built; the executor's half and the last step
-are built or being finished, and none of it has run on the test federation yet.
-The move gives integrators 14 days' notice before the switch, so C07 runs in two
-sittings, two weeks apart. During this run, C07 was started once by mistake, as
-part of a rerun of the other steps: it created the successor federation, with no
-machines hosted and no money moved, and stopped. That attempt is not counted
-here.
+the federation moves to a successor with the new operator in the seat. The move
+gives integrators 14 days' notice before the switch, so C07 runs in two
+sittings, two weeks apart.
+
+**First sitting, 2026-10-27: passed.** On the test stack, with the API at
+oc-me-web `2280312b`, the executor at `b8c55f05` and the app at oc-app-web
+`a90e41e`:
+
+- O4 filed an exit naming O5 as successor, and O1 to O3 ratified it.
+- The successor, `oc-mutiny-v2`, ran its key ceremony on four new guardians in
+  the same four regions. Its settlement key is the executor's.
+- `oc-mutiny-v1`'s gateway also serves `oc-mutiny-v2`, and all four of
+  `oc-mutiny-v2`'s guardians list it.
+- The owner froze `oc-mutiny-v1` and its one integrator was told. Its guardians
+  voted the successor into the federation's own metadata, where anyone holding
+  its ecash can read it.
+- Payouts paused, the drain was recorded, and the executor moved the float to
+  `oc-mutiny-v2` on its own, in five on-chain batches over 13 minutes.
+- Every sat is accounted for: 227,797 sats in `oc-mutiny-v1` before = 220,028
+  credited in `oc-mutiny-v2` + 2,748 on-chain fees + 5,020 mint fees + 1 sat
+  left behind. Unexplained: 0.
+- The executor switched itself to `oc-mutiny-v2` and reported in.
+- The switch waits out the notice. The app shows it disabled until 2026-11-10
+  04:20 UTC, and a switch sent straight to the API is refused and changes
+  nothing.
+
+**Still open.**
+
+- The second sitting, from 2026-11-10 04:20 UTC: the switch, moving the
+  projects, resuming payouts, a top-up and a payout on `oc-mutiny-v2`, and
+  retiring `oc-mutiny-v1`.
+- Two safety checks did not run: halting the move part-way, and restarting the
+  executor while a batch is in transit. The executor reported the move only once
+  it had finished, so the run never saw it in progress. That is being fixed, and
+  both checks will run on a short second move on the test stack.
+
+During this run, C07 was also started once by mistake, as part of a rerun of the
+other steps: it created the successor federation, with no machines hosted and no
+money moved, and stopped. That attempt is not counted here.

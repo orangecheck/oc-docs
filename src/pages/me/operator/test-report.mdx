@@ -100,38 +100,63 @@ the federation moves to a successor with the new operator in the seat. The move
 gives integrators 14 days' notice before the switch, so C07 runs in two
 sittings, two weeks apart.
 
-**First sitting, 2026-10-27: passed.** On the test stack, with the API at
-oc-me-web `2280312b`, the executor at `b8c55f05` and the app at oc-app-web
-`a90e41e`:
+**First sitting, 2026-10-26 to 2026-10-27: passed.** On the test stack, over
+several deploys of the code then on `main`. Each part names what it ran on: the
+API (oc-me-web), the app (oc-app-web) and the executor (oc-me-web).
 
-- O4 filed an exit naming O5 as successor, and O1 to O3 ratified it.
-- The successor, `oc-mutiny-v2`, ran its key ceremony on four new guardians in
-  the same four regions. Its settlement key is the executor's.
-- `oc-mutiny-v1`'s gateway also serves `oc-mutiny-v2`, and all four of
-  `oc-mutiny-v2`'s guardians list it.
-- The owner froze `oc-mutiny-v1` and its one integrator was told. Its guardians
-  voted the successor into the federation's own metadata, where anyone holding
-  its ecash can read it.
-- Payouts paused, the drain was recorded, and the executor moved the float to
-  `oc-mutiny-v2` on its own, in five on-chain batches over 13 minutes.
+- Before the sitting, O4 filed an exit naming O5 as successor, and O1 to O3
+  ratified it.
+- On 2026-10-26, C07's first start created the successor, `oc-mutiny-v2` (see
+  the end of this section).
+- On 2026-10-27, with the API at `e3274060`, the app at `630e563` and the
+  executor at `2fc3a6fd`: `oc-mutiny-v2` ran its key ceremony on four new
+  guardians in the same four regions. Its settlement key is the executor's, and
+  `oc-mutiny-v1`'s gateway also serves it.
+- With the API at `2280312b`, the app at `a90e41e` and the executor at
+  `2fc3a6fd`: all four of `oc-mutiny-v2`'s guardians list the gateway. The owner
+  froze `oc-mutiny-v1` and its one integrator was told. `oc-mutiny-v1`'s
+  guardians voted the successor into the federation's own metadata, where anyone
+  holding its ecash can read it.
+- With the API at `2280312b`, the app at `a90e41e` and the executor at
+  `b8c55f05`: the portal recorded the successor. Payouts paused, the drain was
+  recorded, and the executor moved the float to `oc-mutiny-v2` on its own, in
+  five on-chain batches over 13 minutes.
 - Every sat is accounted for: 227,797 sats in `oc-mutiny-v1` before = 220,028
   credited in `oc-mutiny-v2` + 2,748 on-chain fees + 5,020 mint fees + 1 sat
   left behind. Unexplained: 0.
 - The executor switched itself to `oc-mutiny-v2` and reported in.
-- The switch waits out the notice. The app shows it disabled until 2026-11-10
-  04:20 UTC, and a switch sent straight to the API is refused and changes
-  nothing.
+- With the API at `2280312b` and the app at `a90e41e`: the switch waits out the
+  notice. The app shows it disabled until 2026-11-10 04:20 UTC, and a switch
+  sent straight to the API is refused and changes nothing.
+
+**What the sitting found.** Three faults each stopped it once. All three were
+fixed on 2026-10-27, and the sitting carried on:
+
+- The key ceremony page hid a failed setup-code exchange, so every guardian
+  looked ready. It now shows the error and names the guardians it waits on.
+- Listing the gateway asked no guardian, because the portal's record of a hosted
+  machine did not follow the machine once it started. The portal now checks the
+  machine itself.
+- The executor missed the successor in the federation's metadata, which
+  fedimint-cli 0.11.4 returns in a shape it did not read. It now reads that
+  shape and logs any skip. The test stack's executor runs the fix; production's,
+  which has no federation to move, takes it with its next update.
 
 **Still open.**
 
 - The second sitting, from 2026-11-10 04:20 UTC: the switch, moving the
   projects, resuming payouts, a top-up and a payout on `oc-mutiny-v2`, and
   retiring `oc-mutiny-v1`.
-- Two safety checks did not run: halting the move part-way, and restarting the
-  executor while a batch is in transit. The executor reported the move only once
-  it had finished, so the run never saw it in progress. That is being fixed, and
-  both checks will run on a short second move on the test stack.
+- Two safety checks have not run on the test stack: halting the move part-way,
+  and restarting the executor while a batch is in transit. In the first sitting
+  the executor reported the move only once it had finished, so the run never saw
+  it in progress; it now reports each batch as it goes. Both checks were proven
+  on regtest on 2026-10-27, within stated limits: the portal ran locally, the
+  executor's regular report to it was a stand-in, the halt was set directly, and
+  the restart followed a forced kill of the executor. The live drill runs on the
+  test stack from 2026-11-10.
 
-During this run, C07 was also started once by mistake, as part of a rerun of the
-other steps: it created the successor federation, with no machines hosted and no
-money moved, and stopped. That attempt is not counted here.
+C07 was first started on 2026-10-26, by mistake, during a rerun of the other
+steps. It created the successor federation, `oc-mutiny-v2`, with no machines
+hosted and no money moved, and stopped. The sitting carried on from that
+federation.

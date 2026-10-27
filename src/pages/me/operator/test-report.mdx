@@ -129,7 +129,7 @@ API (oc-me-web), the app (oc-app-web) and the executor (oc-me-web).
   notice. The app shows it disabled until 2026-11-10 04:20 UTC, and a switch
   sent straight to the API is refused and changes nothing.
 
-**What the sitting found.** Three faults each stopped it once. All three were
+**What the sitting found.** Four faults each stopped it once. All four were
 fixed on 2026-10-27, and the sitting carried on:
 
 - The key ceremony page hid a failed setup-code exchange, so every guardian
@@ -137,10 +137,13 @@ fixed on 2026-10-27, and the sitting carried on:
 - Listing the gateway asked no guardian, because the portal's record of a hosted
   machine did not follow the machine once it started. The portal now checks the
   machine itself.
+- After that fix, listing the gateway still reached none of the successor's
+  guardians: it looked for their credentials only where key ceremonies kept them
+  before 2026-10-23. It now finds them the way the ceremony does.
 - The executor missed the successor in the federation's metadata, which
   fedimint-cli 0.11.4 returns in a shape it did not read. It now reads that
   shape and logs any skip. The test stack's executor runs the fix; production's,
-  which has no federation to move, takes it with its next update.
+  which is moving no federation, takes it with its next update.
 
 **Still open.**
 

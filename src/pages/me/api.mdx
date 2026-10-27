@@ -52,6 +52,68 @@ keeps the token they return in its own cookie.
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
 | `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
+## Anchoring
+
+Every receipt except a test event is anchored to a Bitcoin block with
+OpenTimestamps. A calendar receives only the SHA-256 of the receipt's canonical
+bytes, its `digest_sha256`. An hourly job submits new digests, then upgrades
+each pending proof once a calendar has committed it to a block. The calendars
+are trust anchors, so they are named here.
+
+**Where digests are submitted.** In this order; the first calendar that answers
+takes the digest:
+
+- `https://a.pool.opentimestamps.org`
+- `https://bob.btc.calendar.opentimestamps.org`
+- `https://finney.calendar.eternitywall.com`
+- `https://btc.calendar.catallaxy.com`
+- `https://alice.btc.calendar.opentimestamps.org`
+
+**Which calendars an upgrade asks.** A pending proof names the calendar that
+holds its commitment, which can differ from the one it was submitted to: a.pool
+hands its proofs to alice. The upgrade asks the calendar the proof names, and
+only if it is one of these:
+
+- `https://alice.btc.calendar.opentimestamps.org`
+- `https://bob.btc.calendar.opentimestamps.org`
+- `https://finney.calendar.eternitywall.com`
+- `https://a.pool.opentimestamps.org`
+- `https://b.pool.opentimestamps.org`
+- `https://btc.calendar.catallaxy.com`
+
+A proof naming any other calendar is not followed. A receipt reads `anchored`
+only when its proof reaches the merkle root in the header of the block it names.
+
+### Verify a receipt offline
+
+`GET https://me.ochk.io/api/envelope/<id>?format=wrapped` returns everything
+needed:
+
+1. Base64-decode `canonical_b64`. Its SHA-256 must equal `digest_sha256`, and
+   `id` too when `id_scheme` is `sha256`.
+2. Check `signature` with the Ed25519 key named by its `kid` in
+   `https://me.ochk.io/.well-known/oc-envelope-jwks.json`.
+3. When `ots.status` is `anchored`, `ots.proof_b64` is an OpenTimestamps proof
+   that starts at the digest. Wrap it in the standard `.ots` header and check it
+   with the reference client,
+   [`ots`](https://github.com/opentimestamps/opentimestamps-client):
+
+```sh
+# bash; DIGEST is digest_sha256, PROOF_B64 is ots.proof_b64
+{
+  printf '\x00OpenTimestamps\x00\x00Proof\x00\xbf\x89\xe2\xe8\x84\xe8\x92\x94\x01\x08'
+  printf '%s' "$DIGEST" | xxd -r -p
+  printf '%s' "$PROOF_B64" | base64 -d
+} > receipt.ots
+
+ots verify -d "$DIGEST" receipt.ots   # against your own Bitcoin node
+ots info receipt.ots                  # prints the merkle root the proof reaches
+```
+
+Without a node, compare the merkle root `ots info` prints with the `merkleroot`
+of block `ots.btc_block_height` from any source you trust. The proof and the
+block header are all it takes; orangecheck does not need to be online.
+
 ## Authenticated endpoints (oc_session required)
 
 > Integrator-facing endpoints (`/api/integrator/event`,

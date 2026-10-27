@@ -3,7 +3,14 @@
     "buildCommand": "yarn build",
     "installCommand": "yarn install --frozen-lockfile",
     "framework": "nextjs",
-    "git": { "deploymentEnabled": { "docs/sync-*": false, "gh-readonly-queue/**": false } },
+    "git": {
+        "deploymentEnabled": {
+            "main": true,
+            "**": false,
+            "docs/sync-*": false,
+            "gh-readonly-queue/**": false
+        }
+    },
     "headers": [
         {
             "source": "/(.*)",

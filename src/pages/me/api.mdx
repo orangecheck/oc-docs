@@ -54,11 +54,24 @@ keeps the token they return in its own cookie.
 
 ## Anchoring
 
-Every receipt except a test event is anchored to a Bitcoin block with
-OpenTimestamps. A calendar receives only the SHA-256 of the receipt's canonical
-bytes, its `digest_sha256`. An hourly job submits new digests, then upgrades
-each pending proof once a calendar has committed it to a block. The calendars
-are trust anchors, so they are named here.
+These signed records are anchored to a Bitcoin block with OpenTimestamps:
+
+- the receipt of each event a live project was billed for from its live balance;
+- payment receipts;
+- statements;
+- payouts (distributions), a payout's void, and the address payouts go to
+  (payout bindings);
+- each change in how your sats are held, such as a move to your own keys
+  (rebinds);
+- each release batch's manifest (drops).
+
+Test events, events a project was not billed for, preview events and a deleted
+account's payment receipt, whose account id is erased, are not anchored.
+
+A calendar receives only the SHA-256 of a record's canonical bytes, its
+`digest_sha256`. An hourly job submits new digests, then upgrades each pending
+proof once a calendar has committed it to a block. The calendars are trust
+anchors, so they are named here.
 
 **Where digests are submitted.** In this order; the first calendar that answers
 takes the digest:
@@ -81,10 +94,10 @@ only if it is one of these:
 - `https://b.pool.opentimestamps.org`
 - `https://btc.calendar.catallaxy.com`
 
-A proof naming any other calendar is not followed. A receipt reads `anchored`
+A proof naming any other calendar is not followed. A record reads `anchored`
 only when its proof reaches the merkle root in the header of the block it names.
 
-### Verify a receipt offline
+### Verify a record offline
 
 `GET https://me.ochk.io/api/envelope/<id>?format=wrapped` returns everything
 needed:
@@ -92,7 +105,10 @@ needed:
 1. Base64-decode `canonical_b64`. Its SHA-256 must equal `digest_sha256`, and
    `id` too when `id_scheme` is `sha256`.
 2. Check `signature` with the Ed25519 key named by its `kid` in
-   `https://me.ochk.io/.well-known/oc-envelope-jwks.json`.
+   `https://me.ochk.io/.well-known/oc-envelope-jwks.json`. A statement is signed
+   by the app that made it, not by orangecheck: `signature.signer` is `issuer`,
+   and the key is `signature.issuer_jwk`, which the project's JWKS at
+   `signature.issuer_jwks_url` carries while that key is current.
 3. When `ots.status` is `anchored`, `ots.proof_b64` is an OpenTimestamps proof
    that starts at the digest. Wrap it in the standard `.ots` header and check it
    with the reference client,

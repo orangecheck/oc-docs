@@ -461,9 +461,11 @@ after you rotate) and your project's key set (`issuer_jwks_url`).
 | `POST`   | `/api/me/projects/[id]/webhooks`    | register a webhook URL · owner-gated                                                                                      |
 
 A project's name, a custom event's label, a drop's label and a directory tagline
-are text people read, so one rule applies to all of them: no character that
-hides or reorders text, and never orangecheck's own name (`orangecheck`, `ochk`,
-`ochk.io`, `ochk.app`, in any case, width or spacing). A name breaking it
+are text people read. None may hold a character that hides or reorders text, or
+be orangecheck's own name (`orangecheck`, `ochk`, `ochk.io`, `ochk.app`, in any
+case, width or spacing). A project's name says who someone is, so it also may
+not hold one of those as a word: "OrangeCheck Fans" is refused, "orangecheckers"
+is not. A label or tagline may mention orangecheck. A name breaking the rule
 answers `409 name_reserved` at create and rename; a label, a `422` naming it. An
 account holds at most 25 projects (`409 project_limit_reached`).
 

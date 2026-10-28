@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'ochk.app · Operator Runbook',
     description:
-        'Run the oc-guardian binary on hardware you control. Docker pull, cosign verify, config bundle, healthz probe. Public-facing version of the portal RunbookCard.',
+        'Run the oc-guardian binary on hardware you control. Docker pull, cosign verify, settings from the environment, status checks. The operator program is not open yet.',
 };
 
 # ochk.app · Operator Runbook
@@ -14,55 +14,67 @@ process that participates in DKG and threshold-signing with the rest of the
 federation — has to run on a host with a stable network address. This page is
 the runbook for that piece.
 
+The operator program is not open, and there are no guardian seats yet: while the
+system is in testing, orangecheck holds every role
+([ochk.app/custody](https://ochk.app/custody)). This runbook describes how a
+seat is run.
+
 If you'd rather not manage a host, the
-[hosted-hardware option](https://ochk.app/me/operator) on the dashboard lets OC
-provision a VPS for you and run the binary on its hardware (your private key
-still stays in your browser). Either path works; federations cannot tell which
-you used.
+[hosted-hardware option](https://ochk.app/me/operator) on the dashboard lets
+orangecheck run the binary on its hardware. Your operator key still stays in
+your browser or kit, but a hosted guardian is only as independent as
+orangecheck, which runs the machine.
 
 ## Prerequisites
 
 - An operator key provisioned at
   [ochk.app/me/operator](https://ochk.app/me/operator) (or via
-  `oc-guardian init` on the kit). You'll need the **public** half for the config
-  bundle.
+  `oc-guardian init` on the kit). You'll need the **public** half for the
+  guardian's settings.
 - An accepted application — your operator_id appears in the registry at
   [/api/operator/registry](https://me.ochk.io/api/operator/registry).
 - A federation membership — your operator key has signed at least one
   federation's charter at
   [/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
-- A host. Linux, kernel ≥ 5.15, x86_64 or arm64. 4 GB RAM minimum (8 GB
-  recommended). 80 GB SSD. Reachable on a stable IP, ideally with a DNS name.
-  Ports 9000/tcp and 9001/tcp open to federation peers (the federation directory
-  tells you the peer list).
+- A host. Linux, kernel ≥ 5.15, x86_64 (the image is linux/amd64 only). 4 GB RAM
+  minimum (8 GB recommended). 80 GB SSD. Reachable on a stable IP, ideally with
+  a DNS name. Ports 9000/tcp and 9001/tcp open to federation peers (the
+  federation directory tells you the peer list).
 
-## 01 · Config bundle
+## 01 · Settings
 
-Download your config bundle from
-[ochk.app/me/operator → runbook](https://ochk.app/me/operator). The portal
-generates a JSON file pre-filled with your operator pubkey + chosen federation.
-Or compose it by hand:
+The guardian reads its settings from the environment; there is no config file.
+Put them in an env file on the host, say `/etc/oc-guardian/guardian.env`:
 
-```json
-{
-    "operator_id": "op-<your-id>",
-    "operator_pubkey_hex": "<64 hex chars>",
-    "federation_slug": "oc-me-v1",
-    "attestation_post_url": "https://me.ochk.io/api/operator/attestation",
-    "log_level": "info"
-}
+```bash
+# /etc/oc-guardian/guardian.env: one setting per line, comments on their own line
+OC_OPERATOR_ID=op-<your-id>
+OC_OPERATOR_PUBKEY_HEX=<64 hex chars>
+OC_FEDERATION_SLUG=<federation slug>
+# bitcoin, testnet, testnet4, signet or regtest; there is no default
+OC_BITCOIN_NETWORK=bitcoin
+# or OC_BITCOIND_URL, OC_BITCOIND_USERNAME and OC_BITCOIND_PASSWORD
+OC_ESPLORA_URL=<esplora url>
+OC_PUBLIC_HOST=<the name peers reach this host at>
+# keeps setup closed to other machines until DKG is done
+OC_GUARDIAN_SETUP_PASSWORD=<a password>
+OC_ATTESTATION_POST_URL=https://me.ochk.io/api/operator/attestation
 ```
 
-Copy this to the host (`scp oc-guardian.config user@host:/etc/oc-guardian/`) or
-stamp it into the host via your config-management system. **No private key in
-the bundle** — the binary fetches signing material on-demand from your browser
-(or kit) over a localhost RPC port.
+**No private key in these settings.** Your operator key signs the program's
+envelopes in your browser or kit. `fedimintd` signs for the federation with its
+own key share, which it keeps in its data directory. Until DKG has run, whoever
+reaches the setup API first sets the guardian's password, so set
+`OC_GUARDIAN_SETUP_PASSWORD`, or bind the API to 127.0.0.1 until DKG is done.
+Every setting is listed in the
+[kit's README](https://github.com/orangecheck/oc-guardian-kit#running-fedimintd).
 
 ## 02 · Pull the signed image
 
-The guardian binary is shipped as a multi-arch (linux/amd64, linux/arm64)
-distroless Docker image. Verify the cosign signature + SLSA-L3 build provenance
-before running:
+The guardian is shipped as a linux/amd64 Docker image (debian:bookworm-slim,
+with a pinned, hash-checked `fedimintd`). Verify its cosign signature before
+running. The release archives, not the image, also carry SLSA build provenance
+(`gh attestation verify`).
 
 ```bash
 docker pull ghcr.io/orangecheck/oc-guardian:latest
@@ -77,40 +89,45 @@ GitHub Actions runner; anything else is a tampered image.
 
 ## 03 · Run
 
-Mount the config bundle read-only. Bind 9000 + 9001 to the host's public
-interface (or behind a reverse proxy that terminates TLS).
+Pass the settings in and keep `/data` on a volume. Bind 9000 (P2P) and 9001
+(API) to the host's public interface (or behind a reverse proxy that terminates
+TLS).
 
 ```bash
 docker run -d --name oc-guardian --restart unless-stopped \
-  -v /etc/oc-guardian/oc-guardian.config:/etc/oc-guardian/config.json:ro \
+  --env-file /etc/oc-guardian/guardian.env \
+  -v oc-guardian-data:/data \
   -p 9000:9000 \
   -p 9001:9001 \
   ghcr.io/orangecheck/oc-guardian:latest
 ```
 
-The container does **not** hold your private key. When the federation schedules
-a threshold-sign, the binary surfaces the request on its RPC port; your portal
-session (or `oc-guardian sign --serve`) presents the signature.
+The image runs `oc-guardian fedimintd run`, which starts `fedimintd`, restarts
+it if it stops, and sends liveness reports. The container needs **no** operator
+key to run. `fedimintd` keeps its data in `/data/fedimintd`; keep that volume
+across upgrades.
 
 ## 04 · Confirm health
 
-The binary POSTs a signed health envelope to
-`https://me.ochk.io/api/operator/attestation` every 60 seconds. Within ~2
-minutes of first POST, the
-[/me/operator/guardians](https://ochk.app/me/operator/guardians) tab flips to
-green for your operator_id.
+With `OC_ATTESTATION_POST_URL` set, the guardian posts a signed liveness report
+there every 300 seconds, when it has a key to sign with: your operator key, if
+the kit on that machine holds it, or a delegated attestation key
+(`OC_ATTEST_KEY_HEX`). Without one it runs but sends no report. Once reports
+arrive, [/me/operator/guardians](https://ochk.app/me/operator/guardians) shows
+**Signed heartbeat, current**.
 
-You can also probe locally:
+You can also check locally:
 
 ```bash
-curl -s http://<your-host>:9000/healthz
-# expected: {"ok":true,"version":"…","federation_slug":"…"}
+docker exec oc-guardian oc-guardian fedimintd status
 ```
+
+It shows `fedimintd`'s status and setup phase.
 
 ## 05 · Upgrades
 
-When a new signed image lands, the portal posts an info-severity incident to the
-federation. To upgrade:
+Each kit release publishes a new signed image, tagged with the release and
+`latest`. To upgrade:
 
 ```bash
 docker pull ghcr.io/orangecheck/oc-guardian:latest
@@ -123,9 +140,8 @@ docker rm oc-guardian
 # re-run step 03 (the new image)
 ```
 
-Brief threshold pause during the swap — federations tolerate up to 30s under
-§6.1 of the charter, but coordinate via the federation channel so multiple
-guardians don't upgrade simultaneously.
+Your guardian is offline during the swap. Coordinate via the federation channel
+so multiple guardians don't upgrade at the same time.
 
 ## 06 · Leaving or replacing a guardian
 
@@ -138,17 +154,16 @@ federation.
 
 ## Troubleshooting
 
-| Symptom                                           | Likely cause                     | Fix                                          |
-| ------------------------------------------------- | -------------------------------- | -------------------------------------------- |
-| `attestation` tab stays grey                      | binary cannot reach `me.ochk.io` | check egress firewall                        |
-| `attestation` tab is red                          | PCR mismatch with pinned image   | run cosign verify; re-pull the canonical tag |
-| federation peers cannot reach you                 | port 9000/9001 not open          | check ingress firewall + DNS                 |
-| binary refuses to start, "config schema mismatch" | bundle out-of-date               | redownload from the portal                   |
-| signing requests pile up at the binary            | portal session not connected     | open the portal's runbook tab; reconnect     |
+| Symptom                                                | Likely cause                                                                | Fix                                                                      |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| no signed heartbeat on `/me/operator/guardians`        | `OC_ATTESTATION_POST_URL` unset, or no key on the host to sign reports with | set the URL; keep the operator key on the host or delegate a key         |
+| **Signed heartbeat, stale**                            | reports stopped, or the guardian cannot reach `me.ochk.io`                  | check the container is running; check egress firewall                    |
+| federation peers cannot reach you                      | port 9000/9001 not open                                                     | check ingress firewall + DNS                                             |
+| `fedimintd run` refuses to start a guardian before DKG | its setup API or UI can be reached from other machines                      | set `OC_GUARDIAN_SETUP_PASSWORD`, or bind the API to 127.0.0.1 until DKG |
+| the guardian exits at start, naming a setting          | a required setting is unset                                                 | set it (step 01)                                                         |
 
 ## Bypass note
 
-This entire flow has a kit-only equivalent. Replace the portal-issued config
-bundle with `oc-guardian config gen` and the upgrade flow with
-`oc-guardian upgrade`; everything else is identical. See
+This flow needs no portal: the settings are environment variables you write, and
+an upgrade is a new image. For every other step's kit-only equivalent, see
 [github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md).

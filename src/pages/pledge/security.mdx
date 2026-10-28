@@ -70,7 +70,7 @@ pledge enters `disputed`.
 **Mitigation.** Verifiers MUST recompute deterministic outcomes from public
 state — never trust a published outcome envelope's `result` field without
 re-verifying against the witness. The protocol surfaces
-`E_OUTCOME_RESULT_MISMATCH` for this case.
+`E_OUTCOME_EVIDENCE_MISMATCH` for this case.
 
 ### Bond-draining attacks
 
@@ -119,9 +119,11 @@ Network conditions, geo-routing, A/B tests, and CDN behaviors can produce
 different responses to the same URL. Strict-determinism is impossible for
 arbitrary HTTP.
 
-**Mitigation.** The SDK requires three independent HTTP fetches and takes the
-majority. Disagreements that cannot be resolved by majority fall back to
-`disputed`. This is documented as a non-strict-determinism exception in
+**Mitigation.** The spec fixes how to fetch (at most 5 redirects, a 30-second
+timeout, a fixed `User-Agent`, verified TLS) and settles a contested result by
+the majority classification across at least three independent verifications.
+pledge-core does no networking, so running those fetches is the integrator's
+job. This is documented as a non-strict-determinism exception in
 [SPEC §3.4.5](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md);
 integrators choosing `http_get_hash` accept the trade-off.
 

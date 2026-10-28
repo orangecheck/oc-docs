@@ -13,8 +13,9 @@ toolbar click away — all against the same end-to-end-encrypted
 
 **Zero-knowledge by construction.** The service worker is the only component
 that holds the vault key. The popup shows metadata; the content script (the part
-adjacent to a hostile page) gets a single field's value at fill time and nothing
-else. The vault key never touches disk and never reaches the page. See
+adjacent to a hostile page) gets the username and password of the login you
+pick, at fill time, and nothing else. It cannot ask for any other field, a TOTP
+seed included. The vault key never touches disk and never reaches the page. See
 [Security](/vault/security).
 
 ## What it does
@@ -73,10 +74,7 @@ settings. Once disabled, only OC Vault offers to fill.
 
 ## Install
 
-The extension is in publish prep — once it's on the Chrome Web Store and Edge
-Add-ons, the install link will go here.
-
-Until then you can run it from source:
+The extension is not in a browser store. You build it and load it from source:
 
 ```bash
 git clone https://github.com/orangecheck/oc-vault-extension

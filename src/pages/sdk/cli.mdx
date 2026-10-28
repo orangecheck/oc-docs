@@ -1,13 +1,13 @@
 export const metadata = {
     title: '@orangecheck/cli',
     description:
-        'oc shell — check / verify / create / challenge / discover from your terminal or a shell script.',
+        'oc shell — check / verify / discover / challenge, plus me.ochk.io integrator commands, from your terminal or a shell script.',
 };
 
 # `@orangecheck/cli`
 
-`oc` shell tool. Every OC Attest primitive, scriptable, with sensible exit
-codes.
+`oc` shell tool. OC Attest's check, verify, discover and signed challenges,
+plus `oc me` integrator commands, scriptable, with sensible exit codes.
 
 ## Install
 
@@ -17,7 +17,7 @@ npm i -g @orangecheck/cli
 npx -y @orangecheck/cli --help
 ```
 
-Node 20+.
+Node 18+.
 
 ## Commands
 
@@ -51,29 +51,20 @@ Raw attestation verification against `(addr, msg, sig)`.
 ```bash
 oc verify --addr bc1q... --msg "$(cat ./msg.txt)" --sig "AUBH…"
 # ✓ valid
-#   codes: sig_ok_bip322, bond_confirmed
-#   sats:  125000
-#   days:  47
+#   codes:   sig_ok_bip322, bond_confirmed
+#   network: mainnet
+#   sats:    125,000
+#   days:    47
+#   score:   30.12
 ```
+
+Exit code 0 when valid, 2 when not, 1 on error. `--scheme legacy` checks a
+BIP-137 signature; the default is `bip322`.
 
 Or read from a file:
 
 ```bash
 echo '{"addr":"bc1q...","msg":"...","sig":"..."}' | oc verify --file - --json
-```
-
-### `oc create`
-
-Interactive wizard to build a canonical message.
-
-```bash
-oc create \
-    --addr bc1q... \
-    --identity github:alice \
-    --identity nostr:npub1... \
-    --purpose "forum-post" \
-    --ttl 0
-# (prints the canonical message — sign it with your wallet and pass to oc verify)
 ```
 
 ### `oc challenge`
@@ -83,7 +74,9 @@ Signed-challenge auth primitive.
 ```bash
 # Issue
 oc challenge issue --addr bc1q... --audience https://example.com --purpose login
-# → JSON with message + nonce + expiresAt
+# → the message to sign on stdout; the nonce and expiry on stderr
+# with --json: { message, nonce, expiresAt, expiresAtIso }
+# --ttl <seconds> sets the lifetime (default 300)
 
 # Verify
 oc challenge verify \
@@ -94,6 +87,9 @@ oc challenge verify \
     --expected-purpose login
 ```
 
+`oc challenge verify` also reads `{ message, signature }` as JSON from `--file`
+or stdin, and takes `--scheme legacy`. Exit code 0 when valid, 2 when not.
+
 ### `oc discover`
 
 Query Nostr for attestations.
@@ -103,8 +99,23 @@ oc discover --addr bc1q...
 # lists all attestations published to the default relay set
 
 oc discover --identity github:alice --json
-# returns the full envelope array
+# { "count": …, "total": …, "attestations": [ …envelopes ] }
 ```
+
+Also accepts `--id <hex>`. `--limit <n>` caps the list, newest first
+(default 50).
+
+### `oc me`
+
+Helpers for integrators of me.ochk.io.
+
+| Command                                    | What it does                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `oc me archetypes`                         | List the archetype templates.                                                                     |
+| `oc me subtypes`                           | List the billable event subtypes, with what fires each one and a price hint.                      |
+| `oc me init --archetype <id> --project-key <pk> --domain <domain> --name <name>` | Write a price config from an archetype to `oc-config.json` (`--out <path>` to change). Archetypes: `saas-paywall`, `marketplace`, `content-platform`, `gaming`, `agent-only`. |
+| `oc me validate-config [file]`             | Check a price config file, or stdin. Exit code 1 when it has errors.                              |
+| `oc me test-fire <project_key> <subtype>`  | POST one billable event for your own project to `https://me.ochk.io/api/integrator/event`, to test your webhook handler. Needs your own session token as a bearer token (`OC_BEARER_TOKEN` or `--token`). It sends no `X-OC-Signature`, so a project in live mode refuses it. Also takes `--action-label`, `--payment-amount-sats` and `--origin`. |
 
 ## Scripting patterns
 
@@ -130,10 +141,9 @@ done < candidates.txt > allowlist.txt
 
 ## Global options
 
-- `--json` — machine-readable output on every command
-- `--relays wss://...,wss://...` — override the default Nostr relay set
-- `--api-base https://...` — override the hosted verifier
-- `--testnet` / `--signet` — set network mode
+Every command takes `--json` for machine-readable output and `--help` for
+its options. There are no options for relays, the chain API or the network:
+the CLI uses the defaults of [`@orangecheck/sdk`](/sdk/sdk/README).
 
 ## Other command-line tools
 
@@ -212,5 +222,5 @@ your own source, run `stamp verify .git/stamps/<tagname>.stamp --headers-url …
 
 ## See also
 
-- [**OC Attest — HTTP API**](/attest/api) — what the CLI wraps
+- [**OC Attest — HTTP API**](/attest/api) — the same checks as a hosted API
 - [**`@orangecheck/sdk`**](/sdks/javascript) — programmatic equivalent

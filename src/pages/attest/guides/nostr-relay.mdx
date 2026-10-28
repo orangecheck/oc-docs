@@ -59,10 +59,21 @@ ExecStart=/usr/bin/strfry relay
 
 ### Docker compose
 
+The container runs Strfry as usual; Strfry starts the plugin itself from
+`strfry.conf`, and the plugin reads the `OC_*` variables from Strfry's
+environment. Without a global install, point the plugin at npx:
+
+```conf
+# strfry.conf
+writePolicy = {
+  plugin = "npx -y @orangecheck/relay-filter"
+}
+```
+
 ```yaml
 services:
     strfry:
-        image: strfry/strfry:latest
+        image: strfry/strfry:latest # the image needs Node.js 18+ for the plugin
         volumes:
             - ./strfry.conf:/etc/strfry.conf:ro
             - strfry-db:/var/lib/strfry
@@ -70,7 +81,6 @@ services:
             - OC_MIN_SATS=100000
             - OC_MIN_DAYS=30
             - OC_ALLOW_KINDS=0,3,10002
-        command: ['/usr/bin/npx', '--yes', '@orangecheck/relay-filter']
         ports:
             - '7777:7777'
 ```
@@ -141,7 +151,7 @@ async function handleEvent(socket: WebSocket, event: Event) {
 ## What clients see when rejected
 
 ```
-['OK', '<event_id>', false, 'orangecheck: below threshold (min_sats=100000)']
+['OK', '<event_id>', false, 'orangecheck: proof below relay thresholds (min_sats=100000, min_days=30)']
 ```
 
 Clients SHOULD display this message to the user. Good client UX tells the user

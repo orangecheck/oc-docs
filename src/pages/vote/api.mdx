@@ -28,10 +28,12 @@ from mempool.space, runs the pure tally function, and returns JSON.
 ```json
 {
     "poll_id": "9825268c…",
+    "basis": "voter_clocks",
     "state": "tallied",
     "snapshot_block": 947961,
     "turnout": { "voters": 1, "weight": 12311 },
     "tallies": { "yes": 12311, "no": 0 },
+    "counted": ["5d0c…"],
     "ballot_count": 1,
     "reveal_published": false,
     "relays": [{ "relay": "wss://relay.ochk.io", "answered": true, "events": 1 }, …],
@@ -43,10 +45,23 @@ from mempool.space, runs the pure tally function, and returns JSON.
 }
 ```
 
+Every result carries `basis`: `anchored` when ballots are timed by their Bitcoin
+anchors, `voter_clocks` when by the voter's own `created_at`. An anchored poll's
+result also carries `close_height`, and its tally is `state: "provisional"`,
+with an `unanchored` count, until the tip reaches `H_close + G + 6` (see
+[tally algorithm](/vote/tally-algorithm)). A tally carries `counted`, the
+`ballot_id` that stood for each voter, in ascending order.
+
 **200 awaiting_reveal (secret-mode poll pre-close):**
 
 ```json
-{ "poll_id": "cc27…", "state": "awaiting_reveal" }
+{
+    "poll_id": "cc27…",
+    "state": "awaiting_reveal",
+    "basis": "voter_clocks",
+    "ballot_count": 3,
+    "relays": [{ "relay": "wss://relay.ochk.io", "answered": true, "events": 3 }, …]
+}
 ```
 
 **Errors** (JSON with an `error` string):
@@ -55,10 +70,14 @@ from mempool.space, runs the pure tally function, and returns JSON.
 - `404` — no relay that answered holds the poll. If the id is a poll's Nostr
   event id, the body names the `poll_id` to use instead.
 - `409` — `state: "deferred"`: the snapshot block is not yet buried six blocks
-  deep. Retry later.
-- `422` — the poll event's content did not match the poll id.
-- `503` — no relay finished answering the poll, ballot or reveal query. A tally
-  over a ballot set no relay finished sending would be a guess.
+  deep, or, for an anchored poll, no block has passed the deadline yet. Retry
+  later.
+- `422` — the poll event cannot be read, its content does not match the poll id,
+  or its creator signature does not verify.
+- `503` — no relay finished answering the poll, ballot, reveal or (for an
+  anchored poll) stamp query, or the block at the deadline could not be read. A
+  tally over a ballot set no relay finished sending would be a guess.
+- `500` — `tally_failed`: the tally itself threw.
 
 Response is cached for 60 seconds at the edge. Live tallies on the poll page
 recompute client-side against the same function.
@@ -67,7 +86,7 @@ recompute client-side against the same function.
 
 <InstallTabs pkg="@orangecheck/vote-core @orangecheck/bip322" />
 
-Full API surface:
+The main exports (the [SDK reference](/sdk/vote-core/README) lists every one):
 
 ```ts
 import type {
@@ -81,6 +100,9 @@ import type {
 
 import {
     ageDays,
+    // anchored polls: H_close, a ballot's anchor, and when a tally is final
+    anchoredTallyIsFinal,
+    anchorHeightFromStamps,
     ballotId,
     buildCommitMessage,
     canonicalBytes,
@@ -88,12 +110,19 @@ import {
     canonicalize,
     // secret-mode commit
     commit,
+    // collapse byte-identical ballot copies read from several relays
+    distinctBallotCopies,
+    isAnchoredPoll,
     isSupportedMode,
+    // an object nests at most 32 levels (SPEC §7)
+    MAX_NESTING_DEPTH,
     // the snapshot block for a "deadline" poll
     mempoolBlockTimeSource,
+    nestedTooDeep,
     // ids (content-addressed, SHA-256 of canonical bytes with sig.value = "")
     pollId,
     qualifyingUtxos,
+    resolveCloseBlock,
     resolvePollSnapshot,
     revealId,
     // the tally

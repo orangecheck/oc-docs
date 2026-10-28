@@ -59,7 +59,7 @@ establishes:
 | T5  | Use after expiry             | Live verification checks the delegation at now, whatever `signed_at` says                                                 |
 | T6  | Replay across delegations    | `delegation_id` is a hash; unique per delegation                                                                          |
 | T7  | Revocation censorship        | Publish to ≥3 diverse relays; absence counts only from the relays that answer                                             |
-| T8  | Revocation forgery           | BIP-322 under principal (or agent-if-authorized)                                                                          |
+| T8  | Revocation forgery           | BIP-322 under the principal or the agent; any other signer is refused                                                     |
 | T9  | Priority manipulation        | Live: a revocation in effect refuses every action, and `signed_at` is bound to the verifier's clock. Audit: OTS anchoring |
 | T9a | Repeated action              | A verifier that acts on actions acts on each action id once                                                               |
 | T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                                                                     |
@@ -120,8 +120,12 @@ Private security advisory on
 ## Known limitations
 
 v1 explicitly defers: on-chain bond slashing, privacy-preserving encrypted
-scopes with public verifiability, multi-principal joint delegations, per-action
-bond increments, and post-quantum hybrid signatures. Sub-delegation shipped in
-v1.1 ([sub-delegation](/agent/sub-delegation)) and encrypted scopes for named
-recipients in v1.2 ([private scope](/agent/private-scope)). Each is a spec-level
-addition that composes with v1 rather than breaking it.
+scopes with public verifiability, per-action bond increments, and post-quantum
+hybrid signatures. Sub-delegation shipped in v1.1
+([sub-delegation](/agent/sub-delegation)) and encrypted scopes for named
+recipients in v1.2 ([private scope](/agent/private-scope)). M-of-N federation
+principals are specified in v1.2
+([`FEDERATION.md`](https://github.com/orangecheck/oc-agent-protocol/blob/main/FEDERATION.md)),
+and `agent-core` verifies them with `verifyFederationDelegation`; `agent-signer`
+has no helper to build one. Each is a spec-level addition that composes with v1
+rather than breaking it.

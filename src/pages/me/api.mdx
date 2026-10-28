@@ -47,8 +47,8 @@ keeps the token they return in its own cookie.
 | `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
 | `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
 | `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
-| `GET`  | `/api/integrator-config?project_key=…` | sample `IntegratorPriceConfig` lookup                   |
-| `GET`  | `/api/stats/earned`                    | aggregate sat-earnings (last 7d, by class)              |
+| `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404      |
+| `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime      |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
 | `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
 
@@ -61,8 +61,8 @@ These signed records are anchored to a Bitcoin block with OpenTimestamps:
 - statements;
 - payouts (distributions), a payout's void, and the address payouts go to
   (payout bindings);
-- each change in how your sats are held, such as a move to your own keys
-  (rebinds);
+- rebinds, the record of a change in how your sats are held. Moving to your own
+  keys is not open, so none is written today;
 - each release batch's manifest (drops).
 
 Test events, events a project was not billed for, preview events and a deleted
@@ -139,13 +139,13 @@ block header are all it takes; orangecheck does not need to be online.
 > `oc_session` cookie, so it forwards the popup-issued JWT instead. The
 > remaining endpoints in this section require the cookie.
 
-| Method | Path                    | Purpose                                                          |
-| ------ | ----------------------- | ---------------------------------------------------------------- |
-| `GET`  | `/api/auth/me`          | crypto-only identity lookup; 401 otherwise                       |
-| `GET`  | `/api/me/balance`       | sat balance + last-7d aggregate + by-class breakdown             |
-| `GET`  | `/api/me/notifications` | notifications feed                                               |
-| `POST` | `/api/me/notifications` | mark read/unread (`{ id, read }` or `{ all: true, read: true }`) |
-| `GET`  | `/api/me/export`        | GDPR-style account dump · downloadable JSON                      |
+| Method | Path                    | Purpose                                              |
+| ------ | ----------------------- | ---------------------------------------------------- |
+| `GET`  | `/api/auth/me`          | crypto-only identity lookup; 401 otherwise           |
+| `GET`  | `/api/me/balance`       | sat balance + last-7d aggregate + by-class breakdown |
+| `GET`  | `/api/me/notifications` | notifications feed                                   |
+| `POST` | `/api/me/notifications` | mark read (`{ id }`, or `{ mark_all: true }`)        |
+| `GET`  | `/api/me/export`        | GDPR-style account dump · downloadable JSON          |
 
 ## Authenticated · sessions (Per session)
 
@@ -153,7 +153,7 @@ block header are all it takes; orangecheck does not need to be online.
 | ------ | ------------------------- | --------------------------------------- |
 | `POST` | `/api/session/create`     | open a session — records no charge      |
 | `POST` | `/api/session/refresh`    | refresh inside the policy window — free |
-| `POST` | `/api/session/invalidate` | tear down — free, telemetry-only        |
+| `POST` | `/api/session/invalidate` | tear down — free, needs no session      |
 
 ## Authenticated · payment authorization (Per action)
 
@@ -246,9 +246,9 @@ X-OC-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(key, "<t>.<body>")>
 
 The key is the signing secret **as text**, its characters as UTF-8 bytes: do not
 hex-decode it. `<body>` is the raw request body, byte for byte. A `t` more than
-300 seconds from the server's clock is refused. Send `Idempotency-Key` (up to
-200 characters) to make a retry safe: a repeat answers the first result with
-`idempotent_replay: true`.
+300 seconds behind the server's clock, or more than 60 seconds ahead of it, is
+refused. Send `Idempotency-Key` (up to 200 characters) to make a retry safe: a
+repeat answers the first result with `idempotent_replay: true`.
 
 In Python, with [`orangecheck`](/sdk/python) 2.3 or later:
 
@@ -281,28 +281,28 @@ Without the SDK, the header is
 
 ### What the event endpoint answers
 
-| Status | `error` / `reason`                                       | Meaning                                                                                        |
-| ------ | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project     |
-| 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: nothing recorded or charged                                          |
-| 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                               |
-| 401    | `invalid_signature`                                      | The header is there but does not verify (`stale_timestamp`, `bad_signature`, `invalid_format`) |
-| 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                        |
-| 401    | `project_auth_required`                                  | Unsigned, and not from the project owner's own session                                         |
-| 401    | `earner_requires_signature`                              | `user_address` on an unsigned request                                                          |
-| 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                     |
-| 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                    |
-| 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                      |
-| 403    | `earner_not_member`                                      | A live project's event names someone who never signed in to it or granted it anything          |
-| 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again         |
-| 403    | `project_frozen`                                         | Frozen by the platform                                                                         |
-| 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                 |
-| 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                               |
-| 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text          |
-| 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                             |
-| 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                        |
-| 429    | `test_project_event_cap`                                 | A test project's 5,000 events in all are used                                                  |
-| 429    | `test_events_ceiling`                                    | Every test project together used the 2,000 test events of the UTC day                          |
+| Status | `error` / `reason`                                       | Meaning                                                                                                            |
+| ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project                         |
+| 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: nothing recorded or charged                                                              |
+| 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
+| 401    | `invalid_signature`                                      | The header is there but does not verify (`stale_timestamp`, `future_timestamp`, `bad_signature`, `invalid_format`) |
+| 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                                            |
+| 401    | `project_auth_required`                                  | Unsigned, and not from the project owner's own session                                                             |
+| 401    | `earner_requires_signature`                              | `user_address` on an unsigned request                                                                              |
+| 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                                         |
+| 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                                        |
+| 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                                          |
+| 403    | `earner_not_member`                                      | A live project's event names someone who never signed in to it or granted it anything                              |
+| 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again                             |
+| 403    | `project_frozen`                                         | Frozen by the platform                                                                                             |
+| 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                                     |
+| 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                                                   |
+| 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text                              |
+| 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                                                 |
+| 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                                            |
+| 429    | `test_project_event_cap`                                 | A test project's 5,000 events in all are used                                                                      |
+| 429    | `test_events_ceiling`                                    | Every test project together used the 2,000 test events of the UTC day                                              |
 
 The per-person cap on class A events counts only events billed against live
 escrow. A preview event spends nobody's allowance.
@@ -459,7 +459,6 @@ after you rotate) and your project's key set (`issuer_jwks_url`).
 | `GET`    | `/api/me/projects/[id]/events`      | live event stream for this project · owner-gated                                                                          |
 | `GET`    | `/api/me/projects/[id]/webhooks`    | list registered webhooks · owner-gated                                                                                    |
 | `POST`   | `/api/me/projects/[id]/webhooks`    | register a webhook URL · owner-gated                                                                                      |
-| `POST`   | `/api/developer/webhook-test`       | test-fire a synthetic envelope at a registered webhook                                                                    |
 
 A project's name, a custom event's label, a drop's label and a directory tagline
 are text people read, so one rule applies to all of them: no character that
@@ -514,10 +513,10 @@ The same rules hold when orangecheck deletes a project.
 ## Response shapes
 
 All authenticated 401s are `{ ok: false }` with
-`Cache-Control: no-store, private` and `Vary: Cookie`. All 422 validation
-failures return
-`{ error: string, details?: [{ subtype?: string, message: string }] }`. All 429
-rate-limit responses include a `Retry-After` header in seconds.
+`Cache-Control: no-store, private` and `Vary: Cookie`. A 422 names what is wrong
+in `error` or `reason`; a refused price config answers
+`{ error: 'config invalid', details: [{ subtype?: string, message: string }] }`.
+All 429 rate-limit responses include a `Retry-After` header in seconds.
 
 ## Rate limits per bucket
 
@@ -525,7 +524,6 @@ rate-limit responses include a `Retry-After` header in seconds.
 | --------------------------- | ----- | ------ |
 | `integrator.event`          | 120   | 60s    |
 | `payment.authorize`         | 30    | 60s    |
-| `wallet.send`               | 30    | 60s    |
 | `webhooks.register`         | 10    | 60s    |
 | `projects.test-fire`        | 20    | 60s    |
 | `developer.projects.create` | 5     | 60s    |

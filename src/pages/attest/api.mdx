@@ -1,18 +1,21 @@
 export const metadata = {
     title: 'OC Attest — HTTP API',
     description:
-        'Every hosted endpoint at ochk.io that the OC Attest protocol exposes. check, verify, challenge, discover.',
+        'Every hosted endpoint the OC Attest protocol exposes. check, verify, challenge, discover, publish-attestation, stats.',
 };
 
 # OC Attest HTTP API
 
-The hosted API at `https://ochk.io/api/*` is a **reference deployment** of OC
-Attest. Self-hosted verifiers provide the same endpoints. Every route is
-documented here.
+The hosted API at `https://attest.ochk.io/api/*` is a **reference deployment**
+of OC Attest. `https://ochk.io/api/check`, `/api/verify` and `/api/discover`
+forward there and answer the same. `/api/challenge` is served by `ochk.io`, the
+auth host. The same checks run in your own code through
+[`@orangecheck/sdk`](/sdk/sdk/README). Every route is documented here.
 
-Rate limits are per-IP; 60 req/min for read endpoints, 20 req/min for auth
-endpoints. Response shape is stable; new optional fields may be added, existing
-fields will not change meaning.
+Rate limits are per IP, per minute: `/api/check` and `/api/discover` 60,
+`/api/stats` 30, `/api/challenge` 30, `/api/verify` 10,
+`/api/publish-attestation` 5. Response shape is stable; new optional fields may
+be added, existing fields will not change meaning.
 
 ## `GET /api/check`
 
@@ -93,7 +96,18 @@ signature's bytes decide which it is.
 
 ### Response — 200
 
-Same shape as `/api/check` without the policy fields. No cache.
+```json
+{
+    "ok": true,
+    "codes": ["sig_ok_bip322", "bond_confirmed"],
+    "network": "mainnet",
+    "attestation_id": "a3f5b8c2...",
+    "identities": [{ "protocol": "github", "identifier": "alice" }],
+    "metrics": { "sats_bonded": 125000, "days_unspent": 47, "score": 30.12 }
+}
+```
+
+`metrics` is present only when `ok` is true. No cache.
 
 ## `/api/challenge`
 
@@ -109,9 +123,13 @@ Response:
 {
     "message": "orangecheck-auth\n...",
     "nonce": "a3f5b8c2...",
-    "expiresAt": "2026-04-24T07:00:00.000Z"
+    "expiresAt": 1777014000000,
+    "expiresAtIso": "2026-04-24T07:00:00Z"
 }
 ```
+
+`expiresAt` is epoch milliseconds. An optional `ttl` sets the lifetime in
+seconds, 30 to 3600.
 
 ### `POST /api/challenge`
 
@@ -137,7 +155,8 @@ the session-aware variant, see
 
 ## `GET /api/discover`
 
-List attestations for a subject — returns the full envelope array from Nostr.
+List attestations for a subject — a summary of each one the relays hold, most
+recent first.
 
 ```
 GET /api/discover?addr=bc1q...
@@ -145,44 +164,104 @@ GET /api/discover?id=<attestation_id>
 GET /api/discover?identity=github:alice
 ```
 
+`limit` caps the list, 1 to 100, default 50. `total` counts every match before
+the cap.
+
 Response:
 
 ```json
 {
-    "count": 2,
-    "total": 2,
+    "count": 1,
+    "total": 1,
     "attestations": [
-        /* AttestationEnvelope[] */
+        {
+            "attestation_id": "a3f5b8c2...",
+            "address": "bc1q...",
+            "scheme": "bip322",
+            "identities": [{ "protocol": "github", "identifier": "alice" }],
+            "issued_at": "2026-04-20T12:00:00Z",
+            "expires_at": "2027-04-20T12:00:00Z",
+            "verification_url": "https://attest.ochk.io/attest/a3f5b8c2...",
+            "relay_hints": []
+        }
     ]
 }
 ```
 
-Use this when you need to see historical attestations for an address, not just
-"does the latest meet thresholds." Goes out to Nostr relays on every call — no
-cache.
+Each summary leaves out the message and the signature, and nothing is verified:
+use `/api/check` or `/api/verify` for that. Use this when you need to see
+historical attestations for an address, not just "does the latest meet
+thresholds." Cached 60 s.
+
+## `POST /api/publish-attestation`
+
+Broadcast an envelope you built and signed with `createAttestation()`. The
+server recomputes the id, re-verifies the signature, builds the Nostr event from
+the signed message alone, signs that outer event with attest.ochk.io's service
+key, and sends it to its relays.
+
+```json
+{
+    "envelope": {
+        /* AttestationEnvelope */
+    }
+}
+```
+
+Response — 200:
+
+```json
+{
+    "ok": true,
+    "success_count": 3,
+    "total_count": 4,
+    "success": ["wss://..."],
+    "failed": [{ "relay": "wss://...", "reason": "..." }],
+    "event_id": "...",
+    "pubkey": "..."
+}
+```
+
+A 200 can carry `success_count: 0`, so read `success` and `failed`. The service
+key vouches for delivery only; the BIP-322 signature inside is still the proof.
+An envelope that binds a `nostr:` identity is refused with 422
+`nostr_binding_requires_nip07`: that npub must sign the event itself. Other
+refusals are 400 (`invalid_json`, `missing_envelope`, `missing_field`) and 422
+(for example `attestation_id_mismatch`, `signature_invalid`,
+`message_too_large`). The full list is in `/api/openapi`.
+
+## `GET /api/stats`
+
+Aggregate counts over the newest attestations on attest.ochk.io's relays, up to
+500 per relay, deduplicated by attestation id: totals by scheme, identity
+bindings by protocol, unique addresses, and the `bond:` amounts declared in
+signed messages (declared, not checked against the chain). Cached 10 minutes;
+`cached_at` says when it was computed and `window_minutes` is that cache life.
 
 ## Status codes
 
-| Code                     | Severity | Meaning                                     |
-| ------------------------ | -------- | ------------------------------------------- |
-| `sig_ok_bip322`          | success  | BIP-322 signature verified                  |
-| `sig_ok_legacy`          | success  | Legacy signmessage verified, any address    |
-| `sig_invalid`            | error    | Signature does not match                    |
-| `sig_unsupported_script` | error    | BIP-322 full or proof-of-funds signature    |
-| `invalid_scheme`         | error    | Not sent: the signature decides the scheme  |
-| `decode_error`           | error    | Canonical message malformed                 |
-| `invalid_attestation_id` | error    | Claimed ID doesn't match sha256(msg)        |
-| `bond_confirmed`         | success  | Chain lookup returned usable metrics        |
-| `bond_zero`              | warn     | Address holds no confirmed UTXOs            |
-| `bond_pending`           | info     | Only unconfirmed UTXOs found                |
-| `bond_insufficient`      | error    | `bond:` extension exceeds confirmed balance |
-| `below_min_sats`         | error    | Policy threshold — `/api/check` only        |
-| `below_min_days`         | error    | Policy threshold — `/api/check` only        |
-| `aud_mismatch`           | warn     | Signed audience ≠ expected (challenge flow) |
-| `expired`                | error    | Signed `expires` passed or unreadable       |
-| `not_yet_valid`          | error    | Signed `issued_at` ahead of the clock       |
-| `network_testmode`       | warn     | Signature is on testnet/signet              |
-| `bad_request`            | error    | Structural problem with request body        |
+| Code                     | Severity | Meaning                                                                              |
+| ------------------------ | -------- | ------------------------------------------------------------------------------------ |
+| `sig_ok_bip322`          | success  | BIP-322 signature verified                                                           |
+| `sig_ok_legacy`          | success  | Legacy signmessage verified, any address                                             |
+| `sig_invalid`            | error    | Signature does not match                                                             |
+| `sig_unsupported_script` | error    | BIP-322 full or proof-of-funds signature                                             |
+| `invalid_scheme`         | error    | Not sent: the signature decides the scheme                                           |
+| `decode_error`           | error    | Canonical message malformed                                                          |
+| `invalid_attestation_id` | error    | Claimed ID doesn't match sha256(msg)                                                 |
+| `bond_confirmed`         | success  | Chain lookup returned usable metrics                                                 |
+| `bond_zero`              | error    | Address holds no confirmed UTXOs                                                     |
+| `bond_pending`           | info     | Only unconfirmed UTXOs found                                                         |
+| `bond_insufficient`      | error    | `bond:` extension exceeds confirmed balance                                          |
+| `bond_malformed`         | error    | `bond:` value is not a valid integer                                                 |
+| `below_min_sats`         | error    | Policy threshold — `/api/check` only                                                 |
+| `below_min_days`         | error    | Policy threshold — `/api/check` only                                                 |
+| `stake_shared`           | error    | Address also backs another handle on the same protocol — `/api/check?identity=` only |
+| `aud_mismatch`           | warn     | Signed audience ≠ expected (challenge flow)                                          |
+| `expired`                | error    | Signed `expires` passed or unreadable                                                |
+| `not_yet_valid`          | error    | Signed `issued_at` ahead of the clock                                                |
+| `network_testmode`       | warn     | Signature is on testnet/signet                                                       |
+| `bad_request`            | error    | Structural problem with request body                                                 |
 
 ## HTTP status vs. status code
 

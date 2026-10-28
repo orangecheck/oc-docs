@@ -80,8 +80,9 @@ And optionally, with an Attest reference:
   scope parser, verifier.
 - `@orangecheck/agent-signer` — helpers for signing delegations (principal) and
   actions (agent).
-- `@orangecheck/agent-cli` — `oc-agent` shell for minting / revoking / verifying
-  envelopes.
+- `@orangecheck/agent-cli` — `oc-agent` shell for verifying, inspecting and
+  canonicalizing envelopes and checking scope containment. Minting and revoking
+  are `agent-signer` functions.
 - `@orangecheck/agent-mcp` — Model Context Protocol bridge so LLM toolchains can
   produce agent-signed tool calls directly.
 

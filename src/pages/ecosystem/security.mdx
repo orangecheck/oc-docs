@@ -87,8 +87,8 @@ attestation-signing key as a hot wallet for signing and cold wallet for storage.
 Discovering proofs via a single Nostr relay lets that relay hide events or serve
 partitioned views.
 
-**Mitigation**: query **≥3 relays** from independent operators. The reference
-SDKs default to four.
+**Mitigation**: query **≥3 relays** from independent operators.
+`@orangecheck/sdk` defaults to four; `@orangecheck/nostr-core` defaults to five.
 
 ### Stale chain state
 

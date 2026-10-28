@@ -1,28 +1,30 @@
 export const metadata = {
     title: 'Quickstart · OC Chat',
     description:
-        'Sign in with your Bitcoin wallet, send your first end-to-end-encrypted message, and try each of the three send modes — speak-now, pay-to-reach, and seal-til-block.',
+        'Sign in, send your first end-to-end-encrypted message, and try each of the three send modes — speak-now, pay-to-reach, and seal-til-block.',
 };
 
 # Quickstart
 
-Five minutes from a Bitcoin wallet to your first end-to-end-encrypted message.
-No account, no email, no app install — [chat.ochk.io](https://chat.ochk.io) runs
-in the browser.
+Five minutes to your first end-to-end-encrypted message. No app install —
+[chat.ochk.io](https://chat.ochk.io) runs in the browser.
 
-## 1. Sign in with Bitcoin
+## 1. Sign in
 
-Open [chat.ochk.io](https://chat.ochk.io) and sign in. The ceremony is the
-family [BIP-322 sign-in](/ecosystem/bip322): your wallet signs a challenge,
-proving you control the address. There is **no password and no email** — your
-Bitcoin address _is_ your account. (An email-OTP bridge exists on the
-[auth host](/api-reference/auth-host) as a UX fallback, but the canonical
-identity is always the address.)
+Open [chat.ochk.io](https://chat.ochk.io) and sign in with your orangecheck
+account on the [auth host](/api-reference/auth-host): email, Google, GitHub or a
+Bitcoin wallet. The account you sign in with is your inbox, and its id is a
+`did:oc`.
 
-The first time you sign in on a device, the browser generates an **X25519 device
-key** and publishes a [kind-30078 device record](/lock/device-keys) binding that
-key to your address via BIP-322. **This is the only wallet signature you will
-make.** From here, sending and receiving are zero-click.
+The first time you open the app on a device, **Create device & open inbox**
+generates an **X25519 device key**. ochk.io vouches for it, and the browser
+publishes a [kind-30078 device record](/lock/device-keys) for your account
+([session devices](/chat/spec#session-devices-86)). No wallet signature is
+needed. From here, sending and receiving are zero-click.
+
+Binding a Bitcoin address is optional: Settings › Identity › Bitcoin address,
+one [BIP-322](/ecosystem/bip322) signature per device. A bound address lets
+people reach you at it, and you need one to claim a handle or charge postage.
 
 > Your inbox pubkey is `HKDF(device_sk)` — derived from the device key, not
 > chosen. Publishing a device record _is_ creating an inbox; there is no second
@@ -30,9 +32,12 @@ make.** From here, sending and receiving are zero-click.
 
 ## 2. Send your first message (speak-now)
 
-1. Paste the recipient's **Bitcoin address** into the composer.
-2. The app fetches their kind-30078 device record from Nostr and **verifies the
-   BIP-322 binding offline** — a malicious relay cannot forge a device record.
+1. Click **New** and enter the recipient's `did:oc`, **Bitcoin address** or
+   `@handle`.
+2. The app fetches their kind-30078 device records from Nostr. For a Bitcoin
+   address it **verifies the BIP-322 binding offline**; for a `did:oc` it checks
+   ochk.io's signed vouch, and the message details read "via ochk.io, not
+   offline-verifiable". A malicious relay cannot forge either.
 3. Type and send. The app seals an OC Lock envelope to the recipient's device
    key, gift-wraps it (NIP-59, kind-1059) with a throwaway Schnorr key, and
    publishes it.
@@ -51,12 +56,15 @@ key, the subscription loops the gift-wrap back, and it lands in a thread labeled
 
 ## 3. Let strangers reach you (pay-to-reach)
 
-A first message from someone who is **not** an existing contact lands in a
-separate **Requests** surface, not your main inbox — it is delivered and
-decrypted, never dropped. To price that attention instead of merely filtering
-it, publish a **postage policy**: a `floor_sats` and a Lightning receiving
-endpoint (an LNURL Lightning Address today; BOLT12 recommended) resolving to a
-wallet **you** control.
+By default anyone can reach your inbox. Under Settings › Inbox › "Who can reach
+you", **Contacts only** or **Bitcoin floor** moves a first message from someone
+who is **not** an existing contact into a separate **Requests** surface, not
+your main inbox — it is delivered and decrypted, never dropped. To price that
+attention instead of merely filtering it, set a **postage price** under Settings
+› Inbox › Pay-to-reach: a sats floor and a Lightning Address resolving to a
+wallet **you** control. The price is published in your
+[directory listing](/chat/directory), so it needs a listed `@handle` first. Once
+it is set, a stranger's first message without valid postage lands in Requests.
 
 A stranger's wallet then fetches an invoice **directly from your endpoint**,
 pays it, and attaches the preimage to their first message. Your client verifies
@@ -84,20 +92,21 @@ the dead-man's-switch (standing delivery) composition.
 ## 5. Be findable by a handle (optional)
 
 By default you are **invisible** — discoverable only by someone who already
-knows your Bitcoin address. If you opt in, you can publish a revocable
-[directory listing](/chat/directory) so people can find you by a human-readable
-`@handle`. Claiming a handle requires your address to clear a **UTXO-age floor**
-(funded + aged on-chain), which prices out squatting. Opt-in surfaces the
-deanonymization trade-off plainly; revocation is forward-effective only.
+knows your `did:oc` or a Bitcoin address you have bound. If you opt in, you can
+publish a revocable [directory listing](/chat/directory) so people can find you
+by a human-readable `@handle`. Claiming a handle requires a bound Bitcoin
+address that clears a **UTXO-age floor** (funded + aged on-chain), which prices
+out squatting. Opt-in surfaces the deanonymization trade-off plainly; revocation
+is forward-effective only.
 
 ## What you get on the free tier
 
 Everything above works on the **free tier**: all three send modes, the opt-in
 directory, public [channels](/chat/channels), and a best-effort **durable
-inbox** so a message sent while you are offline still arrives. The paid
-**Personal** rung (1,000 sats / 30 days, prepaid over Lightning, no auto-renew)
-only extends the retention horizon, multi-device fan-out, and history depth —
-durability of basic delivery is never the paywall.
+inbox** so a message sent while you are offline still arrives. Durability of
+basic delivery is never the paywall. The plan's paid **Personal** rung is 1,000
+sats / 30 days, prepaid over Lightning, with no auto-renew. Its checkout is not
+open, so Personal cannot be bought today.
 
 ## Next steps
 

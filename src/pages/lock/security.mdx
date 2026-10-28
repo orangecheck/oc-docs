@@ -70,7 +70,7 @@ Three postures, pick one per persona:
 
 A fresh Segwit address with zero transactions leaks no chain history, but also
 provides no "this person is reachable / has stake" signal. If the counterparty
-wants to sybil-gate with orangecheck (see below), your empty address will be
+sybil-gates with orangecheck in their own app, your empty address will be
 rejected — which may be a feature (privacy) or a bug (you can't receive),
 depending on your goals.
 
@@ -198,7 +198,7 @@ paste signatures in manually.
 
 ### URL fragments
 
-Share links use the URL fragment (`#`): `https://lock.ochk.io/unlock#eyJ2Ijoy…`.
+Share links use the URL fragment (`#`): `https://lock.ochk.io/unlock#eyJhbGci…`.
 Fragments are:
 
 - **Not sent to servers** in a normal HTTP request. The Lock origin does not
@@ -248,8 +248,8 @@ untrusted storage, clear chat history regularly (per-thread or global).
 ### Volume, timing, and tab-title leaks
 
 - An operator of the default relay pool knows you're receiving messages.
-- The unread badge in the browser tab title (`(3) app · oc·lock`) is visible to
-  anyone who can see your screen.
+- The unread badge in the browser tab title (`(3) Inbox · OC Lock`) is visible
+  to anyone who can see your screen.
 
 ### Self-chat
 
@@ -316,7 +316,7 @@ You trust the code served at `lock.ochk.io` is what it claims to be. If the DNS
 is hijacked or the Vercel deployment is compromised, a malicious replacement
 could exfiltrate your device secret next time you load the page. Mitigations:
 
-- Verify the TLS certificate chain (Let's Encrypt R12 issuer, SAN includes
+- Verify the TLS certificate chain (issued by Let's Encrypt, SAN includes
   `lock.ochk.io`).
 - Use the app over HTTPS only; never accept a certificate warning.
 - For high-value scenarios where trusting `lock.ochk.io` is unacceptable, build
@@ -358,14 +358,12 @@ Covered above. Summary: your Bitcoin wallet is an in-scope trust anchor.
 - Register from a dedicated browser profile.
 - Use a fresh Bitcoin address funded from a privacy mixer or Lightning, not from
   an exchange.
-- Don't enable the orangecheck gate (requires stake history — correlates you).
 - Delete device, browser profile, and any exports after the session.
 - Consider Tails / Whonix for the session.
 
 ### Commerce / transactional messaging
 
 - Use your public business address.
-- Enable the orangecheck gate to filter inbound (sybil-resistant inbox).
 - Keep history purges per-thread.
 
 ### Long-term confidentiality (years-to-decades)

@@ -16,16 +16,21 @@ it's a bug — open an issue.
 
 ## The response shape
 
-All three surfaces return the same envelope:
+A verification returns the same envelope on all three surfaces (`/api/verify`,
+the SDKs' `verify()`, `oc verify --json`):
 
 ```json
 {
     "ok": true,
     "codes": ["sig_ok_bip322", "bond_confirmed"],
-    "address": "bc1q...",
+    "network": "mainnet",
+    "attestation_id": "a3f5b8c2...",
     "metrics": { "sats_bonded": 125000, "days_unspent": 47, "score": 30.12 }
 }
 ```
+
+`attestation_id`, `identities` and `metrics` are present when the verifier could
+derive them.
 
 `ok: true` iff **every** signature code is a success AND thresholds are met.
 `codes[]` is the ordered list of everything the verifier observed — always
@@ -51,12 +56,13 @@ is on [BIP-322](/ecosystem/bip322#what-the-verifier-accepts).
 
 ## Bond / chain-state codes
 
-| Code                | Severity | Meaning                                                                                 | What to tell the user                                                      |
-| ------------------- | -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `bond_confirmed`    | success  | Confirmed UTXOs found at the address; `sats_bonded` and `days_unspent` are derivable.   | —                                                                          |
-| `bond_zero`         | warn     | Address has no confirmed UTXOs. Signature is still valid — the bond just doesn't exist. | "Send sats to this address and wait for one confirmation before retrying." |
-| `bond_pending`      | info     | Address has only unconfirmed transactions.                                              | "Wait for the first confirmation (≈10 min)."                               |
-| `bond_insufficient` | error    | Declared `bond:` extension exceeds the confirmed balance.                               | "Lower your declared bond, or fund the address up to the declared amount." |
+| Code                | Severity | Meaning                                                                                                                   | What to tell the user                                                      |
+| ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `bond_confirmed`    | success  | Confirmed UTXOs found at the address; `sats_bonded` and `days_unspent` are derivable.                                     | —                                                                          |
+| `bond_zero`         | warn     | Address has no confirmed UTXOs. Signature is still valid — the bond just doesn't exist.                                   | "Send sats to this address and wait for one confirmation before retrying." |
+| `bond_pending`      | info     | Address has only unconfirmed transactions.                                                                                | "Wait for the first confirmation (≈10 min)."                               |
+| `bond_insufficient` | error    | Declared `bond:` extension exceeds the confirmed balance.                                                                 | "Lower your declared bond, or fund the address up to the declared amount." |
+| `bond_malformed`    | error    | The signed `bond:` line is not a whole number of sats in plain digits, so the attestation does not say how much it bonds. | "Sign again with the bond written as a whole number of sats."              |
 
 ## Policy / threshold codes (returned by `/api/check`)
 
@@ -108,22 +114,22 @@ user-facing message. The `severity` field
 (`'success' | 'info' | 'warn' | 'error'`) lets your UI apply the right visual
 treatment without branching on string keys.
 
-The Python SDK exposes an equivalent `STATUS_META` dict.
+The Python SDK has no `STATUS_META`; use the code strings in this table.
 
 ## HTTP status vs. status code
 
 The HTTP status says whether the request was processable; the `codes[]` field
 says what the verification actually found. Do not conflate them.
 
-| HTTP  | Meaning                                                                               |
-| ----- | ------------------------------------------------------------------------------------- |
-| `200` | Request was valid and the verifier ran. `ok` and `codes` tell you what happened.      |
-| `400` | Request shape was wrong — missing `addr`, malformed JSON, etc. `codes` may be absent. |
-| `401` | `/api/auth/*` rejected the session (e.g. `not_authenticated`).                        |
-| `403` | Cross-site POST to a browser-only endpoint.                                           |
-| `404` | `/api/check` subject lookup returned no attestation.                                  |
-| `429` | Rate limit hit. Retry after `Retry-After`.                                            |
-| `500` | Verifier crashed. Open an issue.                                                      |
+| HTTP  | Meaning                                                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------------------------ |
+| `200` | Request was valid and the verifier ran. `ok` and `codes` tell you what happened.                                   |
+| `400` | Request shape was wrong — missing `addr`, malformed JSON, etc. `codes` may be absent.                              |
+| `401` | `/api/auth/*` rejected the session (e.g. `not_authenticated`).                                                     |
+| `403` | Cross-site POST to a browser-only endpoint.                                                                        |
+| `404` | `/api/check` subject lookup returned no attestation.                                                               |
+| `429` | Rate limit hit. attest.ochk.io sends no `Retry-After`: wait a minute. See [errors by host](/api-reference#errors). |
+| `500` | Verifier crashed. Open an issue.                                                                                   |
 
 ## Further
 

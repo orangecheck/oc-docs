@@ -79,7 +79,8 @@ lifetime SKU:
 - **Family Circle** — 200,000 sats / 365 days · adds a shared team vault up to
   10 seats on top of your personal sync. See [Teams](/vault/teams).
 
-Click **pay with bitcoin** on the dashboard. A BTCPay invoice for an on-chain
+On the dashboard, under **Cloud sync, prepaid on-chain**, pick a plan (the
+buttons read like **Annual · 70k sats**). A BTCPay invoice for an on-chain
 payment opens; once the payment confirms and the invoice settles, the dashboard
 turns sync on automatically. What syncs is **double-encrypted ciphertext** —
 OC's storage layer sees only a random envelope id and a timestamp. See
@@ -87,11 +88,16 @@ OC's storage layer sees only a random envelope id and a timestamp. See
 
 ## Always: export a backup
 
-From **settings → portable export**, download every entry as a single JSON file.
-That file is the same ciphertext that lives in your browser. Anyone who later
-recovers your vault key can decrypt it with
-[`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) from npm — no
-vault.ochk.io required. Do this before you wipe a device.
+From **settings → encrypted backup**, click **Download encrypted backup**. The
+file holds your vault key and every entry, sealed under a passphrase you choose
+(scrypt, then AES-256-GCM). **Import** on vault.ochk.io restores it on a new
+device and reinstalls the vault key, so the entries decrypt. This is the backup
+to keep. Do this before you wipe a device.
+
+**settings → portable export** downloads every entry as a single JSON file of
+the same ciphertext that lives in your browser. It opens only where the vault
+key is already held: anyone who has that key can decrypt it with
+[`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) from npm.
 
 ## Migrating in
 
@@ -104,8 +110,9 @@ Parsing happens entirely in your browser — the CSV file never reaches a server
 
 The same vault is available from three surfaces:
 
-- **The browser** — the [OC Vault extension](/vault/extension), in publish prep,
-  adds autofill, login capture, and one-click access to your vault.
+- **The browser** — the [OC Vault extension](/vault/extension) adds autofill,
+  login capture, and one-click access to your vault. It is not in a browser
+  store; you build it and load it from source.
 - **The shell** — `npm install -g @orangecheck/vault-cli` gives you the
   [`oc-vault` command](/vault/developer): `read`, `run`, `inject`, `export`,
   `item list/get`. Resolves `ocv://personal/<item>/<field>` references from

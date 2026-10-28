@@ -53,8 +53,9 @@ out-of-band if your gate depends on it.
   (advisory).
 - [**Verification**](/attest/verification) — the exact checks a verifier
   performs.
-- [**HTTP API**](/attest/api) — `/api/check`, `/api/verify`, `/api/challenge`,
-  `/api/discover`.
+- [**HTTP API**](/attest/api) — attest.ochk.io's `/api/check`, `/api/verify`,
+  `/api/discover`, `/api/publish-attestation` and `/api/stats`, plus ochk.io's
+  `/api/challenge`.
 - [**Guide: gate an Express route**](/attest/guides/express) — drop-in
   middleware in 10 lines.
 - [**Guide: filter an airdrop**](/attest/guides/airdrop) — turn a candidate list
@@ -64,7 +65,8 @@ out-of-band if your gate depends on it.
 - [**Guide: sybil-filter a Nostr relay**](/attest/guides/nostr-relay) — drop a
   Strfry plugin in; reject events from unproofed npubs.
 - [**Guide: self-host the verifier**](/attest/guides/self-hosting) — run the
-  stack on your own Postgres + Vercel / Docker / VM.
+  same checks on your own server with the published packages, your relays and
+  your Esplora.
 
 ## Read the shared layer first
 

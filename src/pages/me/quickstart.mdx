@@ -17,8 +17,8 @@ needs a sales call, and nothing is destructive.
 
 Sign in at [ochk.app](https://ochk.app/me/projects/new) with the account you
 already have. Your orangecheck account is your developer account. The new
-project asks for your app's name and domain, how people sign in (choose **Use
-orangecheck sign-in**), and when to pay your users. Leave that at **Off**; the
+project asks for your app's name and domain, how people sign in (choose
+**orangecheck sign-in**), and when to pay your users. Leave that at **Off**; the
 second track turns it on.
 
 ```text
@@ -49,7 +49,7 @@ events, no charges, and sign-in works the same before and after.
 
 <InstallTabs pkg="@orangecheck/me-client" />
 
-No bundler? `dist/popup.mjs` in the published package is a 2 kB ES module with
+No bundler? `dist/popup.mjs` in the published package is a single ES module with
 no imports of its own. Copy it from the version you install to your own origin,
 say as `/js/oc-popup.mjs`, import `signInWithOc` from that path in a
 `<script type="module">`, and copy it again when you upgrade.
@@ -128,10 +128,11 @@ A backend in Python or another language checks the token itself: see
 The token lasts as long as the person's ochk.io session, 30 days at most, and is
 never refreshed: when it expires, they sign in again. To sign someone out, clear
 the cookie and [end the token](/me/sdk#ending-a-session), so orangecheck refuses
-it too. Clearing the cookie is what signs them out of your site: your server's
-list of ended sessions carries what someone ended everywhere, not single ended
-tokens. Signing out of ochk.io does not sign them out of your site; signing out
-everywhere does, once your server has your project key and signing secret (see
+it too. Clearing the cookie is what signs them out of your site at once. Signing
+out of ochk.io does not sign them out of your site. Once your server has your
+project key and signing secret, its list of ended sessions carries each token
+ended at your origin and every session someone ended everywhere, and your server
+refuses either within about two minutes (see
 [when someone ends every session](/me/sdk#when-someone-ends-every-session)).
 
 `@orangecheck/auth-client` is for orangecheck's own sites; integrators use

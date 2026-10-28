@@ -187,10 +187,10 @@ look-alike sign-in. To test against a stand-in popup, use `button.mjs` and pass
 `popup: { popupOrigin, popupPath }` from your own code, as the
 [examples' offline mode](/integration/reference#run-it-with-no-account) does.
 
-The hashes above are me-client 0.53.0's files as npm publishes them. A new
-version has new hashes: your project's HTML snippet on ochk.app always shows the
-current pair. Under a strict Content-Security-Policy, copy
-`dist/button-auto.mjs` and `dist/button.css` onto your own origin instead.
+The hashes above are for the files of the me-client version the snippet pins, as
+npm publishes them. A new version has new hashes: your project's HTML snippet on
+ochk.app always shows the current pair. Under a strict Content-Security-Policy,
+copy `dist/button-auto.mjs` and `dist/button.css` onto your own origin instead.
 
 ## orangecheck's own button
 
@@ -329,7 +329,7 @@ in [plain HTML](#plain-html-and-javascript). A native build signs the player in
 through their own browser: see [apps and games](/integration/native-sign-in).
 
 Download them from npm, or straight from
-[jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark@0.2/assets/).
+[jsDelivr](https://cdn.jsdelivr.net/npm/@orangecheck/mark/assets/).
 
 ## Versions
 

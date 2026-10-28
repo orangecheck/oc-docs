@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'Multi-account sign-in',
     description:
-        'Hold multiple orangecheck accounts in one browser and switch between them without re-authenticating. How rosters work, what the surface looks like, what every family site gets for free.',
+        'Hold multiple orangecheck accounts in one browser and switch between them without re-authenticating. How rosters work and what the surface looks like.',
 };
 
 # Multi-account sign-in
@@ -168,12 +168,10 @@ function Header() {
 }
 ```
 
-Most family sites never write this code themselves — the canonical
-[`<OcAccountMenu>`](https://design.ochk.io) from `@orangecheck/design` already
-mounts the `§ accounts` section in the header popover, with switch rows, the
-add-another-account entry point, and per-row "leave this account" all wired up.
-Every `.ochk.io` family site (stamp, vault, vote, agent, lock, attest, pledge,
-me, …) gets it on the next `@orangecheck/design` bump.
+No family package renders the roster for you. `AccountMenu` from
+`@orangecheck/app-design/chrome` draws the account button with the items you
+pass it, so a site that offers switching builds those rows from `roster`, as
+above. ochk.app's account menu is built this way.
 
 For sites that mount [`<OcSignIn>`](/sdk/auth-client/functions/OcSignIn)
 directly at `/signin`, the `add` prop controls add-mode rendering — the
@@ -213,10 +211,10 @@ the same as every other multi-account system (Google, GitHub, Slack, …):
   account B, the existing dual-proof transfer flow merges the addresses — and
   the resulting session lands on the surviving canonical account. The roster
   reflects post-merge state on the next `/api/auth/me`.
-- **The same account in the roster twice.** Cannot happen — `/api/auth/switch`
-  refuses no-op switches (target == active), and a second sign-in to an
-  already-rostered account is a successful re-auth, not a duplicate entry. The
-  roster always contains distinct `did_oc`s.
+- **The same account in the roster twice.** Cannot happen — a switch to the
+  active account changes nothing (`200 { ok: true, no_change: true }`), and a
+  second sign-in to an already-rostered account is a successful re-auth, not a
+  duplicate entry. The roster always contains distinct `did_oc`s.
 
 ## See also
 
@@ -224,6 +222,5 @@ the same as every other multi-account system (Google, GitHub, Slack, …):
   every endpoint mentioned above.
 - [`@orangecheck/auth-client`](/sdk/auth-client/README) · React SDK
   auto-generated reference (`useOcSession`, `OcSignIn`, types).
-- [`@orangecheck/design`](https://design.ochk.io) · the family-wide
-  `<OcAccountMenu>` that ships the rendered surface. (It replaced the deprecated
-  `@orangecheck/ui`.)
+- [`@orangecheck/app-design`](https://design.ochk.io) · the family design
+  system; its `AccountMenu` is the account button you fill with your own items.

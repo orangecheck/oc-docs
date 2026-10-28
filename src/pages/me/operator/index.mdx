@@ -1,42 +1,46 @@
 export const metadata = {
     title: 'ochk.app · Operator Program',
     description:
-        'How to apply, get accepted, and run a guardian for the orangecheck federation pool. Lifecycle in-browser via ochk.app/me/operator; bypass parity via the oc-guardian-kit CLI.',
+        'How the guardian operator program works: applying, acceptance, and running a guardian, in the browser at ochk.app/me/operator or with the oc-guardian-kit CLI. The program is not open: while the system is in testing, orangecheck holds every role.',
 };
 
 # ochk.app · Operator Program
 
 **Run a guardian. Earn sats. Hold the key.**
 
-The orangecheck federation pool is operated by independent **guardians** — one
-keypair per operator, threshold-signing federation actions in concert with
-peers. OC the company is not a guardian; we recruit, vet, and pay guardians, but
-every signing key is operator-held and every commitment is operator- signed. The
-federation cannot tell whether a guardian is running on operator-provisioned
-hardware or OC-provisioned hardware; the trust property is in the signature, not
-the hostname.
+In the design, an orangecheck federation is run by independent **guardians**:
+one operator key per guardian, each guardian threshold-signing federation
+actions with its peers. orangecheck recruits, vets and pays guardians, and every
+commitment a guardian makes is signed with its own operator key.
 
-This page is the program overview. Two paths into it:
+**The program is not open.** While the system is in testing, orangecheck holds
+every key that can move funds, and there are no guardian seats yet.
+[ochk.app/custody](https://ochk.app/custody) shows who holds what today. The
+operator pages on ochk.app open only to accounts the program lets in; to anyone
+else the operator routes on me.ochk.io answer `403`. This page describes how the
+program works.
 
-- **[Apply via ochk.app](https://ochk.app/me/operator)** — sign in, generate or
-  import an operator key, fill the application form, sign + submit in-browser.
-  The whole lifecycle (key custody, application, charter ratification,
-  ceremonies, incident publishing) runs in the portal without ever touching a
-  CLI.
-- **[Apply via the kit](https://github.com/orangecheck/oc-guardian-kit)** —
+Two paths into it:
+
+- **[The portal at ochk.app](https://ochk.app/me/operator)** — sign in, make or
+  import an operator key, fill the application form, sign and submit in the
+  browser. The lifecycle (key custody, application, charter ratification,
+  ceremonies, incident publishing) runs in the portal without a CLI.
+- **[The kit](https://github.com/orangecheck/oc-guardian-kit)** —
   `oc-guardian init` on a server you control, fill the questionnaire, run
-  `oc-guardian apply prepare`, email `application.json` to apply@ochk.io. Bypass
-  parity preserved at every step; identical envelopes, identical review queue.
+  `oc-guardian apply prepare`, email `application.json` to apply@ochk.io. Each
+  portal step has a kit equivalent; the envelopes are the same, and so is the
+  review queue.
 
 ## Lifecycle
 
-| Stage           | What happens                                                                                                                                                                                                        | Where                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **identity**    | Generate (or import) an Ed25519 operator keypair. Browser stores it in IndexedDB; kit stores it in OS keychain. Backup is a 24-word BIP-39 mnemonic.                                                                | [ochk.app/me/operator](https://ochk.app/me/operator)                         |
-| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). `oc-guardian apply prepare` hashes the answers and signs a `program-apply` envelope into `application.json`; email it to apply@ochk.io. | Kit + email                                                                  |
-| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                        | Reviewer side                                                                |
-| **federation**  | Pick a federation slot from the directory and ratify its charter. Charter ratification is a `charter-sign` envelope under your operator key.                                                                        | [ochk.app/me/operator/federations](https://ochk.app/me/operator/federations) |
-| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`).    | Portal + binary                                                              |
+| Stage           | What happens                                                                                                                                                                                                        | Where                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **identity**    | Generate (or import) an Ed25519 operator keypair. The browser stores it in IndexedDB, backed up by a 24-word BIP-39 phrase; the kit stores it in the OS keychain, or in a key file (`--key-file`) on a server.      | [ochk.app/me/operator](https://ochk.app/me/operator)                       |
+| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). `oc-guardian apply prepare` hashes the answers and signs a `program-apply` envelope into `application.json`; email it to apply@ochk.io. | Kit + email                                                                |
+| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                        | Reviewer side                                                              |
+| **federation**  | Once you are accepted, an orangecheck admin assigns you a guardian seat, and you ratify the federation's charter: a `charter-sign` envelope under your operator key. The ratification is your join.                 | [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) |
+| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`).    | Portal + binary                                                            |
 
 ## Two ways to run the guardian binary
 
@@ -44,24 +48,30 @@ The federation cannot distinguish between these. Pick whichever fits.
 
 ### Option A · bring your own hardware
 
-You own the host. Pull the cosign-verified Docker image, deploy the binary with
-your operator pubkey baked into the config, expose port 9000 to the federation
-peers. Full runbook: [/me/operator/runbook](/me/operator/runbook).
+You own the host. Pull the cosign-verified Docker image and run
+`oc-guardian fedimintd run`. Its settings come from the environment: your
+operator id and pubkey, the federation, the bitcoin network, a chain source and
+the public host name. Peers reach it on port 9000 (P2P) and clients on port 9001
+(API). Full runbook: [/me/operator/runbook](/me/operator/runbook).
 
 ### Option B · let OC provision for you
 
-Opt into hosted hardware on the dashboard. OC spins up a VPS at the chosen
-vendor + region, deploys the signed image, surfaces start/stop/upgrade controls
-in the portal. Your private key never touches the host — signing requests come
-from your browser (or your kit) to the binary's RPC port. If OC's infra is fully
-compromised tomorrow, the worst case is your guardian goes offline; your key +
-federation membership stay yours.
+Opt into hosted hardware on the dashboard. orangecheck runs the signed image on
+one hosting provider, in a region you choose, and the portal can restart, stop
+or destroy the machine. Your operator key never touches the host: charter
+ratifications, payout claims and exits are still signed in your browser or your
+kit. The guardian's `fedimintd` does hold its own key share on that machine, and
+it signs liveness reports with a key orangecheck made, which counts for your
+seat only while you delegate to it. A hosted guardian is only as independent as
+orangecheck, which runs the machine. Where that matters, run it on hardware you
+control.
 
 Pricing in sats, billed against your operator payouts. Decommission any time.
 
 ## Architectural invariants
 
-These are non-negotiable. Anything that violates them is a bug.
+These hold for every federation in the program. Anything that violates them is a
+bug.
 
 1. **Operator-held keys.** OC the company has zero credentials capable of
    signing as you. Browser IDB or kit OS keychain are equivalent storage — both
@@ -74,17 +84,20 @@ These are non-negotiable. Anything that violates them is a bug.
 3. **Public commitments.** Charter ratifications, incidents, attestations are
    operator-signed and publicly verifiable offline. OC cannot forge a row in any
    of these timelines.
-4. **No custody.** Operator wallets, federation funds, and user balances are
-   held by the federation guardians collectively — never by OC the company. OC
-   at most participates as one guardian among several on federations where it
-   operates a node; on most federations OC is not a guardian.
+4. **Funds sit with the federation.** In a federation, the guardians hold the
+   bitcoin collectively, and orangecheck's executor holds each user's claim on
+   it, as ecash it can spend, until it pays them out
+   ([ochk.app/custody](https://ochk.app/custody)). Today there are no guardian
+   seats: while the system is in testing, orangecheck holds every key that can
+   move funds, and the sats users earn.
 
 ## Sub-pages in this section
 
-- [Charter](/me/operator/charter) — the canonical text guardians ratify. Hash +
-  version live on each federation's record.
-- [Runbook](/me/operator/runbook) — how to actually run the guardian binary on
-  hardware you control. Bypass-parity reference for the portal's RunbookCard.
+- [Charter](/me/operator/charter) — how guardians ratify a charter. The
+  canonical oc-me-v1 text is at [/federation/oc-me-v1](/federation/oc-me-v1);
+  hash and version live on each federation's record.
+- [Runbook](/me/operator/runbook) — how to run the guardian binary on hardware
+  you control.
 - [In-browser flow](/me/operator/in-browser) — the browser-key path that lets
   the entire lifecycle happen without a CLI. Covers IDB persistence, mnemonic
   backup, envelope canonicalization, federation-side equivalence.

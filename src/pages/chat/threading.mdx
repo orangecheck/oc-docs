@@ -90,11 +90,12 @@ tamper-evident**:
 ### The inline v0 profile
 
 The bytes ride **in the ciphertext**, so the file size is bounded to what fits a
-gift-wrap event. The reference client caps inline attachments at **~100 KiB
-raw**. The recipient validates the parsed `attachment` shape and size
-**defensively** even though the AEAD already authenticates it — untrusted MIME
-on a `data:`/blob URL is an [XSS class](/chat/security) the client sanitizes to
-a raster allowlist before rendering.
+gift-wrap event. The reference client sends DM attachments of at most **32 KiB
+raw** and renders none over **~100 KiB**. The recipient validates the parsed
+`attachment` shape and size **defensively** even though the AEAD already
+authenticates it — untrusted MIME on a `data:`/blob URL is an
+[XSS class](/chat/security) the client sanitizes to a raster allowlist before
+rendering.
 
 ### The blob-store upgrade (not v0)
 

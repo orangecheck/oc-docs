@@ -69,10 +69,10 @@ for any of it.
 ## Decentralized delivery, when you want it
 
 Nostr provides auto-delivery as an opt-in layer: publish a device record once,
-and anyone can look you up and gift-wrap a message to your inbox. Four public
-relays by default; self-host or swap at any time. The trust anchor is still
-BIP-322 verification done client-side — a malicious relay can't forge a device
-record or impersonate a sender.
+and anyone can look you up and gift-wrap a message to your inbox. Five relays by
+default (four public ones and relay.ochk.io); self-host or swap at any time. The
+trust anchor is still BIP-322 verification done client-side — a malicious relay
+can't forge a device record or impersonate a sender.
 
 Don't want auto-delivery? Don't publish a device record. Keep the app purely in
 its one-shot `.lock`-file mode. Same crypto either way.
@@ -91,10 +91,12 @@ old one — no transactions, no fees, no delay.
 
 ## Sybil-resistant inboxes (opt-in)
 
-Post your address publicly without drowning in spam. The orangecheck gate on
-every thread can require senders to hold a minimum on-chain stake ("≥ 100k sats
-for ≥ 30 days") before you accept their first message. Real skin in the game, no
-captchas, no centralized anti-spam provider.
+Post your address publicly without drowning in spam. An app built on Lock can
+call `@orangecheck/sdk`'s `check` to require senders to hold a minimum on-chain
+stake ("≥ 100k sats for ≥ 30 days") before it opens their first message
+([layered with orangecheck](/lock/quickstart#layered-with-orangecheck)). Real
+skin in the game, no captchas, no centralized anti-spam provider. lock.ochk.io
+itself does not offer this gate.
 
 ## Every message is a sealable vault
 

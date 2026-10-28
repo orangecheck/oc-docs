@@ -9,15 +9,24 @@ Common questions across all the sibling protocols.
 
 ## Do coins move?
 
-No. Nothing in the orangecheck ecosystem broadcasts Bitcoin transactions. Every
-protocol signs messages; chain state is **read, not written**. Your funds never
-leave your wallet.
+Not for a proof. No protocol broadcasts Bitcoin transactions: every protocol
+signs messages, and chain state is **read, not written**. Your funds never leave
+your wallet to make a proof.
+
+ochk.app is different. While it is in testing, orangecheck holds the sats apps
+pay you there and is the party that moves them.
+[ochk.app/custody](https://ochk.app/custody) says who holds what, read live.
 
 ## Is this custodial?
 
-No. No protocol, no reference implementation, and no hosted service in the
-ecosystem requires a third party to hold funds, keys, or signatures. The signed
-message + signature is the artifact; you share it directly.
+The protocols are not. No protocol and no reference implementation requires a
+third party to hold funds, keys, or signatures. The signed message + signature
+is the artifact; you share it directly.
+
+ochk.app is the exception while it is in testing. orangecheck holds what you
+earn there, and holds the sign-in key of an account made with email, Google or
+GitHub. No federation is bound yet; see
+[ochk.app/custody](https://ochk.app/custody) and the [charter](/charter).
 
 ## Which wallets work?
 
@@ -138,10 +147,13 @@ prioritizes offline-verifiability and transparency over privacy.
 ## Why is the protocol header frozen at v0?
 
 Any change to the canonical message format — including adding a version number —
-breaks every existing signature. We picked `orangecheck` / `oc-lock` /
-`oc-stamp` / `oc-vote` / `oc-agent` / `oc-pledge` as the literal headers so the
-lack of a version number is intentional. v1 will use a different header (e.g.,
-`orangecheck-v1`) and coexist with v0 until deprecated.
+breaks every existing signature. OC Attest's header is the literal
+`orangecheck`, with no version number, on purpose: a new format needs a
+different header (e.g., `orangecheck-v1`) and would coexist with this one. The
+other protocols carry a version in their header: `oc-stamp:v1`,
+`oc-agent:delegation:v1`, `oc-pledge/v1`, `oc-lock:device-bind:v3`, and
+`oc-vote/v0/commit` for a vote commit. See
+[canonical message](/ecosystem/canonical-message).
 
 ## What's the difference between OC Stamp and OC Pledge?
 

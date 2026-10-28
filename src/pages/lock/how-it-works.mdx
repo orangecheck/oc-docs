@@ -190,9 +190,10 @@ On success, the recipient gets the plaintext + a verified sender address.
 Each envelope has a fresh `(eph_sk, eph_pk)` pair. The sender discards `eph_sk`
 after sealing. Consequences:
 
-- **Forward secrecy between envelopes.** If the sender's device is later
-  compromised, old envelopes they sent can't be decrypted (the ephemeral secrets
-  are gone).
+- **Ephemeral secrets are discarded.** The sender's ephemeral secrets are gone,
+  so they cannot reopen what was sealed to others. lock.ochk.io and chat.ochk.io
+  also seal every send to the sender's own devices, though, so a compromised
+  sender device key opens the messages it sent.
 - **No sender-key rotation needed.** The sender's Bitcoin address is the
   long-lived identifier; the X25519 key is throwaway.
 

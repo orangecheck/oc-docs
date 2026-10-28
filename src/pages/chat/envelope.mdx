@@ -1,20 +1,38 @@
 export const metadata = {
     title: 'Envelope & content addressing · OC Chat',
     description:
-        'The two envelope kinds OC Chat adds to OC Lock, and the one cryptographic rule that differs — the recipient-exclusion id/AAD rule that lets a held envelope be re-keyed after the fact without breaking the signature or the ciphertext tag.',
+        'The v0 wire chat.ochk.io sends, the envelope kinds OC Chat defines as its upgrade target, and the one cryptographic rule that differs — the recipient-exclusion id/AAD rule that lets a held envelope be re-keyed after the fact without breaking the signature or the ciphertext tag.',
 };
 
 # Envelope & content addressing
 
 OC Chat does **not** restate OC Lock's cryptography — read the
-[OC Lock envelope reference](/lock/envelope) first. OC Chat adds two `kind`
-values and **one** cryptographic rule that differs from base OC Lock. That rule
-is load-bearing, so this page covers it precisely.
+[OC Lock envelope reference](/lock/envelope) first. The spec's upgrade target
+adds two `kind` values and **one** cryptographic rule that differs from base OC
+Lock. v0, which is what chat.ochk.io sends, uses neither: it rides base OC Lock
+envelopes, as the next section says.
+
+## The v0 wire (what chat.ochk.io sends)
+
+`@orangecheck/lock-core` has no chat kinds, so a v0 message goes out as a base
+OC Lock envelope:
+
+- `kind: "identity"` with `hint: "oc-chat/v1"`.
+- Base OC Lock content addressing: `recipients[]` is inside both the `id` and
+  the AAD, so nothing is re-wrapped after sealing.
+- `sig.value` is empty; no wallet signs a message. The gift-wrap carries
+  `{v: 1, env, sig, pk}`, where `sig` is a BIP-340 signature by the sending
+  device's inbox key over the envelope `id`. The receiver checks that `pk` is
+  bound to `from.address`: by a BIP-322 device record for a Bitcoin address, or
+  by ochk.io's vouch for a `did:oc`.
+- `postage` and `seal` ride inside the encrypted body, so the AEAD and the
+  signed `id` commit them. The seal is the in-ciphertext drand-tlock profile
+  ([Seal-til-block](/chat/seal)), which needs no re-wrap.
 
 ## The envelope kinds
 
-OC Chat introduces new values for the OC Lock envelope `kind` field, alongside
-the existing `"identity"` and `"payment"`:
+The spec's upgrade target introduces new values for the OC Lock envelope `kind`
+field, alongside the existing `"identity"` and `"payment"`:
 
 | `kind`           | Mode                                  | New fields                               |
 | ---------------- | ------------------------------------- | ---------------------------------------- |
@@ -34,7 +52,10 @@ is OC Lock's gift-wrap, unchanged.
 
 ## The recipient-exclusion rule (NORMATIVE)
 
-This is the one cryptographic rule that differs from base OC Lock.
+This is the one cryptographic rule that differs from base OC Lock. It is
+normative for the upgrade target and is **not the v0 wire**: v0 re-wraps
+nothing, so it keeps base OC Lock addressing. An implementation that computes
+`chat_aad` cannot decrypt a v0 envelope, and the reverse holds too.
 
 In base OC Lock, both the envelope `id` and the AEAD AAD **include** the
 `recipients[]` identities. That makes the envelope **un-re-keyable**: changing

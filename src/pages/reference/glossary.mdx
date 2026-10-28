@@ -42,8 +42,8 @@ by design — see [canonical message](/ecosystem/canonical-message).
 
 ## CAP (OC Vote)
 
-`cap_sats` / `cap_days` — per-UTXO upper bounds in the `sats_days` weight mode.
-Prevents a single massive or ancient UTXO from dominating a tally.
+`cap_days` — the per-UTXO cap on age in days in the `sats_days` weight mode,
+required there. Prevents a single ancient UTXO from dominating a tally.
 
 ## Chain analysis
 
@@ -60,8 +60,9 @@ with one.
 
 ## Commit (OC Vote secret mode)
 
-`HMAC(secret, pollId || optionIndex)` — a voter's masked choice during the
-commit phase. Revealed in the reveal phase so the poll's tally can count it.
+`hex(SHA-256("oc-vote/v0/commit\npoll_id: <hex>\nvoter: <addr>\noption: <id>\n"))`
+— a voter's masked choice during the commit phase. Revealed in the reveal phase
+so the poll's tally can count it.
 
 ## Conformance vector
 
@@ -72,9 +73,10 @@ to pass them on every CI run. See [conformance vectors](/ecosystem/conformance).
 ## CSRF
 
 Cross-Site Request Forgery — when a malicious site tricks a logged-in user's
-browser into sending a request to a different site. Defended via `SameSite=Lax`
-session cookies plus a `Sec-Fetch-Site` / `Origin` check on state-changing auth
-endpoints.
+browser into sending a request to a different site. The family session cookie is
+`SameSite=None`, so the defence is a `Sec-Fetch-Site` / `Origin` check: a cookie
+session on a state-changing request is refused unless it comes from the same
+origin or a listed family site.
 
 ## `days_unspent`
 
@@ -164,7 +166,8 @@ declared `bond:` value if present.
 ## Scheme
 
 The signature scheme used: `"bip322"` or `"legacy"`. BIP-322 is preferred.
-`legacy` is accepted only for P2PKH addresses.
+`legacy` (BIP-137) is accepted for P2PKH, P2SH-P2WPKH, P2WPKH and P2TR
+addresses; P2PKH can sign only with `legacy`.
 
 ## Subject
 

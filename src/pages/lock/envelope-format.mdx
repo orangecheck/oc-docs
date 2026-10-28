@@ -9,100 +9,112 @@ export const metadata = {
 OC Lock envelopes are JSON. They canonicalize via
 [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) (JSON Canonicalization
 Scheme) with one spec-specific rule: the `recipients[]` array is sorted by
-`device_id` lexicographically.
+`device_id` lexicographically. The normative text is
+[§4 of the spec](/lock/spec).
 
 ## Shape
 
 ```json
 {
-    "id": "<32-byte envelope id, base64url>",
-    "version": "oc-lock/v0",
-    "sender": {
-        "address": "bc1qalice...",
-        "scheme": "bip322"
+    "v": 2,
+    "kind": "identity",
+    "id": "<32-byte envelope id, hex>",
+    "alg": { "kem": "x25519", "aead": "aes-256-gcm", "kdf": "hkdf-sha256" },
+    "from": {
+        "address": "bc1qalice..."
     },
-    "ephemeral_pk": "<32-byte X25519 public key, base64url>",
     "recipients": [
         {
             "address": "bc1qbob...",
-            "device_id": "<16 bytes, hex>",
-            "wrapped_key": "<AES-GCM(sym_key, nonce, ...), base64url>"
-        },
-        {
-            "address": "bc1qcarol...",
-            "device_id": "<16 bytes, hex>",
-            "wrapped_key": "<...>"
+            "device_id": "<recipient device id>",
+            "device_pk": "<X25519 public key, hex>",
+            "eph_pk": "<ephemeral X25519 public key, hex>",
+            "wrapped_key": "<AES-GCM(kek, nonce_kek, content_key), base64url>",
+            "nonce_kek": "<12-byte nonce, hex>"
         }
     ],
-    "ciphertext": "<AES-GCM ciphertext + auth tag, base64url>",
-    "nonce": "<12-byte AES-GCM nonce, base64url>",
-    "aad_hash": "<sha256 of any associated-data string, hex>",
-    "issued_at": "2026-04-24T06:47:29.977Z",
-    "sig": "<BIP-322 base64 signature over the canonicalized envelope>"
+    "ciphertext": "<AES-GCM(content_key, nonce_ct, payload) + tag, base64url>",
+    "nonce_ct": "<12-byte nonce, hex>",
+    "hint": "<optional plaintext hint, <= 200 bytes>",
+    "created_at": "2026-04-24T06:47:29.977Z",
+    "expires_at": null,
+    "payment": null,
+    "sig": {
+        "alg": "bip322",
+        "pubkey": "bc1qalice...",
+        "value": "<BIP-322 signature over id, base64>"
+    }
 }
 ```
 
 ## Canonicalization
 
-The `sig` field is BIP-322 over the RFC-8785 canonical bytes of the envelope
-**with `sig` emptied** (set to `""`). Canonicalization:
+Two hashes come from the canonical bytes:
 
-1. Strip the `sig` field (treat as `""`).
-2. Sort `recipients[]` by `device_id` lexicographically.
-3. Apply RFC-8785 to the resulting object.
-4. SHA-256 the bytes; that's the envelope `id`.
-5. BIP-322-sign the canonical bytes with the sender's Bitcoin address.
+1. **The AAD.** Set `id`, `ciphertext`, `sig.value` and every
+   `recipients[*].wrapped_key` to `""`, sort `recipients[]` by `device_id`,
+   apply RFC 8785, append LF, and SHA-256 the bytes. The payload is encrypted
+   under this 32-byte digest as AES-GCM associated data.
+2. **The `id`.** With the ciphertext in place, set `id` and `sig.value` to `""`,
+   canonicalize the same way, and SHA-256 the bytes. Hex-encode the digest: that
+   is the envelope `id`.
 
-Re-insert the signature before serializing for transport.
+The sender BIP-322-signs the `id` string with `from.address` and puts the result
+in `sig.value`.
 
 ## Field semantics
 
-| Field            | Why                                                                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `id`             | Content-addressed identifier. Used as the AEAD nonce salt and the HKDF info string's seed.                                |
-| `version`        | `oc-lock/v0` — any change in field order or canonicalization rule requires a new version literal.                         |
-| `sender.address` | The Bitcoin address that signed the envelope via BIP-322.                                                                 |
-| `sender.scheme`  | `bip322` or `legacy` — only `bip322` is accepted in v0.                                                                   |
-| `ephemeral_pk`   | 32-byte X25519 public key, freshly generated for this envelope. The private key is discarded after sealing.               |
-| `recipients[]`   | Each recipient gets a `wrapped_key` — the symmetric AES key encrypted to their device. Sorted by `device_id`.             |
-| `ciphertext`     | AES-256-GCM over the plaintext with associated-data `id` and the per-envelope nonce.                                      |
-| `nonce`          | 12-byte AES-GCM nonce. Fresh per envelope.                                                                                |
-| `aad_hash`       | SHA-256 of any plaintext "associated data" a sender wants to commit to (e.g., a subject line). Optional; empty if unused. |
-| `issued_at`      | ISO 8601 millisecond timestamp. Used for replay-window checks.                                                            |
-| `sig`            | BIP-322 signature binding the envelope to the sender's Bitcoin address.                                                   |
+| Field          | Why                                                                                                             |
+| -------------- | --------------------------------------------------------------------------------------------------------------- |
+| `v`            | `2`. Any change to the shape or canonicalization rule requires a new version.                                   |
+| `kind`         | `identity` (sealed to device keys) or `payment` (sealed to a named relay, released on payment).                 |
+| `id`           | Content-addressed identifier: SHA-256 of the canonical envelope with `id` and `sig.value` empty, hex.           |
+| `alg`          | The fixed suite: X25519, AES-256-GCM, HKDF-SHA256.                                                              |
+| `from.address` | The sender's Bitcoin address. Optional `attestation_id` names an OC attestation.                                |
+| `recipients[]` | One entry per recipient device, each with its own ephemeral key and wrapped content key. Sorted by `device_id`. |
+| `ciphertext`   | AES-256-GCM over the payload with the content key, `nonce_ct`, and the AAD above.                               |
+| `nonce_ct`     | 12-byte nonce for the payload. Also the HKDF salt for every key-encryption key.                                 |
+| `hint`         | Optional plaintext, up to 200 bytes. Visible to anyone holding the envelope.                                    |
+| `created_at`   | ISO 8601 UTC time of sealing.                                                                                   |
+| `expires_at`   | ISO 8601 UTC, or `null`.                                                                                        |
+| `payment`      | `null` in identity mode; the amount, address, confirmations and relay in payment mode.                          |
+| `sig`          | BIP-322 signature over `id` by the sender's address. Empty when the sender did not sign.                        |
 
 ## Validation checklist
 
 A recipient validating an envelope MUST:
 
-1. Check `version === "oc-lock/v0"`. Reject other versions.
-2. Canonicalize the envelope (strip `sig`, sort recipients, RFC-8785).
-3. Verify `id === base64url(sha256(canonical_bytes))`.
-4. Verify the BIP-322 signature over the canonical bytes against
-   `sender.address`.
+1. Check `v === 2` and a known `kind`. Reject anything else.
+2. Reject an envelope whose `expires_at` has passed.
+3. Recompute the `id` (canonicalize with `id` and `sig.value` empty, SHA-256)
+   and reject a mismatch.
+4. Check `sig.pubkey === from.address` and verify `sig.value` as a BIP-322
+   signature over `id` by that address. (A client MAY skip this for its own
+   self-seals.)
 5. Find the recipient entry whose `device_id` matches the local device.
-6. Recompute the HKDF symmetric key from `X25519(local_device_sk, ephemeral_pk)`
-   and `id`.
-7. Decrypt `wrapped_key` with AES-GCM to recover the envelope's symmetric key.
-8. Decrypt `ciphertext` with the envelope's symmetric key, `nonce`, and AAD
-   `id`.
+6. Derive
+   `kek = HKDF(X25519(device_sk, eph_pk), salt = nonce_ct, info = "oc-lock/v2/kek:" || device_id)`.
+7. Decrypt `wrapped_key` with `kek`, `nonce_kek` and AAD `device_id` to recover
+   the content key.
+8. Decrypt `ciphertext` with the content key, `nonce_ct`, and the AAD above.
 
 Skipping any step breaks the security model.
 
 ## AAD and subject lines
 
-The `aad_hash` field commits to associated data that the sender wants bound to
-the ciphertext. Example: a subject line that shows in an inbox UI. The sender
-passes the plaintext subject alongside the ciphertext; the recipient recomputes
-its SHA-256 and checks against `aad_hash`. If the subject has been tampered
-with, decryption fails with a GCM auth-tag mismatch.
+The AAD commits the payload to every plaintext field except the ones it replaces
+with `""`: `v`, `kind`, `alg`, `from`, each recipient's identity and ephemeral
+key, `nonce_ct`, `hint`, `created_at`, `expires_at` and `payment`. A sender that
+wants a subject line visible before decryption puts it in `hint`. If anyone
+changes the hint, or any other committed field, decryption fails with a GCM
+auth-tag mismatch, and the `id` no longer matches the signature.
 
 ## Canonical-bytes test vectors
 
-`oc-lock-protocol/conformance/` ships fixtures for the canonicalization rule —
-given a JSON object, what are the canonical bytes? The reference impl in
-`@orangecheck/lock-core` passes those vectors on every CI push. See
-[conformance vectors](/ecosystem/conformance).
+[`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)
+ships envelope fixtures (`v01-minimal` to `v04-with-hint`) and device-binding
+fixtures. The reference impl in `@orangecheck/lock-core` passes those vectors on
+every CI push. See [conformance vectors](/ecosystem/conformance).
 
 ## See also
 

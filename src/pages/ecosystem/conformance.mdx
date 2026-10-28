@@ -7,9 +7,10 @@ export const metadata = {
 # Conformance vectors
 
 Every sibling protocol ships **normative test vectors** in its `oc-*-protocol`
-repo. The reference implementations (TypeScript + Python) vendor those vectors
-into their test suites and run them on every CI push. Any drift between the spec
-and the implementations is a CI failure.
+repo. The reference implementations (TypeScript + Python) run those vectors on
+every CI push: the OC Attest SDKs vendor a copy, and the other cores read the
+spec repo's `test-vectors/` directly. Any drift between the spec and the
+implementations is a CI failure.
 
 This page describes the pattern. Per-protocol vector details live in the
 protocol's own repo.
@@ -32,43 +33,46 @@ OC Attest, the progenitor spec, additionally mirrors them under
 `conformance/vectors/` for backward compatibility — both directories contain the
 same files.
 
-| Protocol  | Spec repo path                                                                                                 | # vectors          |
-| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------ |
-| OC Attest | [`oc-attest-protocol/test-vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/test-vectors) | 23 (`tv01`–`tv23`) |
-| OC Lock   | [`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)     | 4 (`v01`–`v04`)    |
-| OC Stamp  | [`oc-stamp-protocol/test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors)   | 5 (`v01`–`v05`)    |
-| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)     | 16 (`v01`–`v16`)   |
-| OC Agent  | [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors)   | 5 (`v01`–`v05`)    |
-| OC Pledge | [`oc-pledge-protocol/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors) | 28 (`v01`–`v28`)   |
+| Protocol  | Spec repo path                                                                                                 | # vectors                               |
+| --------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| OC Attest | [`oc-attest-protocol/test-vectors/`](https://github.com/orangecheck/oc-attest-protocol/tree/main/test-vectors) | 29 (`tv01`–`tv29`)                      |
+| OC Lock   | [`oc-lock-protocol/test-vectors/`](https://github.com/orangecheck/oc-lock-protocol/tree/main/test-vectors)     | 4 (`v01`–`v04`), plus `device-binding/` |
+| OC Stamp  | [`oc-stamp-protocol/test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors)   | 9 (`v01`–`v09`)                         |
+| OC Vote   | [`oc-vote-protocol/test-vectors/`](https://github.com/orangecheck/oc-vote-protocol/tree/main/test-vectors)     | 18 (`v01`–`v18`)                        |
+| OC Agent  | [`oc-agent-protocol/test-vectors/`](https://github.com/orangecheck/oc-agent-protocol/tree/main/test-vectors)   | 66 (`v01`–`v66`)                        |
+| OC Pledge | [`oc-pledge-protocol/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors) | 46 (`v01`–`v46`)                        |
 
-Each protocol's reference core (`@orangecheck/<verb>-core`) vendors the matching
-`test-vectors/` directory verbatim and runs every vector on each CI push.
+The OC Attest SDKs vendor `conformance/vectors/` verbatim
+(`sdk/src/__tests__/vectors/` and `sdk-py/tests/vectors/`). Each other reference
+core (`@orangecheck/<verb>-core`) checks out its spec repo in CI and reads
+`test-vectors/` from it (`OC_<VERB>_VECTORS_DIR`, or a sibling checkout
+locally), so it keeps no copy. Every vector runs on each CI push.
 
 ## Vector categories (OC Attest example)
 
-The 23 OC Attest vectors are organized by test category:
+The 29 OC Attest vectors are organized by test category:
 
-| Category            | Count | What they pin                                                 |
-| ------------------- | ----- | ------------------------------------------------------------- |
-| `canonical_message` | 9     | Byte-exact canonical-message output for a given input set     |
-| `identities_format` | 1     | Identity-list sort order and escape rules                     |
-| `attestation_id`    | 2     | `sha256(canonical_bytes)` matches                             |
-| `score_v0`          | 4     | Scoring formula output (`tv10`–`tv13`)                        |
-| `reject`            | 4     | MUST-reject cases — malformed identifiers, wrong header, etc. |
-| `bip322_signature`  | 3     | Real BIP-322 signatures against fixed addresses               |
+| Category            | Count | What they pin                                                            |
+| ------------------- | ----- | ------------------------------------------------------------------------ |
+| `canonical_message` | 7     | Byte-exact canonical-message output for a given input set                |
+| `identities_format` | 3     | Identity-list sort order and escape rules                                |
+| `attestation_id`    | 2     | `sha256(canonical_bytes)` matches                                        |
+| `score_v0`          | 4     | Scoring formula output (`tv10`–`tv13`)                                   |
+| `reject`            | 4     | MUST-reject cases — malformed identifiers, wrong header, etc.            |
+| `bip322_signature`  | 3     | Real BIP-322 signatures against fixed addresses                          |
+| `bond_*`            | 6     | The bond extension: message, signature (2), nullifier, floors, extension |
 
 The categories exist so a developer debugging a specific failure can skim to the
-relevant block rather than re-reading all 23.
+relevant block rather than re-reading all 29.
 
 ## How the CI gate works
 
 Each reference SDK has a `test:conformance` target (or a dedicated test file)
-that loads the vendored vector JSON and asserts every expected output. A typical
-flow:
+that loads the vector JSON and asserts every expected output. A typical flow:
 
 ```bash
-cd packages/sdk      && yarn test   # TS passes all 23 vectors
-cd packages/sdk-py   && pytest      # Python passes all 23 vectors
+cd oc-packages/sdk      && yarn test   # TS passes all 29 vectors
+cd oc-packages/sdk-py   && pytest      # Python passes all 29 vectors
 ```
 
 If either fails, the PR is blocked. If both pass, byte-identity between the two
@@ -76,9 +80,9 @@ implementations is proven (modulo floating-point edge cases in `score_v0`, which
 are handled with a tolerance of 0.01).
 
 Cross-impl drift is prevented by a **third** CI job in `oc-packages`: after both
-suites pass, a diff job fetches `oc-protocol/main/conformance/` and compares it
-against what's vendored in each SDK. If the vendored copy is out of date, CI
-fails and the SDK must re-vendor.
+suites pass, a diff job fetches `oc-attest-protocol`'s `conformance/vectors/` on
+main and compares it against what's vendored in each SDK. If the vendored copy
+is out of date, CI fails and the SDK must re-vendor.
 
 ## Adding a vector
 
@@ -90,10 +94,12 @@ For any sibling protocol, the flow is the same:
    calculation.
 2. Update the spec's `test-vectors/index.json` (or `README.md` listing) so
    tooling can discover the new file.
-3. Re-vendor the directory into the matching reference core (`oc-packages/
-    <verb>-core/src/__tests__/vectors/`) and run the test suite locally.
-4. The new vector must pass before the spec PR merges; the core PR re-vendoring
-   the spec's `test-vectors/` is paired with the spec PR.
+3. Run the matching reference core's test suite locally against the new vector.
+   For OC Attest, re-vendor `conformance/vectors/` into
+   `oc-packages/sdk/src/__tests__/vectors/` and `sdk-py/tests/vectors/` first;
+   the other cores read the spec repo directly.
+4. The new vector must pass before the spec PR merges; for OC Attest, the SDK PR
+   that re-vendors the vectors is paired with the spec PR.
 
 Specs that add a new MUST-reject case should include a vector in the spec's
 reject category so the behavior is pinned.
@@ -101,5 +107,4 @@ reject category so the behavior is pinned.
 ## See also
 
 - [Canonical message](/ecosystem/canonical-message) — what the bytes look like
-- [SDKs at a glance](/sdk) — the per-protocol cores that vendor and run these
-  vectors
+- [SDKs at a glance](/sdk) — the per-protocol cores that run these vectors

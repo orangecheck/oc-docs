@@ -10,8 +10,10 @@ OC Vault seals entries with [OC Lock](/lock/)'s primitives (X25519, HKDF-SHA256,
 AES-256-GCM). This page describes how vault entries are sealed, how cloud sync
 stays metadata-blind, how a new device gets the key, what the portable export
 contains, and how an entry leaves as a signed `.lock` file.
-[`@orangecheck/vault-core`](/sdk/vault-core/README) implements this format for
-the CLI, the SDK and the extension.
+[`@orangecheck/vault-core`](/sdk/vault-core/README) on npm implements the entry
+record, the cloud blob, the export and unwrapping the vault key, for the CLI,
+the SDK and the extension. Wrapping a key, team keys, device grants and the
+encrypted backup file are implemented in vault.ochk.io.
 
 ## Why not OC Lock envelopes
 
@@ -35,7 +37,9 @@ random bytes. It is the AES-256-GCM key for every entry.
 - A device being linked can also receive the key from one that holds it, sealed
   to its X25519 device key (see below).
 - A blob that names scrypt factors outside N 2^14–2^20, r ≤ 16, p ≤ 4 is refused
-  before any key is derived, by the server and by every client.
+  before any key is derived, by the server, vault.ochk.io, the extension and
+  `@orangecheck/vault-core` from 0.3.1. The published `oc-vault` CLI and the
+  GitHub Action install an earlier vault-core that does not check.
 
 Lose both the passphrase and the recovery code, with no encrypted backup file,
 and the entries are unrecoverable — by construction.
@@ -105,10 +109,12 @@ the others. A purge from the trash is the only hard delete.
 A team vault is a second, parallel vault sealed under a separate 32-byte **team
 key** rather than your personal vault key. Family Circle creates one team you
 own; the creating browser generates the team key locally, and **every new member
-receives it through an invite URL whose fragment (`#…`) carries the key**. URL
-fragments are never sent to a server, so vault.ochk.io holds the team key only
-wrapped under each member's personal vault key, as it holds the personal key
-only wrapped.
+receives it through an invite URL whose fragment (`#…`) carries the key**. A
+browser does not send the fragment when it opens the link, so vault.ochk.io
+holds the team key only wrapped under each member's personal vault key, as it
+holds the personal key only wrapped. An invite that vault.ochk.io emails for you
+is the exception: the full link, key included, passes through vault.ochk.io and
+its mail provider.
 
 Team entries reuse the same `packEntryForCloud` envelope as the personal
 double-encrypted blob, only with the team key in both layers. They are stored on
@@ -147,7 +153,7 @@ single JSON snapshot:
     "format": "oc-vault-export",
     "version": 1,
     "exported_at": "2026-05-15T…Z",
-    "identity": "did:oc:…",
+    "identity": "bc1q…", // the account's Bitcoin address, else its did:oc
     "entries": [
         /* VaultEntry records, ciphertext intact */
     ]
@@ -159,8 +165,9 @@ vault key. Anyone holding the key can decrypt them with
 [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) directly — the
 AES-256-GCM, b64url and JSON conventions are all documented and stable. The
 **encrypted backup** file carries the key too, sealed under a passphrase you
-choose (scrypt, then AES-256-GCM), so it restores on a new device with no
-server. If vault.ochk.io shut down tomorrow, both would still open.
+choose (scrypt, then AES-256-GCM), so it restores on a new device without the
+server's copy of the wrapped key. **Import** on vault.ochk.io restores it; no
+published package reads the backup file.
 
 ## Signed .lock export
 
@@ -292,7 +299,7 @@ TTL expiry (1 h / 24 h / 7 d).
 | Package                                               | Role                                                                                                                 |
 | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives.                                                   |
-| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: key wraps, entries, cloud blobs, export, TOTP.                                                     |
+| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: unwrapping the vault key, entries, cloud blobs, export, TOTP.                                      |
 | [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to; the Bitcoin tier's binding and revocation records. |
 | [`@orangecheck/lock-core`](/sdk/lock-core/README)     | `seal` and `unseal`: the signed `.lock` export.                                                                      |
 | [`@orangecheck/nostr-core`](/sdk/nostr-core/README)   | The five relays device records are read from and written to.                                                         |

@@ -137,12 +137,12 @@ delegations).
 }
 ```
 
-Published to Nostr **kind 30086** with `d`-tag prefix `oc-agent-sub:`. Since
-spec 1.5.0, publishers SHOULD add two `t` tags: the parent's id and the root
-delegation's id, as 64 lowercase hex (one tag when they are equal). The event
-also carries `parent`, `root`, `principal`, `agent`, `expires`, and one `scope`
-per granted scope, for people reading it. Tags sit on the Nostr event, outside
-the signed envelope, so they change no id.
+Published to Nostr **kind 30086** with `d`-tag prefix `oc-agent-sub:`.
+Publishers SHOULD add `t` tags for the parent's id and the root delegation's id,
+as 64 lowercase hex (one tag when they are equal), and for the principal's and
+the agent's address. The event also carries `parent`, `root`, `principal`,
+`agent`, `expires`, and one `scope` per granted scope, for people reading it.
+Tags sit on the Nostr event, outside the signed envelope, so they change no id.
 
 Relays index single-letter tags only, so `d` and `t` are the query keys:
 
@@ -152,8 +152,11 @@ Relays index single-letter tags only, so `d` and `t` are the query keys:
 - Under a delegation `D`: `{ kinds: [30086], '#t': ['<D id>'] }`. Keep direct
   children by `content.parent_id`; a deeper link matched by its root id counts
   only once its chain walks back to `D`.
+- Issued by or to an address: `{ kinds: [30086], '#t': ['<btc address>'] }`.
+  Keep a match only if its envelope's `principal.address` or `agent.address` is
+  that address.
 
-The `#t` query finds only sub-delegations published with the tags, so an empty
+The `#t` queries find only sub-delegations published with the tags, so an empty
 answer never proves there are none. A verifier still gets the chain it judges
 from whoever presents the action, or walks it link by link by id. `#parent`,
 `#root` and `#agent` filters are rejected by most relays.

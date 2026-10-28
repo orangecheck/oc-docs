@@ -25,7 +25,7 @@ Bitcoin-address-bound authorship + optional stake context on top.**
 1. SIGN     — canonical message → id
 2. SUBMIT   — POST <id bytes> to OTS calendar(s)
 3. PENDING  — calendar returns a commitment to its internal Merkle tree
-4. UPGRADE  — ~1h later, calendar anchors its root to a Bitcoin block
+4. UPGRADE  — hours later, calendar anchors its root to a Bitcoin block
 5. VERIFY   — parse proof, walk to block header, compare Merkle roots
 ```
 
@@ -181,8 +181,11 @@ The `stake` field is outside the `id` and the signature, so an aggregator could
 strip or change it. A verifier that cares about stake re-resolves the
 attestation and checks it was signed by `signer.address`.
 
-The reference aggregator at `stamp.ochk.io` runs this batching for convenience.
-A signer with their own Bitcoin node and OTS calendar has no need of an
+`stamp.ochk.io` runs no aggregator. Its `/api/ots` route forwards each id to
+alice, bob or finney as the browser sends it, because the calendars do not allow
+cross-origin requests; the verify page upgrades the proof in your browser when
+you open the stamp there later. Nothing batches, watches or republishes. A
+signer with their own Bitcoin node and OTS calendar has no need of an
 aggregator.
 
 ## Further reading

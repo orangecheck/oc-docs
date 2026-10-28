@@ -45,7 +45,7 @@ The signed attestation is a self-contained JSON blob:
         { "protocol": "nostr", "identifier": "npub1alice..." }
     ],
     "issued_at": "2026-04-24T06:47:29.977Z",
-    "verification_url": "https://ochk.io/a/a3f5b8c2..."
+    "verification_url": "https://attest.ochk.io/attest/a3f5b8c2..."
 }
 ```
 
@@ -91,11 +91,12 @@ curl "https://attest.ochk.io/api/check?addr=bc1q...&min_sats=100000&min_days=30"
 ```
 
 That's the whole API surface for most gates. The hosted verifier lives at
-`attest.ochk.io` — `ochk.io` is the auth host and serves no `/api/check`. It
-answers `Cache-Control: public, max-age=60` and rate-limits at 60 requests per
-minute per IP; self-hosted verifiers can tune both. See
+`attest.ochk.io`; `ochk.io/api/check` forwards there. It answers
+`Cache-Control: public, max-age=60` and rate-limits at 60 requests per minute
+per IP; when you run `check()` yourself, both are yours to set. See
 [Quickstart](/attest/quickstart) for the other endpoints and
-[Self-host the verifier](/attest/guides/self-hosting) to run it yourself.
+[Self-host the verifier](/attest/guides/self-hosting) to run the same checks on
+your own server.
 
 ## Revocation
 
@@ -104,8 +105,9 @@ There is **no explicit revocation event**. Two paths:
 - **Implicit** — spend the bonded UTXOs. Next verification reports `bond_zero`
   or `bond_insufficient`. Every consumer sees it within a block.
 - **Explicit replacement** — publish a new attestation at a fresh address, or a
-  new event with the same `d`-tag (which replaces the old event per kind-30078
-  semantics).
+  newer one for the same address. The `d`-tag is the attestation_id, so each
+  attestation is its own event; a lookup takes the one whose signed `issued_at`
+  is newest.
 
 The chain state is authoritative. Nothing else needs to be.
 

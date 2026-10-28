@@ -22,7 +22,7 @@ flowchart TB
     M -->|"H(bytes) = id"| ID["envelope id"]
     ID -->|submit| OTS[("OTS calendar(s)")]
     OTS -->|pending proof| P["pending"]
-    P -.~1h later.-> CONF["confirmed<br/>(Merkle path<br/>to block header)"]
+    P -.hours later.-> CONF["confirmed<br/>(Merkle path<br/>to block header)"]
     M --> ENV[(".stamp envelope<br/>JSON, self-contained")]
     CONF -->|upgrade ots.proof| ENV
     ENV --> BC["Bitcoin block<br/>anchor"]
@@ -50,9 +50,9 @@ Bitcoin headers.
    id to the three default OTS calendars (alice, bob, finney); two must answer.
 6. Client assembles the envelope: v, kind, id, content (hash + length + mime +
    ref), signer, signed_at, stake (null), ots (pending), sig.
-7. About an hour later, an OTS calendar anchors the root to a Bitcoin block. The
-   upgraded proof contains the Merkle path from id up to the block header. Any
-   client can fetch and replace `ots.proof`.
+7. Usually within a few hours, an OTS calendar anchors the root to a Bitcoin
+   block. The upgraded proof contains the Merkle path from id up to the block
+   header. Any client can fetch and replace `ots.proof`.
 8. Alice ships `blogpost.md.stamp` alongside her post.
 
 A year later, Bob reads the post offline on a plane. He loads the `.stamp`, his

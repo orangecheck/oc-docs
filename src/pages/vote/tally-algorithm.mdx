@@ -247,7 +247,7 @@ ballot from another tally, whoever publishes it.
 
 ## Conformance
 
-The 16 canonical vectors in `oc-vote-protocol/test-vectors/`. In anchored-poll
+The 18 canonical vectors in `oc-vote-protocol/test-vectors/`. In anchored-poll
 vectors, `inputs.chain` gives the chain tip and `H_close`, and `inputs.anchors`
 gives each anchored ballot's verified anchor height; a ballot not listed has no
 anchor.
@@ -270,10 +270,12 @@ anchor.
 | `v14`  | Anchored poll still open — `H_close` is `none`, so `provisional` with `close_height: null`                         |
 | `v15`  | `"deadline"` snapshot with 4 confirmations — `deferred` with `E_REORG`, still carrying `basis` and `close_height`  |
 | `v16`  | `counted` order — each voter's standing ballot id, lowercase hex ascending; a superseded ballot is not listed      |
+| `v17`  | `v04` with the later ballot nested 32 levels deep, the most allowed — it counts                                    |
+| `v18`  | `v04` with the later ballot nested 33 levels deep — malformed, not counted; the earlier ballot stands              |
 
 The `@orangecheck/vote-core` suite loads this directory and checks every vector
 byte for byte. A reimplementation in another language is conformant iff it
-passes all 16.
+passes all 18.
 
 ## Edge cases
 

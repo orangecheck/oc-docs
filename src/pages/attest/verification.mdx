@@ -60,9 +60,14 @@ retry across multiple explorers if the primary times out.
 
 - **`sats_bonded`** — sum of confirmed UTXO values, unless the canonical
   message's extensions block includes `bond: <integer>`, in which case use
-  exactly that value (capped at the confirmed balance).
-- **`days_unspent`** — floor((now - earliest_confirm_time) / 86400) over the
-  bonded set.
+  exactly that value. A bond above the confirmed balance fails with
+  `bond_insufficient`, and a `bond:` value that is not a valid integer fails
+  with `bond_malformed`; both set `ok: false`.
+- **`days_unspent`** — without a `bond:` line, floor((now -
+  earliest_confirm_time) / 86400) over the confirmed UTXOs. With a `bond:` line,
+  or when the caller asks for an amount (`check()` with `min_sats`), the
+  confirmed UTXOs are taken oldest first until they cover that amount, and the
+  age is that of the youngest UTXO in the set.
 - **`score`** — `score_v0` applied to the two values above.
 
 Emit `bond_confirmed` if metrics computed cleanly, or `bond_zero` /
@@ -81,10 +86,10 @@ If the caller passed `min_sats` and/or `min_days`, compare them against the
 computed metrics. Add `below_min_sats` / `below_min_days` to the codes list on
 failure.
 
-Final `ok` is `true` iff **every signature code is a success AND all thresholds
-are met**. Bond observations (`bond_zero`, `bond_pending`) do NOT set
-`ok: false` on their own — they're observations, not failures. Policy layers
-decide what the observations mean.
+Final `ok` is `true` iff **the signature verifies, the bond is confirmed
+(`bond_confirmed`) AND all thresholds are met**. `bond_zero` (no confirmed
+UTXOs, with `bond_pending` added when unconfirmed ones exist) sets `ok: false`,
+as do `bond_insufficient` and `bond_malformed`.
 
 ## Output shape
 
@@ -92,7 +97,6 @@ decide what the observations mean.
 {
     "ok": true,
     "codes": ["sig_ok_bip322", "bond_confirmed"],
-    "address": "bc1qalice...",
     "attestation_id": "a3f5b8c2...",
     "identities": [{ "protocol": "github", "identifier": "alice" }],
     "metrics": {

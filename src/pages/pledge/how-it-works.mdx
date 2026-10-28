@@ -26,7 +26,7 @@ swearer: bc1qexampleaddress…
 proposition: I will publish my Q3 results by block 920000.
 resolution:
   mechanism: stamp_published
-  query: content_hash:sha256:7d…
+  query: stamp(content_hash=sha256:7d…, signer=bc1qexampleaddress…)
 resolves_at:
   block: 920000
 expires_at: 2026-08-01T00:00:00Z
@@ -58,15 +58,15 @@ pledge_id := sha256(canonical_message_bytes)   // hex-lowercase
 Fixed at v1.0. No extensions without working integrator code demonstrating the
 need.
 
-| Mechanism            | Resolution outcome is computed from…                   | Determines outcome offline? |
-| -------------------- | ------------------------------------------------------ | --------------------------- |
-| `chain_state`        | Bitcoin RPC against a small canonical DSL              | yes                         |
-| `counterparty_signs` | a BIP-322 signature from the named counterparty        | no — needs resolver         |
-| `nostr_event_exists` | a Nostr query against ≥ 2 relays from the default set  | yes                         |
-| `stamp_published`    | a lookup of a specific OC Stamp envelope by hash or id | yes                         |
-| `http_get_hash`      | SHA-256 of the response body of a specified URL        | yes                         |
-| `dns_record`         | a DoH query for a specified record from a resolver set | yes                         |
-| `vote_resolves`      | the tally of a named OC Vote poll above a threshold    | no — needs resolver         |
+| Mechanism            | Resolution outcome is computed from…                        | Determines outcome offline? |
+| -------------------- | ----------------------------------------------------------- | --------------------------- |
+| `chain_state`        | Bitcoin RPC against a small canonical DSL                   | yes                         |
+| `counterparty_signs` | a BIP-322 signature from the named counterparty             | no — needs resolver         |
+| `nostr_event_exists` | a Nostr query against ≥ 2 relays from the default set       | yes                         |
+| `stamp_published`    | a lookup of an OC Stamp envelope by content hash and signer | yes                         |
+| `http_get_hash`      | SHA-256 of the response body of a specified URL             | yes                         |
+| `dns_record`         | a DoH query for a specified record from a resolver set      | yes                         |
+| `vote_resolves`      | the tally of a named OC Vote poll above a threshold         | yes                         |
 
 Every mechanism produces a deterministic boolean outcome given fixed public
 state. The SDK refuses any combination that can't.
@@ -94,18 +94,21 @@ evidence:
   result: <canonical query output>
   witness: <chain_height + chain_hash | nostr_event_id | http_response_hash | dns_response | counterparty_sig | vote_poll_id>
 dispute_window_ends_at: <ISO-8601 UTC>
-sig: <base64 BIP-322 from resolved_by | empty if deterministic>
 ```
 
-For deterministic mechanisms — `chain_state`, `nostr_event_exists`,
-`stamp_published`, `http_get_hash`, `dns_record` — **every verifier
-independently produces the byte-identical outcome envelope**. No resolver is
-required and `sig` is empty. This is the property that makes Pledge gas-free:
-anyone can resolve, no one needs permission.
+The envelope's `sig` is not part of this canonical message: it is a base64
+BIP-322 signature from `resolved_by` over the outcome id, or `null` for a
+deterministic outcome.
 
-For `counterparty_signs` and `vote_resolves`, the outcome requires a BIP-322
-signature from the named resolver. Absence of that signature within `expires_at`
-→ `expired_unresolved`.
+For deterministic mechanisms — `chain_state`, `nostr_event_exists`,
+`stamp_published`, `http_get_hash`, `dns_record`, `vote_resolves` — **every
+verifier independently produces the byte-identical outcome envelope**. No
+resolver is required and `sig` is `null`. This is the property that makes Pledge
+gas-free: anyone can resolve, no one needs permission.
+
+For `counterparty_signs`, the outcome requires a BIP-322 signature from the
+counterparty. Absence of that signature within `expires_at` →
+`expired_unresolved`.
 
 A `disputed` outcome is produced when a contradictory outcome envelope is
 published within the dispute window. Disputed pledges stay disputed until the
@@ -119,9 +122,11 @@ A swearer who wants to exit gracefully publishes:
 oc-pledge-abandonment/v1
 pledge_id: <sha256>
 abandoned_at: <ISO-8601 UTC>
-reason: <single-line, max 280 chars>
-sig: <base64 BIP-322 from swearer>
+reason: <one line; the signer writes at most 280 UTF-8 bytes>
 ```
+
+The envelope's `sig` is a base64 BIP-322 signature from the swearer over the
+abandonment id. A verifier does not refuse a reason for its length.
 
 **Abandonment counts as `broken` in the public ledger.** No "honorable exit"
 classification. The reason field is informational; the ledger is binary. This is

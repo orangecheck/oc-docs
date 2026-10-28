@@ -36,7 +36,7 @@ export const meta = {
 - **§8 Verification algorithm** — seven steps.
 - **§10 Errors** — nine codes, all prefixed `E_`.
 - **§11 Security model** — what OC Stamp proves / does not prove.
-- **§12 Compliance checklist** — twelve boxes.
+- **§12 Compliance checklist** — fourteen boxes.
 
 ## Canonical message (§3)
 
@@ -141,6 +141,8 @@ A client is OC Stamp v1 compliant if and only if:
 - Verifies OTS anchor against Bitcoin block headers per §6.3 when
   `status === "confirmed"`.
 - Verifies sender BIP-322 signatures before trusting envelope contents.
+- Queries relays with the §7.1 filters only, whole values in `#d` and `#t`, and
+  treats a relay that did not answer as not heard back, per §7.3.
 - When enforcing a stake policy, re-resolves `stake` and requires the
   attestation's address to equal `signer.address` (§8.1 step 7).
 - Produces error codes per §10.
@@ -151,4 +153,4 @@ A client is OC Stamp v1 compliant if and only if:
 ## Read the full spec
 
 [`oc-stamp-protocol/SPEC.md`](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md)
-— 16 sections, ~500 lines of normative prose.
+— 17 sections (§0–§16), ~500 lines of normative prose.

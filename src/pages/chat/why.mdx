@@ -8,10 +8,10 @@ export const metadata = {
 
 OC Chat exists because [lock.ochk.io](/lock/) proved the crypto and the
 transport work, but its chat was unusable — a wallet signature on **every**
-send, no real push, messages lost while offline, no way to move to a new phone.
-You could not fix that inside a one-shot file-drop tool. So we extracted a real
-messenger. The constraint: **change the UX, not the cryptography, and stay
-inside the [orangecheck invariants](/ecosystem/security).**
+send, messages lost while offline, no way to move to a new phone. You could not
+fix that inside a one-shot file-drop tool. So we extracted a real messenger. The
+constraint: **change the UX, not the cryptography, and stay inside the
+[orangecheck invariants](/ecosystem/security).**
 
 This page is the rationale, decision by decision. The [spec](/chat/spec) says
 _what_; this says _why_ — and is honest about what we gave up.
@@ -65,7 +65,9 @@ review caught that the first design would have shipped un-round-trippable sealed
 messages. The fix: for chat kinds, the `id` and AAD **exclude `recipients[]`
 entirely** — the recipient set is mutable delivery routing; the _content_ is
 what is addressed. Re-wrap then preserves the `id`, the signature, and the tag.
-Test vector `vc04` proves it with real crypto. See
+Test vector `vc04` proves it with real crypto. This is the spec's upgrade
+target. v0, which chat.ochk.io sends, re-wraps nothing — its seal rides inside
+the ciphertext — so it keeps base OC Lock addressing. See
 [Envelope & content addressing](/chat/envelope).
 
 ## Postage is a preimage, sender → recipient direct
@@ -87,12 +89,15 @@ page has the full construction and its honest ceiling.
 We want "a message the chain unlocks at block N." The honest truth is that there
 is no browser-shippable, consensus-enforced decrypt-at-height primitive today:
 adaptor-signature / CLTV-witness extraction has no shippable secp256k1 WASM
-build, and the PSBT loop is UX death. So v0 reuses OC Lock payment-mode's
-re-wrap pattern, generalizing the release predicate from "payment confirmed" to
-"block height reached," with the key escrowed to a **named beacon** (drand
-quicknet). We refuse to call this "trustless." The envelope carries an optional
-`seal.cltv_outpoint` so the consensus-enforced path can be added later **without
-a format break** — structurally pre-wired, not promised.
+build, and the PSBT loop is UX death. So v0 timelock-encrypts a reveal secret to
+a future round of a **named beacon** (drand quicknet) and carries it inside the
+ciphertext; the client also checks that the chain has reached the block before
+it shows the body. The spec-pure path, the upgrade target, reuses OC Lock
+payment-mode's re-wrap pattern, generalizing the release predicate from "payment
+confirmed" to "block height reached." We refuse to call either "trustless." The
+envelope carries an optional `seal.cltv_outpoint` so the consensus-enforced path
+can be added later **without a format break** — structurally pre-wired, not
+promised.
 
 ### The Ed25519 test on the seal, out loud
 
@@ -138,8 +143,10 @@ We name the gaps rather than paper over them:
 - **Group chat without social-graph leakage at the relay.** Held until an
   MLS-grade group protocol is production-ready; private channels are reserved
   behind the same descriptor.
-- **Account/device recovery without the Bitcoin key.** A lost key loses history
-  and contacts; social-recovery is roadmapped, never pretended trivial.
+- **History recovery without a backup.** Your account is your orangecheck
+  account, so losing a device does not lose it, but keys and history live only
+  on your devices. A new device cannot read earlier messages unless you kept
+  chat.ochk.io's encrypted backup file and restore it.
 - **Post-quantum confidentiality.** X25519 / secp256k1 / BLS12-381 are
   classically secure only; long-range seals carry quantum risk over their
   lifetime.

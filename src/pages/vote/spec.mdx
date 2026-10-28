@@ -235,6 +235,9 @@ index single-letter tags only, so a reader MUST NOT depend on them.
 - Numbers: integers plain, no floats expected.
 - Strings: `\uXXXX` only for control chars, `"`, `\`. Everything else literal.
 - Final byte: LF (0x0a).
+- Depth: a poll, ballot or reveal nests at most 32 levels of objects and arrays,
+  the object itself being level 1. One nested deeper is malformed: a verifier
+  rejects it and a tally does not count it (vectors v17, v18).
 
 Reference: RFC 8785.
 

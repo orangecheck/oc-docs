@@ -196,8 +196,9 @@ both a text note and file attachments, the composer puts the note at
 `files[0].name = "message.txt"` and the receiver renders it inline as the
 accompanying message.
 
-- **Nostr event.** Put the canonical JSON in `content`; any kind works (we don't
-  use Nostr for envelope transport by default — only for the device directory).
+- **Nostr event.** Put the canonical JSON in `content`; any kind works.
+  lock.ochk.io gift-wraps every envelope it sends as a kind-1059 event to each
+  recipient device's inbox ([chat transport](/lock/chat)).
 - **Paper / SD card.** Self-contained bytes; decrypt when you're back online.
 
 ## What's plaintext on the wire

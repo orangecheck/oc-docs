@@ -42,8 +42,8 @@ six times. This section is the shared layer.
 Writing the canonical-message format six times (once per protocol) would produce
 six slightly-different descriptions and, over time, actual drift in the impls.
 By specifying it once and linking from every protocol's pages, we keep the docs
-in sync with the reality — every sibling literally uses the same
-canonical-message builder under the hood.
+in sync with the reality — each sibling's core has its own canonical-message
+builder, and every one follows the shape rules written once here.
 
 When a protocol _extends_ a shared concept — like Vote's secret-mode commitment,
 or Lock's envelope canonicalization rule — the protocol's own pages cover only

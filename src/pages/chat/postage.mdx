@@ -6,15 +6,18 @@ export const metadata = {
 
 # Postage (pay-to-reach)
 
-Postage is OC Chat's anti-spam for strangers: a first message from someone who
-is not a contact must carry a Lightning **preimage** proving a payment **to the
-recipient**. Attention is **priced, not filtered** — _sats as signal_, the
-inverse of hashcash, where the cost accrues to the recipient as value. **OC
-operates no payment rail and collects nothing**; sender and recipient transact
-directly.
+Postage is OC Chat's anti-spam for strangers: once a recipient sets a postage
+price, a first message from someone who is not a contact must carry a Lightning
+**preimage** proving a payment **to the recipient** to reach the inbox; without
+one it lands in Requests. Attention is **priced, not filtered** — _sats as
+signal_, the inverse of hashcash, where the cost accrues to the recipient as
+value. **OC operates no payment rail and collects nothing**; sender and
+recipient transact directly.
 
-This is the `pay-to-reach` mode (`kind="chat"` with a `postage` block). Contacts
-message for free; only stranger → inbox is gated.
+This is the `pay-to-reach` mode: a `postage` block on the message. In the spec's
+upgrade target it rides a `kind="chat"` envelope; in v0, which is what
+chat.ochk.io sends, it rides inside the encrypted body of an `identity`
+envelope. Contacts message for free; only stranger → inbox is gated.
 
 ## Recipient policy
 
@@ -63,7 +66,8 @@ change.)
 
 ## Recipient-side verification (mostly offline) — NORMATIVE
 
-A recipient verifying inbound `postage` MUST run all six checks:
+A recipient verifying inbound `postage` MUST run all six checks (the payee check
+is part of 3):
 
 1. **Settlement** — `SHA-256(preimage) == payment_hash`. The load-bearing
    Lightning bearer proof.
@@ -74,8 +78,15 @@ A recipient verifying inbound `postage` MUST run all six checks:
    description-hash (lnurl PR #234, 2026-05) — and MUST hash the **verbatim**
    `lnurl_metadata` bytes (never `JSON.stringify(JSON.parse(x))`, which reorders
    and breaks the match).
-3. **Recipient** — the `lnurl_metadata` `text/identifier` equals the claimed
-   `recipient`, resolved from an identity-signed endpoint.
+3. **Recipient and payee** — the `lnurl_metadata` `text/identifier` equals the
+   claimed `recipient`, resolved from an identity-signed endpoint. Every carrier
+   field comes from the sender, who could mint and pay an invoice on a node of
+   their own, so the recipient MUST also check that the `bolt11` is signed by a
+   node its own endpoint issues invoices from, and SHOULD check that
+   `lnurl_metadata` equals, byte for byte, what its endpoint serves. The
+   recipient learns its node set by requesting an unpaid invoice from its own
+   endpoint when it sets a floor; one that does not know its node set treats
+   postage as unverified.
 4. **Amount** — the `bolt11` carries an explicit amount AND
    `amount_sats >= floor_sats` (reject amountless invoices).
 5. **Nonce** — the in-body `nonce` is the one committed in `payerdata`.
@@ -130,11 +141,12 @@ flow is **inbound** subscription billing, and even that has no outbound leg.
 
 A recipient with no Lightning endpoint of their own — an institution, a
 non-technical staff member — MAY name a **Fedimint federation** as their postage
-last-mile. The federation's LNURL/Lightning-Address endpoint is published in the
-recipient's own kind-30078-bound listing exactly like any other endpoint, so the
-six-step verification is **unchanged and endpoint-agnostic**. The structural
-difference is **custody**: the federation receives the sats and settles ecash to
-the recipient's federation account.
+last-mile. This is part of the protocol; chat.ochk.io does not offer it. The
+federation's LNURL/Lightning-Address endpoint is published in the recipient's
+own kind-30078-bound listing exactly like any other endpoint, so the six-step
+verification is **unchanged and endpoint-agnostic**. The structural difference
+is **custody**: the federation receives the sats and settles ecash to the
+recipient's federation account.
 
 - **OC stays absent + non-custodial.** OC touches no sats, runs no guardian
   share, holds no hot wallet, and is never in the HTLC path — the federation

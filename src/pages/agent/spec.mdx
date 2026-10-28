@@ -124,24 +124,27 @@ verify(D):
      effective before A.signed_at, else E_REVOKED
 
 verify(A, D):
-  8. verify(D) clean, at now
-  9. base stamp checks on A else E_BAD_ACTION_STAMP
- 10. A.delegation_id == D.id else E_DELEGATION_MISMATCH
- 11. A.signer.address == D.agent.address else E_AGENT_MISMATCH
- 12. A.signed_at ∈ [D.issued_at, D.expires_at) else E_OUT_OF_WINDOW
- 12a. |now − A.signed_at| ≤ the verifier's bound (120 s recommended) else E_STALE
- 12b. act on each A.id once: keep accepted ids until A.signed_at + the bound
- 13. A.scope_exercised ⊆ some scope in D.scopes else E_SCOPE_DENIED
+      verify(D) clean, at now
+  8. base stamp checks on A else E_BAD_ACTION_STAMP
+  9. A.delegation_id == D.id else E_DELEGATION_MISMATCH
+ 10. A.signer.address == D.agent.address else E_AGENT_MISMATCH
+ 11. A.signed_at ∈ [D.issued_at, D.expires_at) else E_OUT_OF_WINDOW
+ 11a. |now − A.signed_at| ≤ the verifier's bound (120 s recommended) else E_STALE
+ 11b. act on each A.id once: keep accepted ids until A.signed_at + the bound
+ 12. A.scope_exercised ⊆ some scope in D.scopes else E_SCOPE_DENIED
+ 12a. content-bound keys (stamp:sign mime, max_bytes, content_hash_prefix)
+      are derived from A.content, not the agent's claim, and must still fit
+      the grant, else E_SCOPE_DENIED
 
 optional bond check:
- 14. D.bond non-null else E_NO_BOND
- 15. D.bond.sats >= threshold else E_BOND_UNMET
- 16. resolve(D.bond.attestation_id) still valid else E_BOND_UNVERIFIED
+ 13. D.bond non-null else E_NO_BOND
+ 14. D.bond.sats >= threshold else E_BOND_UNMET
+ 15. resolve(D.bond.attestation_id) still valid else E_BOND_UNVERIFIED
 ```
 
-`A.signed_at` is chosen by the agent. Live, steps 6, 7 and 12a make it
+`A.signed_at` is chosen by the agent. Live, steps 6, 7 and 11a make it
 irrelevant to whether the delegation is in force or revoked. An **audit** (§SPEC
-8.6) skips steps 6, 12a and 12b, refuses only a revocation effective before
+8.6) skips steps 6, 11a and 11b, refuses only a revocation effective before
 `A.signed_at`, and MUST report that time as the agent's claim unless a checked
 OTS anchor fixes it. An audit never decides whether to act now. In
 `@orangecheck/agent-core`, `verifyAction` is the live check and

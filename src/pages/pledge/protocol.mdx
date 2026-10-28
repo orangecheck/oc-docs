@@ -79,8 +79,8 @@ result offline forever.**
 
   Three envelope kinds. Three d-tag namespaces. One Nostr kind (30078).
   Pledge is signed by swearer (or agent under delegation).
-  Outcome is signed by counterparty (counterparty_signs / vote_resolves)
-       or unsigned-and-deterministic (chain_state, http_get_hash, etc.).
+  Outcome is signed by counterparty (counterparty_signs)
+       or unsigned-and-deterministic (chain_state, vote_resolves, etc.).
   Abandonment is signed by swearer; counts as broken.
   No custody. No arbiter. No registrar. No token.
 ```
@@ -137,8 +137,8 @@ sees:
 
 - Alice committed to publishing exactly `sha256:e3b0c4…` before 2026-09-01.
 - Alice's bond is attestation `0x111…111`, min 500K sats × 60 days unspent.
-- The pledge is `pending` until either (a) a matching stamp is published or (b)
-  `expires_at` passes.
+- The pledge is `pending` until `resolves_at` (2026-09-01), then `resolvable`
+  until an outcome is recorded.
 
 ### Alice keeps her word
 

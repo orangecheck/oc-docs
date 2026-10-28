@@ -15,16 +15,17 @@ canonicalization, BIP-322 identity binding — is **unchanged from
 <SpecCard
     repo="oc-chat-protocol"
     kind="spec"
-    version="v0"
+    version="v0.4.0"
     note="This page mirrors the structure of the full normative document, which lives in the spec repo."
 />
 
 The key words MUST, MUST NOT, SHOULD, MAY are per RFC 2119.
 
-> **Status: v0, draft.** New `kind` values and new optional blocks (`postage`,
-> `seal` sub-fields) are additive; clients MUST preserve unknown fields when
-> relaying and MAY ignore them when decrypting. Incompatible changes increment
-> OC Lock's `envelope.v` (currently 2).
+> **Status: 0.4.0 (2026-10-27).** Before 1.0, a minor version can change the
+> wire, and the spec's CHANGELOG says when it does. New `kind` values and new
+> optional blocks (`postage`, `seal` sub-fields) are additive; clients MUST
+> preserve unknown fields when relaying and MAY ignore them when decrypting.
+> Incompatible changes increment OC Lock's `envelope.v` (currently 2).
 
 ## What OC Chat adds (§1)
 
@@ -54,10 +55,18 @@ reject them rather than mis-decrypt. A `chat-channel` post is **public** —
 `recipients[]` MUST be empty (`E_CHANNEL_RECIPIENTS` otherwise). Detail:
 [Envelope](/chat/envelope).
 
+> **v0 status.** `@orangecheck/lock-core` has no `chat` or `chat-seal` kind, so
+> a v0 message — what chat.ochk.io sends — goes out as a base OC Lock `identity`
+> envelope with `hint: "oc-chat/v1"`, base OC Lock content addressing
+> (`recipients[]` inside the `id` and the AAD), and `postage` / `seal` inside
+> the encrypted body. The spec's §7.6 profile is normative for v0. The `chat`
+> and `chat-seal` kinds and the §3 rule below are the **upgrade target**
+> (vectors `vc03`, `vc04`).
+
 ## Content addressing — the recipient-exclusion rule (§3)
 
-For `kind ∈ { "chat", "chat-seal" }`, `recipients[]` is **delivery routing, not
-content**, and is excluded from both the id and the AAD:
+In the upgrade target, for `kind ∈ { "chat", "chat-seal" }`, `recipients[]` is
+**delivery routing, not content**, and is excluded from both the id and the AAD:
 
 ```
 chat_aad         = SHA-256( canonical( env | id="", ciphertext="", sig.value="", recipients=[] ) )
@@ -84,7 +93,8 @@ entry** merged locally, never a recompute of the signed `id`. Proven by vector
   wrapped to a **named beacon**, released only after the chain passes
   `unlock_block`. **Beacon-enforced, not consensus** — "trustless" is forbidden.
 
-Detail: [The three send modes](/chat/modes).
+In v0 the three modes share the `identity` kind, and `postage` and `seal` ride
+inside the encrypted body. Detail: [The three send modes](/chat/modes).
 
 ## Threading (§5)
 
@@ -92,8 +102,9 @@ Thread state is inside the encrypted payload:
 `{body, conversation_id, seq, parent_id, recv_queue?}`. **`parent_id` MUST equal
 the `chat_envelope_id` of the parent** (or `null`); clients order by the
 hash-chain and MUST NOT trust `created_at`. Attachments (§5.1) ride E2EE inside
-the payload (inline v0 profile, ~100 KiB; blob-store upgrade for larger).
-Detail: [Threading & attachments](/chat/threading).
+the payload (inline v0 profile: readers accept up to ~100 KiB, chat.ochk.io
+sends up to 32 KiB; blob-store upgrade for larger). Detail:
+[Threading & attachments](/chat/threading).
 
 ## Postage (§6)
 
@@ -101,10 +112,10 @@ A recipient publishes a `floor_sats` + an identity-signed Lightning endpoint
 (LNURL + LUD-18 in v0; BOLT12 recommended). The sender's `postage` block rides
 inside the encrypted payload (§6.2). The recipient runs the six-step offline
 verification (§6.3): settlement, the re-derived description-hash binding,
-recipient, amount, nonce, and a local spent-ledger. **No OC payment rail**
-(§6.4); zap receipts are forbidden as proof. A named-Fedimint custodial fallback
-(§6.5) is gated on a money-transmitter analysis. Detail:
-[Postage](/chat/postage).
+recipient and payee (the invoice is signed by one of the recipient's own nodes),
+amount, nonce, and a local spent-ledger. **No OC payment rail** (§6.4); zap
+receipts are forbidden as proof. A named-Fedimint custodial fallback (§6.5) is
+gated on a money-transmitter analysis. Detail: [Postage](/chat/postage).
 
 ## Seal (§7)
 
@@ -126,15 +137,19 @@ the content to the recipient inbox key, closing the social-graph leak. A
 **durable inbox** (§8.1) uses opaque per-conversation `queue_id`s
 (`HMAC(HKDF(device_sk), conversation_id)`) + a derivable bootstrap queue.
 **NIP-42 relay AUTH** (§8.4, kind-22242) is the institutional metadata
-hardening. Detail: [Transport & durable inbox](/chat/transport).
+hardening; chat.ochk.io does not support AUTH relays. Detail:
+[Transport & durable inbox](/chat/transport).
 
 ## Directory (§8.2)
 
 A **kind-30114** opt-in, addressable listing keyed by a salted handle hash. A
-resolver honors a handle only if all three hold: signed by `inbox_pubkey`;
-`inbox_pubkey` device-bound (kind-30078) to `address`; and `address` clears the
-**UTXO floor** (funded + aged). The **social-graph firewall** (§8.2.3) keeps any
-edge metadata out. Revocation is by tombstone, forward-effective only. Detail:
+handle belongs to the earliest claim anchored in Bitcoin that still stands. A
+resolver honors a claim only if all four hold: signed by `inbox_pubkey`;
+`inbox_pubkey` device-bound (kind-30078) to `address`; the claim's coin cleared
+the **UTXO floor** at its anchor and still stands; and the claim is anchored
+(OpenTimestamps, 6 confirmations). A read that gets no answer ends the walk with
+`E_DIR_UNRESOLVED`. The **social-graph firewall** (§8.2.3) keeps any edge
+metadata out. Revocation is by tombstone, forward-effective only. Detail:
 [Discoverability directory](/chat/directory).
 
 ## Channels (§8.3)
@@ -181,25 +196,27 @@ never steps a message up. Vector `vc18`. Normative text:
 
 In addition to [OC Lock §6 codes](/lock/spec):
 
-| Code                          | Meaning                                                                                                       |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `E_BLOCK_UNMET`               | Seal release requested before `unlock_block + confirmations` confirmed.                                       |
-| `E_BEACON_UNAVAILABLE`        | Seal beacon did not respond or could not be reached.                                                          |
-| `E_NO_POSTAGE`                | A `pay-to-reach` envelope from a non-contact lacked valid postage for the floor.                              |
-| `E_BAD_POSTAGE`               | `SHA-256(preimage) != payment_hash`, or the nonce/recipient/amount binding did not match.                     |
-| `E_THREAD_GAP`                | `parent_id` does not resolve to a held parent envelope id.                                                    |
-| `E_QUEUE_ROUTE`               | A durable-inbox deposit/drain referenced a `queue_id` the caller is not entitled to, or a malformed queue id. |
-| `E_DIR_UNVERIFIED`            | A kind-30114 listing failed the §8.2.2 gate (signature / kind-30078 binding / UTXO floor).                    |
-| `E_DIR_REVOKED`               | The resolved listing is a tombstone or absent — the handle is not discoverable.                               |
-| `E_CHANNEL_RECIPIENTS`        | A `chat-channel` envelope carried a non-empty `recipients[]`.                                                 |
-| `E_CH_POLICY_INVALID`         | A descriptor's `write.rooted` flag did not match its `write.policy`.                                          |
-| `E_CH_UNAUTHORIZED`           | A descriptor replacement or moderation tombstone was signed by an out-of-roster address.                      |
-| `E_CH_WRITE_DENIED`           | A channel post failed the channel's `write.policy` gate.                                                      |
-| `E_CH_NOT_WRITER`             | The post author holds a reader-only role on the channel.                                                      |
-| `E_CHAN_FLOOR`                | A `utxo-floor` post's `write_proof` failed (bad `control_sig`, below value, or under age).                    |
-| `E_RELAY_AUTH_REQUIRED`       | An `auth-required` relay rejected a publish/subscribe pending NIP-42 AUTH.                                    |
-| `E_FEDIMINT_UNAVAILABLE`      | A named-Fedimint postage endpoint did not respond.                                                            |
-| `E_FEDIMINT_BINDING_MISMATCH` | A federation-fronted postage invoice failed the §6.3 binding.                                                 |
+| Code                          | Meaning                                                                                                                                                   |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `E_BLOCK_UNMET`               | Seal release requested before `unlock_block + confirmations` confirmed.                                                                                   |
+| `E_BEACON_UNAVAILABLE`        | Seal beacon did not respond or could not be reached.                                                                                                      |
+| `E_NO_POSTAGE`                | A `pay-to-reach` envelope from a non-contact lacked valid postage for the floor.                                                                          |
+| `E_BAD_POSTAGE`               | `SHA-256(preimage) != payment_hash`, the nonce/recipient/amount binding did not match, or the invoice was not signed by one of the recipient's own nodes. |
+| `E_THREAD_GAP`                | `parent_id` does not resolve to a held parent envelope id.                                                                                                |
+| `E_QUEUE_ROUTE`               | A durable-inbox deposit/drain referenced a `queue_id` the caller is not entitled to, or a malformed queue id.                                             |
+| `E_DIR_UNVERIFIED`            | No claim for the handle passes the §8.2.2 gate (unanchored claim / signature / kind-30078 binding / coin floor at the anchor).                            |
+| `E_DIR_UNRESOLVED`            | The read could not settle the handle: a read before the holder got no answer, or the walk reached a bound. The client offers the address route.           |
+| `E_DIR_REVOKED`               | The resolved listing is a tombstone or absent — the handle is not discoverable.                                                                           |
+| `E_CHANNEL_RECIPIENTS`        | A `chat-channel` envelope carried a non-empty `recipients[]`.                                                                                             |
+| `E_CH_POLICY_INVALID`         | A descriptor's `write.rooted` flag did not match its `write.policy`.                                                                                      |
+| `E_CH_UNAUTHORIZED`           | A descriptor replacement or moderation tombstone was signed by an out-of-roster address.                                                                  |
+| `E_CH_WRITE_DENIED`           | A channel post failed the channel's `write.policy` gate.                                                                                                  |
+| `E_CH_NOT_WRITER`             | The post author holds a reader-only role on the channel.                                                                                                  |
+| `E_CHAN_FLOOR`                | A `utxo-floor` post's `write_proof` failed (bad `control_sig`, below value, or under age).                                                                |
+| `E_CH_CLOSED`                 | The channel is closed: new posts are denied; only removal tombstones are accepted.                                                                        |
+| `E_RELAY_AUTH_REQUIRED`       | An `auth-required` relay rejected a publish/subscribe pending NIP-42 AUTH.                                                                                |
+| `E_FEDIMINT_UNAVAILABLE`      | A named-Fedimint postage endpoint did not respond.                                                                                                        |
+| `E_FEDIMINT_BINDING_MISMATCH` | A federation-fronted postage invoice failed the §6.3 binding.                                                                                             |
 
 ## Nostr kind registry (§10)
 
@@ -212,7 +229,7 @@ ephemeral, never stored).
 | ----- | ------------------------------------------ | -------------------- | -------- |
 | 30110 | channel descriptor (addressable)           | `oc-lock-chat-ch:`   | v1       |
 | 30111 | channel post (`chat-channel`, addressable) | `oc-lock-chat-msg:`  | v1       |
-| 30112 | seal / block-height anchor descriptor      | `oc-lock-chat-seal:` | v0       |
+| 30112 | seal / block-height anchor descriptor      | `oc-lock-chat-seal:` | draft    |
 | 30113 | group-key rotation (private channels)      | `oc-lock-chat-*:`    | reserved |
 | 30114 | discoverability directory (addressable)    | `oc-lock-chat-dir:`  | v1       |
 | 30115 | postage-policy record (`pay-to-post`)      | `oc-lock-chat-*:`    | reserved |
@@ -283,5 +300,6 @@ A client is OC Chat v0 compliant iff it:
   mirrored at [Why OC Chat](/chat/why).
 - [`SECURITY.md`](https://github.com/orangecheck/oc-chat-protocol/blob/main/SECURITY.md)
   → mirrored at [Security posture](/chat/security).
-- `test-vectors/` — five+ reproducible fixtures, including `vc04` (re-wrap
-  `id`/tag stability) and `vc05` (preimage verification).
+- [`test-vectors/`](https://github.com/orangecheck/oc-chat-protocol/tree/main/test-vectors)
+  — reproducible fixtures `vc01`–`vc25`, including `vc04` (re-wrap `id`/tag
+  stability) and `vc05` (preimage verification).

@@ -24,10 +24,16 @@ same key that signs gift-wraps):
 // kind 30114, addressable.
 // d-tag = "oc-lock-chat-dir:" || base64url(SHA-256("oc-lock-chat-dir/v1:" || lower(handle)))
 {
-    "v": 1,
+    "v": 2,
     "handle": "<[a-z0-9_]{3,32}>",
     "address": "<bitcoin address the inbox key is bound to>",
     "inbox_pubkey": "<hex; the reachability pointer = the event pubkey>",
+    "claim": {
+        "outpoint": "<txid:vout of a coin paying to address>",
+        "nonce": "<64 lowercase hex>",
+        "ots": "<base64 OpenTimestamps proof over claim_id>",
+        "repoints": [], // optional, at most 16
+    },
     "display_name": "<=48 chars, optional>",
     "bio": "<=80 chars, optional>",
     "avatar": "<small inline raster data: URL, ≤24KB, optional>",
@@ -35,7 +41,13 @@ same key that signs gift-wraps):
     "created_at": 1733846400,
 }
 // listing_id = SHA-256(canonical(content))   // content-addressed
+// claim_id   = SHA-256(canonical({v: 1, handle: lower(handle), address, outpoint, nonce}))
 ```
+
+The **claim** is what orders the handle. It names the coin that backs it and is
+anchored in Bitcoin with OpenTimestamps; its anchor is the height of the proof's
+lowest Bitcoin attestation, once that has 6 confirmations. A `v: 1` listing
+carries no claim and holds no handle.
 
 The `d`-tag is a **salted hash of the handle**, so a conforming directory is
 **lookup-by-known-handle, never enumerate-all** — there is no `GET /all` and no
@@ -54,24 +66,31 @@ key would be deterministically enumerable).
 
 A bare listing is **not** Bitcoin-load-bearing: _"address X, here is my inbox
 key, signed by X"_ substitutes perfectly to an Ed25519 npub signed by an npub. A
-conforming resolver MUST refuse to honor a handle unless **all three** hold:
+conforming resolver MUST refuse to honor a claim unless **all four** hold:
 
 1. The kind-30114 event is signed by `inbox_pubkey`.
 2. `inbox_pubkey` is bound to `address` via a valid kind-30078 device record
    (the existing BIP-322 binding). **The directory inherits its Bitcoin proof
    from the device record — no second wallet ceremony.**
-3. **`address` clears the UTXO floor:** it controls at least one confirmed UTXO
-   of age ≥ the deployment's `dir_utxo_floor`. This is the load-bearing hook —
-   **an Ed25519 keypair has no analog to an aged, funded UTXO**, so a handle
-   costs Bitcoin maturity to claim (Sybil-resistance doubling as anti-squat).
-   UTXO state is public chain data, so the check preserves
-   offline-verifiability.
+3. **The claim's coin cleared the floor at its anchor, and the claim still
+   stands on a coin.** The `outpoint` pays to `address`, carries at least the
+   deployment's `dir_floor_sats`, and confirmed at least `dir_floor_confs`
+   blocks before the anchor. The claim's current coin (its `outpoint`, or the
+   coin a re-point moved it to) has not been spent by a transaction with
+   `dir_repoint_blocks + 6` or more confirmations. This is the load-bearing hook
+   — **an Ed25519 keypair has no analog to a coin that was already aged when the
+   claim was anchored**, so a handle costs Bitcoin maturity to claim
+   (Sybil-resistance doubling as anti-squat). UTXO state is public chain data,
+   so the check preserves offline-verifiability.
+4. **The claim is anchored:** its OpenTimestamps proof's lowest Bitcoin
+   attestation verifies and has at least 6 confirmations.
 
-The RECOMMENDED v0 floor is _funded + ≥ 144 confirmations (~1 day)_, with the
-actual UTXO age surfaced as a **graduated trust signal** (older = more trusted).
-A handle that fails (2) or (3) MUST be treated as un-listed
-(`E_DIR_UNVERIFIED`). Handle uniqueness is **first-writer-wins, best-effort
-across relays, explicitly NOT global consensus** — the **address is the trust
+The RECOMMENDED v0 values are any funded output (`dir_floor_sats = 1`), 144
+confirmations (~1 day) at the anchor, and a re-point window of 1008 blocks (~1
+week) after the backing coin is spent. A claim that fails the gate MUST be
+treated as un-listed (`E_DIR_UNVERIFIED`). A handle belongs to the **earliest
+claim anchored in Bitcoin that still stands** — ordered by a block height no
+claimant chooses, **not by global consensus** — and the **address is the trust
 root; the handle is a non-authoritative display label.** A `did:oc`-only
 identity (the session bridge, no Bitcoin address) MAY publish a bridge listing
 but MUST NOT claim a scarce handle; a conforming client surfaces it with a muted
@@ -94,12 +113,15 @@ exposes. This is the same firewall that keeps the
 ## Revocation (forward-effective only)
 
 Self-removal = publish a replacement kind-30114 event with the **same d-tag**,
-`opted_in: false`, optional fields stripped, signed by the inbox key. Because
-the event is NIP-33-addressable, the tombstone **replaces** the prior record at
-conforming relays. A conforming client treats a tombstone — or an absent record
-— as not-discoverable, refuses to resolve the handle, treats a tombstone seen on
-**any** relay as authoritative even if a stale live copy exists elsewhere, and
-SHOULD fire a NIP-09 deletion request.
+`opted_in: false`, an `"ends": "<claim_id>"` naming the claim it withdraws,
+optional fields stripped, signed by the inbox key. Because the event is
+NIP-33-addressable, the tombstone **replaces** the prior record at conforming
+relays. A conforming client treats a tombstone — or an absent record — as
+not-discoverable, refuses to resolve the handle to that address, treats a
+tombstone seen on **any** relay as authoritative over that same owner's older
+live copies even if a stale one exists elsewhere, and SHOULD fire a NIP-09
+deletion request. A `claim_id` that a tombstone ends never counts again, so
+listing again takes a new claim, behind every claim anchored before it.
 
 > **Revocation is forward-effective only.** A tombstone stops new resolution on
 > conforming relays; it cannot retract copies on non-conforming relays,
@@ -109,14 +131,20 @@ SHOULD fire a NIP-09 deletion request.
 
 ## Resolution
 
-To find a user, a client computes the `d`-tag from the queried handle, fetches
-the kind-30114 events for that `d`-tag across its relay set (freshest
-`created_at` wins; a tombstone wins over any live copy), verifies the three gate
-conditions, and on success surfaces `address` + profile + a **trust tier** so
-the user can start a thread. First-contact still passes the recipient's
-[anti-spam policy](/chat/modes) — **being listed is not a free-message bypass.**
-Privacy-sensitive resolution SHOULD query relays **directly**, not a third-party
-indexer (which would learn who-searches-for-whom).
+To find a user, a client computes the `d`-tag from the queried handle and reads
+the kind-30114 events for it: the deployment's directory relay
+(`wss://relay.ochk.io`) completely, and 2 or more public relays as a bounded
+audit. It orders the live claims by **(anchor height, `claim_id`)** and walks
+that order. Each address's state is its freshest record by `created_at`,
+compared only within that one address; a tombstone signed by a bound key ends
+the claim it names. The first claim whose binding and backing coin stand holds
+the handle. A read that gets no answer stops the walk with `E_DIR_UNRESOLVED`
+rather than pass a claim over. On success the client surfaces `address` +
+profile + a **trust tier** so the user can start a thread. First-contact still
+passes the recipient's [anti-spam policy](/chat/modes) — **being listed is not a
+free-message bypass.** Privacy-sensitive resolution SHOULD query relays
+**directly**, not a third-party indexer (which would learn
+who-searches-for-whom).
 
 ## The honest disclosures
 

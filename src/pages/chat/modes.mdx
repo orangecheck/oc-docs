@@ -18,13 +18,20 @@ extension, not a new canonical surface — the
 | **pay-to-reach**   | `chat`      | a settled-sats preimage (Lightning) | `postage` ([§6](/chat/postage)) |
 | **seal-til-block** | `chat-seal` | a block-height predicate (Bitcoin)  | `seal` ([§7](/chat/seal))       |
 
+The `kind` column is the spec's upgrade target. In v0, which is what
+chat.ochk.io sends, all three modes go out as a base OC Lock `identity` envelope
+with `hint: "oc-chat/v1"`, and `postage` and `seal` ride inside the encrypted
+body ([Envelope](/chat/envelope)).
+
 ## speak-now — the daily driver (free)
 
-`kind="chat"`, no `postage`, no `seal`. An identity-mode OC Lock envelope sealed
-to the recipient's device keys. The per-device X25519 key authenticates the send
-— **the sender does not sign each message with BIP-322**; that was performed
-once per device at [device-record binding time](/lock/device-keys). The send
-loop is sub-second.
+No `postage`, no `seal` (`kind="chat"` in the upgrade target). An identity-mode
+OC Lock envelope sealed to the recipient's device keys. **The sender does not
+sign each message with BIP-322**: each message carries a Schnorr signature by
+the sending device's inbox key over the envelope id, and that key is bound to
+the sender once per device — by a BIP-322 [device record](/lock/device-keys), or
+on chat.ochk.io by ochk.io's vouch for a `did:oc` device. The send loop is
+sub-second.
 
 **Receiving is never gated by payment.** Free-tier anti-spam is _recipient
 policy_, enforced by the recipient's client, not the protocol:
@@ -36,21 +43,23 @@ policy_, enforced by the recipient's client, not the protocol:
 A first message that does not clear the policy is **delivered and decrypted,
 never dropped** — it is placed in a distinct **filtered/pending** state (the
 "Requests" surface) so the recipient always sees that someone reached them.
-Acceptance is a client-local, **explicit and revocable allowlist**: opening a
+Acceptance is a client-local, **explicit and revocable allowlist**: approving a
 filtered conversation lets that sender reach your inbox normally thereafter, and
 you may revoke at any time. The allowlist is private — it is never published,
 never carried on the wire, and never co-indexed with the directory (the
-[social-graph firewall](/chat/directory#the-social-graph-firewall-normative)). A
-recipient signals acceptance only by **replying** — there is deliberately no
-"your request was opened" receipt, which would be a read-receipt-style metadata
-leak.
+[social-graph firewall](/chat/directory#the-social-graph-firewall-normative)).
+The spec allows acceptance to be signalled only by **replying** — no "your
+request was opened" receipt, which would be a read-receipt-style metadata leak.
+chat.ochk.io sends nothing when you open a request; its **Approve** button sends
+the sender an empty encrypted acknowledgement that clears the "may need to
+accept you" note on their side.
 
 ## pay-to-reach — a stranger reaches you (paid, peer-to-peer)
 
-`kind="chat"` with a `postage` block. A stranger's first message to a recipient
-who has published a **postage floor** must carry a valid Lightning **preimage**
-proving payment **to the recipient**. The payment is **sender → recipient
-direct**; no OC service is in the path.
+A `postage` block on the message (`kind="chat"` in the upgrade target). A
+stranger's first message to a recipient who has published a **postage floor**
+must carry a valid Lightning **preimage** proving payment **to the recipient**.
+The payment is **sender → recipient direct**; no OC service is in the path.
 
 The flow, end to end:
 
@@ -73,10 +82,10 @@ the named-Fedimint custodial fallback are in [Postage](/chat/postage).
 
 ## seal-til-block — a message that opens in the future (the timelock mode)
 
-`kind="chat-seal"` with a `seal` block. The `content_key` is wrapped to a
-**named beacon**, not the recipient; the beacon releases it only after the
-Bitcoin chain passes `seal.unlock_block`. The recipient receives the ciphertext
-immediately but holds no key.
+A `seal` block on the message (`kind="chat-seal"` in the upgrade target). The
+`content_key` is wrapped to a **named beacon**, not the recipient; the beacon
+releases it only after the Bitcoin chain passes `seal.unlock_block`. The
+recipient receives the ciphertext immediately but holds no key.
 
 > **This is beacon-enforced policy, not Bitcoin consensus.** The word
 > "trustless" MUST NOT describe a `chat-seal` envelope whose anchor is a beacon.

@@ -34,7 +34,9 @@ After the one binding signature, sending and receiving are zero-click.
    record and **verifies the BIP-322 binding offline**.
 2. Alice writes "gm". The app builds the payload
    `{body:"gm", conversation_id, seq:1, parent_id:null}`, seals it to Bob's
-   device key with a fresh `content_key`, and computes the `chat_envelope_id`
+   device key with a fresh `content_key`, and computes the envelope `id`. In v0,
+   which chat.ochk.io sends, that is the base OC Lock `id` with `recipients[]`
+   included; the spec's upgrade target computes a `chat_envelope_id`
    [excluding `recipients[]`](/chat/envelope).
 3. **No wallet popup.** The per-device key authenticates the send; BIP-322 was
    spent once at registration. The send loop is sub-second.
@@ -58,9 +60,11 @@ queues of ciphertext it can neither read nor tie to a Bitcoin address.
 
 Bob has a laptop and a phone, each with its own device key and kind-30078
 record. Alice's client wraps the one `content_key` once per active device
-(vector `vc02`). A new device is authorized by a **BIP-322 signature from Bob's
-primary wallet** over a link statement naming the new `device_pk` —
-Bitcoin-load-bearing and auditable.
+(vector `vc02`). Each new device is bound by its own record: a **BIP-322
+signature from Bob's wallet** over that device's binding statement, which names
+the new `device_pk` — Bitcoin-load-bearing and auditable. On chat.ochk.io a
+`did:oc` device is vouched for by ochk.io instead, and binding a Bitcoin address
+is an optional extra signature per device.
 
 **Portability cliff (disclosed):** a message sent _before_ a device existed was
 never wrapped to it, so the new device cannot read it without a backfill —
@@ -94,29 +98,32 @@ Full mechanics: [Postage](/chat/postage).
 
 Alice wants the contents readable only after block 900000.
 
-**Seal.** Alice picks a named beacon (default: drand quicknet). She locks the
-body under a reveal secret, timelock-encrypts that secret to the beacon, sets
-`kind="chat-seal"` and
-`seal{unlock_block:900000, anchor:"beacon", beacon_id:"drand:quicknet", beacon_url, confirmations:6}`,
-and signs (vector `vc03`). Bob receives the ciphertext immediately but holds no
-key. The compose UI **forces** Alice to acknowledge: _the named beacon can
-release early if its threshold colludes, and the seal is permanently bricked if
-the beacon disappears._
+**Seal.** Alice's client uses the named beacon drand quicknet, the only one
+chat.ochk.io offers. She locks the body under a reveal secret, timelock-encrypts
+that secret to the beacon, puts
+`seal{unlock_block:900000, anchor:"beacon", beacon_id:"drand:quicknet", beacon_url, confirmations:1, …}`
+inside the encrypted body of an ordinary chat envelope, and signs (vectors
+`vc10`, `vc13`). In the upgrade target the `seal` is a top-level field of a
+`kind="chat-seal"` envelope (vector `vc03`). Bob receives the ciphertext
+immediately but holds no key. The compose UI **forces** Alice to acknowledge:
+_the named beacon can release early if its threshold colludes, and the seal is
+permanently bricked if the beacon disappears._
 
-**Release.** After block 900006 confirms, and the drand round elapses, the
+**Release.** After block 900001 confirms, and the drand round elapses, the
 [hard chain gate](/chat/seal#the-hard-chain-gate-normative) lets Bob's client
 surface the body — at the **later** of (the round elapsing, the chain reaching
 the height) — and record the observed block hash as a receipt. In the spec-pure
-beacon-device path, Bob authenticates to the beacon over BIP-322, the beacon
-re-wraps `content_key` for Bob's device and returns a **detached `recipients[]`
-entry**, and the `id` + ciphertext tag are unchanged — proven by vector `vc04`,
-the whole reason chat-kind `id`/AAD [exclude `recipients[]`](/chat/envelope).
+beacon-device path (the upgrade target), Bob authenticates to the beacon over
+BIP-322, the beacon re-wraps `content_key` for Bob's device and returns a
+**detached `recipients[]` entry**, and the `id` + ciphertext tag are unchanged —
+proven by vector `vc04`, the whole reason chat-kind `id`/AAD
+[exclude `recipients[]`](/chat/envelope).
 
-This is the same re-wrap machinery as [OC Lock payment mode](/lock/protocol),
-with the release predicate generalized from "payment confirmed" to "block height
-reached." It is **beacon-enforced policy** — see
-[Why H5](/chat/why#the-ed25519-test-on-the-seal-out-loud) for why we ship this
-and not the CLTV-witness path yet.
+That path is the same re-wrap machinery as
+[OC Lock payment mode](/lock/protocol), with the release predicate generalized
+from "payment confirmed" to "block height reached." It is **beacon-enforced
+policy** — see [Why H5](/chat/why#the-ed25519-test-on-the-seal-out-loud) for why
+we ship this and not the CLTV-witness path yet.
 
 ## Flow 5 — standing-delivery (dead-man's-switch)
 
@@ -128,12 +135,13 @@ check-ins stop, the chain reaches the height and the beacon releases. **The
 switch fires on silence.**
 
 This is the one seal use case with real, repeat, high-stakes demand — and the
-sharpest failure mode: a beacon outage could false-fire an irreversible
-disclosure. A conforming deployment MUST provide a mandatory **second check-in
-channel** so a single beacon's liveness cannot trigger release alone, and MUST
-state plainly that a multi-year seal depends on the named beacon existing and
-cooperating that far out (the drand `fastnet` sunset, which permanently bricked
-its ciphertexts, is the cautionary precedent). Full construction:
+sharpest failure mode: a beacon, app or relay outage that blocks a check-in
+could false-fire an irreversible disclosure. The spec RECOMMENDS a **second,
+non-app check-in channel** for institutional use; chat.ochk.io says so in its
+copy and does not enforce it. A deployment MUST state plainly that a multi-year
+seal depends on the named beacon existing and cooperating that far out (the
+drand `fastnet` sunset, which permanently bricked its ciphertexts, is the
+cautionary precedent). Full construction:
 [Seal-til-block § standing delivery](/chat/seal#standing-delivery-dead-mans-switch).
 
 ## Flow 6 — institutional / source-intake
@@ -157,7 +165,8 @@ so the recipient inbox tags on its private replies never appear to a passive
 observer, and a staff recipient with no Lightning node can name a
 [Fedimint federation](/chat/postage#named-fedimint-custodial-fallback-institutional-last-mile)
 as their postage last-mile (the federation custodies and settles; OC touches no
-sats), gated on a money-transmitter analysis.
+sats), gated on a money-transmitter analysis. Both are protocol options;
+chat.ochk.io offers neither.
 
 ## Where to go next
 

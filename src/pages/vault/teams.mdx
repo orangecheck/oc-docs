@@ -36,14 +36,18 @@ only.
 
 1. **You create the team.** Your browser draws a fresh 32-byte team key and
    stores it in IndexedDB under a per-team metadata record. It leaves the
-   browser only in an invite fragment (step 2) or wrapped under a member's
-   personal vault key (step 4).
+   browser in an invite link (step 2) and wrapped under a member's personal
+   vault key (step 4).
 2. **You invite a teammate.** vault.ochk.io issues an invite token (a
    one-time-use, expiring credential — no key material) and hands you an invite
    URL whose **fragment** carries the team key:
-   `https://vault.ochk.io/vault/team/join#<invite-token>.<b64url-team-key>`. URL
-   fragments are never sent to a server, the same primitive
-   [one-time share links](/vault/protocol#one-time-share-links) use.
+   `https://vault.ochk.io/vault/team/join?token=<invite-token>#<b64url-team-key>`.
+   The token is in the query string; only the key is in the fragment. A browser
+   does not send the fragment when it opens the link, the same primitive
+   [one-time share links](/vault/protocol#one-time-share-links) use. Copy the
+   link and send it yourself, and the key stays off our server. **Send invite**
+   has vault.ochk.io email the link for you instead: the full link, team key
+   included, then passes through vault.ochk.io and its mail provider.
 3. **They open the link.** Their browser extracts the team key from the
    fragment, claims the invite under their signed-in session, and joins. The
    token is consumed; the team key now lives in their IndexedDB.
@@ -144,9 +148,10 @@ even with the advisory lock bypassed.
 Deletes are soft for teams too. A deleted team entry keeps its row with
 `deleted_at` set so the tombstone propagates to every member's browser. The team
 trash is reachable by owner / admin (the same role gate as management actions);
-restoring brings the entry back for everyone. Permanent purge from the team
-trash is the only hard delete and runs the same compare-and-swap as a normal
-write.
+restoring brings the entry back for everyone. An owner or admin can purge an
+entry from the team trash for good. A trashed entry more than 30 days old is
+also deleted for good, the next time someone opens the trash or deletes an
+entry.
 
 ## Folders
 
@@ -160,9 +165,10 @@ folder-fetch failure never disrupts the entry list.
 - **Leave a team.** Available to every role _except_ owner. Your seat releases,
   your local copy of the team key is dropped, the server forgets your
   membership. Already-decrypted entries in your browser's IndexedDB are cleared.
-- **Transfer ownership.** Owners can promote an existing admin to owner; the
-  previous owner becomes an admin. Useful if the team's original payer is
-  rotating out.
+- **Transfer ownership.** The owner offers ownership to an existing member. It
+  moves only when that member accepts; the previous owner then becomes an admin.
+  The owner can withdraw the offer, and the member can decline it. Useful if the
+  team's original payer is rotating out.
 - **Delete the team.** Owner-only, irreversible — every blob on the server is
   purged. Members' local IndexedDB still holds whatever cached entries they last
   saw, until they clear browser data.
@@ -171,14 +177,17 @@ folder-fetch failure never disrupts the entry list.
 
 | OC sees                                                                                                      | OC does **not** see                                          |
 | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Which OC identities are members of which teams                                                               | The team key, ever                                           |
+| Which OC identities are members of which teams                                                               | The team key, unless vault.ochk.io emails an invite for you  |
 | How many encrypted blobs each team has, when each was last updated, the rough byte-size                      | Entry names, types, tags, payloads, the team's "shape"       |
 | Who is the owner of each team and the role assignment of each member (the server enforces role-gated writes) | Whose browsers actually decrypt entries (no usage telemetry) |
 | Email addresses members opted to publish so teammates can see them in management                             | Email addresses members did not opt to publish               |
 | Payment receipts for Family Circle billing                                                                   | Anything correlating a payment to specific entry contents    |
 
-The auditable claim is the cryptographic one: **the team key is not on our
-server, in any form, ever**. Everything else falls out of that.
+The auditable claim is the cryptographic one: **our server holds the team key
+only wrapped under each member's personal vault key**, which it cannot open. The
+exception is an invite you have vault.ochk.io email: that link, team key
+included, passes through our server and its mail provider on the way out.
+Everything else falls out of that.
 
 ## Where things live
 
@@ -191,6 +200,4 @@ server, in any form, ever**. Everything else falls out of that.
   HKDF, [`@orangecheck/vault-core`](/sdk/vault-core/README) for the entry model.
   The team-share extension to the entry envelope is the team key in both
   encryption layers — there is no new primitive.
-- **CLI** — `oc-vault` currently addresses `personal/` only. Team-vault CLI is
-  on the roadmap; the cryptographic primitives are in place, the command-surface
-  design is what's missing.
+- **CLI** — `oc-vault` addresses `personal/` only. It does not read team vaults.

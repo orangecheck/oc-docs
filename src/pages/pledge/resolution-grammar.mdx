@@ -6,10 +6,11 @@ export const metadata = {
 
 # Resolution grammar
 
-OC Pledge ships **seven** resolution mechanisms. Each is a deterministic
-function of public state plus the pledge envelope. New mechanisms are added only
-with working integrator code demonstrating real demand — same discipline
-orangecheck applies to identity bindings.
+OC Pledge ships **seven** resolution mechanisms. Six are deterministic functions
+of public state plus the pledge envelope; `counterparty_signs` needs the
+counterparty's signature. New mechanisms are added only with working integrator
+code demonstrating real demand — same discipline orangecheck applies to identity
+bindings.
 
 The canonical DSL for each mechanism is normative; conforming implementations
 must produce byte-identical outcome envelopes for byte-identical inputs. Full
@@ -42,7 +43,7 @@ class, neither kept nor broken.
 ## nostr_event_exists
 
 ```
-kind=<N>, author=<pubkey>, tag(<name>)=<value>, created_at_before=<time>
+kind=<N> author=<npub_or_hex> tag(<name>)=<value> created_at_before=<ISO 8601 UTC>
 ```
 
 Implementations query ≥ 2 relays from the default set; an event is considered to
@@ -50,25 +51,41 @@ exist if any relay returns it and it validates.
 
 ## stamp_published
 
-Looks up a specific OC Stamp envelope by content hash or id. The verifier
-consults the OC Stamp directory (Nostr kind-30083 under the `oc-stamp:*` d-tag
-namespace) and validates the envelope. This is the canonical way to pledge "I
-will publish X by time T."
+Looks up an OC Stamp envelope by content hash and signer:
+
+```
+stamp(content_hash=sha256:<hex>, signer=<addr>)
+```
+
+The verifier consults the OC Stamp directory (Nostr kind-30083 under the
+`oc-stamp:*` d-tag namespace) and validates each matching envelope. The pledge
+is `kept` if at least one is authentic and its `signed_at` is before the
+pledge's `resolves_at`. This is the canonical way to pledge "I will publish X by
+time T."
 
 ## http_get_hash
 
-Fetches a URL, compares SHA-256 of the response body to an expected value.
-Follows redirects up to a fixed limit. Implementations document their
-user-agent, timeout, and redirect behavior — disagreements on HTTP resolution
-are not protocol bugs and resolve in favor of the majority of conforming
-implementations (see SPEC §3.4.5 for the formal "best-effort" clause for
-non-fully-deterministic public state).
+Fetches a URL, compares SHA-256 of the response body to an expected value:
+
+```
+GET <https-url> body_sha256 == <64-hex>
+```
+
+Implementations follow at most 5 redirects, stop after 30 seconds in total, send
+`User-Agent: oc-pledge/0.1`, and verify TLS. Disagreements on transient network
+conditions are not protocol bugs: a contested result goes to the majority across
+at least three independent verifications (SPEC §3.4.5).
 
 ## dns_record
 
-`<record_type> <name>` queried via DNS-over-HTTPS from a specified resolver set.
-The resolver set is part of the canonical query so that two verifiers reach the
-same answer.
+```
+<TYPE> <name> == <value>
+```
+
+`TYPE` is one of `A`, `AAAA`, `TXT`, `CAA`, `MX`, `CNAME`. The query runs over
+DNS-over-HTTPS against at least two of the resolvers the spec names (Cloudflare,
+Google, Quad9). The record matches only if every queried resolver returns
+`<value>` byte for byte.
 
 ## vote_resolves
 
@@ -84,12 +101,15 @@ explicitly rejected:
 - **`self_proof`** — a free-text "trust me" proof. Refused on
   protocol-correctness grounds: a pledge whose truth can't be checked from
   public state is not a pledge, it's a claim.
-- **`oracle_attests`** — single-oracle resolution. Refused because the oracle
-  becomes a captured intermediary; any oracle-resolution use case can be modeled
-  as `counterparty_signs` with the oracle as counterparty.
-- **`majority_signs`** — m-of-n threshold of named signers. Deferred until v0.2
-  with bonded voter sets; in v1.0 the same thing is modeled via `vote_resolves`
-  with a 1-option poll.
+- **`arbiter_decides`** — an unconstrained third-party judgment. Use
+  `vote_resolves` for group judgment, or `counterparty_signs` with the
+  adjudicator as the counterparty.
+- **`oracle_feed`** — a price, weather or score feed makes the oracle a trust
+  anchor without naming it. Use `http_get_hash` against a specific endpoint,
+  which names the oracle.
+- **`kleros_court`** — embeds a specific token-economy arbitration system. Use
+  `vote_resolves`.
+- **`escrow_release`** — requires custody, which the protocol refuses.
 
 The full rejection log: [WHY](/pledge/why) and the
 [REGISTRY](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md).

@@ -38,10 +38,10 @@ attaches to the same Bitcoin address that holds the bond."
 
 The teeth are not in losing the bond. The teeth are in:
 
-1. **The public record.** A broken pledge is queryable forever via
-   `outcomesFor(address)`. Gates, forums, relays, airdrops, DAOs, and any other
-   verifier can refuse to interact with addresses that have broken pledges in a
-   recent window.
+1. **The public record.** A broken pledge is queryable forever via the NIP's
+   `outcomes_for(address)` relay query. Gates, forums, relays, airdrops, DAOs,
+   and any other verifier can refuse to interact with addresses that have broken
+   pledges in a recent window.
 2. **The economic continuity.** The address that broke the pledge is the same
    address whose `sats × days` Continues to age. Honest signers accumulate
    kept-pledge history alongside their stake. A new address has no history; an

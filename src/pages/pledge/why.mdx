@@ -68,10 +68,11 @@ the short version:
   attached public record meaningful. A slashing mechanism would require custody,
   which the entire orangecheck family refuses.
 - **No aggregated reputation score.** Same discipline orangecheck follows with
-  `sats_bonded` and `days_unspent` vs. `score_v0`. The protocol ships raw
-  metrics (`pledgesSworn`, `outcomesFor`, `bondInFlight`) and refuses to ship a
-  reference score at all. There is no natural scoring function that doesn't
-  embed strong policy opinions; any shipped score will be misused as canonical.
+  `sats_bonded` and `days_unspent` vs. `score_v0`. The protocol defines raw
+  relay queries (`pledges_sworn`, `outcomes_for`, `bond_in_flight`) and refuses
+  to ship a reference score at all. There is no natural scoring function that
+  doesn't embed strong policy opinions; any shipped score will be misused as
+  canonical.
 - **No revocation.** A pledge you can walk back is not a pledge. A swearer can
   publish an [abandonment envelope](/pledge/state-machine), but it counts as
   `broken`. No "honorable exit" — preempts the race-to-abandon attack where
@@ -79,9 +80,9 @@ the short version:
 - **No pledge chains in v1.0.** The pattern of "this pledge's resolution
   triggers that pledge's resolution" is interesting and we expect to ship it
   post-v1 once we observe what real-world patterns demand it.
-- **No bonded voter sets for dispute resolution in v1.0.** v1.0 ships with a
-  named address list for `vote_resolves`. Bonded voters is a v0.2 enhancement
-  once real dispute volume exists.
+- **No voter list in the pledge.** `vote_resolves` names an OC Vote poll by id,
+  and the poll sets who votes and how each ballot is weighted
+  ([weight modes](/vote/weight-modes)).
 
 ## What we kept from each adjacent system
 

@@ -147,7 +147,7 @@ console.log('Author:', result.envelope.signer.address);
 if (result.anchor.status === 'confirmed') {
     console.log('Anchored in Bitcoin block:', result.anchor.blockHeight);
 } else {
-    console.log('Anchor:', result.anchor.status); // "pending" or "none"
+    console.log('Anchor:', result.anchor.status); // "pending", "none", or "unchecked" if headers did not load
 }
 ```
 

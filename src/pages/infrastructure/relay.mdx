@@ -23,7 +23,7 @@ It's a [strfry](https://github.com/hoytech/strfry) instance running on Fly.io
 (region `fra`). strfry has no kind allowlist of its own, so one write-policy
 plugin,
 [`policy/oc-dtag-filter.py`](https://github.com/orangecheck/oc-relay-infra/blob/main/policy/oc-dtag-filter.py),
-decides what it stores. It applies two gates:
+decides what it stores. It applies two shape gates to every event:
 
 1. **Kind allowlist.** Only the family's kinds are accepted: 30078, 30080–30087,
    and OC Chat's 30110–30112 and 30114. Anything else is rejected with
@@ -49,18 +49,28 @@ decides what it stores. It applies two gates:
 | 30112 | OC Chat · seal                            | `oc-lock-chat-seal:`                                                                                                                                         |
 | 30114 | OC Chat · directory                       | `oc-lock-chat-dir:` or `oc-lock-chat-chdir:`                                                                                                                 |
 
-Together, those two gates mean **every event served from relay.ochk.io is by
-construction an orangecheck family event**. Spam is structurally impossible
-without anyone deciding what's spam — the policy is shape-only, never content.
+Together, those two gates mean **every event served from relay.ochk.io has a
+family kind and a family `d` tag**. On top of them:
+
+- **Two kinds are checked further.** A kind-30114 directory event must meet OC
+  Chat's claim rule, and a kind-30078 OC Lock device record (`oc-lock:device:`)
+  must carry a valid BIP-322 signature. A sidecar runs both checks; a late or
+  failed check is a refusal.
+- **Each source has write limits.** A source (an IPv4 address, or an IPv6
+  address by its /64) may send 30 events at once and then one every 2 seconds,
+  and at most 1,000 events and 4 MiB of event JSON per UTC day. A source with 60
+  events refused within an hour is refused for the next hour. Over a limit, the
+  answer is `rate-limited: too many events from this address, try again later`.
 
 ## What it doesn't do
 
-- **It does not read content.** The policy plugin gates by `kind` and the
-  literal `d`-tag bytes, never the envelope body. If you want semantic
-  rejection, you want a verifier; the relay enforces shape.
+- **It does not judge content.** Apart from the directory and device-record
+  checks above, the policy reads only `kind` and the literal `d`-tag bytes,
+  never the envelope body. If you want semantic rejection, you want a verifier;
+  the relay enforces shape.
 - **It does not require auth.** No NIP-42 challenge on the read or write path.
-  Anyone, anywhere, with any pubkey, can publish a family-shaped event or query
-  for one.
+  Anyone, anywhere, with any pubkey, can publish a family-shaped event (within
+  the write limits) or query for one.
 - **It does not charge.** Free, anonymous, public.
 - **It does not act as a custodian or trust anchor.** Relays are commodity
   infrastructure. Trust anchors are Bitcoin (BIP-322 attestations) and

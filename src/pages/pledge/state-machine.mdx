@@ -8,14 +8,14 @@ export const metadata = {
 
 Every pledge is in **exactly one** of these states at any given time:
 
-| State                | Meaning                                                                  |
-| -------------------- | ------------------------------------------------------------------------ |
-| `pending`            | Sworn, before `resolves_at`.                                             |
-| `resolvable`         | Past `resolves_at`, within `expires_at`, no outcome published yet.       |
-| `kept`               | Outcome published, outcome = kept, dispute window passed.                |
-| `broken`             | Outcome published, outcome = broken, dispute window passed.              |
-| `disputed`           | Contradictory outcome envelopes within dispute window — pending dispute. |
-| `expired_unresolved` | Past `expires_at` with no consistent outcome.                            |
+| State                | Meaning                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| `pending`            | Sworn, before `resolves_at`.                                                                          |
+| `resolvable`         | Past `resolves_at`, within `expires_at`, no outcome published yet.                                    |
+| `kept`               | Outcome published, outcome = kept. Provisional until the dispute window passes, then final.           |
+| `broken`             | Outcome published, outcome = broken (provisional until the dispute window passes), or an abandonment. |
+| `disputed`           | Contradictory outcome envelopes within dispute window — pending dispute.                              |
+| `expired_unresolved` | Past `expires_at` with no consistent outcome.                                                         |
 
 State transitions are **pure functions** of
 `(pledge envelope, outcome envelope or absence, current time, relevant public state)`.
@@ -32,8 +32,8 @@ stateDiagram-v2
     [*] --> pending: sworn
     pending --> resolvable: now ≥ resolves_at
     pending --> broken: abandonment<br/>envelope
-    resolvable --> kept: outcome verified<br/>(after dispute window)
-    resolvable --> broken: outcome verified<br/>(after dispute window)
+    resolvable --> kept: outcome verified<br/>(final after dispute window)
+    resolvable --> broken: outcome verified<br/>(final after dispute window)
     resolvable --> disputed: contradictory<br/>outcome envelope
     resolvable --> expired_unresolved: now ≥ expires_at<br/>no outcome
     disputed --> kept: dispute mechanism resolves
@@ -58,12 +58,13 @@ where swearers dodge a foreseeable break by admitting it slightly earlier.
 ## What "verified" means in `resolvable → kept|broken`
 
 For deterministic mechanisms (`chain_state`, `nostr_event_exists`,
-`stamp_published`, `http_get_hash`, `dns_record`): the verifier re-computes the
-outcome envelope from public state. Byte-equal to the published one ⇒ verified.
+`stamp_published`, `http_get_hash`, `dns_record`, `vote_resolves`): the verifier
+re-computes the outcome envelope from public state. Byte-equal to the published
+one ⇒ verified. For `vote_resolves`, that public state is the named OC Vote
+poll's tally, checked against the pledge's threshold; the outcome is unsigned.
 
-For `counterparty_signs` and `vote_resolves`: BIP-322 signature checks under the
-resolver address; for `vote_resolves`, the named poll must have a finalized
-tally meeting the pledge's threshold.
+For `counterparty_signs`: a BIP-322 signature check under the counterparty's
+address.
 
 ## Bond verification at every transition
 
@@ -79,14 +80,13 @@ anything to a swearer's status; it only _exposes_ the facts.
 
 ## Dispute window
 
-For deterministic outcomes the dispute window is short (default 24 hours)
-because contradiction is unlikely — if two observers reach different outcomes
-for the same public state, at least one is buggy. For `counterparty_signs` it's
-longer (default 7 days) because contradiction is the expected disagreement mode
-and the pledge's `dispute.mechanism` needs time to resolve.
+Each outcome envelope carries its own `dispute_window_ends_at`, written by
+whoever writes the outcome. The pledge has no dispute-window field, and the
+protocol sets no default length.
 
-The dispute window length is a per-pledge field, not a global default. Swearers
-choose at swearing time.
+`classifyState` returns an outcome as soon as it is in force, inside the window
+too. A verifier that wants to tell a provisional outcome from a final one
+compares `now` with `dispute_window_ends_at` itself.
 
 ## The `expired_unresolved` class is intentional
 

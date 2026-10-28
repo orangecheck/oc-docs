@@ -7,8 +7,9 @@ export const metadata = {
 # Weight modes
 
 A poll's `weight_mode` determines how each ballot gets weighted in the final
-tally. Three modes ship as canonical; adding a new one requires a protocol
-version bump.
+tally. Three modes ship as canonical. Any other mode is an extension, added
+through the protocol's weight-mode registry (SPEC §11) without a version bump; a
+client that does not support a poll's mode rejects it with `E_UNSUPPORTED_MODE`.
 
 All three start from the same set: a voter's **qualifying UTXOs** are the coins
 the voter's address held at the snapshot block that were at least `min_days` old

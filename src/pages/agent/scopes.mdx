@@ -141,8 +141,8 @@ verifiers MAY reject such delegations by policy.
 
 New products, verbs, and constraint keys are allocated by PR to the
 [oc-agent-protocol](https://github.com/orangecheck/oc-agent-protocol)
-repository. Vendor-specific experimental values SHOULD use an `x-vendor/` prefix
-until standardized.
+repository. Each name is a lowercase identifier (`[a-z][a-z0-9_]*`). Until a
+name is registered, strict-mode verifiers refuse it.
 
 ## Implementing the sub-scope check
 

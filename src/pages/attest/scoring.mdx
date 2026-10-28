@@ -11,11 +11,11 @@ chain state — the signer doesn't control them at signing time.
 
 ## The three metrics
 
-| Metric         | Meaning                       | How it's derived                                                                                                                                                    |
-| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sats_bonded`  | Integer satoshis              | Sum of confirmed, unspent UTXO values at the address — or, if the `bond:` extension is present in the signed message, exactly that declared value (surplus ignored) |
-| `days_unspent` | Integer days                  | Days since the earliest confirmation time among the bonded UTXOs                                                                                                    |
-| `score`        | Reference `score_v0` (number) | Formula below; advisory only                                                                                                                                        |
+| Metric         | Meaning                       | How it's derived                                                                                                                                                                                |
+| -------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sats_bonded`  | Integer satoshis              | Sum of confirmed, unspent UTXO values at the address — or, if the `bond:` extension is present in the signed message, exactly that declared value (surplus ignored)                             |
+| `days_unspent` | Integer days                  | Days since the oldest confirmed UTXO was confirmed — or, with a `bond:` line or a `min_sats` the checker asks for, the age of the youngest UTXO in the oldest-first set that covers that amount |
+| `score`        | Reference `score_v0` (number) | Formula below; advisory only                                                                                                                                                                    |
 
 These are recomputed from live chain state on every verify call. The signed
 canonical message does NOT carry these values authoritatively — if it did, a
@@ -64,8 +64,8 @@ reimplementing the formula. Gates should ignore it.
 
 ## Tier labels (UI convenience)
 
-The reference SDKs expose a `computeTier()` helper that returns a coarse-grained
-label for visual display:
+`@orangecheck/sdk` exposes `computeScore(sats, days, { algorithm: 'tier' })`,
+which returns a coarse-grained label for visual display:
 
 | Tier       | Minimum sats | Minimum days |
 | ---------- | ------------ | ------------ |
@@ -82,9 +82,8 @@ labels.
 ## Edge cases
 
 - **`sats_bonded == 0`** → status code `bond_zero`. The signature is still valid
-  cryptographically; the chain state just shows no bond right now. Default
-  verifier behavior returns `ok: true` with `bond_zero` in the codes — policy
-  layers decide what zero bond means.
+  cryptographically; the chain state just shows no bond right now. Verification
+  returns `ok: false` with `bond_zero` in the codes and no metrics.
 - **Unconfirmed deposits** → `bond_pending`. Unconfirmed UTXOs never count
   toward `sats_bonded`.
 - **Spent UTXOs** → not counted. When the signer spends, the proof's
@@ -93,8 +92,8 @@ labels.
   holding more than they want to "bond" should use the `bond:` extension to pin
   intent.
 - **Multiple UTXOs, one old and one new** → `days_unspent` is computed from the
-  oldest-first greedy selection against the declared bond (or over the full
-  confirmed set if no bond is declared).
+  oldest-first greedy selection against the declared bond or the `min_sats`
+  asked for (or from the oldest confirmed UTXO when neither applies).
 
 ## Your own algorithm
 

@@ -62,9 +62,10 @@ relay event = a lost message. A conforming deployment therefore SHOULD provide a
 **store-and-forward inbox** — an operator-run queue retaining the _opaque_
 gift-wrap inner blob until the recipient drains it.
 
-> **This is the free-tier floor, not a paid feature.** A paid tier extends only
-> the retention horizon, multi-device fan-out, and history depth. Durability of
-> basic delivery is never the paywall.
+> **This is the free-tier floor, not a paid feature.** A paid tier extends the
+> retention horizon, multi-device fan-out, and history depth; chat.ochk.io's
+> Personal plan also raises the per-message, queue and hourly deposit caps.
+> Durability of basic delivery is never the paywall.
 
 The operator MUST be unable to (a) **read** any message — it holds ciphertext
 only, never a key — or (b) **link** two conversations of one recipient, or link
@@ -141,6 +142,10 @@ open relay. [NIP-42](https://nips.nostr.com/42) lets a relay demand an
 **authenticated** connection before it serves or accepts events, so an
 _unauthenticated_ observer never sees the `p` tag. Pairing an `auth-required`
 relay with the v2 wrap is the **institutional privacy posture**.
+
+This is part of the protocol. chat.ochk.io does not perform the AUTH handshake
+and offers only a fixed list of open relays, so it cannot use an `auth-required`
+relay.
 
 **Handshake.** On an `auth-required` relay the server sends
 `["AUTH", <challenge>]`; the client replies

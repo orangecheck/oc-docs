@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC Pledge — Specification',
     description:
-        'Normative pointer page. The full SPEC, NIP, REGISTRY, WHY, and SECURITY documents live in the oc-pledge-protocol repo. 33 conformance vectors are required-pass for any conforming implementation.',
+        'Normative pointer page. The full SPEC, NIP, REGISTRY, WHY, and SECURITY documents live in the oc-pledge-protocol repo. The conformance vectors are required-pass for any conforming implementation.',
 };
 
 # Specification
@@ -9,11 +9,10 @@ export const metadata = {
 <SpecCard
     repo="oc-pledge-protocol"
     kind="spec"
-    note="SPEC.md is the authoritative rules. The full normative set — four documents plus thirty-three required-pass conformance vectors — is laid out below."
+    note="SPEC.md is the authoritative rules. The full normative set — four documents plus the required-pass conformance vectors — is laid out below."
 />
 
-The normative spec is one repo, four documents, twenty-eight conformance
-vectors:
+The normative spec is one repo, four documents and a set of conformance vectors:
 
 | Document                                                                                                             | What it covers                                                        |
 | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -23,26 +22,28 @@ vectors:
 | [`REGISTRY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md)                             | Resolution mechanisms, extension policy, change process               |
 | [`WHY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/WHY.md)                                       | Design rationale + the rejected-design log                            |
 | [`SECURITY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SECURITY.md)                             | Threat model, verifier obligations, mitigations                       |
-| [`/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)                         | 33 conformance vectors — required-pass for any impl                   |
+| [`/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)                         | Conformance vectors — required-pass for any impl                      |
 | [`/examples/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/examples)                                 | Three runnable example envelopes                                      |
 
 License: **MIT**, for the spec, the examples and the test vectors.
 
 ## Conformance vectors
 
-Twenty-eight vectors at v1.0:
+The vectors, by group:
 
-| Group                     | Vectors | Coverage                                                              |
-| ------------------------- | ------- | --------------------------------------------------------------------- |
-| Resolution mechanisms     | v01–v07 | One happy-path vector per mechanism (`chain_state` … `vote_resolves`) |
-| Agent delegation          | v08     | Pledge signed by an agent under `pledge:create` delegation scope      |
-| Edge cases                | v09–v10 | `resolves_at == expires_at`, same-block resolve                       |
-| Outcome envelope shapes   | v11–v16 | One per mechanism — deterministic and resolver-signed                 |
-| Abandonment               | v17     | Abandonment envelope, classification = broken                         |
-| Bond verification         | v18–v20 | Valid, invalid, and spent-mid-pledge                                  |
-| Bilateral consistency     | v21–v22 | Both parties consistent vs contradictory                              |
-| State-machine transitions | v23–v27 | All 5 transition classes from §2.4 of the brief                       |
-| Malformed-input rejection | v28     | Empty `nonce` — implementation MUST reject before computing canonical |
+| Group                     | Vectors               | Coverage                                                                                                                                                                  |
+| ------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resolution mechanisms     | v01–v07               | One happy-path vector per mechanism (`chain_state` … `vote_resolves`)                                                                                                     |
+| Agent delegation          | v08, v33              | Pledge signed by an agent under `pledge:create` delegation scope; an agent address equal to the swearer is rejected                                                       |
+| Edge cases                | v09–v10               | `resolves_at == expires_at`, same-block resolve                                                                                                                           |
+| Outcome envelope shapes   | v11–v16               | One per mechanism — deterministic and resolver-signed                                                                                                                     |
+| Abandonment               | v17                   | Abandonment envelope, classification = broken                                                                                                                             |
+| Bond verification         | v18–v20, v29–v30      | Valid, invalid, and spent-mid-pledge; `days_unspent` is the age of the coins covering `min_sats`                                                                          |
+| Bilateral consistency     | v21–v22               | Both parties consistent vs contradictory                                                                                                                                  |
+| State-machine transitions | v23–v27, v31–v32, v39 | All 5 transition classes from §2.4 of the brief; an outcome dated after `now`, a signed outcome after `expires_at`, an abandonment whose reason holds a line break        |
+| Malformed-input rejection | v28, v41–v45          | Empty `nonce` — implementation MUST reject before computing canonical; a line feed in `evidence.result`, the string `"null"` for a null field, non-ASCII digits in a time |
+| Field tolerance           | v34–v38, v40          | Abandonment reasons and outcome evidence a verifier MUST NOT refuse (long, empty, line breaks); a lone surrogate's canonical bytes                                        |
+| Delegation scope check    | v46                   | 31 `pledge:create` scope cases                                                                                                                                            |
 
 Every vector is a `(inputs, expected_outputs)` JSON tuple. Implementations ship
 a harness that runs all vectors and reports pass/fail. **CI must run the

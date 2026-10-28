@@ -87,8 +87,8 @@ We considered three shapes:
    sub-scope decidability becomes undecidable for a realistic feature set.
 3. **Declarative scope strings with a constraint registry.** Shipped. Simple
    enough to parse in a hundred lines, powerful enough to express "send at most
-   1000 sats via Lightning to this node, ten times, until Friday," and
-   structurally limited so sub-scope containment is always decidable.
+   1000 sats via Lightning to this node, until Friday," and structurally limited
+   so sub-scope containment is always decidable.
 
 Scope strings are the protocol's contract with both humans and verifiers. A user
 reading `ln:send(max_sats<=1000,node=03abc…)` in a wallet prompt understands it

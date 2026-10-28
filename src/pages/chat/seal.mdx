@@ -6,11 +6,12 @@ export const metadata = {
 
 # Seal-til-block
 
-`seal-til-block` (`kind="chat-seal"` with a `seal` block) sends a message whose
-contents become readable only **after the Bitcoin chain passes a future block
-height**. The recipient receives the ciphertext immediately but holds no key
-until then. This is the one mode that **fails the Ed25519 substitution test by
-design** — and OC Chat says so, in writing, on every seal surface.
+`seal-til-block` (a `seal` block on the message; `kind="chat-seal"` in the
+spec's upgrade target) sends a message whose contents become readable only
+**after the Bitcoin chain passes a future block height**. The recipient receives
+the ciphertext immediately but holds no key until then. This is the one mode
+that **fails the Ed25519 substitution test by design** — and OC Chat says so, in
+writing, on every seal surface.
 
 > **A v0 beacon seal is beacon-enforced, not Bitcoin-consensus-enforced.** The
 > word "trustless" MUST NOT describe it. A colluding beacon threshold can
@@ -44,14 +45,17 @@ loud. We do not paper over it.
   "beacon_id":       "drand:quicknet",
   "beacon_url":      "<https endpoint of the beacon>",
   "redundant_beacon": null,
-  "confirmations":   6,
+  "confirmations":   1,
   "cltv_outpoint":   null
 }
 ```
 
 `seal` is committed in the `id`: changing `unlock_block` or any beacon field
 changes the `id` and breaks the sender signature (the
-[content-addressing rule](/chat/envelope)).
+[content-addressing rule](/chat/envelope)). This is the spec's seal block. The
+v0 seal that chat.ochk.io sends carries no `redundant_beacon` or
+`cltv_outpoint`, adds the profile fields below, and sets `confirmations` to 1 by
+default.
 
 ## What ships: the v0 in-ciphertext drand-tlock profile
 
@@ -140,8 +144,9 @@ If `redundant_beacon` is set, `content_key` is escrowed independently to
 doubles the early-release surface**: either committee can independently decrypt
 the body early. A sealed message's UI MUST read **"readable early by
 `{named quorum}`"**, not "unlocks at block N." Opt-in only, with the asymmetry
-disclosed. (The drand `fastnet` sunset, which permanently bricked its
-ciphertexts, is the cautionary precedent for why the hedge exists — and
+disclosed. This is a protocol option; chat.ochk.io does not offer a redundant
+beacon. (The drand `fastnet` sunset, which permanently bricked its ciphertexts,
+is the cautionary precedent for why the hedge exists — and
 [Security S3/S4](/chat/security) for its cost.)
 
 ## Standing delivery (dead-man's-switch)

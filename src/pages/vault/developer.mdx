@@ -13,7 +13,7 @@ one `ocv://` reference syntax, and a GitHub Action.
 ## The model — why a leaked token is not a leaked vault
 
 OC Vault is zero-knowledge: `vault.ochk.io` stores only ciphertext, and the
-vault key is derived from your passphrase. A developer surface has to let a
+vault key is unwrapped with your passphrase. A developer surface has to let a
 headless process read secrets without breaking that, so oc-vault **splits the
 credential in two**:
 
@@ -130,8 +130,8 @@ declare const passphrase: string;
 const vault = OcVault.fromExport(exportJson, escrow, passphrase);
 ```
 
-The vault key is derived in-process and never transmitted. Full API reference:
-[`/sdk/vault-core`](/sdk/vault-core/README).
+The vault key is unwrapped in-process and never transmitted unsealed. Full API
+reference: [`/sdk/vault-core`](/sdk/vault-core/README).
 
 ## GitHub Actions
 

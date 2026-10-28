@@ -6,34 +6,35 @@ export const metadata = {
 
 # OC Vault · Quickstart
 
-**Five steps from cold to a working vault.** No OC account to create — your
-Bitcoin identity _is_ the account. Nothing here is destructive, and the free
-tier needs no payment.
+**Five steps from cold to a working vault.** You sign in to your orangecheck
+account; the vault itself opens with a passphrase only you hold. Nothing here is
+destructive, and the free tier needs no payment.
 
-## 01 · sign in with Bitcoin
+## 01 · sign in
 
 Open [vault.ochk.io](https://vault.ochk.io) and click **sign in**. Vault uses
 the orangecheck family auth host at `ochk.io`:
 
 - **Bitcoin wallet** — a single BIP-322 challenge. UniSat, Xverse, Leather, OKX,
   Phantom, Sparrow, or a manual paste-and-sign fallback.
-- **Email-OTP** — for users without a wallet, an orangecheck-issued identity is
-  provisioned silently. That is an identity, not custody of your secrets: the
-  vault key is generated in your browser on either path and OC never sees it.
+- **An email code, Google or GitHub** — an orangecheck account without a wallet.
 
-There is no password to choose and none to forget. The session is a short-lived
-signed cookie scoped to `.ochk.io`; vault.ochk.io verifies it locally and stores
-nothing about you server-side beyond payment status.
+Either way the sign-in only fetches ciphertext; it does not open your vault. The
+session is a short-lived signed cookie scoped to `.ochk.io`, which vault.ochk.io
+verifies locally.
 
-## 02 · the vault key is generated for you
+## 02 · set your vault passphrase
 
-On first load your browser generates a **vault key** — 32 random bytes held in
-IndexedDB. This is the AES-256-GCM key that seals every entry. It never leaves
-the device and OC never sees it.
+On first open your browser generates a **vault key** — 32 random bytes, the
+AES-256-GCM key that seals every entry — and asks for a **vault passphrase**: a
+generated six-word one by default (about 50 bits), or one you choose. It also
+shows a **recovery code** once: 24 characters, 120 bits. Keep it offline.
 
-You don't manage this key directly. Its fingerprint (`sha256[:8]`) is shown on
-the settings page so you can confirm two devices are _not_ yet sharing one —
-that is what cloud sync is for.
+The key is stored on vault.ochk.io only wrapped under the passphrase and under
+the recovery code (scrypt, then AES-256-GCM), so any device you sign in on can
+unlock with either. orangecheck never receives the passphrase or the code and
+cannot reset them. Lose both, with no encrypted backup file, and the entries are
+gone.
 
 ## 03 · add your first entry
 
@@ -103,8 +104,8 @@ Parsing happens entirely in your browser — the CSV file never reaches a server
 
 The same vault is available from three surfaces:
 
-- **The browser** — install the [OC Vault extension](/vault/extension) for
-  autofill, login capture, and one-click access to your vault from the toolbar.
+- **The browser** — the [OC Vault extension](/vault/extension), in publish prep,
+  adds autofill, login capture, and one-click access to your vault.
 - **The shell** — `npm install -g @orangecheck/vault-cli` gives you the
   [`oc-vault` command](/vault/developer): `read`, `run`, `inject`, `export`,
   `item list/get`. Resolves `ocv://personal/<item>/<field>` references from

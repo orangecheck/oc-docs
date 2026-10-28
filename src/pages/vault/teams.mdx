@@ -24,19 +24,20 @@ team key is shared, so the people on the membership list can read what the team
 has. Everyone _outside_ the membership list — including OC — sees ciphertext
 only.
 
-| Property               | Personal vault                                | Team vault                                                                                 |
-| ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Key                    | 32 random bytes per identity                  | 32 random bytes per team                                                                   |
-| Where the key lives    | your browser's IndexedDB                      | every member's browser IndexedDB, escrowed under their personal vault key                  |
-| How a new device joins | Witnessed Recovery, encrypted backup, or sync | invite URL whose **fragment** carries the team key (the fragment never leaves the browser) |
-| Server sees            | random envelope id + ciphertext               | random envelope id + ciphertext + the team id                                              |
-| Cryptographic backstop | only the vault key decrypts                   | only the team key decrypts                                                                 |
+| Property               | Personal vault                                                                      | Team vault                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Key                    | 32 random bytes per identity                                                        | 32 random bytes per team                                                                   |
+| Where the key lives    | your browser's IndexedDB                                                            | every member's browser IndexedDB, escrowed under their personal vault key                  |
+| How a new device joins | passphrase or recovery code, a hand-off from another device, or an encrypted backup | invite URL whose **fragment** carries the team key (the fragment never leaves the browser) |
+| Server sees            | random envelope id + ciphertext                                                     | random envelope id + ciphertext + the team id                                              |
+| Cryptographic backstop | only the vault key decrypts                                                         | only the team key decrypts                                                                 |
 
 ## How a team is formed and joined
 
 1. **You create the team.** Your browser draws a fresh 32-byte team key and
-   stores it in IndexedDB under a per-team metadata record. The key never leaves
-   the device.
+   stores it in IndexedDB under a per-team metadata record. It leaves the
+   browser only in an invite fragment (step 2) or wrapped under a member's
+   personal vault key (step 4).
 2. **You invite a teammate.** vault.ochk.io issues an invite token (a
    one-time-use, expiring credential — no key material) and hands you an invite
    URL whose **fragment** carries the team key:
@@ -44,7 +45,7 @@ only.
    fragments are never sent to a server, the same primitive
    [one-time share links](/vault/protocol#one-time-share-links) use.
 3. **They open the link.** Their browser extracts the team key from the
-   fragment, signs the invite-claim challenge with their wallet, and joins. The
+   fragment, claims the invite under their signed-in session, and joins. The
    token is consumed; the team key now lives in their IndexedDB.
 4. **They get a team-key escrow for free.** As soon as your browser holds a team
    key, it wraps that key under your **personal** vault key and stores it on the

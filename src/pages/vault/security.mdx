@@ -17,27 +17,29 @@ Implementers and researchers should also read the protocol's
 
 ## One-glance threat model
 
-| Adversary                                 | What they learn                                                             | What they cannot                                         | Mitigation                                                                                               |
-| ----------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| **OC / vault.ochk.io database access**    | That an identity has _N_ encrypted blobs, each with a random id + timestamp | Entry names, types, tags, payloads — anything readable   | Baked in — the double-encrypted blob (see below)                                                         |
-| **Network observer**                      | You speak HTTPS to vault.ochk.io                                            | Content (TLS) and metadata (double encryption)           | —                                                                                                        |
-| **Possessor of a share URL**              | Share ciphertext                                                            | The entry — the AES key lives in the URL fragment only   | Send the link over a channel only the recipient has                                                      |
-| **Possessor of a team invite URL**        | The team key                                                                | The personal vaults of any member                        | Send the link over a channel only the recipient has — same rule as share URLs. See [Teams](/vault/teams) |
-| **Stolen unlocked browser**               | Full decrypted vault                                                        | —                                                        | Auto-lock; OS disk encryption; lock before stepping away                                                 |
-| **Stolen locked / signed-out browser**    | Ciphertext at rest in IndexedDB                                             | Plaintext — the session cookie is required to re-open    | Auto-lock; sign out on shared machines                                                                   |
-| **Compromised wallet extension**          | Can complete a sign-in as you                                               | Cannot exfiltrate the vault key (never leaves IndexedDB) | Hardware wallet; manual signature paste                                                                  |
-| **Lost wallet, no export, no cloud sync** | —                                                                           | —                                                        | **None — the entries are gone. This is by design.**                                                      |
+| Adversary                                             | What they learn                                                             | What they cannot                                       | Mitigation                                                                                               |
+| ----------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **OC / vault.ochk.io database access**                | That an identity has _N_ encrypted blobs, each with a random id + timestamp | Entry names, types, tags, payloads — anything readable | Baked in — the double-encrypted blob (see below)                                                         |
+| **Network observer**                                  | You speak HTTPS to vault.ochk.io                                            | Content (TLS) and metadata (double encryption)         | —                                                                                                        |
+| **Possessor of a share URL**                          | Share ciphertext                                                            | The entry — the AES key lives in the URL fragment only | Send the link over a channel only the recipient has                                                      |
+| **Possessor of a team invite URL**                    | The team key                                                                | The personal vaults of any member                      | Send the link over a channel only the recipient has — same rule as share URLs. See [Teams](/vault/teams) |
+| **Stolen unlocked browser**                           | Full decrypted vault                                                        | —                                                      | Auto-lock; OS disk encryption; lock before stepping away                                                 |
+| **Stolen locked / signed-out browser**                | Ciphertext at rest in IndexedDB                                             | Plaintext — the session cookie is required to re-open  | Auto-lock; sign out on shared machines                                                                   |
+| **Someone who takes over your sign-in**               | Can sign in as you and fetch your ciphertext and wrapped vault key          | Open them: that takes your passphrase or recovery code | A strong passphrase; the recovery code kept offline                                                      |
+| **Lost passphrase and recovery code, no backup file** | —                                                                           | —                                                      | **None — the entries are gone. This is by design.**                                                      |
 
 ## What is sealed
 
-- **Every entry payload** — AES-256-GCM under the per-browser vault key, with a
-  fresh 12-byte nonce per write.
+- **Every entry payload** — AES-256-GCM under the vault key, with a fresh
+  12-byte nonce per write.
 - **All entry metadata in the cloud** — entry name, type, tags and timestamps
   are wrapped a second time before upload. OC's blob store sees only a random
   16-byte envelope id and an `updated_at` value. See
   [Protocol → double-encrypted blob](/vault/protocol#cloud-sync--the-double-encrypted-blob).
-- **The vault key itself** — 32 random bytes that never leave the device. OC has
-  no copy and the protocol provides no path to obtain one.
+- **The vault key itself** — 32 random bytes. OC holds it only wrapped under
+  your passphrase and under your recovery code (scrypt, then AES-256-GCM), and,
+  while you link a device, sealed to that device's key. It cannot open any of
+  them.
 
 ## What is exposed by design
 
@@ -57,20 +59,21 @@ Honesty matters more than a clean table:
 
 ## The recovery tradeoff — read this twice
 
-There is **no master-password reset and no recovery backdoor**, because there is
-no account and no key escrow. If you lose access to the wallet that signs you in
-_and_ you have neither a portable export nor active cloud sync, your entries are
-permanently unrecoverable. OC cannot help — OC has nothing to help with.
+There is **no passphrase reset and no recovery backdoor**. orangecheck holds
+your vault key only wrapped under your passphrase and your recovery code, and
+can open neither. If you lose both _and_ have no encrypted backup file, your
+entries are permanently unrecoverable. OC cannot help. Losing your sign-in is
+different: recover it like any login; it only fetches ciphertext.
 
 This is the cost of the core guarantee. A vendor that can recover your data for
 you can also be compelled, or breached, into surrendering it. OC Vault chose the
 other side of that trade. Mitigate it deliberately:
 
-- **Export regularly.** `settings → portable export` produces a file that
-  [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) can open forever.
-- **Turn on cloud sync** so a second device holds the entries.
-- **Witnessed Recovery** (a paid SKU) lets a chosen party hold a timelocked
-  recovery shard — without ever holding key access.
+- **Keep the recovery code offline.** It is the only way in without the
+  passphrase.
+- **Make an encrypted backup** from settings: your vault key and every entry
+  under a passphrase you choose, restorable anywhere with open code.
+- **Witnessed Recovery** is not built and is not for sale.
 
 ## Breach checking · k-anonymity
 

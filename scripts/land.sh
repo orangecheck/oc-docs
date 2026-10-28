@@ -9,6 +9,8 @@
 #   bash scripts/land.sh <branch>          LAND_TIMEOUT=<seconds> (default 3600)
 #   LAND_PR=<number> bash scripts/land.sh   only watch PR <number>: did it land?
 #
+# A PR it opens carries every suppressions-init and suppressions-raise line in
+# the branch's commits. A PR it reuses keeps its body: close it to open a fresh one.
 # Refuses when a check fails on the PR, when the queue drops it, or when the PR
 # is closed. Rebase isn't needed first: the queue rebases onto main itself, so
 # the commits main takes are new ones; a release tag goes on the commit main
@@ -38,8 +40,16 @@ else
     sha=$(git rev-parse --verify "$branch^{commit}")
     git push -q origin "$sha:refs/heads/$branch"
     if ! gh pr view "$branch" -R "$repo" --json number > /dev/null 2>&1; then
+        # CI judges a pull request's suppressions lines on its body alone (lint-gate.md),
+        # so the reviewed ones in the branch's commits go there, read from the range
+        # GitHub itself compares.
+        lines=$(gh api "repos/$repo/compare/main...$sha" --jq '.commits[].commit.message' \
+            | sed -nE 's/^[[:space:]]*(suppressions-(init|raise):.*)$/\1/p' | awk '!seen[$0]++') \
+            || refuse "could not read main...$sha for its suppressions lines; no PR opened"
+        body="Landed by scripts/land.sh through the merge queue."
+        [ -z "$lines" ] || body+=$'\n\n'"$lines"
         gh pr create -R "$repo" --base main --head "$branch" --title "$(git log -1 --format=%s "$sha")" \
-            --body "Landed by scripts/land.sh through the merge queue." > /dev/null
+            --body "$body" > /dev/null
     fi
     gh pr merge "$branch" -R "$repo" --auto > /dev/null
     number=$(gh pr view "$branch" -R "$repo" --json number --jq .number)

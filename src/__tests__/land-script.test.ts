@@ -1,8 +1,8 @@
 // scripts/land.sh against a scripted gh: a PR the queue has merged is reported
 // merged even when one read shows it open and out of the queue, and a real drop
-// still fails, with its reason.
+// still fails, with its reason. A PR it opens carries the branch's suppressions lines.
 import { spawnSync } from 'node:child_process';
-import { chmodSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -59,6 +59,67 @@ esac
         encoding: 'utf8',
     });
     return { code: r.status, out: r.stdout + r.stderr };
+}
+
+/**
+ * Runs the script on branch topic with no PR open yet. origin's push URL is a local
+ * bare repository, so origin still reads as GitHub, and ssh is refused outright, so
+ * nothing can reach the real one. gh answers the compare for main...topic with
+ * `messages` (or fails when it is null) and records the arguments `gh pr create` gets.
+ */
+function open(messages: string[] | null) {
+    const dir = mkdtempSync(join(tmpdir(), 'land-open-'));
+    const bare = join(dir, 'bare.git');
+    spawnSync('git', ['init', '-q', '--bare', bare]);
+    const work = checkout();
+    const git = (...a: string[]) => spawnSync('git', ['-C', work, ...a], { encoding: 'utf8' });
+    git('config', 'remote.origin.pushurl', bare);
+    git('checkout', '-q', '-b', 'topic');
+    git(
+        '-c',
+        'user.name=land-test',
+        '-c',
+        'user.email=land-test@example.invalid',
+        'commit',
+        '-q',
+        '--allow-empty',
+        '-m',
+        'Topic'
+    );
+    if (messages) writeFileSync(join(dir, 'messages'), messages.join('\n') + '\n');
+    const fake = join(dir, 'gh');
+    writeFileSync(
+        fake,
+        `#!/usr/bin/env bash
+case "$*" in
+  *graphql*) printf '%s\\n' "${read('MERGED', false, false, '-', 'm'.repeat(40))}" ;;
+  *commit.message*) [ -f "${dir}/messages" ] && cat "${dir}/messages" ;;
+  "pr view"*--jq*) echo 7 ;;
+  "pr view"*) exit 1 ;;
+  "pr create"*) printf '%s\\0' "$@" > "${dir}/created" ;;
+  "pr merge"*) ;;
+  *) exit 1 ;;
+esac
+`
+    );
+    chmodSync(fake, 0o755);
+    const r = spawnSync('bash', [resolve('scripts/land.sh'), 'topic'], {
+        cwd: work,
+        env: {
+            ...process.env,
+            LAND_GH: fake,
+            LAND_POLL: '0',
+            LAND_TIMEOUT: '30',
+            GIT_SSH_COMMAND: 'false',
+        },
+        encoding: 'utf8',
+    });
+    const pushed =
+        spawnSync('git', ['-C', bare, 'rev-parse', '-q', '--verify', 'topic']).status === 0;
+    const created = join(dir, 'created');
+    const args = existsSync(created) ? readFileSync(created, 'utf8').split('\0') : null;
+    const body = args ? args[args.indexOf('--body') + 1] : null;
+    return { code: r.status, out: r.stdout + r.stderr, body, pushed };
 }
 
 describe('scripts/land.sh', () => {
@@ -119,5 +180,41 @@ describe('scripts/land.sh', () => {
         const failed = land([['OPEN', 'true', 'true', 'QUEUED', 'FAILURE', '-', 'h'].join('\t')]);
         expect(failed.out).toContain('a check failed on PR #7');
         expect(failed.code).toBe(1);
+    });
+
+    it("copies each suppressions line in the branch's commits into the PR it opens, once", () => {
+        const r = open([
+            'Move the feed',
+            '',
+            'suppressions-raise: src/a.tsx react-hooks/refs it moved here from b.tsx',
+            'Unrelated text naming suppressions-raise: in passing',
+            'First file',
+            '',
+            '  suppressions-init: first file, written by --suppress-rule',
+            'suppressions-raise: src/a.tsx react-hooks/refs it moved here from b.tsx',
+        ]);
+        expect(r.code).toBe(0);
+        expect(r.pushed).toBe(true);
+        expect(r.body).toBe(
+            [
+                'Landed by scripts/land.sh through the merge queue.',
+                '',
+                'suppressions-raise: src/a.tsx react-hooks/refs it moved here from b.tsx',
+                'suppressions-init: first file, written by --suppress-rule',
+            ].join('\n')
+        );
+    });
+
+    it('opens the PR with the plain body when the commits carry no line', () => {
+        const r = open(['Fix a link', '', 'The guide moved.']);
+        expect(r.code).toBe(0);
+        expect(r.body).toBe('Landed by scripts/land.sh through the merge queue.');
+    });
+
+    it('opens no PR when it cannot read the range', () => {
+        const r = open(null);
+        expect(r.code).toBe(1);
+        expect(r.out).toContain('for its suppressions lines; no PR opened');
+        expect(r.body).toBeNull();
     });
 });

@@ -10,9 +10,11 @@ export const metadata = {
 [vault.ochk.io](https://vault.ochk.io) is a commercial product of orangecheck,
 parallel to [ochk.app](/me/). Every entry is encrypted in your browser, your
 extension or your CLI under one vault key, which a passphrase only you hold
-unlocks. It encrypts with [OC Lock](/lock/)'s primitives, but it does not seal
-entries to a Bitcoin address or sign them with a wallet: OC Lock's envelopes and
-its Flow 4 self-vault are not what vault does today.
+unlocks. It encrypts with [OC Lock](/lock/)'s primitives under that key, and
+does not store entries as OC Lock envelopes. With a Bitcoin wallet you can also
+export an entry as a signed `.lock` envelope sealed to your own OC Lock devices,
+and bind a browser to your address
+([Protocol](/vault/protocol#signed-lock-export)).
 
 The pitch is one sentence: **a password manager that physically cannot read your
 data.** OC holds ciphertext and nothing else. Even with full database access
@@ -138,7 +140,8 @@ Witnessed Recovery is not built and is not for sale.
 - [Developer platform](/vault/developer) — the `oc-vault` CLI, `ocv://` secret
   references, access tokens, the GitHub Action
 - [Protocol](/vault/protocol) — the vault key and its escrow, the entry record,
-  double-encrypted sync, device hand-off, the export format
+  double-encrypted sync, device hand-off and the Bitcoin device tier, the export
+  format, the signed `.lock` export
 - [Security](/vault/security) — threat model, what is sealed, what is exposed,
   the recovery tradeoff
 
@@ -147,7 +150,8 @@ Witnessed Recovery is not built and is not for sale.
 - **Product** — [vault.ochk.io](https://vault.ochk.io)
 - **Browser extension** — see [/vault/extension](/vault/extension)
 - **Primitives** — [OC Lock](/lock/)'s X25519, HKDF-SHA256 and AES-256-GCM;
-  vault does not use its signed `.lock` envelopes
+  entries are stored under the vault key, and one exports as a signed `.lock`
+  envelope when you ask
 - **SDK** — [`@orangecheck/vault-core`](/sdk/vault-core/README) (the vault
   crypto + model + resolver), `@orangecheck/vault-cli` (the `oc-vault` command),
   and lower-level [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README)

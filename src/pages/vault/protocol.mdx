@@ -1,25 +1,26 @@
 export const metadata = {
     title: 'OC Vault · Protocol',
     description:
-        'How OC Vault seals entries with OC Lock primitives: the vault key and its escrow, the per-entry AES-256-GCM record, the double-encrypted cloud blob that keeps the server blind to metadata, the device hand-off, and the portable export format.',
+        'How OC Vault seals entries with OC Lock primitives: the vault key and its escrow, the per-entry AES-256-GCM record, the double-encrypted cloud blob that keeps the server blind to metadata, the device hand-off and the opt-in Bitcoin device tier, the portable export format, and the signed .lock export.',
 };
 
 # OC Vault · Protocol
 
 OC Vault seals entries with [OC Lock](/lock/)'s primitives (X25519, HKDF-SHA256,
 AES-256-GCM). This page describes how vault entries are sealed, how cloud sync
-stays metadata-blind, how a new device gets the key, and what the portable
-export contains. [`@orangecheck/vault-core`](/sdk/vault-core/README) implements
-this format for the CLI, the SDK and the extension.
+stays metadata-blind, how a new device gets the key, what the portable export
+contains, and how an entry leaves as a signed `.lock` file.
+[`@orangecheck/vault-core`](/sdk/vault-core/README) implements this format for
+the CLI, the SDK and the extension.
 
 ## Why not OC Lock envelopes
 
 OC Lock seals each message as a BIP-322-signed `.lock` envelope addressed to
 device keys bound to a Bitcoin address. That takes a wallet signature per seal,
 and an address: many vault accounts sign in with an email code, Google or
-GitHub. So vault seals everything under a symmetric **vault key** instead. It
-does not implement OC Lock's envelopes or its Flow 4 self-vault, and a signed
-`.lock` export of an entry is not built.
+GitHub. So vault seals everything under a symmetric **vault key** instead, and
+does not store entries as OC Lock envelopes. With a wallet, you can export an
+entry as one: see [Signed .lock export](#signed-lock-export).
 
 ## The vault key
 
@@ -161,6 +162,62 @@ AES-256-GCM, b64url and JSON conventions are all documented and stable. The
 choose (scrypt, then AES-256-GCM), so it restores on a new device with no
 server. If vault.ochk.io shut down tomorrow, both would still open.
 
+## Signed .lock export
+
+With a Bitcoin wallet, an entry can leave the vault as an OC Lock envelope: open
+the entry, then **Export as .lock**. The file is a plain OC Lock envelope
+(`v: 2`, `kind: "identity"`) made by lock-core's `seal()`. The sender is the
+Bitcoin address linked to your orangecheck account with a BIP-322 proof, and the
+recipients are that same address's live OC Lock devices. The vault key is not
+used.
+
+1. vault.ochk.io reads the address's device records (kind 30078, `d` tag
+   `oc-lock:device:<address>`) from nostr-core's five relays, and goes on only
+   if 4 of the 5 finished answering: the
+   [read floor](/infrastructure/relay#write-quorum-and-read-floor). It judges
+   the union of their records, so a revocation any one of them holds retires the
+   device. Records whose BIP-322 signature fails are dropped.
+2. Before you sign, the sheet lists each device with its id and signed bind
+   date, and says that the file opens on those devices without your vault
+   passphrase, that it shows your Bitcoin address, which relays the list came
+   from, and that those relays see your IP address. You tick every device. One
+   you no longer hold stops the export: revoke it at ochk.io/lock first.
+3. Your wallet signs the envelope id once. vault.ochk.io checks the signature
+   against your address before it saves anything.
+4. The browser saves `<entry name>.lock`. Nothing is uploaded.
+
+The payload inside the ciphertext is the entry, decrypted, as this object in RFC
+8785 canonical JSON (`tags` and `folder` only when set):
+
+```json
+{
+    "format": "oc-vault-entries",
+    "version": 1,
+    "entries": [
+        {
+            "type": "password",
+            "name": "github · primary",
+            "fields": { "username": "…", "password": "…" },
+            "created_at": "2026-05-15T…Z",
+            "updated_at": "2026-05-15T…Z"
+        }
+    ]
+}
+```
+
+Any listed device opens it:
+
+- at ochk.io/lock, on a device bound there;
+- in OC Vault, on a browser bound under the
+  [Bitcoin device tier](#the-bitcoin-device-tier): **Import** opens it in that
+  browser, checks the sender's signature, and adds the entries;
+- with lock-core's `unseal` and the device's secret key, anywhere.
+
+Anyone can check who signed it, offline and without a device: the envelope `id`
+is the SHA-256 of its canonical bytes with `id` and `sig.value` emptied, and
+`sig.value` is a BIP-322 signature by `from.address` over that `id`
+([envelope](/lock/envelope)). Any BIP-322 verifier checks it.
+
 ## Handing the key to a new device
 
 Besides unlocking with the passphrase, a new device can get the vault key from
@@ -168,8 +225,54 @@ one that already holds it. Each browser has an X25519 device key, registered
 with vault.ochk.io under the signed-in session. The holding device, after a
 fingerprint check by the person, seals the vault key to the new device's key
 (ephemeral X25519, HKDF-SHA256, AES-256-GCM with the device id as associated
-data); the server stores and serves that grant opaquely. Device records carry no
-BIP-322 binding and are not published to Nostr.
+data); the server stores and serves that grant opaquely. These device records
+carry no BIP-322 binding and are not published to Nostr, unless you opt in to
+the [Bitcoin device tier](#the-bitcoin-device-tier).
+
+## The Bitcoin device tier
+
+Under **Settings → Devices**, you can bind this browser's vault device key to
+your account's Bitcoin address. It is opt-in. Your wallet signs an OC Lock v3
+binding statement for the key, and the browser publishes it as an OC Lock device
+record to nostr-core's five relays. The sheet says first that the record is
+public, that it links your address to this browser's key, and that those relays
+see your IP address. Your vault still opens with your passphrase.
+
+**Labels.** Each device in the list gets a label, worked out again on every read
+and never stored:
+
+| Label                                                   | When                                                                         |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Verified by your Bitcoin address                        | a live bind of that device names the key vault.ochk.io has registered for it |
+| Bound to a different key than this device: not verified | a live bind of that device names another key                                 |
+| Linked by sign-in (via ochk.io)                         | no live bind names it, or your account has no Bitcoin address                |
+| Could not check                                         | fewer than 4 of the 5 relays finished answering                              |
+
+The first two need a read where 4 of the 5 relays answered, judged on the union
+of their records.
+
+**Bind and revoke.** Each takes one wallet signature, checked against your
+address before anything is published. vault.ochk.io then asks each of the five
+relays on its own for the record, and reports it done only when 2 serve it back:
+the [write quorum](/infrastructure/relay#write-quorum-and-read-floor). Below
+that it says how many did, and to check again before relying on it. A revocation
+is dated no earlier than the device's latest signed bind. Removing a bound
+device from the list offers to revoke it as well, because it can still open what
+is sealed to your address.
+
+**The key hand-off.** Your account has the tier once your address has a live OC
+Lock device, bound here or at ochk.io/lock. A browser learns that from a read
+where 4 of the 5 relays answered, or by binding itself, and remembers it; only a
+later read of 4 of 5 that finds no live device clears it. From then on that
+browser sends the vault key only to a device labelled **Verified by your Bitcoin
+address**, read fresh at the moment of sending, and sends nothing when fewer
+than 4 relays answer. Until a browser has seen the tier, its hand-off is the
+fingerprint check alone.
+
+**Opening .lock files.** A bound browser is an OC Lock device of your address.
+**Import** opens a `.lock` file of vault entries sealed to it, in the browser,
+and adds the entries. The key lives in vault.ochk.io's storage in that browser,
+so ochk.io/lock cannot use it.
 
 ## One-time share links
 
@@ -186,8 +289,10 @@ TTL expiry (1 h / 24 h / 7 d).
 
 ## SDK surface
 
-| Package                                               | Role                                                               |
-| ----------------------------------------------------- | ------------------------------------------------------------------ |
-| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives. |
-| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: key wraps, entries, cloud blobs, export, TOTP.   |
-| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to.  |
+| Package                                               | Role                                                                                                                 |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives.                                                   |
+| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: key wraps, entries, cloud blobs, export, TOTP.                                                     |
+| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to; the Bitcoin tier's binding and revocation records. |
+| [`@orangecheck/lock-core`](/sdk/lock-core/README)     | `seal` and `unseal`: the signed `.lock` export.                                                                      |
+| [`@orangecheck/nostr-core`](/sdk/nostr-core/README)   | The five relays device records are read from and written to.                                                         |

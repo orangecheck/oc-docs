@@ -8,8 +8,8 @@ export const metadata = {
 
 `wss://relay.ochk.io` is the family's first-party Nostr relay. Every OC web app
 publishes to it (alongside ≥4 public relays), and every OC client app reads from
-it (alongside the public set, racing for first response). It exists for
-reliability and family-curated indexing — not as a trust anchor.
+it (alongside the public set). It exists for reliability and family-curated
+indexing — not as a trust anchor.
 
 > **Hard architectural invariant: relay.ochk.io is never the only copy of
 > anything.** Every event is also published to public relays. Every read also
@@ -90,10 +90,46 @@ without anyone deciding what's spam — the policy is shape-only, never content.
        └───────────────────────────────────────┘
 ```
 
-Reads race all five and resolve on the first `EOSE`; the racing-read default
-timeout is 1500ms, so a momentary blip on any one relay (including ours) never
-holds up the page. Writes hit all five; the publish call returns one result per
-relay so callers can show "published to 4/5 relays."
+Reads ask all five at once and wait for each relay to finish answering (`EOSE`)
+or time out. `queryEvents` waits 1500 ms by default; a caller that needs every
+answer passes a longer timeout. The result reports, per relay, whether it
+finished. Writes hit all five; the publish call returns one result per relay so
+callers can show "published to 4/5 relays."
+
+## Write quorum and read floor
+
+OC Lock device records, and the revocations that retire them, are where a missed
+relay matters most: a sender that misses a revocation keeps sealing to a device
+its owner has given up. lock.ochk.io, vault.ochk.io and chat.ochk.io count these
+records (kind 30078, `d` tag `oc-lock:device:<address>`) by one rule, over
+nostr-core's five `DEFAULT_RELAYS`:
+
+- **Write quorum.** A bind or a revocation is in effect once `WRITE_QUORUM = 2`
+  of the five serve it back, each relay asked on its own. An `OK` to the publish
+  is not enough.
+- **Read floor.** A read that rests on an absence (no revocation of this device,
+  no bind for this address) counts only when `readFloor(asked)` of the relays
+  asked have finished answering. Five asked: four.
+
+```ts
+export const WRITE_QUORUM = 2;
+
+export function readFloor(asked: number): number {
+    return Math.max(1, asked - WRITE_QUORUM + 1);
+}
+```
+
+The floor and the quorum add up to more than the relays asked
+(`readFloor + WRITE_QUORUM > asked`; with five, 4 + 2 > 5). So of the relays
+holding any write in effect, a read at the floor always hears from at least one.
+A write short of the quorum is reported as not in effect yet, never as done. A
+read short of the floor is not taken as an answer.
+
+| App                                                              | Writes device records to                                         | In effect at  | Reads at the floor                                                                 |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- |
+| [lock.ochk.io](/lock/device-keys#when-a-record-counts)           | the five                                                         | 2 of the five | yes: sealing to an address, an address's other devices, checking a revocation took |
+| [vault.ochk.io](/vault/protocol#the-bitcoin-device-tier)         | the five                                                         | 2 of the five | yes: device labels, the vault key hand-off, the `.lock` export                     |
+| [chat.ochk.io](/chat/how-it-works#1-identity--a-bitcoin-address) | your relays and the five (chat's own four relays are among them) | 2 of the five | not yet: it comes with a later release                                             |
 
 ## Operational
 

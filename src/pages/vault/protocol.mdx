@@ -117,16 +117,16 @@ envelope id, so the server still sees ciphertext plus an `updated_at`.
 The collaborative **signal** is different from personal sync, and the
 client-side machinery reflects that:
 
-| Property              | Personal cloud sync                                          | Team vault                                                                     |
-| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| Key                   | personal vault key (per identity)                            | team key (per team)                                                            |
-| Key escrow            | wrapped under your passphrase and your recovery code         | escrowed under your personal vault key so a clean reinstall finds the team key |
-| Concurrency           | the same identity on multiple devices                        | many identities, each potentially editing concurrently                         |
-| Reconciliation        | per-entry `synced_at` + `remote_rev`, pull/push              | compare-and-swap on the server `updated_at`, plus a poll loop                  |
-| Freshness model       | "are my local edits backed up yet?"                          | "how fresh is what I'm looking at relative to my teammates' writes?"           |
-| Loop                  | sync once per visibility/focus, then idle                    | 8-second background poll while the tab is visible                              |
-| Concurrent-edit guard | last-write-wins, conflict copies kept                        | advisory edit-locks (~30 s TTL, heartbeated while the editor is open)          |
-| Surfaced state        | `cloud sync` stat tile · `<synced>/<total>` · last-sync time | `liveness` stat tile · last-refresh time · `live across teammates`             |
+| Property              | Personal cloud sync                                          | Team vault                                                                       |
+| --------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Key                   | personal vault key (per identity)                            | team key (per team)                                                              |
+| Key escrow            | wrapped under your passphrase and your recovery code         | escrowed under your personal vault key so a clean reinstall finds the team key   |
+| Concurrency           | the same identity on multiple devices                        | many identities, each potentially editing concurrently                           |
+| Reconciliation        | per-entry `synced_at` + `remote_rev`, pull/push              | compare-and-swap on the server `updated_at`, plus a poll loop                    |
+| Freshness model       | "are my local edits backed up yet?"                          | "how fresh is what I'm looking at relative to my teammates' writes?"             |
+| Loop                  | sync once per visibility/focus, then idle                    | 8-second background poll while the tab is visible                                |
+| Concurrent-edit guard | last-write-wins, conflict copies kept                        | advisory edit-locks (~90 s TTL, heartbeated every 30 s while the editor is open) |
+| Surfaced state        | `cloud sync` stat tile · `<synced>/<total>` · last-sync time | `liveness` stat tile · last-refresh time · `live across teammates`               |
 
 The polling loop is index-gated and cheap, but it's still a poll — that's why
 the team page surfaces its own **liveness tile** (last-refresh time, with a

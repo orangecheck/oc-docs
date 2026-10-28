@@ -50,9 +50,9 @@ never carried on the wire, and never co-indexed with the directory (the
 [social-graph firewall](/chat/directory#the-social-graph-firewall-normative)).
 The spec allows acceptance to be signalled only by **replying** — no "your
 request was opened" receipt, which would be a read-receipt-style metadata leak.
-chat.ochk.io sends nothing when you open a request; its **Approve** button sends
-the sender an empty encrypted acknowledgement that clears the "may need to
-accept you" note on their side.
+chat.ochk.io sends nothing when you open or approve a request: **Approve** only
+adds the sender to your device's allowlist. The sender's "may need to accept
+you" note clears when you reply.
 
 ## pay-to-reach — a stranger reaches you (paid, peer-to-peer)
 

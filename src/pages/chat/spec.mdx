@@ -242,38 +242,64 @@ The authoritative cross-family table is the workspace
 A client is OC Chat v0 compliant iff it:
 
 - Reuses OC Lock §4.2 wrapping verbatim for `content_key`.
-- Computes `chat_aad` and `chat_envelope_id` with `recipients=[]` for
-  `kind ∈ {chat, chat-seal}` and reproduces the test vectors.
+- Sends `speak-now`, `pay-to-reach` and `seal-til-block` messages as base OC
+  Lock `"identity"` envelopes carrying `hint: "oc-chat/v1"`, with base content
+  addressing: `recipients[]` is inside both the `id` and the AAD. The
+  recipient-exclusion rule (`chat_aad`, `chat_envelope_id`, `vc03`/`vc04`)
+  belongs to the upgrade target.
+- Delivers a first message that does not clear the recipient's policy into the
+  filtered/pending state, never dropping it; keeps the approval allowlist on the
+  client, never published or carried on the wire; and emits no acceptance
+  receipt: a reply is the only acceptance a sender sees (§4.1, S19).
 - Carries `conversation_id`/`seq`/`parent_id` inside the encrypted payload and
   orders by the `parent_id` hash-chain, never by `created_at`.
 - If it offers durable store-and-forward: derives `queue_id`/`bootstrap_id` per
-  §8.1, routes solely on opaque ids, stores the blob byte-for-byte, reproduces
-  `vc06`.
-- If it offers the directory: publishes only on explicit opt-in (default
-  invisible), derives the salted-handle d-tag (`vc07`), refuses to resolve
-  unless the §8.2.2 gate passes, enforces the social-graph firewall, honors
-  tombstones (`vc08`), and exposes no bulk-dump endpoint.
+  §8.1, routes solely on those opaque ids, stores the blob byte-for-byte, gates
+  a proven bootstrap queue on §8.1.5 proofs, and reproduces `vc06` and `vc21`.
+- If it offers the directory: publishes a kind-30114 listing only on explicit
+  opt-in (default invisible), derives the salted-handle d-tag (`vc07`), orders
+  claims by anchor and resolves a handle only when the §8.2.2 gate passes
+  (signature, kind-30078 binding, a coin that cleared the floor at the anchor,
+  an anchor with 6 confirmations), stops with `E_DIR_UNRESOLVED` rather than
+  pass over a claim whose read got no answer, pins each contact to the address
+  its handle resolved to, reads directory relays completely and runs the public
+  audit, anchors before publishing, follows and makes re-points, enforces the
+  social-graph firewall, honors tombstones (`vc08`), and exposes no bulk-dump
+  endpoint (`vc22`–`vc25`).
 - For `pay-to-reach`: carries `postage` in the payload and runs the full §6.3
   verification (re-deriving the description-hash binding itself, over verbatim
-  bytes), routes a failing/replayed message to filtered/pending (never dropped),
-  and never claims transferable third-party proof.
-- Wraps to the beacon and performs release re-wrap as a detached `recipients[]`
-  merge for `seal-til-block`, and **never labels a v0 beacon seal "trustless."**
-- Surfaces every trust anchor (beacon id/url, relay, redundant beacon) and the
-  early-release / brick risks at compose time.
+  bytes, and checking the preimage, amount, expiry, identifier and the local
+  spent-ledger), routes a failing/replayed message to filtered/pending (never
+  dropped), and never claims transferable third-party proof.
+- For `seal-til-block`: follows the v0 drand-tlock profile (§7.6). The seal
+  block rides inside the encrypted body, the reveal secret is timelocked to the
+  quicknet round derived from `unlock_block`, and the body is never shown before
+  the client has itself confirmed `chain_tip ≥ unlock_block + confirmations`. It
+  caps the horizon, states the Ed25519 verdict on every seal surface, reproduces
+  `vc10`–`vc13`, and **never labels a v0 beacon seal "trustless."** The
+  beacon-device wrap and release re-wrap (§7.2–7.3) belong to the upgrade
+  target.
+- If it offers standing delivery (§7.7): carries `standing_id` inside the
+  encrypted seal body, opens only the check-in with the highest `unlock_block`
+  for a `standing_id`, and tells the author that a second check-in channel is
+  recommended and not enforced.
+- Surfaces every trust anchor (beacon id/url, relay, any redundant beacon) and
+  the early-release / brick risks at compose time.
 - Operates **no OC payment rail** for postage.
 - If it offers public channels: publishes a founder-rooted descriptor with one
-  `write.policy` + matching `rooted` flag, gives every version its own d-tag, a
-  `t` tag, an `s` tag (but the genesis) and a `binding` tag, fetches every
-  version by `#t` (plus the legacy d-tag), reads every key the founder and
-  admins have bound, revoked ones included, one key per read, walks forward by
-  `#s` only from versions those reads returned, reports a read cut off at its
-  bound as not read unless those reads were complete, validates the governance
-  hash-chain over them (earlier versions by their binding, the last version only
-  while its binding is live), rejects a non-empty `recipients[]` channel post,
-  verifies `utxo-floor` proofs offline, renders non-rooted channels in the muted
-  "via ochk.io" tier, honors tombstones, and reproduces `vc14`–`vc17`, `vc19`
-  and `vc20`.
+  `write.policy` + matching `rooted` flag, publishes each version with its `t`,
+  `s` and `binding` tags, fetches every version by `#t` (plus the legacy d-tag),
+  reads every key the founder and admins have bound, revoked ones included, one
+  key per read, walks forward by `#s` only from versions those reads returned,
+  reports a read cut off at its bound as not read unless those reads were
+  complete, validates the governance hash-chain over them (earlier versions by
+  their binding, the last version only while its binding is live; `status` and
+  `successor_channel_id` changed by the founder only), picks the tip as §8.3.1
+  orders it, re-signs before revoking a device, rejects a non-empty
+  `recipients[]` channel post, verifies `utxo-floor` proofs against public chain
+  data (deduped per outpoint, failing closed), renders non-rooted channels in
+  the muted "via ochk.io" tier, honors tombstones, and reproduces `vc14`–`vc17`,
+  `vc19` and `vc20`.
 - If it supports an `auth-required` relay: completes the kind-22242 handshake,
   signs with a fresh per-connection ephemeral key by default, surfaces the relay
   as a named trust anchor, and never presents AUTH as making a relay trustless.
@@ -281,8 +307,8 @@ A client is OC Chat v0 compliant iff it:
   defaults to a fresh throwaway identity, never claims SecureDrop-grade
   anonymity.
 - If it offers a named-Fedimint postage fallback: surfaces the federation as a
-  named custodian, lets the sender decline, keeps OC out of custody, and gates
-  on a money-transmitter analysis.
+  named custodian before the sender pays, lets the sender decline, keeps OC out
+  of custody, and gates on a money-transmitter analysis.
 - If it accepts `did:oc` session devices: binds a session record only through a
   vouch that verifies against the ochk.io JWKS, renders it as session, and steps
   a message up to "verified · `address`" only when the signing key resolves to

@@ -547,25 +547,6 @@ Pledge is the only row with all six properties.
 The six verbs — am, whisper, decide, declare, delegate, **swear** — are now
 complete.
 
-## Live case studies
-
-The three reference shapes were exercised end-to-end by OC contributors against
-real orangecheck bonds before the v1.0 spec cut. The runbook for adding
-subsequent OC-led pledges is in
-[`RUNBOOK.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/RUNBOOK.md).
-
-| Shape                    | Mechanism                                      | Pledge URL                              | Outcome                     |
-| ------------------------ | ---------------------------------------------- | --------------------------------------- | --------------------------- |
-| Research preregistration | `stamp_published`                              | _filled in by the swearer post-publish_ | _filled in post-resolution_ |
-| Bilateral SLA            | `counterparty_signs` + `vote_resolves` dispute | _filled in by the swearer post-publish_ | _filled in post-resolution_ |
-| Open-source delivery     | `http_get_hash`                                | _filled in by the swearer post-publish_ | _filled in post-resolution_ |
-
-The pattern: each row gets the live `pledge.ochk.io/p/<id>` URL when the pledge
-publishes, the swearer's address, and the outcome envelope id once the pledge
-resolves (kept / broken / disputed / expired_unresolved). Future OC-led pledges
-add rows; the table grows over time as a worked-example index for new
-integrators.
-
 ## Where to go next
 
 - Read [SPEC.md](/pledge/spec) for normative encoding rules.

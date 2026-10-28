@@ -8,6 +8,8 @@
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
 import nextTypescript from 'eslint-config-next/typescript';
 
+import localRules from './scripts/eslint-local-rules.mjs';
+
 const eslintConfig = [
     /**
      * Unused-directive reporting is OFF, and this is not laziness.
@@ -154,13 +156,13 @@ const eslintConfig = [
          */
         files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
         rules: {
-            'react-hooks/set-state-in-effect': 'warn',
-            'react-hooks/purity': 'warn',
-            'react-hooks/immutability': 'warn',
-            'react-hooks/refs': 'warn',
-            'react-hooks/static-components': 'warn',
-            'react-hooks/preserve-manual-memoization': 'warn',
-            'react-hooks/exhaustive-deps': 'warn',
+            'react-hooks/set-state-in-effect': 'error',
+            'react-hooks/purity': 'error',
+            'react-hooks/immutability': 'error',
+            'react-hooks/refs': 'error',
+            'react-hooks/static-components': 'error',
+            'react-hooks/preserve-manual-memoization': 'error',
+            'react-hooks/exhaustive-deps': 'error',
         },
     },
     {
@@ -172,6 +174,19 @@ const eslintConfig = [
          */
         files: ['**/*.cjs'],
         rules: { '@typescript-eslint/no-require-imports': 'off' },
+    },
+    {
+        /**
+         * react-hooks disable comments are counted (lint-gate.md): named next-line ones under the first rule,
+         * whose kept findings eslint-suppressions.json holds; bare next-line, regions, same-line and multi-rule ones under
+         * the second, never suppressed. scripts/lint-guards.mjs covers what no rule can.
+         */
+        files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
+        plugins: { local: localRules },
+        rules: {
+            'local/no-react-hooks-disable': 'error',
+            'local/no-react-hooks-disable-wide': 'error',
+        },
     },
 ];
 

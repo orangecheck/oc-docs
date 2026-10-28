@@ -19,6 +19,8 @@ concurrency:
 
 jobs:
     quality:
+        permissions:
+            contents: read
         name: Code Quality
         runs-on: ubuntu-latest
         steps:
@@ -64,6 +66,17 @@ jobs:
 
             - name: Lint
               run: yarn lint
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+                  OC_EVENT: ${{ github.event_name }}
+                  OC_BEFORE: ${{ github.event.before }}
+                  OC_AFTER: ${{ github.event.after }}
+                  OC_PR_BASE: ${{ github.event.pull_request.base.sha }}
+                  OC_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+                  OC_PR_BODY: ${{ github.event.pull_request.body }}
+                  OC_MG_BASE: ${{ github.event.merge_group.base_sha }}
+                  OC_MG_HEAD: ${{ github.event.merge_group.head_sha }}
+                  OC_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
             # moved-pages.test.ts compares the pages with the commit main was at.
             - name: Test

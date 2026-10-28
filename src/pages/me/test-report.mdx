@@ -1,0 +1,230 @@
+export const metadata = {
+    title: 'ochk.app · Test report',
+    description:
+        "ochk.app's testing phase, checked part by part: the operator suite on mutinynet, the anchor block, the handoffs, a halt-and-restart drill, the executor on phoenixd and the no-KYC walk-through. What passed, with evidence you can check, and what is still open.",
+};
+
+# ochk.app · Test report
+
+> **Draft, not final.** The first gate of ochk.app's testing phase closes when
+> every part below has passed, the small test with real amounts and real
+> operators included. This report covers each part. Several are still open, each
+> with its date or owner under [Still open](#still-open). This page changes as
+> they close.
+
+**What it covers.** The payouts, the anchor block, each handoff (from
+orangecheck to a federation, from one federation to its successor, from a
+federation to a user) and what the product asks a person for. Each claim names
+the evidence behind it: a block, a transaction, a test run, or a line of the
+test log kept with the runs. Run ids are the times the test harness started, in
+UTC.
+
+**What it is not.**
+
+- **Not real money yet.** Everything here ran on test networks (mutinynet,
+  regtest, testnet3) or on a separate test deployment. The one exception is the
+  anchor block, which is on Bitcoin mainnet; it commits to test records.
+- **Not operator independence.** Every operator identity in these tests is held
+  by orangecheck.
+
+| Part                                                   | State                                              | Evidence                                       |
+| ------------------------------------------------------ | -------------------------------------------------- | ---------------------------------------------- |
+| [Operator suite on mutinynet](#operator-suite-phase-c) | C01–C06 and C08–C11 pass; C07 half done            | runs listed below; five mutinynet transactions |
+| [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423   | the block; a proof file you can verify         |
+| [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run | seat claims citing block 972639; the C07 move  |
+| [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                  | drill runs of 2026-10-28                       |
+| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; two script changes in review   | rehearsal of 2026-10-28                        |
+| [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator     | code read and a live walk, 2026-10-27          |
+| [Still open](#still-open)                              | C07's second sitting, the mainnet test and more    | each with its date or owner                    |
+
+## Operator suite (phase C)
+
+A four-guardian federation, `oc-mutiny-v1`, run end to end through ochk.app on
+mutinynet: operators take seats, the key ceremony runs through the portal, a
+gateway is funded, and orangecheck's executor settles top-ups and payouts
+through it. Each step runs as a script against the API and in a browser, and
+passes only when both do. The full section, with what each step proves and the
+limits the run found, is the
+[operator suite test report](/me/operator/test-report).
+
+| Step                                                | Result                                       | Run                        |
+| --------------------------------------------------- | -------------------------------------------- | -------------------------- |
+| C01–C04                                             | Pass, 2026-10-26                             | `2026-10-26T17-00-11-634Z` |
+| C05, C06                                            | Pass, 2026-10-26                             | `2026-10-26T18-31-32-449Z` |
+| C08–C10                                             | Pass, 2026-10-26                             | `2026-10-26T19-05-48-205Z` |
+| C03, C04, C05, C08, C10 again                       | Pass on oc-me-web `2fc3a6fd`                 | `2026-10-26T21-04-10-930Z` |
+| C11 (payout to an invoice with no description hash) | Pass, 2026-10-26                             | `2026-10-26T21-40-11-790Z` |
+| C07 (moving to a successor)                         | First sitting passed; second from 2026-11-10 | `2026-10-27T06-32-36-960Z` |
+
+The payouts in this section are C04 (1,200 sats to a wallet orangecheck does not
+hold), C05 (a payout with one guardian of four down), C08 (a halt holds a
+payout, and on resume it settles once) and C11. The test federation's id is
+`49a3e8647708603ba20f4eb5e249d393f8e4ae80963b65bd0344f78806b9785e`, and its
+successor's is
+`eac8dbfc9b5de20a7f63d85c524bb219a2a11bf2d4dd62d6dddaf4c1d36fc799`.
+
+## Anchor block
+
+ochk.app commits its public records, payouts among them, to Bitcoin through
+OpenTimestamps: it sends only the SHA-256 of a record to public calendars, and a
+calendar's proof later points into a block
+([how anchoring works](/me/api#anchoring)). On the test deployment, anchoring
+was switched on for this check on 2026-10-27, with no Nostr relay set, so only
+digests left it.
+
+- **All 14 test payouts are anchored in one block**, Bitcoin block 973423,
+  `00000000000000000001dbc40e0eedd2f0dd80d6c69d048957305b27b4e95d55`. So are the
+  test deployment's payout binding and its one cancelled payout: 16 records in
+  all, each read back as anchored after the hourly run at 19:00 UTC on
+  2026-10-27 (test log 2026-10-27T19:08:41Z).
+- **One of them, checked offline.** Payout
+  `05ad976f08bb7fee785a30853ae75fbdfef1e079c70007cb9390fed43dd40ab9`: its id is
+  the SHA-256 of its record, and the proof starts from that digest. Following
+  the proof reaches block 973423's merkle root, checked against the block header
+  served by mempool.space and by blockstream.info, with two verifiers
+  (python-opentimestamps 0.4.5's `verify_against_blockheader`, and a second,
+  independent parser). The block's time is 2026-10-27 16:24:04 UTC. With one bit
+  of the digest flipped, the proof does not reach the root (test log
+  2026-10-27T17:15:31Z).
+- **Check it yourself.** The proof is
+  [`05ad976f….ots`](/test-report/05ad976f08bb7fee785a30853ae75fbdfef1e079c70007cb9390fed43dd40ab9.ots).
+  `ots info` on it names the digest and block 973423; any OpenTimestamps
+  verifier checks it against the block header.
+
+The test deployment read these records as pending until the anchor run asked the
+calendar the proof names. It now does (oc-me-web `0002c5cd`, live 2026-10-27).
+On 2026-10-27 production held no records of this kind, so none of production's
+had been anchored yet.
+
+## Handoffs
+
+| Handoff                                       | Run                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| A seat to an operator, before the ceremony    | **Run, 2026-10-22.** Four operators each bound a key and claimed a reserved seat in `oc-mutiny-v1`: two in the browser, two by script with a claim signed over Bitcoin block 972639 (`000000000000000000016e48619f0e6d7304598ea2b044e4dadb815383c0b65f`). The key ceremony then ran on all four (run `2026-10-22T17-57-50-820Z`). The successor's four seats were reserved and claimed the same way by 2026-10-27. |
+| A running federation to its successor         | **First sitting run, 2026-10-27; second from 2026-11-10.** The executor moved the float from `oc-mutiny-v1` to `oc-mutiny-v2` in five on-chain batches, listed below. 227,797 sats before = 220,028 credited + 2,748 on-chain fees + 5,020 mint fees + 1 left behind; unexplained 0 (run `2026-10-27T06-32-36-960Z`).                                                                                              |
+| A federation to a user                        | **Run on mutinynet.** Payouts from the federation to a Lightning address settled through the gateway: C04, and C11 for an invoice with no description hash. Not yet with real amounts: that is the [bounded mainnet test](#still-open).                                                                                                                                                                            |
+| Balances orangecheck holds, into a federation | **Not run.** It needs a mainnet federation that production can join, and a Fedimint executor in production; production's executor runs phoenixd. The plan of who is owed what is built, read-only.                                                                                                                                                                                                                 |
+
+The C07 move, each transaction confirmed on mutinynet:
+
+| Batch | Transaction                                                        | Block   | Fee (sats) |
+| ----- | ------------------------------------------------------------------ | ------- | ---------- |
+| 0     | `8ef0141f28053cab5ac0e23fe52f4f62ac243b32069f7c173e97d7a311231d69` | 3538817 | 494        |
+| 1     | `69be7d7cbff907e00ce466bfa32a62dd9b97db9d2dd1eb6631873873e34e9f4e` | 3538822 | 494        |
+| 2     | `b8c7e8d3faaebeb43229320fa1bb8fbabb3025d3aae0abbb033c9c31dd16a47d` | 3538827 | 494        |
+| 3     | `cb7cd8d35a8187e348e642901ff8ec64ae72251690ab243b28ec9e86c8710e27` | 3538833 | 773        |
+| 4     | `0865baa268db0d911205e41a0f0ac791f611b4703f7814f20938b918c3d6cb6d` | 3538838 | 493        |
+
+The fees add up to the 2,748 sats above. Look each one up on any mutinynet
+explorer.
+
+## Halt-and-restart drill
+
+**2026-10-28, on regtest.** The executor's own code ran unmodified against a
+local Fedimint federation (four fedimintd 0.11.4 guardians, an LNv2 gateway on
+its own Lightning node) and against the portal's own payout handlers on a local
+database. One call was stubbed: fetching an invoice from a Lightning address,
+which no regtest server can answer. C04 and C11 proved that hop on mutinynet.
+The executor was killed twice on purpose: once after a payment left and before
+its receipt was posted, once after it recorded the payment's start and before it
+paid.
+
+| #   | What it proves                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------- |
+| 1   | A payout settles once: one payment, one receipt, the spend counter up by amount plus fee                                  |
+| 2   | A halt stops new hand-outs; payouts already handed out finish; the status page reads degraded                             |
+| 3   | On resume, each held-back payout is paid exactly once                                                                     |
+| 4   | Killed after paying: on restart the executor holds the payout, reports it, and never pays it again                        |
+| 5   | The owner marks it paid with the node's proof of payment; it settles, and the action is audited                           |
+| 6   | Killed before paying: the owner finds nothing on the node and releases it; it is then paid once                           |
+| 7   | The spending ceiling stops a payout that would cross it, and the status page reads it as reached                          |
+| 8   | Conservation: 9 payments = 9 settled payouts = 19,832 sats; the node spent 19,963 sats with fees, the same as the counter |
+
+**Run 1** (oc-me-web `8e46fd5b`, 06:09–06:46 UTC) found two faults. In step 6, a
+payout the owner released was never paid by the executor that held it. In step
+7, the status page read the ceiling as not reached while no payout could fit
+under it. Both were fixed that morning.
+
+**Run 2** (oc-me-web `fee8df42`, 06:57–07:23 UTC) passed all 8. The fixes are
+live in the portal as oc-me-web `63aeb9e4` (2026-10-28). The executor's part
+reaches production with its next update.
+
+## Executor on phoenixd
+
+**2026-10-28, on testnet3, on a machine separate from production.** Production's
+executor pays through phoenixd. The executor build prepared for production's
+next update (bundle SHA-256
+`3e5f8a7a6bc930bfcf45977f0a2b4a3687e371c2ccb9004b5752a1ad9c1a352a`) was booted
+on phoenixd 0.6.0, checked against the image's pinned hash, against a stand-in
+for the portal. Its invoices were signed by a key nobody holds, so nothing could
+be paid.
+
+- **Boot:** phoenixd and the executor started, and the first report reached the
+  portal.
+- **Fee cap:** a payout whose routing fee would be 84 sats, over the cap of 50,
+  was refused before phoenixd was asked to pay.
+- **A payment that fails:** recorded as not sent, nothing reported uncertain,
+  and the executor's payment journal written to disk and cleared on the next
+  pass.
+- **Wrong network, wrong data folder:** the start script refused all 7
+  mismatches tried, before phoenixd started.
+- **Executor crash:** the start script restarted the executor, and nothing was
+  paid twice.
+
+Two changes to the start script came out of the rehearsal and are in review:
+phoenixd runs under the same restart supervisor as the executor, and a shutdown
+stops the executor before phoenixd. Both passed on the same machine, including a
+stop during a payment, where the payment was held on restart and never paid
+twice. They are reported here as passing once they land.
+
+## No-KYC walk-through
+
+**2026-10-27.** Every input, write and outbound call on the person's,
+integrator's and operator's paths was read in the code, at the then-current
+`main` of oc-www (`3796387`), oc-app-web (`7691e53`), oc-me-web (`b8c55f05`),
+oc-packages (`d169d906`), oc-guardian-kit (`d41074d`) and oc-docs (`3248cd4`).
+Then the paths were walked live on the test deployment by a throwaway account
+with a fresh Bitcoin key, every form recorded and nothing submitted, its stored
+rows read back and the account purged after. The email-code and Google or GitHub
+sign-ins were read in the code, not walked.
+
+- **A person** signs in with a Bitcoin address and a BIP-322 signature, an email
+  and a code, or Google or GitHub. Everything else is optional: a display name
+  ("need not be your real name"), a Nostr key, more ways to sign in, a backing
+  coin, passkeys. A Lightning address is asked only to cash out. No page asks
+  for a legal name, phone, date of birth, ID, selfie, postal address, country,
+  tax id or bank details, and no code calls an identity check.
+- **An integrator** uses an ordinary account. A project asks for a name, a
+  domain and its settings; the domain is proved by DNS or a meta tag. There is
+  no billing profile, legal entity, address, country, tax id or payout
+  destination: top-ups are Lightning invoices.
+- **An operator** needs an invite, an operator key, a signed claim over a recent
+  Bitcoin block, signatures on the charter, and a Lightning address to be paid.
+  The apply form asks for the questionnaire's answers, and optionally a handle
+  and an email.
+- **What is published about a person.** Nostr gets only a salted commitment for
+  a record that names a person; OpenTimestamps gets a digest. A record's full
+  envelope is served to whoever holds its id: that is the receipt model.
+
+**Finding.** The operator questionnaire
+([`application-questionnaire.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/docs/application-questionnaire.md))
+asks for a legal name or company name with its jurisdiction, a country and
+region, and two references, and says the operator is listed publicly with them.
+The portal stores the answers; no code checks or publishes any of it. Whether it
+keeps asking is open, with the legal read below.
+
+Two parts of the walk-through are not in this draft yet: what an app receives
+about a person at sign-in, and what deleting an account erases. Each is added
+when its check is done.
+
+## Still open
+
+| Part                                                                                                                    | When, or who                                       |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1` | not before 2026-11-10 04:20:41 UTC                 |
+| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor restarted mid-batch  | after the second sitting                           |
+| The executor start-script changes above                                                                                 | in review                                          |
+| The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                         |
+| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started   |
+| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                          |
+| Balances orangecheck holds, into a federation                                                                           | after a mainnet federation and a Fedimint executor |

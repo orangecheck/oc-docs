@@ -562,6 +562,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
             },
             {
+                href: '/me/test-report',
+                label: 'Test report',
+                blurb: 'The testing phase part by part: payouts, the anchor block, handoffs, drills, no-KYC. What passed and what is open.',
+            },
+            {
                 href: '/me/operator',
                 label: 'Operator',
                 blurb: 'Provision + run a federation: seats → charter → DKG → live. Lifecycle in-browser; bypass parity via the kit.',

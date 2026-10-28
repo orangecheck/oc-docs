@@ -784,6 +784,14 @@
             "tests": []
         },
         {
+            "id": "page:/me/test-report",
+            "kind": "page",
+            "entry": "src/pages/me/test-report.mdx",
+            "reach": "https://ochk.io/docs/me/test-report",
+            "area": "me",
+            "tests": []
+        },
+        {
             "id": "page:/me/webhooks",
             "kind": "page",
             "entry": "src/pages/me/webhooks.mdx",

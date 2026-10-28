@@ -29,12 +29,28 @@ else. The vault key never touches disk and never reaches the page. See
   re-prompted.
 - **Your vault in the popup.** Search, copy, reveal — the same actions the web
   app has. The popup syncs automatically; there is no manual refresh button.
-- **TOTP codes** — copy a live 6-digit RFC 6238 code with one click.
+- **Password generator.** **generate** in the popup makes a random password (20
+  characters of every kind by default) or a diceware passphrase (6 words), with
+  the options and word list vault.ochk.io's generator has, and an estimate of
+  its strength in bits. It needs no vault, so it works locked or signed out.
+  Nothing it makes is saved or sent, and a copy clears with the clipboard
+  setting.
 
 ## Settings worth knowing
 
-- **Auto-lock** — clear the key from memory after N idle minutes; pick
-  **forever** on the unlock screen if you'd rather it stay open.
+- **Auto-lock when idle** — 5, 15 (the default), 30 or 60 minutes, or never. The
+  unlock screen offers the same choice as **stay unlocked for**, where never
+  reads **forever**. The vault also locks when you lock it and when the browser
+  closes.
+- **Unlock with a passkey** — **set up** in settings, where the browser supports
+  passkeys; the locked popup then offers **unlock with passkey** beside the
+  passphrase. The passkey belongs to the extension: its relying party is the
+  extension's own origin, so it is separate from a passkey you set up on
+  vault.ochk.io. It seals the vault key the way vault.ochk.io's passkey unlock
+  does, and the seal is kept in this browser for your account. The seal is
+  refused, and removed, if your vault passphrase or vault key changes, and
+  removing the extension removes it too: set passkey unlock up again after
+  either. **remove** in settings turns it off.
 - **Offer autofill on login fields** — master switch for the on-field mark and
   dropdown.
 - **Open the autofill menu on field focus** — turn off if you keep your

@@ -1,0 +1,100 @@
+export const metadata = {
+    title: 'Security',
+    description:
+        'Summary of the OC Attest threat model: what an attestation proves, what it does not, the adversaries it is built for, and what a verifier must do. The authoritative copy is SECURITY.md in oc-attest-protocol.',
+};
+
+# Security
+
+<SpecCard
+    repo="oc-attest-protocol"
+    kind="security"
+    note="This page is a summary. The authoritative copy lives in the spec repo."
+/>
+
+The threat model every orangecheck protocol shares is on
+[Ecosystem security](/ecosystem/security). This page covers the
+attestation-specific layer on top.
+
+## Report channel
+
+Email **security@ochk.io**. Do not open a public issue for a bug that affects
+verifiers. See
+[`SECURITY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/SECURITY.md#6-reporting)
+for the full reporting terms.
+
+## What a valid attestation proves
+
+A verifier that resolves an attestation against live chain state can rely on
+three facts:
+
+- **Address control.** The signer held the private key for the address when they
+  signed. BIP-322 signature over the canonical message.
+- **Sats bonded.** The address held `sats_bonded` sats unspent when the verifier
+  resolved the chain, re-derived from current UTXOs, never taken from the
+  envelope.
+- **Days unspent.** The bonded coin has been confirmed for at least
+  `days_unspent` days, also re-derived live.
+
+And one self-asserted fact:
+
+- **Handle ownership.** A claim like `github:alice` or `nostr:npub1…` is the
+  address holder's claim. The attestation does not prove it; a verifier may
+  check it out of band.
+
+## What an attestation does NOT prove
+
+- **Personhood or uniqueness.** One person can hold many addresses, and many
+  addresses can collude. OC Attest raises the cost of sybils; it does not make
+  them impossible.
+- **Reputation.** Sats × time is an economic signal, not a moral one.
+- **Future control.** Custody of the key can change after the signature, by
+  theft, sale or a wallet change. Treat an attestation as a point in time.
+- **Chain finality.** The holder can spend the coin the moment the attestation
+  is published. Re-resolve chain state on every check, and never cache a result
+  longer than your tolerance for sybil entry.
+
+## Adversaries
+
+| Adversary                   | What they can do                                  | What stops them                                                                                                                            |
+| --------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Anonymous sybil farmer      | Produce many synthetic identities cheaply         | The bond cost scales per identity                                                                                                          |
+| Spammer with one wallet     | Sign many messages from one address               | One address is one attestation; the bond does not multiply                                                                                 |
+| Stolen-key opportunist      | Sign attestations with a compromised key          | The rightful holder publishes a fresh attestation from a new address                                                                       |
+| Compromised hosted verifier | attest.ochk.io answers `ok: true` falsely         | Run the checks yourself with the published packages ([Self-hosting the verifier](/attest/guides/self-hosting)); chain state is open to all |
+| Chain-watching deanonymizer | Cluster addresses by spending behaviour           | Out of scope: the attestation publishes the address                                                                                        |
+| Block-reorg griefer         | Bond with a transaction that is later reorged out | Verifiers require a confirmation depth                                                                                                     |
+
+OC Attest is not built to defend against coercion (a holder forced to sign once
+can be forced again), a compromised publishing platform stripping or replacing
+unsigned metadata (re-fetch from at least two relays), or a patient adversary
+who bonds for years to look like a long-term holder (cost rises with bond ×
+time; size your gate for it).
+
+## What a verifier must do
+
+1. **Re-derive sats and days** from current chain state. Do not trust
+   `sats_bonded` or `days_unspent` in the envelope.
+2. **Check the BIP-322 signature** against the exact canonical message bytes.
+   See [Canonical message](/ecosystem/canonical-message).
+3. **Check the audience** when your gate scopes proofs to one origin, and drop
+   attestations issued for a different site.
+4. **Require a confirmation depth** before counting `days_unspent`. Six is the
+   default in `@orangecheck/sdk` (`BOND_MIN_CONFIRMATIONS`); high-stakes gates
+   should require more.
+5. **Apply your freshness window.** The signature has no expiry of its own.
+6. **Take the subject from the signed message.** Relay tags and the envelope's
+   `address`, `identities`, `issued_at` and `expires_at` are not signed. An
+   attestation answers a query only if its canonical message states the id,
+   address or identity asked for.
+7. **Hold one bond to one identity per protocol.** If the address also binds a
+   different identity on the same protocol, refuse with `stake_shared`.
+
+The exact algorithm is on [Verification](/attest/verification).
+
+## Privacy
+
+Every attestation is public: it reveals the address, the bonded coin and any
+claimed handles. There is no zero-knowledge mode. Use a different address per
+context to keep gates from seeing each other's attestations; on-chain analysis
+can still cluster them.

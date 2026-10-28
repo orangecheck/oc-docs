@@ -280,6 +280,14 @@
             "tests": []
         },
         {
+            "id": "page:/attest/security",
+            "kind": "page",
+            "entry": "src/pages/attest/security.mdx",
+            "reach": "https://ochk.io/docs/attest/security",
+            "area": "attest",
+            "tests": []
+        },
+        {
             "id": "page:/attest/verification",
             "kind": "page",
             "entry": "src/pages/attest/verification.mdx",

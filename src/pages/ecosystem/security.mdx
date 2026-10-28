@@ -141,19 +141,22 @@ Stake raises the cost of sybils; it does not eliminate them.
 
 Each sibling has its own protocol-specific security page:
 
-- **OC Attest** — sybil-at-scale economics, score-choice tradeoffs
-- **OC Lock** — envelope authentication, device-key rotation, sealed-message
-  re-encryption attacks
-- **OC Stamp** — OTS anchor verification, pre-anchor spoofing window,
-  calendar-operator trust
-- **OC Vote** — ballot-commitment mode, weight-mode selection under sybil
-  assumption, tally-operator determinism
-- **OC Agent** — delegation-scope confinement, action-replay protection,
-  revocation-propagation latency, principal-key compromise blast radius
-- **OC Pledge** — bond-sufficiency analysis under public-exposure enforcement,
-  resolution-mechanism gaming, abandonment-vs-default disambiguation
+- [**OC Attest**](/attest/security) — what an attestation proves and does not,
+  the adversary model, verifier obligations
+- [**OC Lock**](/lock/security) — envelope authentication, device-key rotation,
+  sealed-message re-encryption attacks
+- [**OC Stamp**](/stamp/security) — OTS anchor verification, pre-anchor spoofing
+  window, calendar-operator trust
+- [**OC Vote**](/vote/security) — ballot-commitment mode, weight-mode selection
+  under sybil assumption, tally-operator determinism
+- [**OC Agent**](/agent/security) — delegation-scope confinement, action-replay
+  protection, revocation-propagation latency, principal-key compromise blast
+  radius
+- [**OC Pledge**](/pledge/security) — bond-sufficiency analysis under
+  public-exposure enforcement, resolution-mechanism gaming,
+  abandonment-vs-default disambiguation
 
-Each links back to this page for the shared layer.
+This page is the layer they share.
 
 ## Reporting a vulnerability
 

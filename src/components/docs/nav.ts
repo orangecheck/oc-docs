@@ -53,7 +53,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/getting-started/which-protocol',
                 label: 'Which protocol do I need?',
-                blurb: 'A decision tree across Attest / Lock / Stamp / Vote / Agent.',
+                blurb: 'A decision tree across Attest / Lock / Stamp / Vote / Agent / Pledge.',
             },
             {
                 href: '/getting-started/quickstart',
@@ -117,7 +117,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/ecosystem/nostr-kind-30078',
                 label: 'Nostr publication',
-                blurb: 'Kind registry (30078, 30080–30085) + d-tag conventions for all six protocols.',
+                blurb: 'Kind registry (30078–30115) + d-tag conventions for every protocol.',
             },
             {
                 href: '/ecosystem/conformance',
@@ -167,9 +167,14 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Exact checks a verifier performs.',
             },
             {
+                href: '/attest/security',
+                label: 'Security',
+                blurb: 'What an attestation proves and does not, the adversaries, what a verifier must do.',
+            },
+            {
                 href: '/attest/api',
                 label: 'HTTP API',
-                blurb: '/api/check, /api/verify, /api/challenge, /api/discover.',
+                blurb: "attest.ochk.io's /api/check, /api/verify, /api/discover, /api/publish-attestation and /api/stats, plus ochk.io's /api/challenge.",
             },
             {
                 href: '/attest/guides/express',
@@ -212,7 +217,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/lock/quickstart',
                 label: 'Quickstart',
-                blurb: 'Seal your first vault in five minutes.',
+                blurb: 'Register a device, seal an envelope, open it.',
             },
             {
                 href: '/lock/how-it-works',
@@ -430,7 +435,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/agent/spec',
                 label: 'Specification',
-                blurb: 'Normative rules. Early draft — subject to change.',
+                blurb: 'Normative rules: envelopes, scope grammar, verification algorithm, error codes.',
             },
         ],
     },
@@ -492,7 +497,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/pledge/spec',
                 label: 'Specification',
-                blurb: 'Normative rules; reference impls must pass the 28 conformance vectors.',
+                blurb: 'Normative rules; reference impls must pass the conformance vectors.',
             },
         ],
     },
@@ -514,7 +519,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/sdk',
                 label: 'SDK reference',
-                blurb: '@orangecheck/me-client v0.30 — every export, every type, every code sample.',
+                blurb: '@orangecheck/me-client — every export, every type, every code sample.',
             },
             {
                 href: '/me/integrations',
@@ -554,7 +559,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/federation',
                 label: 'Federation custody',
-                blurb: 'Who holds the sats today, the federation design that replaces it, and how graduation works.',
+                blurb: 'Who holds the sats today and the federation design. Not live: orangecheck holds every role while in testing.',
             },
             {
                 href: '/me/custody',
@@ -564,7 +569,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/operator',
                 label: 'Operator',
-                blurb: 'Provision + run a federation: seats → charter → DKG → live. Lifecycle in-browser; bypass parity via the kit.',
+                blurb: 'How the guardian operator program works, in the browser or with the kit. The program is not open.',
             },
             {
                 href: '/me/operator/charter',
@@ -574,7 +579,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/operator/runbook',
                 label: 'Operator runbook',
-                blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, healthz.',
+                blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, status checks. The program is not open.',
             },
             {
                 href: '/me/operator/in-browser',
@@ -643,12 +648,12 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/chat/quickstart',
                 label: 'Quickstart',
-                blurb: 'Sign in with Bitcoin, send your first E2EE message, try each of the three send modes.',
+                blurb: 'Sign in, send your first E2EE message, try each of the three send modes.',
             },
             {
                 href: '/chat/how-it-works',
                 label: 'How it works',
-                blurb: 'Device key → inbox → directory → gift-wrap → threading. One signature, then zero-click forever.',
+                blurb: "Device key → inbox → directory → gift-wrap → threading. One binding per device (ochk.io's vouch or a BIP-322 signature), then zero-click.",
             },
             {
                 href: '/chat/modes',
@@ -663,12 +668,12 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/chat/postage',
                 label: 'Postage (pay-to-reach)',
-                blurb: 'Lightning postage paid direct to the recipient, the offline six-step verification, the replay ceiling, the named-Fedimint fallback. OC operates no rail.',
+                blurb: 'Lightning postage paid direct to the recipient, the offline recipient-side checks, the replay ceiling. OC operates no rail.',
             },
             {
                 href: '/chat/seal',
                 label: 'Seal-til-block',
-                blurb: 'The named beacon, the v0 drand-tlock profile, the hard chain gate, redundant beacons, standing delivery (dead-man’s-switch).',
+                blurb: 'The named beacon, the v0 drand-tlock profile, the hard chain gate, standing delivery (dead-man’s-switch), and the redundant-beacon protocol.',
             },
             {
                 href: '/chat/directory',
@@ -683,12 +688,12 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/chat/transport',
                 label: 'Transport & durable inbox',
-                blurb: 'Gift-wrap, the v2 encrypted wrap, opaque per-conversation queue routing, NIP-42 relay AUTH.',
+                blurb: 'Gift-wrap, the v2 encrypted wrap, opaque per-conversation queue routing, and the NIP-42 relay AUTH protocol.',
             },
             {
                 href: '/chat/envelope',
                 label: 'Envelope & content addressing',
-                blurb: 'The two new kinds and the recipient-exclusion id/AAD rule that makes a held envelope re-wrap-safe.',
+                blurb: 'The v0 wire chat.ochk.io sends, and the upgrade-target kinds with the recipient-exclusion id/AAD rule.',
             },
             {
                 href: '/chat/protocol',
@@ -747,7 +752,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/api-reference/auth-host',
                 label: 'ochk.io · auth host',
-                blurb: 'Family auth host — sign-in (BIP-322 + email-OTP), JWKS, challenge primitive, account ops, contact form.',
+                blurb: 'Family auth host — sign-in (BIP-322, email-OTP, Google/GitHub), JWKS, challenge primitive, account ops, contact form.',
             },
             {
                 href: '/api-reference/attest',
@@ -779,7 +784,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/cli',
                 label: '@orangecheck/cli',
-                blurb: '`oc` shell — check / verify / create / challenge / discover.',
+                blurb: '`oc` shell — check / verify / challenge / discover, plus `oc me` integrator commands.',
             },
             // ── core ───────────────────────────────────────────────────
             {
@@ -923,7 +928,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/design/README',
                 label: '@orangecheck/design',
-                blurb: 'The family design system — tokens, primitives, family chrome. Storybook at design.ochk.io.',
+                blurb: 'Frozen: fixes only. The family design system is @orangecheck/app-design.',
             },
             {
                 href: '/sdk/insights-client/README',
@@ -938,7 +943,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/ui/README',
                 label: '@orangecheck/ui (deprecated)',
-                blurb: 'Deprecated. Replaced by @orangecheck/design — see design.ochk.io.',
+                blurb: 'Deprecated. Use @orangecheck/app-design.',
             },
             {
                 href: '/sdk/webhook-verify/README',
@@ -982,7 +987,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/reference/multi-account',
                 label: 'Multi-account sign-in',
-                blurb: 'Hold multiple orangecheck accounts in one browser and switch between them without re-auth. Roster model, wire surface, every family site gets it for free.',
+                blurb: 'Hold multiple orangecheck accounts in one browser and switch between them without re-auth. Roster model and wire surface.',
             },
             {
                 href: '/infrastructure/relay',

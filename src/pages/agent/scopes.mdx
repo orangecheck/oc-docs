@@ -133,9 +133,10 @@ own verifier reads it there.
 ## Wildcards
 
 A delegation MAY grant `product:verb(key=*)` to express "any value for key."
-Wildcards widen — use them deliberately. An unbonded delegation with
-`http:request(*)` (no constraints, blanket verb) is maximally permissive;
-verifiers MAY reject such delegations by policy.
+Wildcards widen — use them deliberately. The blanket grant is the scope with no
+constraint list, `http:request`: maximally permissive, and verifiers MAY reject
+such delegations by policy. A constraint always names a key, so
+`http:request(*)` is not a scope string.
 
 ## Adding new scopes
 

@@ -1,43 +1,43 @@
 export const metadata = {
     title: 'OC Vault · Protocol',
     description:
-        'How OC Vault maps onto OC Lock Flow 4: the vault key, the per-entry AES-256-GCM envelope, the double-encrypted cloud blob that keeps the server blind to metadata, and the portable export format.',
+        'How OC Vault seals entries with OC Lock primitives: the vault key and its escrow, the per-entry AES-256-GCM record, the double-encrypted cloud blob that keeps the server blind to metadata, the device hand-off, and the portable export format.',
 };
 
 # OC Vault · Protocol
 
-OC Vault is the consumer productization of [OC Lock](/lock/) **Flow 4** — the
-self-vault pattern. This page describes how vault entries are sealed, how cloud
-sync stays metadata-blind, and what the portable export actually contains. For
-the normative envelope rules see the
-[`oc-lock-protocol`](https://github.com/orangecheck/oc-lock-protocol) spec.
+OC Vault seals entries with [OC Lock](/lock/)'s primitives (X25519, HKDF-SHA256,
+AES-256-GCM). This page describes how vault entries are sealed, how cloud sync
+stays metadata-blind, how a new device gets the key, and what the portable
+export contains. [`@orangecheck/vault-core`](/sdk/vault-core/README) implements
+this format for the CLI, the SDK and the extension.
 
-## Why Flow 4 is shaped differently from Flows 1–3
+## Why not OC Lock envelopes
 
-OC Lock's Flows 1–3 (device-to-device, group, time-locked) seal each message as
-a full BIP-322-signed `.lock` envelope. That requires a wallet sign-prompt per
-seal — fine for a one-off file drop, wrong for password-manager UX where a user
-adds fifty entries in a sitting.
-
-Flow 4 keeps the Lock **primitives** (X25519, HKDF-SHA256, AES-256-GCM, RFC 8785
-canonicalization) but defers envelope construction to _export_ time. Day-to-day
-writes are sealed under a symmetric **vault key**; a full signed `.lock`
-envelope is produced only when the user explicitly chooses to share or back up
-an entry.
+OC Lock seals each message as a BIP-322-signed `.lock` envelope addressed to
+device keys bound to a Bitcoin address. That takes a wallet signature per seal,
+and an address: many vault accounts sign in with an email code, Google or
+GitHub. So vault seals everything under a symmetric **vault key** instead. It
+does not implement OC Lock's envelopes or its Flow 4 self-vault, and a signed
+`.lock` export of an entry is not built.
 
 ## The vault key
 
-On first load the browser generates a **vault key**: 32 cryptographically-random
-bytes, persisted in IndexedDB.
+On first setup the browser generates a **vault key**: 32 cryptographically
+random bytes. It is the AES-256-GCM key for every entry.
 
-- It is the AES-256-GCM key-encryption key for every entry.
-- It never leaves the device. OC never receives it, and the protocol has no
-  mechanism by which it could.
-- Its `sha256[:8]` fingerprint is surfaced in settings so a user can verify
-  device parity.
+- It is stored on vault.ochk.io only **wrapped**: under your vault passphrase
+  and under a recovery code (scrypt N = 2^17, r = 8, p = 1, then AES-256-GCM),
+  filed under your account's `did:oc`. Any device you sign in on fetches the
+  wraps and unlocks with either secret. OC holds neither secret and cannot open
+  the wraps.
+- A device being linked can also receive the key from one that holds it, sealed
+  to its X25519 device key (see below).
+- A blob that names scrypt factors outside N 2^14–2^20, r ≤ 16, p ≤ 4 is refused
+  before any key is derived, by the server and by every client.
 
-Lose the vault key with no export and no cloud sync, and the entries are
-unrecoverable — by construction. There is no escrow.
+Lose both the passphrase and the recovery code, with no encrypted backup file,
+and the entries are unrecoverable — by construction.
 
 ## The entry envelope
 
@@ -72,7 +72,7 @@ unchanged entry still produces fresh ciphertext.
 ## Cloud sync · the double-encrypted blob
 
 Cloud sync (a paid tier) mirrors encrypted entries to an OC-hosted blob store so
-they reach every device signed in with the same Bitcoin identity. To keep OC
+they reach every device signed in to the same orangecheck account. To keep OC
 blind even to entry _metadata_, the entire entry record is wrapped a **second**
 time before transit:
 
@@ -105,8 +105,9 @@ A team vault is a second, parallel vault sealed under a separate 32-byte **team
 key** rather than your personal vault key. Family Circle creates one team you
 own; the creating browser generates the team key locally, and **every new member
 receives it through an invite URL whose fragment (`#…`) carries the key**. URL
-fragments are never sent to a server, so vault.ochk.io never holds the team key
-any more than it holds the personal vault key.
+fragments are never sent to a server, so vault.ochk.io holds the team key only
+wrapped under each member's personal vault key, as it holds the personal key
+only wrapped.
 
 Team entries reuse the same `packEntryForCloud` envelope as the personal
 double-encrypted blob, only with the team key in both layers. They are stored on
@@ -116,16 +117,16 @@ envelope id, so the server still sees ciphertext plus an `updated_at`.
 The collaborative **signal** is different from personal sync, and the
 client-side machinery reflects that:
 
-| Property              | Personal cloud sync                                                                                                | Team vault                                                                     |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| Key                   | personal vault key (per identity)                                                                                  | team key (per team)                                                            |
-| Key escrow            | none — wrap under your passphrase via [Witnessed Recovery](/vault/security#the-recovery-tradeoff--read-this-twice) | escrowed under your personal vault key so a clean reinstall finds the team key |
-| Concurrency           | the same identity on multiple devices                                                                              | many identities, each potentially editing concurrently                         |
-| Reconciliation        | per-entry `synced_at` + `remote_rev`, pull/push                                                                    | compare-and-swap on the server `updated_at`, plus a poll loop                  |
-| Freshness model       | "are my local edits backed up yet?"                                                                                | "how fresh is what I'm looking at relative to my teammates' writes?"           |
-| Loop                  | sync once per visibility/focus, then idle                                                                          | 8-second background poll while the tab is visible                              |
-| Concurrent-edit guard | last-write-wins, conflict copies kept                                                                              | advisory edit-locks (~30 s TTL, heartbeated while the editor is open)          |
-| Surfaced state        | `cloud sync` stat tile · `<synced>/<total>` · last-sync time                                                       | `liveness` stat tile · last-refresh time · `live across teammates`             |
+| Property              | Personal cloud sync                                          | Team vault                                                                     |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Key                   | personal vault key (per identity)                            | team key (per team)                                                            |
+| Key escrow            | wrapped under your passphrase and your recovery code         | escrowed under your personal vault key so a clean reinstall finds the team key |
+| Concurrency           | the same identity on multiple devices                        | many identities, each potentially editing concurrently                         |
+| Reconciliation        | per-entry `synced_at` + `remote_rev`, pull/push              | compare-and-swap on the server `updated_at`, plus a poll loop                  |
+| Freshness model       | "are my local edits backed up yet?"                          | "how fresh is what I'm looking at relative to my teammates' writes?"           |
+| Loop                  | sync once per visibility/focus, then idle                    | 8-second background poll while the tab is visible                              |
+| Concurrent-edit guard | last-write-wins, conflict copies kept                        | advisory edit-locks (~30 s TTL, heartbeated while the editor is open)          |
+| Surfaced state        | `cloud sync` stat tile · `<synced>/<total>` · last-sync time | `liveness` stat tile · last-refresh time · `live across teammates`             |
 
 The polling loop is index-gated and cheap, but it's still a poll — that's why
 the team page surfaces its own **liveness tile** (last-refresh time, with a
@@ -145,18 +146,30 @@ single JSON snapshot:
     "format": "oc-vault-export",
     "version": 1,
     "exported_at": "2026-05-15T…Z",
-    "identity": "bc1q…",
+    "identity": "did:oc:…",
     "entries": [
         /* VaultEntry records, ciphertext intact */
     ]
 }
 ```
 
-The `entries` carry the same per-entry ciphertext as IndexedDB. Anyone holding
-the vault key can decrypt them with
+The `entries` carry the same per-entry ciphertext as IndexedDB, but not the
+vault key. Anyone holding the key can decrypt them with
 [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) directly — the
-AES-256-GCM, b64url and JSON conventions are all documented and stable. If
-vault.ochk.io shut down tomorrow, this file would still open.
+AES-256-GCM, b64url and JSON conventions are all documented and stable. The
+**encrypted backup** file carries the key too, sealed under a passphrase you
+choose (scrypt, then AES-256-GCM), so it restores on a new device with no
+server. If vault.ochk.io shut down tomorrow, both would still open.
+
+## Handing the key to a new device
+
+Besides unlocking with the passphrase, a new device can get the vault key from
+one that already holds it. Each browser has an X25519 device key, registered
+with vault.ochk.io under the signed-in session. The holding device, after a
+fingerprint check by the person, seals the vault key to the new device's key
+(ephemeral X25519, HKDF-SHA256, AES-256-GCM with the device id as associated
+data); the server stores and serves that grant opaquely. Device records carry no
+BIP-322 binding and are not published to Nostr.
 
 ## One-time share links
 
@@ -176,5 +189,5 @@ TTL expiry (1 h / 24 h / 7 d).
 | Package                                               | Role                                                               |
 | ----------------------------------------------------- | ------------------------------------------------------------------ |
 | [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives. |
-| [`@orangecheck/lock-core`](/sdk/lock-core/README)     | The `.lock` envelope shapes used by signed single-entry export.    |
-| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — the basis for multi-device sync.   |
+| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: key wraps, entries, cloud blobs, export, TOTP.   |
+| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to.  |

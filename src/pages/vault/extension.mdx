@@ -29,6 +29,11 @@ else. The vault key never touches disk and never reaches the page. See
   re-prompted.
 - **Your vault in the popup.** Search, copy, reveal — the same actions the web
   app has. The popup syncs automatically; there is no manual refresh button.
+- **TOTP codes.** A TOTP entry, or a login that carries one, shows its current
+  code and the seconds it has left. **copy** on a TOTP entry in the list, or
+  beside its code, takes the code, never the secret, and a copy clears with the
+  clipboard setting. The secret stays masked like a password. Codes follow RFC
+  6238, as on vault.ochk.io.
 - **Password generator.** **generate** in the popup makes a random password (20
   characters of every kind by default) or a diceware passphrase (6 words), with
   the options and word list vault.ochk.io's generator has, and an estimate of

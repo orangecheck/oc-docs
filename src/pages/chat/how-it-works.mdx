@@ -51,6 +51,16 @@ once that binding reaches their relays your messages read **"verified · your
 address"**: the link from the address to the device key is BIP-322 and checks
 offline. ([Session devices](/chat/spec#session-devices-86).)
 
+chat.ochk.io writes a device record, a Bitcoin binding and every revocation to
+your relays and to nostr-core's five (chat's own four relays are among them). It
+calls one done only once 2 of the five serve it back, each asked on its own: the
+family's [write quorum](/infrastructure/relay#write-quorum-and-read-floor).
+Below that it says "Not in effect yet", and **Try again** sends the same signed
+event again. A device lookup always asks the five, as well as chat's four. Chat
+does not apply the read floor yet: today a lookup counts once any one relay
+finishes answering, so it can miss a revocation that only silent relays hold.
+The floor comes with a later release.
+
 ### 2. Discovery — fetch a device key by address
 
 To message someone you know, you type their Bitcoin address; the client fetches

@@ -56,6 +56,14 @@ Honesty matters more than a clean table:
   of them are.
 - **Your Bitcoin address.** It is your identifier with the auth host. Using an
   address with no on-chain history avoids linking the vault to a balance.
+- **Bound browsers, if you opt in.** Binding a browser under Settings → Devices
+  publishes a public record on five Nostr relays that links your Bitcoin address
+  to that browser's key, and those relays see your IP address. See
+  [the Bitcoin device tier](/vault/protocol#the-bitcoin-device-tier).
+- **What a `.lock` export holds.** It opens on every device it lists without
+  your vault passphrase, and it names your Bitcoin address. Revoke a device you
+  no longer hold before you export. See
+  [Signed .lock export](/vault/protocol#signed-lock-export).
 
 ## The recovery tradeoff — read this twice
 

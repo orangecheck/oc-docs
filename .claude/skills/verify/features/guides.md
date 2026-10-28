@@ -37,6 +37,7 @@ done                                                                         # e
 curl -s "$B/lock/spec" | grep -o '<title[^>]*>[^<]*' | head -1                # Specification · OC Lock — orangecheck docs
 curl -s "$B/lock/spec" | grep -c 'href="/lock/'                               # 0: every link carries /docs
 curl -s "$B/lock/spec" | grep -c 'A device revoking itself should carry it'  # 1: the page carries OC Lock 2.2.1's rule
+curl -s "$B/lock/device-keys" | grep -c 'id="when-a-record-counts"'         # 1: lock.ochk.io's write quorum and read floor
 ```
 
 Proves it when: every page is 200, the title names the page, no link drops the

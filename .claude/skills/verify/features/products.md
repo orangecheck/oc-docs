@@ -37,10 +37,13 @@ for p in me me/quickstart me/sdk me/operator/charter vault cosign connect federa
 done                                                                    # every one 200
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://docs.ochk.io/federation/oc-me-v1
 # 308 https://ochk.io/docs/federation/oc-me-v1
+curl -s "$B/vault/protocol" | grep -oE 'id="(signed-lock-export|the-bitcoin-device-tier)"'
+# id="signed-lock-export" and id="the-bitcoin-device-tier"
 ```
 
-Proves it when: every page is 200 and the charter's old address is one 308 to its
-new one.
+Proves it when: every page is 200, the charter's old address is one 308 to its
+new one, and the vault protocol page carries the `.lock` export and the Bitcoin
+device tier sections.
 
 ## Gotchas
 

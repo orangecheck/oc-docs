@@ -15,7 +15,10 @@ Visit [/app](https://lock.ochk.io/app) in a browser, enter your Bitcoin address,
 pick your wallet (UniSat, Xverse, Leather — or paste a signature from any
 signmessage-capable wallet), and sign the binding statement. The browser stores
 a 32-byte X25519 secret in IndexedDB and publishes a public kind-30078 event to
-four Nostr relays.
+nostr-core's five Nostr relays. The browser is set up once two of them serve the
+record back; until then the page says "Not set up yet", and **Try again** sends
+the same record
+([when a record counts](/lock/device-keys#when-a-record-counts)).
 
 You never do this step again for this address in this browser.
 
@@ -23,10 +26,11 @@ You never do this step again for this address in this browser.
 
 On [/app](https://lock.ochk.io/app), click **+ new** and paste the recipient's
 Bitcoin address. The thread opens. Type a message or attach files and press
-**send**. The app looks up the recipient on Nostr, verifies the BIP-322 binding
-on their device record, seals the envelope, publishes a gift-wrap so the
-recipient's inbox auto-delivers, and exposes a share URL / `.lock` / QR on the
-resulting bubble so you can also hand the envelope off out-of-band any time.
+**send**. The app looks up the recipient on Nostr (4 of the 5 relays must
+answer), verifies the BIP-322 binding on their device record, seals the
+envelope, publishes a gift-wrap so the recipient's inbox auto-delivers, and
+exposes a share URL / `.lock` / QR on the resulting bubble so you can also hand
+the envelope off out-of-band any time.
 
 Every sent message is a sealed vault by definition — same crypto, same identity
 binding, same envelope structure. The URL encodes the full envelope in its

@@ -166,6 +166,28 @@ A revocation one relay holds retires the bind another relay still serves, so a
 sender that reads several relays needs only one of them to have it. A sender
 that reads none of the relays holding it keeps sealing to the device.
 
+## When a record counts
+
+lock.ochk.io counts device records by the family's
+[write quorum and read floor](/infrastructure/relay#write-quorum-and-read-floor).
+It publishes to nostr-core's five relays, then asks each relay on its own for
+the event.
+
+- **Writes need 2 of the five.** Registering a browser, revoking it, revoking
+  another device with your wallet, and updating a record to v3 are done only
+  once 2 of the five serve the record back. Below that the page says "Not in
+  effect yet" and offers **Try again**, which sends the same signed event again;
+  the wallet is not asked to sign again. A browser being registered keeps its
+  key either way. A revocation this browser sends without a wallet signature
+  only replaces its own record, so it needs all five.
+- **A revocation is checked.** After it is in effect, lock.ochk.io reads the
+  address's devices again and says it is done only when that read, at the floor,
+  no longer shows the device. With too few answers it says "Not checked yet".
+- **Reads that rest on an absence need 4 of the 5.** Sealing to an address needs
+  them, because only then does a missing revocation mean there is none; with
+  fewer it sends nothing and says "Too few relays answered." The list of an
+  address's other devices needs them too.
+
 ## Rotation
 
 To rotate a device key cleanly:

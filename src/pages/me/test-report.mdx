@@ -27,15 +27,15 @@ UTC.
 - **Not operator independence.** Every operator identity in these tests is held
   by orangecheck.
 
-| Part                                                   | State                                              | Evidence                                       |
-| ------------------------------------------------------ | -------------------------------------------------- | ---------------------------------------------- |
-| [Operator suite on mutinynet](#operator-suite-phase-c) | C01–C06 and C08–C11 pass; C07 half done            | runs listed below; five mutinynet transactions |
-| [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423   | the block; a proof file you can verify         |
-| [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run | seat claims citing block 972639; the C07 move  |
-| [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                  | drill runs of 2026-10-28                       |
-| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; one finding, its fix in review | rehearsal of 2026-10-28                        |
-| [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator     | code read and a live walk, 2026-10-27          |
-| [Still open](#still-open)                              | C07's second sitting, the mainnet test and more    | each with its date or owner                    |
+| Part                                                   | State                                                | Evidence                                       |
+| ------------------------------------------------------ | ---------------------------------------------------- | ---------------------------------------------- |
+| [Operator suite on mutinynet](#operator-suite-phase-c) | C01–C06 and C08–C11 pass; C07 half done              | runs listed below; five mutinynet transactions |
+| [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423     | the block; a proof file you can verify         |
+| [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run   | seat claims citing block 972639; the C07 move  |
+| [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                    | drill runs of 2026-10-28                       |
+| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; one finding, its fix partly live | rehearsal of 2026-10-28                        |
+| [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator       | code read and a live walk, 2026-10-27          |
+| [Still open](#still-open)                              | C07's second sitting, the mainnet test and more      | each with its date or owner                    |
 
 ## Operator suite (phase C)
 
@@ -178,13 +178,13 @@ holds payouts back while the reports carry no balance, and one already handed
 out failed before anything was sent. But payouts would have stopped until
 someone restarted the machine.
 
-The fix is built and in review: phoenixd runs under the same restart supervisor
-as the executor, the status page reads a report with no Lightning node behind it
-as degraded, and a shutdown stops the executor before phoenixd. The rehearsal
-ran it on the same machine and it passed, including a stop during a payment,
-where the payment was held on restart and never paid twice. The status page part
-reaches production when it lands, and the restart part with the next executor
-deploy.
+The fix has three parts. The status page now reads a report with no Lightning
+node behind it as degraded; that part has been live in production since
+2026-10-28. phoenixd now runs under the same restart supervisor as the executor,
+and a shutdown stops the executor before phoenixd. Both are approved, and reach
+production with the next executor deploy. The rehearsal ran all three on the
+same machine and they passed, including a stop during a payment, where the
+payment was held on restart and never paid twice.
 
 ## No-KYC walk-through
 
@@ -223,17 +223,19 @@ The portal stores the answers; no code checks or publishes any of it. Whether it
 keeps asking is open, with the legal read below.
 
 Two parts of the walk-through are not in this draft yet: what an app receives
-about a person at sign-in, and what deleting an account erases. Each is added
-when its check is done.
+about a person at sign-in, and what deleting an account erases. Both are listed
+under [Still open](#still-open).
 
 ## Still open
 
-| Part                                                                                                                    | When, or who                                       |
-| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1` | not before 2026-11-10 04:20:41 UTC                 |
-| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor restarted mid-batch  | after the second sitting                           |
-| The phoenixd restart fix above                                                                                          | in review; then the next executor deploy           |
-| The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                         |
-| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started   |
-| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                          |
-| Balances orangecheck holds, into a federation                                                                           | after a mainnet federation and a Fedimint executor |
+| Part                                                                                                                    | When, or who                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1` | not before 2026-11-10 04:20:41 UTC                                            |
+| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor restarted mid-batch  | after the second sitting                                                      |
+| phoenixd's restart supervisor and the shutdown order (approved)                                                         | the next executor deploy                                                      |
+| The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                                                    |
+| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started                              |
+| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                                                     |
+| Balances orangecheck holds, into a federation                                                                           | orangecheck; after a mainnet federation and a Fedimint executor in production |
+| The no-KYC walk-through: what an app receives about a person at sign-in                                                 | orangecheck                                                                   |
+| The no-KYC walk-through: what deleting an account erases                                                                | orangecheck                                                                   |

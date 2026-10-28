@@ -222,9 +222,41 @@ region, and two references, and says the operator is listed publicly with them.
 The portal stores the answers; no code checks or publishes any of it. Whether it
 keeps asking is open, with the legal read below.
 
-Two parts of the walk-through are not in this draft yet: what an app receives
-about a person at sign-in, and what deleting an account erases. Both are listed
-under [Still open](#still-open).
+**What an app receives.** A third-party app (an integrator's project, a site
+that opens the sign-in popup, an OC Connect client, a webhook receiver) gets a
+person's email address or Bitcoin address only through a scope the person
+grants. Granting it, or turning on its renewal, takes a fresh re-proof within 5
+minutes: a passkey, or an email code or a Bitcoin signature (oc-me-web
+`src/pages/api/me/scope-grants.ts:208` and `:260`,
+`src/lib/privacy/identity-reproof.ts:38`). No grant from before that rule is in
+force: on 2026-10-28 production held no scope grants at all. On every sign-in
+path the popup hands the opening site only the account id, did, display name and
+Nostr key (`src/lib/auth/popup-resume.ts:80`), and a site outside orangecheck
+gets a token bound to its own origin, with neither in it (oc-www
+`src/lib/auth/bound-token.ts:13`). orangecheck's own sites on ochk.io are the
+exception: they receive the Bitcoin address and the sign-in identity without a
+grant (oc-www `src/pages/api/auth/me.ts:111`).
+
+**What deleting an account does.** It does what ochk.app's deletion dialog and
+the erasure email say (oc-app-web `f87a2ae`, oc-me-web `1d38acfe`, both live
+since 2026-10-28). An admin completes the request, and an alert tells us when
+one has waited a day. Completing it closes the account and its sign-in, and
+erases the person's data on ochk.io, me.ochk.io, vault, chat and cosign, except
+a few records: payment records keep their amounts and times for accounting, and
+the audit log and the deletion request stay, without the reason given; each
+keeps the account only as a keyed id, or not at all. On cosign, the person's
+messages in conversations with other people and the reports they filed stay,
+with the account taken off them. Backups roll off within 30 days, and copies
+cached by the CDN expire within a day.
+
+The order is me.ochk.io, then vault, chat and cosign, then ochk.io, with a
+second pass minutes later (oc-me-web `src/lib/me/account-purge.ts:1-23`). The
+purge keys payment records and drops their description
+(`src/lib/payment/store.ts:88`), keys the request and drops its reason
+(`src/lib/me/deletion-requests-store.ts:261`), drops the person's webhook
+retries (`src/lib/developer/webhook-queue.ts:350`), and deletes every backup row
+that names the account, in its key or its value
+(`src/lib/backup/run-backup.ts:452`), live in oc-me-web `7e1ce4d1`.
 
 ## Still open
 
@@ -237,5 +269,3 @@ under [Still open](#still-open).
 | Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started                              |
 | The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                                                     |
 | Balances orangecheck holds, into a federation                                                                           | orangecheck; after a mainnet federation and a Fedimint executor in production |
-| The no-KYC walk-through: what an app receives about a person at sign-in                                                 | orangecheck                                                                   |
-| The no-KYC walk-through: what deleting an account erases                                                                | orangecheck                                                                   |

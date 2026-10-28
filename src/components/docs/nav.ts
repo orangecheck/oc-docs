@@ -212,7 +212,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/lock/why',
                 label: 'Why OC Lock',
-                blurb: 'The v1 postmortem — what went wrong and what v2 fixes.',
+                blurb: 'Why OC Lock exists, and the short history from v1 to v2.',
             },
             {
                 href: '/lock/quickstart',
@@ -363,7 +363,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/vote/api',
                 label: 'Library + CLI',
-                blurb: 'The vote-core API surface and the oc-vote CLI.',
+                blurb: "vote.ochk.io's HTTP API, the vote-core library, and tallying with vote-cli.",
             },
             {
                 href: '/vote/security',
@@ -539,7 +539,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/webhooks',
                 label: 'Webhooks',
-                blurb: 'Reception in Node + Rust, raw-body warning, retry semantics.',
+                blurb: 'Reception in Node, Python and Rust, raw-body warning, retry semantics.',
             },
             {
                 href: '/me/drops',
@@ -584,7 +584,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/me/operator/in-browser',
                 label: 'In-browser flow',
-                blurb: 'How the portal runs the entire operator lifecycle without a CLI. Storage, round-trip, recovery.',
+                blurb: 'How the portal runs the operator lifecycle without a CLI. Storage, round-trip, recovery. The program is not open.',
             },
         ],
     },
@@ -601,7 +601,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/vault/quickstart',
                 label: 'Quickstart',
-                blurb: 'Sign in with Bitcoin, add an entry, audit passwords, turn on cloud sync, export a backup.',
+                blurb: 'Sign in, add an entry, audit passwords, turn on cloud sync, export a backup.',
             },
             {
                 href: '/vault/extension',
@@ -779,7 +779,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/sdk/python',
                 label: 'orangecheck (Python)',
-                blurb: 'Python SDK. Same surface as @orangecheck/sdk, same conformance vectors.',
+                blurb: 'Stake checks and attestations with the TypeScript conformance vectors, plus ochk.app sign-in, events and webhooks.',
             },
             {
                 href: '/sdk/cli',

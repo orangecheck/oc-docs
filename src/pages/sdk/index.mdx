@@ -49,7 +49,7 @@ Serve every sibling protocol.
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | [`@orangecheck/sdk`](/sdk/sdk/README)                             | Core TypeScript SDK — `check()`, `verify()`, `createAttestation()`, `issueChallenge()`, scoring.       |
 | [`orangecheck` (Python)](/sdk/python)                             | Python SDK. Same surface as `@orangecheck/sdk`, same conformance vectors.                              |
-| [`@orangecheck/cli`](/sdk/cli)                                    | `oc` shell — check / verify / create / challenge / discover.                                           |
+| [`@orangecheck/cli`](/sdk/cli)                                    | `oc` shell — check / verify / discover / challenge, plus `oc me` integrator commands.                  |
 | [`@orangecheck/gate`](/sdk/gate/README)                           | HTTP middleware for Express / Next / Fastify / Hono / Workers.                                         |
 | [`@orangecheck/react`](/sdk/react/README)                         | `<OcBadge>`, `<OcGate>`, `<OcChallengeButton>`.                                                        |
 | [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README)       | One `getSigner(wallet, { address })` API across UniSat / Xverse / Leather / OKX / Phantom.      |
@@ -58,8 +58,10 @@ Serve every sibling protocol.
 | [`@orangecheck/auth-core`](/sdk/auth-core/README)                 | Ed25519 JWT verify + cookie helpers — consumer half of the ochk.io auth host.                          |
 | [`@orangecheck/auth-client`](/sdk/auth-client/README)             | React provider + hooks for cross-subdomain auth via the ochk.io host.                                  |
 | [`@orangecheck/nostr-core`](/sdk/nostr-core/README)               | Browser Nostr client (publishEvent, queryEvents, DEFAULT_RELAYS).                                      |
-| [`@orangecheck/bip322`](/sdk/bip322/README)                     | Bitcoin message signatures, currently 1.1.0: `verifySignature()` for BIP-322 and legacy BIP-137, and since 1.1 `signMessage()` for a key you hold. No bitcoinjs-lib. |
-| [`@orangecheck/design`](/sdk/design/README)                        | The family design system — tokens, primitives, family chrome. Storybook at [design.ochk.io](https://design.ochk.io). |
+| [`@orangecheck/bip322`](/sdk/bip322/README)                     | Bitcoin message signatures: `verifySignature()` for BIP-322 and legacy BIP-137, and since 1.1 `signMessage()` for a key you hold. No bitcoinjs-lib. |
+| [`@orangecheck/app-design`](https://www.npmjs.com/package/@orangecheck/app-design) | The family design system — tokens, type, primitives and app chrome, scoped under `data-oc-app="ochk"`. Stories at [design.ochk.io](https://design.ochk.io). |
+| [`@orangecheck/mark`](https://www.npmjs.com/package/@orangecheck/mark) | The orangecheck mark, with no dependencies: SVG strings, a data URI, a React component, and SVG and PNG files. See [the sign-in button](/integration/sign-in-button). |
+| [`@orangecheck/site-kit`](https://www.npmjs.com/package/@orangecheck/site-kit) | Family-internal scaffolding for the `.ochk.io` Next.js sites: SEO, security headers and CSP, the session gate, the OG card route, the sitemap, analytics. Not for third-party use. |
 | [`@orangecheck/legal`](https://www.npmjs.com/package/@orangecheck/legal) | Family-internal Terms / Privacy / security-disclosure documents rendered by every family site.   |
 | [`@orangecheck/insights-client`](/sdk/insights-client/README) | Server-side event emit for oc insights, the family's first-party analytics.  |
 
@@ -116,7 +118,7 @@ Serve every sibling protocol.
 
 | Package                                                                           | Command               | Purpose                                                              |
 | --------------------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------- |
-| [`@orangecheck/cli`](/sdk/cli)                                                    | `oc`                  | OC Attest — check / verify / create / challenge / discover.          |
+| [`@orangecheck/cli`](/sdk/cli)                                                    | `oc`                  | OC Attest — check / verify / discover / challenge; `oc me` integrator commands. |
 | [`@orangecheck/agent-cli`](https://www.npmjs.com/package/@orangecheck/agent-cli) | `oc-agent`            | Verify, inspect and canonicalize delegation / action / revocation envelopes. |
 | [`@orangecheck/stamp-cli`](https://www.npmjs.com/package/@orangecheck/stamp-cli) | `stamp`, `git-stamp`  | Sign files and git tags with your Bitcoin address; anchor to Bitcoin. |
 | [`@orangecheck/vote-cli`](https://www.npmjs.com/package/@orangecheck/vote-cli)   | `oc-vote`             | Tally, verify and inspect polls.                                     |
@@ -128,9 +130,10 @@ Still on npm so old lockfiles resolve. Nothing new should depend on them.
 
 | Package                                                           | Status                                                                                                   |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [`@orangecheck/ui`](/sdk/ui/README)                               | Deprecated. Replaced by [`@orangecheck/design`](https://design.ochk.io).                                 |
+| [`@orangecheck/design`](/sdk/design/README)                       | Deprecated. Frozen: fixes only, no new components. The family design system is `@orangecheck/app-design`. |
+| [`@orangecheck/ui`](/sdk/ui/README)                               | Deprecated. Unmaintained. Use `@orangecheck/app-design`.                                                 |
 | [`@orangecheck/webhook-verify`](/sdk/webhook-verify/README)       | Deprecated. It verified webhook deliveries from fleet.ochk.io, which is retired. No replacement.         |
-| `@orangecheck/agent-console-client`                              | Unmaintained, not marked deprecated on npm. Its only target, console.ochk.io, is retired; the source is no longer in oc-packages. |
+| `@orangecheck/agent-console-client`                              | Deprecated. A client for console.ochk.io, which is retired. No replacement; the source is no longer in oc-packages. |
 
 ## Semver
 
@@ -144,12 +147,12 @@ and `@orangecheck/bip322` are at v1.0.0+ — wire-format-stable; type changes ar
 
 ## Cross-implementation conformance
 
-The TypeScript SDK and the Python SDK ship vendored copies of the same
-canonical test vectors from the protocol repos. CI re-runs both suites on
-every push and fails on drift. This means: a canonical message built in TS
-and a canonical message built in Python for the same inputs are
-**byte-identical**. Ditto attestation IDs, poll IDs, stamp envelope IDs,
-pledge IDs. If you ever observe otherwise, it's a bug — please file it.
+The TypeScript and Python SDKs run the same canonical test vectors: OC
+Attest's from a vendored copy, OC Pledge's straight from the protocol repo.
+CI re-runs both suites on every push and fails on drift. This means: a
+canonical message built in TS and a canonical message built in Python for the
+same inputs are **byte-identical**. Ditto attestation IDs and pledge IDs. If
+you ever observe otherwise, it's a bug — please file it.
 
 ## Local generation of the auto-gen reference
 

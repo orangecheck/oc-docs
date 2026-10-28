@@ -17,8 +17,8 @@ export const metadata = {
 OC Lock's core protocol seals a single envelope from a sender to a recipient.
 Chat is that same primitive _applied repeatedly, over a persistent transport,
 with local thread state._ Nothing new happens cryptographically — the envelope
-format, the device keys, the BIP-322 sender signature, the orangecheck gate are
-all unchanged. What changes is:
+format, the device keys and the BIP-322 sender signature are all unchanged. What
+changes is:
 
 - messages arrive without the sender having to copy-paste a URL
 - both sides keep per-conversation history
@@ -34,8 +34,10 @@ Bitcoin address you control**. That address is:
   phish
 - **verifiable** — every message is signed BIP-322 from the sender's address, so
   recipients can prove who sent it without trusting a server
-- **sybil-resistant on demand** — opt into the orangecheck filter and only
-  accept DMs from addresses that hold on-chain stake
+- **sybil-resistant on demand** — an app built on Lock can check a sender's
+  on-chain stake before it opens a message
+  ([layered with orangecheck](/lock/quickstart#layered-with-orangecheck));
+  lock.ochk.io itself does not offer this filter
 - **portable across devices** — register a new device with the same address and
   your inbox is there, no account migration
 
@@ -135,7 +137,7 @@ Honest summary:
 - **No "typing" indicators, no read receipts.** These are metadata leaks; we
   haven't added them.
 - **Delivery isn't guaranteed if every relay drops you.** Relays have their own
-  retention and admission policies. We publish to 4 by default; in practice
+  retention and admission policies. We publish to 5 by default; in practice
   you're always reachable on at least one.
 - **History lives in each browser.** The sender's client gift-wraps a
   self-addressed copy to every device record published under their own address,
@@ -147,9 +149,9 @@ Honest summary:
   state events, and a membership change protocol. 1:1 works today; groups will
   land later.
 - **No chain payments gating chat messages.** We deliberately kept payment-mode
-  out of chat — Bitcoin transactions per message is absurd. If you want a
-  payment precondition _for starting a thread_, use the orangecheck stake gate
-  (sybil filter) instead.
+  out of chat — Bitcoin transactions per message is absurd. lock.ochk.io has no
+  stake gate on threads either; an app that wants one can check the sender with
+  `@orangecheck/sdk` before it opens a message.
 
 ## Storage model
 
@@ -202,7 +204,6 @@ subscription; opening `/app` again with an unlocked device resumes it.
 - Groups (sender-keys model, proper ratchet)
 - Typing indicators and read receipts (opt-in per thread, since these leak
   metadata)
-- Media attachments (reusing the OC Lock archive format)
 - Mobile push via a user-operated relay
 
 See [`/reference/faq`](/reference/faq) for quick answers about the chat flow.

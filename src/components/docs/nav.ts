@@ -194,7 +194,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/attest/guides/self-hosting',
                 label: 'Guide: self-host the verifier',
-                blurb: 'Run the whole stack on your own Postgres + Vercel / Docker / VM.',
+                blurb: 'Run the same checks on your own server with the published packages.',
             },
         ],
     },

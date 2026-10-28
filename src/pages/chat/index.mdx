@@ -1,23 +1,26 @@
 export const metadata = {
     title: 'OC Chat · chat.ochk.io',
     description:
-        'Bitcoin-identity messaging: your address is your inbox. End-to-end-encrypted chat where the identity is a Bitcoin address (BIP-322), the anti-spam is Lightning postage paid directly to the recipient, and a message can be sealed to open only at a future Bitcoin block height. A mode of OC Lock, not a seventh verb.',
+        'End-to-end-encrypted chat where your orangecheck account is your inbox and a Bitcoin address (BIP-322) can be bound to it, the anti-spam is Lightning postage paid directly to the recipient, and a message can be sealed to open only at a future Bitcoin block height. A mode of OC Lock, not a seventh verb.',
 };
 
 # OC Chat
 
-**Your Bitcoin address is your inbox.** [chat.ochk.io](https://chat.ochk.io) is
-an end-to-end-encrypted messenger where the identity is a **Bitcoin address**
-(BIP-322), the anti-spam is **Lightning postage paid directly to the
-recipient**, and a message can be **sealed to open only at a future Bitcoin
-block height**. No phone number, no account, no custody.
+**Your orangecheck account is your inbox.** [chat.ochk.io](https://chat.ochk.io)
+is an end-to-end-encrypted messenger where the identity is your orangecheck
+account (`did:oc`), to which you can bind a **Bitcoin address** (BIP-322), the
+anti-spam is **Lightning postage paid directly to the recipient**, and a message
+can be **sealed to open only at a future Bitcoin block height**. No phone
+number, no custody.
 
 It is **not a new verb.** OC Chat is a _mode of [OC Lock](/lock/)_ — it reuses
 OC Lock's envelope crypto (X25519 ECDH + AES-256-GCM, BIP-322 identity binding,
-RFC 8785 canonicalization) verbatim and adds two envelope `kind` values plus a
-thin threading / postage / seal layer. The way [vault.ochk.io](/vault/) is OC
-Lock Flow 4 + Lightning, chat.ochk.io is OC Lock + threads + postage + a
-block-height seal.
+RFC 8785 canonicalization) verbatim and adds a thin threading / postage / seal
+layer. The spec also defines new envelope `kind` values as its upgrade target;
+chat.ochk.io sends every message as a base OC Lock `identity` envelope with
+`hint: "oc-chat/v1"` ([Envelope](/chat/envelope)). The way
+[vault.ochk.io](/vault/) is OC Lock Flow 4 + Lightning, chat.ochk.io is OC
+Lock + threads + postage + a block-height seal.
 
 ## The three send modes
 
@@ -27,18 +30,21 @@ Everything past these is a registry extension, not a new canonical surface.
 
 | Mode               | Envelope `kind` | What it adds                                                                                         |
 | ------------------ | --------------- | ---------------------------------------------------------------------------------------------------- |
-| **speak-now**      | `chat`          | Free 1:1 E2EE. Your BIP-322 identity is the account. Sub-second send, no per-message popup.          |
+| **speak-now**      | `chat`          | Free 1:1 E2EE. Your orangecheck account is the identity. Sub-second send, no per-message popup.      |
 | **pay-to-reach**   | `chat`          | A stranger pays Lightning postage to **you** to land in your inbox. OC never touches the sats.       |
 | **seal-til-block** | `chat-seal`     | A named beacon releases the key only after the chain passes block N. Beacon-enforced, not consensus. |
 
-See [The three send modes](/chat/modes) for the full breakdown.
+The `kind` column is the spec's upgrade target; on the wire chat.ochk.io sends
+all three as `identity`. See [The three send modes](/chat/modes) for the full
+breakdown.
 
 ## How it works, in one paragraph
 
-You sign in once with BIP-322; your browser generates an X25519 device key bound
-to your Bitcoin address and published to Nostr
-([OC Lock kind-30078](/lock/device-keys)). To message someone, you fetch their
-device key by Bitcoin address, seal an OC Lock envelope to it, and gift-wrap it
+You sign in with your orangecheck account; your browser generates an X25519
+device key, ochk.io vouches for it, and its record is published to Nostr
+([OC Lock kind-30078](/lock/device-keys)). One BIP-322 signature can also bind
+it to a Bitcoin address. To message someone, you fetch their device keys by
+`did:oc` or Bitcoin address, seal an OC Lock envelope to them, and gift-wrap it
 over Nostr (NIP-59) so relays learn nothing — not who, not when, not what.
 Threading lives inside the ciphertext as a hash-chain. A stranger attaches a
 Lightning preimage (paid to your own wallet) to reach you. To seal a message for
@@ -53,7 +59,7 @@ upgrade ships, that beacon is a trust anchor, not the chain. Full tour in
 ┌────────────────────────────────────────────────────────────────┐
 │  chat.ochk.io           threads, postage UI, seal compose       │
 ├────────────────────────────────────────────────────────────────┤
-│  oc-chat-protocol       kind=chat / chat-seal, threading, seal   │
+│  oc-chat-protocol       threading, postage, seal                 │
 │  oc-lock-protocol       envelope crypto, canonicalization        │
 │  @orangecheck/lock-*    X25519 ECDH, HKDF, AES-256-GCM           │
 ├────────────────────────────────────────────────────────────────┤
@@ -92,10 +98,10 @@ delivery is the free-tier floor, never the paywall**. A conforming deployment
 provides at least best-effort store-and-forward so a message sent while you are
 offline still arrives.
 
-| SKU          | Price                | For                                                                                       |
-| ------------ | -------------------- | ----------------------------------------------------------------------------------------- |
-| **Free**     | 0 sats               | All three send modes, best-effort durable inbox, the directory, channels.                 |
-| **Personal** | 1,000 sats / 30 days | Extends only the retention horizon, multi-device fan-out, and history depth on the inbox. |
+| SKU          | Price                | For                                                                                     |
+| ------------ | -------------------- | --------------------------------------------------------------------------------------- |
+| **Free**     | 0 sats               | All three send modes, best-effort durable inbox, the directory, channels.               |
+| **Personal** | 1,000 sats / 30 days | Inbox retention of 365 days (not 14), multi-device backfill, higher size and rate caps. |
 
 **Personal is closed for now:** it is paid over Lightning, and Lightning is off
 across orangecheck since 2026-09-02. The free tier is unaffected.
@@ -127,8 +133,9 @@ early never loses days.
   roles, moderation, source-intake.
 - [Transport & durable inbox](/chat/transport) — gift-wrap, the v2 encrypted
   wrap, opaque per-conversation queue routing, relay AUTH.
-- [Envelope & content addressing](/chat/envelope) — the two new kinds and the
-  recipient-exclusion `id`/AAD rule that makes re-wrap safe.
+- [Envelope & content addressing](/chat/envelope) — the v0 wire, and the upgrade
+  target's two new kinds and recipient-exclusion `id`/AAD rule that makes
+  re-wrap safe.
 - [Protocol walkthrough](/chat/protocol) — the six flows, narrated end to end.
 - [Security posture](/chat/security) — the threat model and the nineteen+ named
   non-protections.

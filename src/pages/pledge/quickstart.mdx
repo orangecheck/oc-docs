@@ -91,8 +91,10 @@ if (!result.ok) throw new Error(`${result.code}: ${result.message}`);
 ## 4. Publish
 
 A pledge travels as a kind-30078 Nostr event with `d` tag
-`oc-pledge:<pledge_id>` and the envelope as its content
+`oc-pledge:<pledge_id>` and the canonical JSON of the envelope as its content
 ([NIP](https://github.com/orangecheck/oc-pledge-protocol/blob/main/NIP_ORANGECHECK_PLEDGE.md)).
+Readers find an address's pledges by its `t` tags: the swearer's address, the
+marker `oc-pledge`, and the counterparty's address when the pledge names one.
 The BIP-322 signature inside the envelope is what readers verify; the Nostr
 signature only satisfies the relay, so any key will do.
 
@@ -100,16 +102,24 @@ signature only satisfies the relay, so any key will do.
 import type { PledgeEnvelope } from '@orangecheck/pledge-core';
 
 import { publishEvent } from '@orangecheck/nostr-core';
+import { canonicalizePledgeEnvelope } from '@orangecheck/pledge-core';
 import { finalizeEvent, generateSecretKey } from 'nostr-tools/pure';
 
 declare const pledge: PledgeEnvelope; // from step 2
+
+const tags = [
+    ['d', `oc-pledge:${pledge.id}`],
+    ['t', pledge.swearer.address],
+    ['t', 'oc-pledge'],
+];
+if (pledge.counterparty) tags.push(['t', pledge.counterparty]);
 
 const event = finalizeEvent(
     {
         kind: 30078,
         created_at: Math.floor(Date.now() / 1000),
-        tags: [['d', `oc-pledge:${pledge.id}`]],
-        content: JSON.stringify(pledge),
+        tags,
+        content: canonicalizePledgeEnvelope(pledge),
     },
     generateSecretKey()
 );
@@ -185,14 +195,14 @@ const bond = await verifyBond({
 ```
 
 For deterministic mechanisms (`chain_state`, `nostr_event_exists`,
-`stamp_published`, `http_get_hash`, `dns_record`), every observer with access to
-the same public state produces the byte-identical outcome envelope — **no
-resolver is required**, and `sig` is `null`.
+`stamp_published`, `http_get_hash`, `dns_record`, and `vote_resolves`, whose OC
+Vote tally is itself a pure function), every observer with access to the same
+public state produces the byte-identical outcome envelope — **no resolver is
+required**, and `sig` is `null`.
 
-For `counterparty_signs` and `vote_resolves`, the outcome must be signed by the
-designated resolver: pass `signer` to `createOutcome`, whose address must equal
-`resolved_by`. With no signed outcome by `expires_at`, the pledge resolves to
-`expired_unresolved`.
+For `counterparty_signs`, the outcome must be signed by the counterparty: pass
+`signer` to `createOutcome`, whose address must equal `resolved_by`. With no
+signed outcome by `expires_at`, the pledge resolves to `expired_unresolved`.
 
 ## 6. Show the public history
 
@@ -209,4 +219,4 @@ states; that's the [composition surface](/pledge/composition).
 - [Resolution grammar](/pledge/resolution-grammar) — every mechanism in detail
 - [Composition with the family](/pledge/composition) — gate predicates,
   agent-delegated pledges, vote-resolved disputes
-- [Specification](/pledge/spec) — normative rules + 33 conformance vectors
+- [Specification](/pledge/spec) — normative rules + conformance vectors

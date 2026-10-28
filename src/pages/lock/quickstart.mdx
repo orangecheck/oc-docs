@@ -12,19 +12,19 @@ click.
 ## 1. Register your device
 
 Visit [/app](https://lock.ochk.io/app) in a browser, enter your Bitcoin address,
-pick your wallet (UniSat, Xverse, Leather — or paste a signature from any
-signmessage-capable wallet), and sign the binding statement. The browser stores
-a 32-byte X25519 secret in IndexedDB and publishes a public kind-30078 event to
-nostr-core's five Nostr relays. The browser is set up once two of them serve the
-record back; until then the page says "Not set up yet", and **Try again** sends
-the same record
+pick your wallet (UniSat, Xverse, Leather, OKX, Phantom — or paste a signature
+from any signmessage-capable wallet), and sign the binding statement. The
+browser stores a 32-byte X25519 secret in IndexedDB and publishes a public
+kind-30078 event to nostr-core's five Nostr relays. The browser is set up once
+two of them serve the record back; until then the page says "Not set up yet",
+and **Try again** sends the same record
 ([when a record counts](/lock/device-keys#when-a-record-counts)).
 
 You never do this step again for this address in this browser.
 
 ## 2. Send a message
 
-On [/app](https://lock.ochk.io/app), click **+ new** and paste the recipient's
+On [/app](https://lock.ochk.io/app), click **New** and paste the recipient's
 Bitcoin address. The thread opens. Type a message or attach files and press
 **send**. The app looks up the recipient on Nostr (4 of the 5 relays must
 answer), verifies the BIP-322 binding on their device record, seals the
@@ -37,7 +37,7 @@ binding, same envelope structure. The URL encodes the full envelope in its
 fragment, so nothing touches a server.
 
 ```
-https://oc-lock-web.vercel.app/unlock#eyJ2Ijoy…
+https://lock.ochk.io/unlock#eyJhbGci…
 ```
 
 Share the URL through any channel: Signal, email, paper QR code, carrier pigeon.
@@ -56,9 +56,9 @@ Total on-screen time: < 3 seconds.
 
 ## 4. Hand off an envelope
 
-Every sent bubble exposes three affordances: **copy url**, **download .lock**,
-**show qr**. Same envelope, three ways to deliver it out-of-band if the Nostr
-auto-delivery isn't convenient (counterpart isn't on Lock yet, in-person
+Every message bubble, sent or received, exposes three affordances: **Link**,
+**.lock**, **QR**. Same envelope, three ways to deliver it out-of-band if the
+Nostr auto-delivery isn't convenient (counterpart isn't on Lock yet, in-person
 hand-off, air-gapped recipient). See [chat transport](/lock/chat) for the full
 delivery model and [security implications](/lock/security) for the trust model.
 

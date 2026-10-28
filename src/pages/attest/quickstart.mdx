@@ -27,8 +27,8 @@ curl -s 'https://attest.ochk.io/api/check?addr=bc1pezn5yjxmz9nuahtqprvhfeya2nv4z
 {
     "ok": true,
     "sats": 10000,
-    "days": 307,
-    "score": 103.46,
+    "days": 363,
+    "score": 120.66,
     "attestation_id": "bbde80f884ae849d2cc8d4fa19687e7ec862f8b7c85a3ee8cf93739548e23658",
     "address": "bc1pezn5yjxmz9nuahtqprvhfeya2nv4zdfk49u5amquhqptykx695rs60hqa2",
     "identities": [
@@ -42,8 +42,10 @@ curl -s 'https://attest.ochk.io/api/check?addr=bc1pezn5yjxmz9nuahtqprvhfeya2nv4z
 ```
 
 That is the whole product in one response. This address has proved control of an
-unspent 10,000-sat output that has sat still for 307 days, and has bound a Nostr
-identity to it. `ok` is the answer to "should I let this one in".
+unspent 10,000-sat output that has sat still for `days` days, and has bound a
+Nostr identity to it. `days` and `score` grow each day the coin stays put, so
+the numbers you see are higher than these. `ok` is the answer to "should I let
+this one in".
 
 `score` is **advisory** — a convenience number, not a consensus value. Gate on
 `sats` and `days`, which are facts about the chain. See
@@ -56,15 +58,16 @@ identity to it. `ok` is the answer to "should I let this one in".
 ```sh
 # a floor this address clears
 curl -s '.../api/check?addr=bc1pezn…&min_sats=5000&min_days=90'
-{"ok": true,  "sats": 10000, "days": 307, "score": 103.46}
+{"ok": true,  "sats": 10000, "days": 363, "score": 120.66}
 
 # a floor it does not
 curl -s '.../api/check?addr=bc1pezn…&min_sats=100000000&min_days=3650'
-{"ok": false, "sats": 10000, "days": 307, "score": 103.46}
+{"ok": false, "sats": 10000, "days": 363, "score": 120.66, "reasons": ["below_min_sats", "below_min_days"]}
 ```
 
-Note that a failing check still returns the facts. You decide what to do with a
-10,000-sat, 307-day identity — the endpoint does not moralise about it.
+Note that a failing check still returns the facts, plus `reasons` naming the bar
+it missed. You decide what to do with a 10,000-sat identity of that age — the
+endpoint does not moralise about it.
 
 An address that has never attested is a different answer — and it comes back
 with a **404**, not a 200:
@@ -119,8 +122,14 @@ The value is `protocol:identifier` — a bare npub is rejected.
 
 ```sh
 curl -s 'https://attest.ochk.io/api/check?identity=nostr:npub1yfk7w33n60g05whqdmzluaftan390q89mqhht67wf4r8y90m3h9spyzpyn'
-{"ok": true, "sats": 10000, "days": 307, "address": "bc1pezn…"}
+{"ok": true, "sats": 10000, "days": 363, "address": "bc1pezn…", "identity_trust": "self_asserted"}
 ```
+
+`identity_trust: "self_asserted"` comes back on every identity lookup. The
+attestation proves control of the address, not of the handle bound beside it:
+the binding is the address holder's claim, and the newest claim for a handle is
+the one returned. Check the handle yourself before you rely on it, or gate on
+`addr` when you need the subject pinned.
 
 ## 4. See everything an address has published
 
@@ -166,7 +175,7 @@ const result = await check({
     minSats: 5000,
     minDays: 90,
 });
-// { ok: true, sats: 10000, days: 307, score: 103.46 }
+// { ok: true, sats: 10000, days: 363, score: 120.66, ... }
 ```
 
 An address a person typed or scanned goes through `normalizeAddress` from
@@ -192,21 +201,23 @@ rather than load-bearing.
 
 `verify({ msg, addr, sig })` is the lower-level primitive if you hold a raw
 signed message rather than a published envelope, and `createAttestation()`
-builds and signs a new one.
+builds a new envelope from a message and the signature the wallet made over it.
 
-To check an envelope you already hold without installing anything:
+To check an envelope you already hold without installing anything, send its
+address, message and signature:
 
 ```sh
 curl -s -X POST https://attest.ochk.io/api/verify \
   -H 'content-type: application/json' \
-  -d '{"envelope": { … }, "policy": {"min_sats": 5000, "min_days": 90}}'
+  -d '{"addr": "bc1q…", "msg": "…", "sig": "…"}'
 ```
 
-`envelope` is the full canonical `AttestationEnvelope` JSON as produced by
-`createAttestation()`. See [Verification](/attest/verification) for the exact
-checks a verifier performs, and
-[Self-host the verifier](/attest/guides/self-hosting) to run the whole stack
-yourself.
+`msg` is the canonical message exactly as signed. The answer carries `ok`,
+`codes` and, when `ok` is true, `metrics` (`sats_bonded`, `days_unspent`,
+`score`). It applies no thresholds, so compare `metrics` with your own bar. See
+[Verification](/attest/verification) for the exact checks a verifier performs,
+and [Self-hosting the verifier](/attest/guides/self-hosting) to run them on your
+own server with the published packages.
 
 ## Get your own attestation
 
@@ -226,5 +237,6 @@ curl -s https://attest.ochk.io/api/openapi
 
 OpenAPI 3.1, covering `/api/check`, `/api/verify`, `/api/discover`,
 `/api/publish-attestation` and `/api/stats`. Generate a client from it in any
-language. (`/api/stats` reports a rolling **10-minute** window, so zeros there
-mean "quiet right now", not "empty".)
+language. (`/api/stats` counts the newest attestations it reads off the relays,
+up to 500 per relay, and caches the result for 10 minutes. `window_minutes` is
+that cache life, not a time window.)

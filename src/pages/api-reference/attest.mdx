@@ -18,13 +18,13 @@ controls ≥ X sats unspent for ≥ Y days." The load-bearing primitive is
 
 ## Surface map
 
-| Tag        | Endpoints                  | Purpose                                                                              |
-| ---------- | -------------------------- | ------------------------------------------------------------------------------------ |
-| `check`    | `/api/check`               | One-call sybil-gate. `?addr=…&min_sats=…&min_days=…` → `{ ok, score, sats, days }`.  |
-| `verify`   | `/api/verify`              | Full envelope verification — recompute id, verify BIP-322, assert bond meets policy. |
-| `discover` | `/api/discover`            | List attestations matching a subject across the family Nostr relay set.              |
-| `publish`  | `/api/publish-attestation` | Server-side broadcaster. Client builds + signs locally; server fans out to relays.   |
-| `stats`    | `/api/stats`               | Network-wide aggregate. Heavy-cached (10 min).                                       |
+| Tag        | Endpoints                  | Purpose                                                                                                                           |
+| ---------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `check`    | `/api/check`               | One-call sybil-gate. `?addr=…&min_sats=…&min_days=…` → `{ ok, score, sats, days }`.                                               |
+| `verify`   | `/api/verify`              | Verify `addr` + `msg` + `sig` — recompute id, verify the signature, measure the bond. No thresholds; returns `codes` + `metrics`. |
+| `discover` | `/api/discover`            | List attestations matching a subject across the family Nostr relay set.                                                           |
+| `publish`  | `/api/publish-attestation` | Server-side broadcaster. Client builds + signs locally; server fans out to relays.                                                |
+| `stats`    | `/api/stats`               | Network-wide aggregate. Heavy-cached (10 min).                                                                                    |
 
 ## Auth posture
 
@@ -50,10 +50,10 @@ under [the auth host's API](/api-reference/auth-host), not here.
 
 ## Conformance
 
-The HTTP API mirrors the TypeScript [`@orangecheck/sdk`](/sdk/sdk/README)
-behavior 1:1 — same conformance vectors run on both. A canonical message built
-in TS and a canonical message rebuilt server-side for the same inputs are
-byte-identical. If you observe drift, it's a bug.
+The HTTP routes call the published [`@orangecheck/sdk`](/sdk/sdk/README)
+(`check()`, `verify()` and its discovery helpers), so they answer as the SDK
+does. The conformance vectors run in the SDK's own tests, and attest.ochk.io's
+CI sends one of them to `/api/verify`. If you observe drift, it's a bug.
 
 ## Live spec — embedded
 

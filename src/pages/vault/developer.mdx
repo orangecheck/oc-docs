@@ -20,7 +20,7 @@ credential in two**:
 - **An access token** authorizes _transport_ — it lets a caller fetch your
   encrypted blobs. It carries **no key material**. A leaked token yields only
   ciphertext, exactly what the server already holds.
-- **The passphrase** derives the vault key and performs _decryption_,
+- **The passphrase** unwraps the vault key and performs _decryption_,
   client-side. It is never sent anywhere.
 
 This is stricter than the service-account model elsewhere in the industry, where
@@ -49,9 +49,8 @@ The plaintext is produced only at run time.
 ocv://<vault>/<item>/<field>[?attr=otp]
 ```
 
-- **vault** — `personal` (your own vault). CLI access to
-  [team vaults](/vault/teams) is on the roadmap — the cryptographic primitives
-  are in place, only the command surface is missing.
+- **vault** — `personal` (your own vault). The CLI and the SDK do not read
+  [team vaults](/vault/teams).
 - **item** — an entry's name (case-insensitive) or its 32-hex id.
 - **field** — a field name; omit it for the entry type's primary field
   (`password` for a login, `key` for an api-key, `secret` for a totp).
@@ -60,7 +59,7 @@ ocv://<vault>/<item>/<field>[?attr=otp]
 ```
 ocv://personal/Stripe/key
 ocv://personal/GitHub/username
-ocv://personal/GitHub/login?attr=otp
+ocv://personal/GitHub?attr=otp
 ```
 
 ## The `oc-vault` CLI

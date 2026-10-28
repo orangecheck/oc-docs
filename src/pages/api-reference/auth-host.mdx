@@ -21,15 +21,15 @@ per-request fetch to the auth host.
 
 ## Surface map
 
-| Tag         | Endpoints                                                            | Purpose                                                                                                                 |
-| ----------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/switch`, `/account` | Session lifecycle. JWT verification key, current session, sign-in/out, multi-account switch, account edit.              |
-| `challenge` | `/api/challenge` (GET + POST)                                        | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                |
-| `email-otp` | `/api/auth/email-otp/start`, `/verify`                               | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                              |
-| `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers`     | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers. |
-| `connect`   | `/api/connect/provision`, `/api/connect/apps`                        | OC Connect — provision a `did:oc` for an integrator's own users. See [Integration](/integration).                       |
-| `public`    | `/api/family-stats`                                                  | Cross-subdomain family-wide stats. No auth.                                                                             |
-| `forms`     | `/api/contact`                                                       | Contact-form relay via Resend. Same-origin only.                                                                        |
+| Tag         | Endpoints                                                            | Purpose                                                                                                                                          |
+| ----------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `auth`      | `/api/auth/jwks`, `/me`, `/signin`, `/logout`, `/switch`, `/account` | Session lifecycle. JWT verification key, current session, sign-in/out, multi-account switch, account edit.                                       |
+| `challenge` | `/api/challenge` (GET + POST)                                        | BIP-322 signed-challenge primitive — issue + verify, the building block.                                                                         |
+| `email-otp` | `/api/auth/email-otp/start`, `/verify`                               | Email-OTP sign-in. Same session-cookie outcome as BIP-322.                                                                                       |
+| `oauth`     | `/api/auth/<provider>/start`, `/callback`, `/api/auth/providers`     | Google / GitHub sign-in run on the auth host. Same session-cookie outcome; `/providers` lists the configured providers.                          |
+| `connect`   | `/api/connect/provision`, `/claim-link`, `/delete`, `/apps`          | OC Connect — provision a `did:oc` for an integrator's own users, hand them a claim link, delete them; register apps. See [OC Connect](/connect). |
+| `public`    | `/api/family-stats`                                                  | Cross-subdomain family-wide stats. No auth.                                                                                                      |
+| `forms`     | `/api/contact`                                                       | Contact-form relay via Resend. Same-origin only.                                                                                                 |
 
 ## Auth scheme
 
@@ -39,7 +39,9 @@ per-request fetch to the auth host.
 - `Domain=.ochk.io` (cross-subdomain)
 - `HttpOnly` (no JS access)
 - `Secure` (TLS only)
-- `SameSite=Lax`
+- `SameSite=None` (so sibling subdomains can set it by credentialed fetch). The
+  CSRF gate is an origin check: a cookie session on an unsafe method is refused
+  unless the request comes from the same origin or a listed family site.
 
 Consumer sites verify locally — no fetch to the auth host on every request. The
 Ed25519 public JWK lives at [`/api/auth/jwks`](https://ochk.io/api/auth/jwks)
@@ -54,18 +56,22 @@ consumer code never branches on how the user signed in.
 **BIP-322 (canonical):**
 
 1. `GET /api/challenge?addr=...&audience=...&purpose=login` →
-   `{ message, nonce, expiresAt }`
+   `{ message, nonce, expiresAt, expiresAtIso }`. The `audience` must be the
+   auth host, a family site or a first-party site; only then is the challenge
+   recorded for sign-in.
 2. User signs `message` with their Bitcoin wallet via
    [`@orangecheck/wallet-adapter`](/sdk/wallet-adapter/README) or directly.
-3. `POST /api/auth/signin` with `{ address, message, signature, nonce }` → 200 +
-   `oc_session` cookie set.
+3. `POST /api/auth/signin` with
+   `{ message, signature, expectedNonce, expectedAudience, expectedPurpose: "login" }`
+   (plus optional `scheme`: `"bip322"` or `"legacy"`, and `add`) → 200
+   `{ ok, token, account }` + `oc_session` cookie set. The nonce works once.
 
 **Email-OTP (lower-friction):**
 
-1. `POST /api/auth/email-otp/start` with `{ email }` → server emails 6-digit
-   code
-2. `POST /api/auth/email-otp/verify` with `{ email, code }` → 200 + `oc_session`
-   cookie set.
+1. `POST /api/auth/email-otp/start` with `{ email }` → server emails a 6-digit
+   code and answers `{ ok, token, expires_at }`.
+2. `POST /api/auth/email-otp/verify` with `{ email, code, token }` (plus
+   optional `add`) → 200 `{ ok, token, account }` + `oc_session` cookie set.
 
 **OAuth providers (Google / GitHub):**
 

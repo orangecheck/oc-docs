@@ -1,174 +1,52 @@
 export const metadata = {
     title: 'Self-hosting the verifier',
     description:
-        'Run the whole ochk.io stack — hosted endpoints, dashboard, challenge flow — on your own infrastructure. Three env vars and a Postgres database, no Supabase lock-in.',
+        'Run OC Attest verification on your own server with the published packages: your relays, your Esplora, no call to attest.ochk.io.',
 };
 
 # Self-hosting the verifier
 
-> **Not forkable yet.** The repository behind ochk.io is private today, so you
-> cannot clone it. Everything that decides a verdict is open:
-> [`@orangecheck/sdk`](https://www.npmjs.com/package/@orangecheck/sdk),
-> [`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) and
-> [`@orangecheck/bip322`](https://www.npmjs.com/package/@orangecheck/bip322)
-> (MIT), so you can run the same checks inside your own server now. This page
-> describes the hosted service's shape, for when its code is published.
-
-The hosted service runs on any Postgres 14+ database. If you don't want to
-depend on it — for privacy, latency, regulatory, or ideological reasons — this
-is the deployment it would take.
+The site behind attest.ochk.io is not public, so you cannot clone or deploy it.
+Everything that decides a verdict is published under MIT:
+[`@orangecheck/sdk`](https://www.npmjs.com/package/@orangecheck/sdk),
+[`@orangecheck/gate`](https://www.npmjs.com/package/@orangecheck/gate) and
+[`@orangecheck/bip322`](https://www.npmjs.com/package/@orangecheck/bip322).
+attest.ochk.io's `/api/check` calls the same `check()` you can run inside your
+own server. This page shows how.
 
 ## What you're standing up
 
-A self-hosted instance replicates every ochk.io endpoint:
+Each hosted endpoint has a published counterpart you call in-process:
 
-| Path                                          | Hosted                           | Self-hosted                 |
-| --------------------------------------------- | -------------------------------- | --------------------------- |
-| `GET /api/check`                              | Cached 60 s at the edge.         | Same, your cache.           |
-| `POST /api/verify`                            | Stateless BIP-322 verification.  | Same.                       |
-| `/api/challenge`                              | Public, stateless.               | Same.                       |
-| `/api/auth/*`                                 | Sign-in-with-Bitcoin + sessions. | Same — needs your DB.       |
-| `/api/discover`                               | Queries Nostr relays.            | Same — point at any relays. |
-| `/dashboard`, `/create`, `/verify`, `/signin` | Rendered from Next.js.           | Same code.                  |
+| Hosted endpoint     | In your own code                                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/check`    | `check()` from `@orangecheck/sdk`, or `@orangecheck/gate` in front of a route                                                       |
+| `POST /api/verify`  | `verify({ addr, msg, sig })` from `@orangecheck/sdk`                                                                                |
+| `GET /api/discover` | `getAttestationsForAddress()`, `getAttestationsForIdentity()`, `discoverAttestations()` from `@orangecheck/sdk`                     |
+| `/api/challenge`    | `issueChallenge()` and `verifyChallenge()` from `@orangecheck/sdk`; see [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) |
 
-The only parts that require a database are `/api/auth/*` and `/dashboard` — the
-account + session store. The public verification surface is stateless.
+None of these needs a database. They read attestations from Nostr relays and
+coins from an Esplora API.
 
 ## Prerequisites
 
-- **Node.js 20+** and **yarn**.
-- **Postgres 14+** — any provider. Supabase, Neon, Railway, RDS, plain Docker,
-  or a bare VM.
+- **Node.js 18+**.
 - An **Esplora-compatible** Bitcoin endpoint —
   [`mempool.space`](https://mempool.space) and
   [`blockstream.info`](https://blockstream.info) both work and are pre-wired as
-  fallbacks. For full sovereignty, run your own Bitcoin node with
+  primary and fallback. For full sovereignty, run your own Bitcoin node with
   [Blockstream Esplora](https://github.com/Blockstream/esplora) on top.
-- Access to **Nostr relays** for attestation discovery. The defaults
-  (`wss://relay.damus.io`, `wss://relay.primal.net`, `wss://nos.lol`) work out
-  of the box; override if you want to pin specific relays.
-
-## Three env vars
-
-Everything fits in a short `.env`:
-
-```bash
-# Postgres connection — anything standard works (Supabase, Neon, Railway, local).
-# For Supabase, use the Transaction Pooler URL.
-DATABASE_URL=postgres://user:pass@host:5432/orangecheck
-
-# Signs session JWTs. Rotate by changing this — existing sessions become
-# invalid and users must sign in again. 32+ random chars, any format.
-SESSION_SECRET=change-me-to-a-random-string-at-least-32-characters-long
-
-# Public site URL — used in OG images, redirects, canonical URLs, and
-# as the default `audience` when issuing challenges.
-NEXT_PUBLIC_SITE_URL=https://your-deploy.example.com
-```
-
-If you're using Supabase (what ochk.io runs on), replace `DATABASE_URL` with the
-Supabase pair:
-
-```bash
-SUPABASE_URL=https://<project-ref>.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<service_role key — bypasses RLS, server-only>
-```
-
-Both paths are supported — the `@/lib/db` module auto-detects which one is
-configured.
-
-## Apply the schema
-
-The database schema lives at `src/lib/db/schema.sql`. Run it once against your
-Postgres:
-
-```bash
-psql $DATABASE_URL < src/lib/db/schema.sql
-```
-
-Three tables get created:
-
-| Table          | Rows per user | What it stores                                                                                |
-| -------------- | ------------- | --------------------------------------------------------------------------------------------- |
-| `accounts`     | 1             | `btc_address`, `display_name`, `nostr_npub`, timestamps. **No email, no password.**           |
-| `attestations` | 0–N           | Cached copy of your published attestations for the dashboard. Canonical source remains Nostr. |
-| `sessions`     | 0–N           | Revocation list for issued JWT cookies.                                                       |
-
-Row-level security is enabled but permissive: the service-role key is
-server-only, and every query runs through the Next.js API routes. No anonymous
-key is ever exposed to the browser.
-
-## Deploy
-
-The whole thing is a standard Next.js Pages-Router app. Every host works:
-
-### Vercel
-
-```bash
-git clone <your fork>
-cd <your fork>
-vercel --prod
-# Then in the Vercel dashboard: set DATABASE_URL + SESSION_SECRET +
-# NEXT_PUBLIC_SITE_URL as Production env vars.
-```
-
-### Docker
-
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-COPY . .
-RUN yarn build
-EXPOSE 3000
-CMD ["yarn", "start"]
-```
-
-```yaml
-# docker-compose.yml
-services:
-    postgres:
-        image: postgres:16
-        environment:
-            POSTGRES_PASSWORD: localdev
-            POSTGRES_DB: orangecheck
-        volumes:
-            - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-            - pgdata:/var/lib/postgresql/data
-        ports:
-            - '5432:5432'
-
-    web:
-        build: .
-        environment:
-            DATABASE_URL: postgres://postgres:localdev@postgres:5432/orangecheck
-            SESSION_SECRET: local-dev-secret-not-for-production
-            NEXT_PUBLIC_SITE_URL: http://localhost:3000
-        ports:
-            - '3000:3000'
-        depends_on:
-            - postgres
-
-volumes:
-    pgdata:
-```
-
-### Bare VM
-
-Standard `yarn build && yarn start` behind any reverse proxy (Caddy, nginx,
-Cloudflare). The app itself is stateless; scale horizontally by pointing
-multiple instances at the same Postgres.
+- Access to **Nostr relays** for attestation discovery. The SDK's defaults are
+  `wss://relay.damus.io`, `wss://nos.lol`, `wss://nostr.oxtr.dev` and
+  `wss://relay.ochk.io`; override them to pin specific relays.
 
 ## Pointing the SDK at your own relays + explorer
 
-Here's a nuance worth understanding before you start chasing "API base URL"
-settings: **`@orangecheck/sdk` doesn't call `/api/check` at all**. The SDK is a
-full local verifier — `check()` queries Nostr for the attestation, runs BIP-322
+**`@orangecheck/sdk` doesn't call `/api/check` at all.** The SDK is a full local
+verifier — `check()` queries Nostr for the attestation, runs BIP-322
 verification in-process, and fetches UTXOs directly from Esplora. It never
-round-trips through ochk.io or your fork. So for SDK consumers, "self-hosting"
-usually just means pointing at **your own relays** and **your own Esplora
-node**, not at a replacement API.
+round-trips through attest.ochk.io. So "self-hosting" means pointing it at
+**your own relays** and **your own Esplora node**, not at a replacement API.
 
 ```ts
 import { check } from '@orangecheck/sdk';
@@ -185,78 +63,74 @@ await check({
 });
 ```
 
-The Python SDK accepts the equivalent `relays=` and Esplora options on every
-call.
+To gate HTTP routes, `@orangecheck/gate` wraps the same `check()`:
+[Gate an Express route](/attest/guides/express) shows `ocGate`, and the package
+also exports `ocGateFastify`, `ocGateHono` and `ocGateFetch`. Its `relays`
+option sets the relays; it takes no Esplora option.
 
-**When _do_ you need the hosted site?** Two cases:
+The Python SDK (`orangecheck` on PyPI) is a client for the hosted HTTP API
+(`https://ochk.io` by default). It takes no relay or Esplora options, so it
+cannot run `check()` on its own.
 
-1. You're relying on `/api/auth/*` for Sign-in-with-Bitcoin sessions. That's a
-   server-side flow (session cookie + Postgres), so if you want your own
-   sessions you host the site yourself — the instructions above cover it.
-2. You want the dashboard, `/create` UI, `/verify` UI, `/a/[id]` short-link
-   resolver, or `/api/og/check` share previews. These are Next.js pages living
-   inside the site repo; fork it, point your DNS at the deploy, done.
+**What stays hosted.** Two things have no published counterpart:
+
+1. Family sign-in on ochk.io (`/api/auth/*` and its `oc_session` cookie). For
+   sessions on your own site,
+   [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) runs the
+   challenge flow on your server.
+2. The attest.ochk.io pages: create, verify, dashboard and the share links.
 
 ## Operational notes
 
-- **Rate limiting** is in-memory and resets on every cold start — fine for a
-  casual deploy, inadequate for a busy one. For production, put
-  [Vercel WAF rate limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting),
-  Cloudflare, or a Redis-backed limiter in front. See
+- **Rate limiting.** attest.ochk.io's limits do not apply to code you run. If
+  you expose your own endpoint, put a limiter in front of it (a WAF, Cloudflare,
+  reverse-proxy rules or a Redis-backed limiter): each `check()` costs relay
+  queries and an Esplora lookup. See
   [Security implications](/ecosystem/security#relay-censorship--partition) for
   context.
-- **Session revocation** is a single row in `sessions` — delete it and the JWT
-  cookie stops working on the next request. Auto-purge expired rows by
-  cron-calling `select purge_expired_sessions();` every hour.
-- **Chain-state caching.** `/api/check` caches verification outcomes for 60 s.
-  Tune via the `Cache-Control` header on the handler if your traffic pattern
-  differs.
-- **Multi-relay Nostr queries.** Set `NOSTR_RELAYS` to a comma-separated list to
-  override the default trio. Always query ≥ 3 relays so one partition doesn't
-  break discovery.
+- **Chain-state caching.** attest.ochk.io caches `/api/check` answers for 60 s.
+  `@orangecheck/gate` caches each lookup in process (`cacheTtlMs`, 60 s by
+  default). With bare `check()`, cache as your traffic needs.
+- **Multi-relay Nostr queries.** Pass `relays` to `check()` or the gate. Always
+  query ≥ 3 relays so one partition doesn't break discovery.
 - **Esplora fallback.** `mempool.space` is tried first, `blockstream.info` is
-  the fallback. Both are public — no API key needed. Override via SDK options
-  when integrating.
+  the fallback. Both are public — no API key needed. `esploraMainnetBase`
+  replaces the first; the `blockstream.info` fallback stays.
 
 ## Security hardening checklist
 
-- [ ] `SESSION_SECRET` is at least 32 random characters, rotated when you
-      suspect leakage.
-- [ ] `DATABASE_URL` / service-role key never leaves the server (not in
-      `NEXT_PUBLIC_*`).
-- [ ] `NEXT_PUBLIC_SITE_URL` is set — challenges use it as the default
-      `audience`, preventing replay against a different host.
-- [ ] HTTPS only — the session cookie has the `Secure` flag in production.
-- [ ] Rate limiting in front of the deployment (WAF / Cloudflare / reverse-proxy
-      rules).
+- [ ] Rate limiting in front of any endpoint you expose.
 - [ ] Multi-relay Nostr discovery (at least three distinct operators).
-- [ ] BIP-322 libraries kept up-to-date (`bitcoinjs-lib`, Rust `bitcoin` +
-      `secp256k1` for the Python SDK).
+- [ ] Challenges carry your own `audience` and `purpose`, and you pass them to
+      `verifyChallenge()` as `expectedAudience` and `expectedPurpose`,
+      preventing replay against a different host.
+- [ ] `@orangecheck/sdk` and `@orangecheck/bip322` kept up to date (`bip322`
+      depends only on `@noble/curves`, `@noble/hashes` and `@scure/base`).
 - [ ] Read [Security implications](/ecosystem/security) end to end before going
       live.
 
 ## What you get by self-hosting
 
-- **No rate limits** — your infra, your throughput budget.
-- **No dependency on ochk.io's uptime** — if our `/status` goes red, yours
-  doesn't.
-- **Private telemetry** — no request logs leave your network.
+- **No dependency on attest.ochk.io** — `check()` talks to relays and an Esplora
+  API, never to attest.ochk.io.
+- **No attest.ochk.io rate limits** — the relays and Esplora API you use may
+  have their own.
 - **Pin the relays** you trust, or query your own.
-- **Regulatory clarity** — if your jurisdiction requires in-country data
-  residency, you control it.
+- **Your own chain source** — point `esploraMainnetBase` at your own node.
 
-The protocol is identical. The canonical message, the attestation ID, the
-conformance vectors — a self-hosted verifier produces **byte-identical** outputs
-to `ochk.io`. An attestation created against yours verifies on ours and
-vice-versa.
+The verdict logic is the same code: attest.ochk.io's `/api/check` calls this
+`check()`. Given the same relays and chain state, your answer matches the hosted
+one. attest.ochk.io reads `wss://nos.lol`, `wss://relay.primal.net`,
+`wss://nostr.oxtr.dev` and `wss://relay.ochk.io`; pass those as `relays` to see
+what it sees.
 
 ## Further
 
-- [`/api/auth/*` reference](/attest/api) — session endpoints documented in
-  detail.
-- [`@orangecheck/sdk`](/sdk/sdk/README) — the SDK that talks to your instance.
+- [`/api/auth/*` reference](/api-reference/auth-host) — ochk.io's session
+  endpoints.
+- [`@orangecheck/sdk`](/sdk/sdk/README) — the SDK reference.
+- [`@orangecheck/gate`](/sdk/gate/README) — the middleware reference.
 - [Security implications](/ecosystem/security) — operational threat model.
 - Source:
   [github.com/orangecheck/oc-packages](https://github.com/orangecheck/oc-packages)
-  — the published SDK. The verifier stack itself is distributed privately as a
-  reference at this time; contact us to request access.
+  — the published SDK, gate and BIP-322 packages.

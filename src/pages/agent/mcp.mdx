@@ -190,4 +190,7 @@ A working pair to fork:
 [`mcp-wrap`](https://github.com/orangecheck/oc-agent-examples/tree/main/mcp-wrap)
 (client) and
 [`verifying-mcp-server`](https://github.com/orangecheck/oc-agent-examples/tree/main/verifying-mcp-server)
-(server).
+(server). They differ from this page in two ways: `mcp-wrap` calls
+`stampInvocation` and reads the agent's signature back on stdin, and the pair
+sends the delegation and the action together in an `_oc_agent` field of the
+request rather than in `params._meta`.

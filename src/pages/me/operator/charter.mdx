@@ -1,47 +1,44 @@
 export const metadata = {
     title: 'ochk.app · Federation Charter',
     description:
-        'Canonical charter every guardian on an orangecheck federation ratifies. Hash + version land on each federation record; signatures are public commitments verifiable offline.',
+        'How guardians ratify an orangecheck federation charter. Hash + version land on each federation record; signatures are public commitments verifiable offline. The oc-me-v1 charter text is at /docs/federation/oc-me-v1.',
 };
 
 # ochk.app · Federation Charter
 
-**Version v1 (placeholder · pending federation provisioning).**
+**The oc-me-v1 charter is v1.0.0, at
+[/federation/oc-me-v1](/federation/oc-me-v1).**
 
-This page is the **canonical text** every guardian on an orangecheck federation
-ratifies before going live. The SHA-256 of this page's content is the
-`charter_hash` recorded against each federation in the directory at
-[ochk.app/me/operator/federations](https://ochk.app/me/operator/federations).
-Operators verify the hash matches the bytes they read here before signing —
-that's the trust dance.
+Every guardian on an orangecheck federation ratifies its charter before going
+live. For oc-me-v1, the `charter_hash` is the SHA-256 of the canonical-bytes
+block in [that charter](/federation/oc-me-v1#canonical-bytes). A federation
+created in the portal hashes its own canonical bytes, built from its parameters
+and its seats' operator keys. Operators verify the hash before signing.
 
-> **Status note · 2026-05.** No federation has gone live yet. The version below
-> ships as a placeholder so the charter-ratification surface renders honestly;
-> **do not sign against this hash**. The first real charter lands alongside the
-> first federation provisioning ceremony, with v1 frozen + hashed at that
-> moment. Until then, the placeholder hash flips ratification CTAs to disabled
-> in the portal.
+> **Status.** The operator program is not open, and no federation has guardian
+> seats yet: while the system is in testing, orangecheck holds every role
+> ([ochk.app/custody](https://ochk.app/custody)). A federation with no charter
+> of its own reads version `v0-pending`; **do not sign against that**.
 
 ## How to verify before signing
 
-You should compute the hash yourself. Don't trust the value displayed on
-[ochk.app/me/operator/federations](https://ochk.app/me/operator/federations);
-verify it matches what you read on this page.
+You should compute the hash yourself. Don't trust the value displayed in the
+portal; verify it matches the canonical bytes.
 
 ```bash
-# fetch the canonical text
-curl -s https://ochk.io/docs/me/operator/charter > charter.txt
+# charter.txt: the canonical-bytes block from /federation/oc-me-v1,
+# LF newlines, one trailing newline
 shasum -a 256 charter.txt
-# expected: matches the federation's charter_hash field
+# expected: the charter_hash at
+# https://me.ochk.io/api/operator/charter?federation=oc-me-v1
 ```
 
-Then sign in the portal (verify-then-sign flow) or via the kit:
+`oc-guardian charter fetch oc-me-v1` prints the published hash, version and
+canonical URL. Then sign in the portal (verify-then-sign flow) or via the kit:
 
 ```bash
-oc-guardian charter sign \
-  --federation oc-me-v1 \
-  --version v1 \
-  --hash <hash from above>
+oc-guardian charter sign oc-me-v1 --out charter-sig.json
+oc-guardian charter publish --file charter-sig.json
 ```
 
 Either path produces a byte-identical `charter-sign` envelope. The federation
@@ -51,8 +48,9 @@ recoverable from any node that has the envelope.
 
 ## The Charter
 
-> _Note: the text below is illustrative until v1 freezes. The frozen v1 will
-> replace this with the exact bytes that hash into the federation records._
+> _Note: the text below illustrates what a charter covers. It is not in force:
+> no federation has guardian seats. The oc-me-v1 charter text is at
+> [/federation/oc-me-v1](/federation/oc-me-v1)._
 
 ### Article 1 · Custody
 
@@ -70,7 +68,7 @@ this federation, it is one of N — never a majority of M in any M-of-N quorum.
 A guardian on this federation commits to:
 
 - **Uptime ≥ 99.5%** rolling 30-day window. Maintenance windows publishable via
-  `oc-guardian incident publish` with severity=info.
+  `oc-guardian alerts post` with `--severity info`.
 - **Incident disclosure within 72 hours** for any event that affects threshold
   availability or share security. Public, operator-signed, permanent.
 - **Charter ratification** before joining; **re-ratification** within 14 days of
@@ -87,9 +85,10 @@ The federation operates an M-of-N threshold scheme as recorded in the federation
 directory entry (e.g. "3-of-4"). Any state-changing federation action requires M
 valid signatures from distinct guardian operator keys.
 
-A guardian whose key is compromised initiates a `share-rotation` ceremony within
-24 hours of disclosure; the new key is published via a `charter-sign` envelope
-under the new pubkey, replacing the old.
+A guardian whose key is compromised discloses it within 24 hours. Guardian
+membership is fixed once keys are generated, so a compromised share is not
+rotated in place: the federation moves to a successor federation with a fresh
+key ceremony.
 
 ### Article 4 · User-facing properties
 
@@ -115,8 +114,8 @@ accept the exit within 14 days, redistribute the share to a replacement guardian
 transition publicly.
 
 Forced exit (federation removing a guardian for charter violation) requires
-M-of-N quorum of remaining guardians and a public `incident publish` with
-severity=critical naming the violation.
+M-of-N quorum of remaining guardians and a public incident
+(`oc-guardian alerts post --severity critical`) naming the violation.
 
 ### Article 6 · Amendment
 
@@ -133,11 +132,11 @@ for human readability only.
 
 ## Signature roster
 
-Operators who have ratified the current version land on the ratification grid at
-[ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
-Anyone can independently verify the roster by fetching
-`/api/operator/charter?federation=<slug>` and checking each signature against
-the corresponding operator pubkey from the public registry.
+Signatures on a federation's charter are public at
+`https://me.ochk.io/api/operator/charter?federation=<slug>`. Anyone can verify
+the roster by checking each signature against the corresponding operator pubkey
+from the public registry. A signer's own queue of charters waiting for their key
+is [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
 
 ## Where the kit lives
 

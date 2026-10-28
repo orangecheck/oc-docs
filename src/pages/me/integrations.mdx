@@ -117,7 +117,7 @@ Paying your users:
 
 | What you see                                        | Meaning                                                                                                | Fix                                                                                                     |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `IntegratorPriceConfig invalid` (422)               | Validation failed server-side.                                                                         | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`.   |
+| `config invalid` (422)                              | Your `IntegratorPriceConfig` failed validation server-side.                                            | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`.   |
 | `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against the wrong or a stale key set. | Use raw body bytes; the key set is `me.ochk.io/api/dev-jwks`, re-fetched with `oc.webhook.fetchJwks()`. |
 | `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                                          | Honor `Retry-After`; back off exponentially.                                                            |
 | `domain_unverified` (403)                           | Your project_key fired in `live` mode but `verification.state !== 'verified'`.                         | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.           |
@@ -135,5 +135,5 @@ strategy. If you're considering self-hosting, the contracts to honor are at:
 - `oc-agent-protocol/SPEC.md` + `FEDERATION.md` (delegations)
 - `oc-lock-protocol/SPEC.md` (encrypted DMs)
 
-The hosted service is a convenience, not a moat. Charter commitment 04 keeps
-every reference site free and self-hostable forever.
+The hosted service is a convenience, not a moat. Charter commitment 04 on
+[ochk.io/about](https://ochk.io/about) is that the protocol sites stay free.

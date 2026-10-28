@@ -18,17 +18,18 @@ sequenceDiagram
     participant C as Client
     participant W as Wallet<br/>(BIP-322)
     participant S as Server
-    C->>S: GET /api/challenge?addr=bc1q…
+    C->>S: GET /auth/challenge?addr=bc1q…
     S-->>C: { message, nonce, expiresAt }
-    C->>W: user signs canonical message
+    C->>W: user signs the challenge message
     W-->>C: signature
-    C->>S: POST /api/auth/signin<br/>{ message, signature, expectedNonce }
-    S->>S: verify BIP-322 · upsert account · mint cookie
-    S-->>C: 200 { ok, account }<br/>Set-Cookie: oc_session=…
+    C->>S: POST /auth/signin<br/>{ message, signature }
+    S->>S: verifyChallenge · nonce from session · open session
+    S-->>C: 200 { ok, address }<br/>Set-Cookie: session cookie
 ```
 
-The session cookie is `httpOnly + Secure + SameSite=Lax` with a 30-day Max-Age.
-Subsequent authenticated requests ride the cookie; the server reads
+These are your server's routes, as in the sample below. Its session cookie is
+`httpOnly + Secure + SameSite=Lax` with a 30-day Max-Age. Subsequent
+authenticated requests ride the cookie; the server reads
 `req.session.verifiedAddress` as a cryptographically-proven identifier.
 
 ## Server implementation

@@ -93,7 +93,7 @@ See [SDK overview](/sdk).
 - [Canonical message format](/ecosystem/canonical-message) — what polls and
   ballots are signed as
 - [BIP-322 signing](/ecosystem/bip322) — how voters sign ballots
-- [Conformance vectors](/ecosystem/conformance) — `v01`–`v16` test fixtures
+- [Conformance vectors](/ecosystem/conformance) — `v01`–`v18` test fixtures
 - [Security model](/ecosystem/security)
 
 ## Spec + implementation
@@ -102,7 +102,7 @@ See [SDK overview](/sdk).
   [`oc-vote-protocol`](https://github.com/orangecheck/oc-vote-protocol) (MIT)
 - Reference impl: `@orangecheck/vote-core`, `vote-cli` in
   [`oc-packages`](https://github.com/orangecheck/oc-packages)
-- Conformance vectors: 16 fixtures covering minimal public poll, sats weighting,
+- Conformance vectors: 18 fixtures covering minimal public poll, sats weighting,
   `sats_days` with cap, vote-change semantics, secret-ballot commit-reveal,
   ballot times, anchored and clock-dated polls, provisional and deferred
-  tallies, and the order of `counted`
+  tallies, the order of `counted`, and the 32-level nesting limit

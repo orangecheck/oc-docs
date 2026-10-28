@@ -15,11 +15,11 @@ and a nullifier for your app.
 
 ## 1. Set the floor
 
-Open your project on [ochk.app](https://ochk.app/me/projects) and choose **Use
-orangecheck sign-in**. That is the project's **Sign-in** tab: **How people sign
-in**, then **Who can sign in** below it. Pick a minimum amount and age, for
-example 100,000 sats unspent 30 days. The lowest floor is 1,000 sats: ochk.io
-won't take a smaller coin. The floor is saved in the project and served,
+Open your project on [ochk.app](https://ochk.app/me/projects), go to its
+**Sign-in** tab, and under **How people sign in** turn on **orangecheck
+sign-in**. **Who can sign in** appears below it. Pick a minimum amount and age,
+for example 100,000 sats unspent 30 days. The lowest floor is 1,000 sats:
+ochk.io won't take a smaller coin. The floor is saved in the project and served,
 uncached, at `GET https://me.ochk.io/api/integrator/<project_key>/sign-in`:
 
 ```text

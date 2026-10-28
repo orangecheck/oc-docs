@@ -17,16 +17,16 @@ Implementers and researchers should also read the protocol's
 
 ## One-glance threat model
 
-| Adversary                                             | What they learn                                                             | What they cannot                                       | Mitigation                                                                                               |
-| ----------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| **OC / vault.ochk.io database access**                | That an identity has _N_ encrypted blobs, each with a random id + timestamp | Entry names, types, tags, payloads — anything readable | Baked in — the double-encrypted blob (see below)                                                         |
-| **Network observer**                                  | You speak HTTPS to vault.ochk.io                                            | Content (TLS) and metadata (double encryption)         | —                                                                                                        |
-| **Possessor of a share URL**                          | Share ciphertext                                                            | The entry — the AES key lives in the URL fragment only | Send the link over a channel only the recipient has                                                      |
-| **Possessor of a team invite URL**                    | The team key                                                                | The personal vaults of any member                      | Send the link over a channel only the recipient has — same rule as share URLs. See [Teams](/vault/teams) |
-| **Stolen unlocked browser**                           | Full decrypted vault                                                        | —                                                      | Auto-lock; OS disk encryption; lock before stepping away                                                 |
-| **Stolen locked / signed-out browser**                | Ciphertext at rest in IndexedDB                                             | Plaintext — the session cookie is required to re-open  | Auto-lock; sign out on shared machines                                                                   |
-| **Someone who takes over your sign-in**               | Can sign in as you and fetch your ciphertext and wrapped vault key          | Open them: that takes your passphrase or recovery code | A strong passphrase; the recovery code kept offline                                                      |
-| **Lost passphrase and recovery code, no backup file** | —                                                                           | —                                                      | **None — the entries are gone. This is by design.**                                                      |
+| Adversary                                             | What they learn                                                             | What they cannot                                                                                                             | Mitigation                                                                                                                                                                                                         |
+| ----------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **OC / vault.ochk.io database access**                | That an identity has _N_ encrypted blobs, each with a random id + timestamp | Entry names, types, tags, payloads — anything readable                                                                       | Baked in — the double-encrypted blob (see below)                                                                                                                                                                   |
+| **Network observer**                                  | You speak HTTPS to vault.ochk.io                                            | Content (TLS) and metadata (double encryption)                                                                               | —                                                                                                                                                                                                                  |
+| **Possessor of a share URL**                          | Share ciphertext                                                            | The entry — the AES key lives in the URL fragment only                                                                       | Send the link over a channel only the recipient has                                                                                                                                                                |
+| **Possessor of a team invite URL**                    | The team key                                                                | The personal vaults of any member                                                                                            | Send the link over a channel only the recipient has — same rule as share URLs. **Send invite** emails it through vault.ochk.io and its mail provider; copy it to keep it off our server. See [Teams](/vault/teams) |
+| **Stolen unlocked browser**                           | Full decrypted vault                                                        | —                                                                                                                            | Auto-lock; OS disk encryption; lock before stepping away                                                                                                                                                           |
+| **Stolen locked / signed-out browser**                | Ciphertext at rest in IndexedDB                                             | Plaintext — re-opening takes the passphrase, the recovery code or a passkey you set up; a session cookie alone opens nothing | Auto-lock; sign out on shared machines. With **Stay unlocked on this device** on, a browser closed without a lock re-opens the vault without the passphrase                                                        |
+| **Someone who takes over your sign-in**               | Can sign in as you and fetch your ciphertext and wrapped vault key          | Open them: that takes your passphrase or recovery code                                                                       | A strong passphrase; the recovery code kept offline                                                                                                                                                                |
+| **Lost passphrase and recovery code, no backup file** | —                                                                           | —                                                                                                                            | **None — the entries are gone. This is by design.**                                                                                                                                                                |
 
 ## What is sealed
 
@@ -80,7 +80,8 @@ other side of that trade. Mitigate it deliberately:
 - **Keep the recovery code offline.** It is the only way in without the
   passphrase.
 - **Make an encrypted backup** from settings: your vault key and every entry
-  under a passphrase you choose, restorable anywhere with open code.
+  under a passphrase you choose. **Import** on vault.ochk.io restores it in any
+  browser.
 - **Witnessed Recovery** is not built and is not for sale.
 
 ## Breach checking · k-anonymity
@@ -103,8 +104,9 @@ The scan never runs unless you explicitly click it. The rest of the health audit
 
 ## Operational hardening you control
 
-- **Auto-lock** — set an idle timeout in settings; on expiry the tab reloads,
-  clearing every decrypted value from memory.
+- **Auto-lock** — set an idle timeout in settings; on expiry the vault locks
+  without a reload: the vault key is dropped and every decrypted value is
+  cleared.
 - **Clipboard auto-clear** — a copied secret is wiped from the OS clipboard
   after a configurable delay (default 30 s).
 - **Conceal previews** — keep TOTP codes and entry previews masked until

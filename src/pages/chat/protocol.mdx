@@ -15,7 +15,7 @@ explains how they compose. Throughout, Alice and Bob are identified by their
 ## The mental model
 
 ```
-  one BIP-322 signature per device, ever
+  one binding per device, ever (BIP-322, or ochk.io's vouch)
         │
         ▼
   device_pk (X25519) ──published──▶ Nostr kind-30078  (find me by my bitcoin address)
@@ -26,7 +26,7 @@ explains how they compose. Throughout, Alice and Bob are identified by their
                  (no per-message wallet popup)
 ```
 
-After the one binding signature, sending and receiving are zero-click.
+After the one binding, sending and receiving are zero-click.
 
 ## Flow 1 — speak-now (the daily driver)
 
@@ -38,8 +38,8 @@ After the one binding signature, sending and receiving are zero-click.
    which chat.ochk.io sends, that is the base OC Lock `id` with `recipients[]`
    included; the spec's upgrade target computes a `chat_envelope_id`
    [excluding `recipients[]`](/chat/envelope).
-3. **No wallet popup.** The per-device key authenticates the send; BIP-322 was
-   spent once at registration. The send loop is sub-second.
+3. **No wallet popup.** The per-device key authenticates the send; the device
+   was bound once, at registration. The send loop is sub-second.
 4. The envelope is gift-wrapped (ephemeral Schnorr key, minute-rounded
    `created_at`) and published. The relay sees a throwaway pubkey, Bob's inbox
    pubkey, and an opaque blob.
@@ -129,19 +129,23 @@ we ship this and not the CLTV-witness path yet.
 
 A journalist arms a disclosure: a `seal-til-block` envelope to a trusted
 recipient, set to release at a future height, **unless** the journalist checks
-in before then. Check-in re-anchors the seal (pushes `unlock_block` forward) via
-a fresh sealed envelope superseding the prior, under a shared `standing_id`. If
-check-ins stop, the chain reaches the height and the beacon releases. **The
-switch fires on silence.**
+in before then. Each check-in re-seals the same content to a later
+`unlock_block` under the same `standing_id`, carried inside the encrypted seal
+body so relays never learn a switch exists; the recipient's client opens only
+the check-in with the highest `unlock_block`. If check-ins stop, the last
+deadline passes and the message opens. **The switch fires on silence.**
 
 This is the one seal use case with real, repeat, high-stakes demand — and the
-sharpest failure mode: a beacon, app or relay outage that blocks a check-in
-could false-fire an irreversible disclosure. The spec RECOMMENDS a **second,
-non-app check-in channel** for institutional use; chat.ochk.io says so in its
-copy and does not enforce it. A deployment MUST state plainly that a multi-year
-seal depends on the named beacon existing and cooperating that far out (the
-drand `fastnet` sunset, which permanently bricked its ciphertexts, is the
-cautionary precedent). Full construction:
+sharpest failure mode: anything that stops a check-in from landing (an app or
+relay outage, a lost device) can false-fire an irreversible disclosure. A relay
+that drops a check-in can make the switch fire but cannot suppress it. The spec
+RECOMMENDS a **second, non-app check-in channel** for institutional use;
+chat.ochk.io says so in its copy and does not enforce it. v0 caps each arm at
+~30 days (4320 blocks), so a live standing delivery needs a check-in at least
+that often, and offers no multi-year seal: one would depend on the named beacon
+existing and cooperating that far out (the drand `fastnet` sunset, which
+permanently bricked its ciphertexts, is the cautionary precedent). Full
+construction:
 [Seal-til-block § standing delivery](/chat/seal#standing-delivery-dead-mans-switch).
 
 ## Flow 6 — institutional / source-intake

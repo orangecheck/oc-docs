@@ -15,30 +15,30 @@ export const metadata = {
 > balance and is the party that moves it.** That is a stage, deliberately:
 > orangecheck operates every role until independent operators take them. Read
 > the descriptor schema, graduation envelope and rotation rules below as the
-> contract that comes into force when a federation binds, and
-> [ochk.app/custody](https://ochk.app/custody) as the present tense.
+> protocol's custody contract, and [ochk.app/custody](https://ochk.app/custody)
+> as the present tense.
 
-**ochk.app is designed to be federation-custodied by default, with a move to
-your own keys on demand.** This page is the user-facing explanation; the
-protocol-level contract is at
+**In ochk.app's design, guardians hold the bitcoin and your earned sats reach
+you as a payout to a Lightning wallet you choose.** This page is the user-facing
+explanation; the protocol-level contract is at
 [`oc-attest-protocol/FEDERATION-CUSTODY.md`](https://github.com/orangecheck/oc-attest-protocol/blob/main/FEDERATION-CUSTODY.md)
 (v1.2-draft-1, additive extension).
 
-Two questions get conflated here, and this page used to conflate them.
-Self-custody of your **signing key** is live and real on the BIP-322 path — that
-key never reaches OC. Self-custody of your **sats** is not live for anyone. The
-rest of this page is about the second one.
+Two questions get conflated here. Self-custody of your **signing key** is live
+and real on the BIP-322 path — that key never reaches OC. Self-custody of your
+**sats** is not live for anyone. The rest of this page is about the second one.
 [ochk.app/custody](https://ochk.app/custody) says who holds what today.
 
-## What "federation-custodied" will mean
+## What federation custody means in ochk.app
 
-Once a federation is bound, your orangecheck account is backed by a Bitcoin
-address (BIP-322 path) or a federation-issued ecash note set (email-OTP path).
-For the federation path, the private key that controls the underlying on-chain
-UTXOs is held collectively by an M-of-N guardian set — no single guardian (and
-not OC the company) can spend or freeze. Recovery is by re-proving your email,
-not by remembering twelve words. The guardians threshold-sign on your behalf
-when you sign in; you don't see it and never need to.
+Once a federation is bound, an M-of-N guardian set holds the bitcoin, and no
+single guardian can move it. orangecheck's executor holds your claim on it as
+ecash and pays you out to a Lightning wallet you choose; that payout is how your
+sats reach keys you hold. No app pays real sats yet, and
+[ochk.app/custody](https://ochk.app/custody) shows who holds each role today.
+
+The protocol's custody contract also describes recovery by re-proving your email
+and a sweep of your sats to a BIP-322 wallet. ochk.app builds neither.
 
 None of that is in force. The guardians that once ran this were torn down in
 July 2026, and the browser-side Fedimint client that would have joined a
@@ -47,11 +47,11 @@ reach its own error path.
 
 ## The three options at threshold
 
-|                                          | how it works                                                                                                        | live today?                                                                                                                           |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **federation custody** (the destination) | guardians collectively hold the key. recovery by re-proving email.                                                  | no. no federation is bound, so no client can join one — `/api/federations` publishes that state.                                      |
-| **fedimint client**                      | sweep to a fedimint federation you trust more (your community's, your country's, your own).                         | no. ochk.app has no browser-side Fedimint client, so a bound federation would not open this either.                                   |
-| **self-custody**                         | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Sparrow, hardware wallet). only you can sign. | sign-in is live (in-place, no redirect) and the signing key is yours. the sat sweep is not — there is no federation balance to sweep. |
+|                                          | how it works                                                                                                        | live today?                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **federation custody** (the destination) | guardians collectively hold the bitcoin. orangecheck's executor pays you out to a Lightning wallet you choose.      | no. no federation is bound, so no client can join one — `/api/federations` publishes that state.    |
+| **fedimint client**                      | sweep to a fedimint federation you trust more (your community's, your country's, your own).                         | no. ochk.app has no browser-side Fedimint client, so a bound federation would not open this either. |
+| **self-custody**                         | sweep to any BIP-322-capable Bitcoin wallet (UniSat, Xverse, Leather, Sparrow, hardware wallet). only you can sign. | sign-in is live (in-place, no redirect) and the signing key is yours. the sat sweep is not built.   |
 
 None of these is the `signing_method` on your session. That claim says only who
 holds your signing key: `bip322` once a BIP-322-verified Bitcoin address is
@@ -94,10 +94,8 @@ at a specific time.
 | `proof`           | M signatures from M of N declared guardians PLUS one self-key signature.                                |
 | `graduated_at`    | ISO-8601 timestamp; the OTS proof anchors this to a Bitcoin block.                                      |
 
-The envelope contract is a draft at the spec level, not yet normative, and is
-reflected in the [`/me/balance`](https://ochk.app/me/balance#own-keys) UI, which
-states today what it can and cannot do. The producing path — collecting a quorum
-signature from a real federation — opens when a federation binds.
+The envelope contract is a draft at the spec level, not yet normative. ochk.app
+does not build the sweep that would produce one.
 
 ## Guardian descriptor
 
@@ -129,6 +127,10 @@ The descriptor id is `fed:` + lowercase hex
 `SHA-256(canonical_descriptor_bytes)`.
 
 ## What stays the same when you move to your own keys
+
+This is the protocol's move to your own keys; ochk.app does not build it. In
+ochk.app your sats reach keys you hold as a payout to a Lightning wallet you
+choose.
 
 | Stays the same                                                    | Changes                                                            |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------ |

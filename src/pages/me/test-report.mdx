@@ -33,7 +33,7 @@ UTC.
 | [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423   | the block; a proof file you can verify         |
 | [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run | seat claims citing block 972639; the C07 move  |
 | [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                  | drill runs of 2026-10-28                       |
-| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; two script changes in review   | rehearsal of 2026-10-28                        |
+| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; one finding, its fix in review | rehearsal of 2026-10-28                        |
 | [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator     | code read and a live walk, 2026-10-27          |
 | [Still open](#still-open)                              | C07's second sitting, the mainnet test and more    | each with its date or owner                    |
 
@@ -171,11 +171,20 @@ be paid.
 - **Executor crash:** the start script restarted the executor, and nothing was
   paid twice.
 
-Two changes to the start script came out of the rehearsal and are in review:
-phoenixd runs under the same restart supervisor as the executor, and a shutdown
-stops the executor before phoenixd. Both passed on the same machine, including a
-stop during a payment, where the payment was held on restart and never paid
-twice. They are reported here as passing once they land.
+**One finding: phoenixd was not restarted when it died.** Killed on purpose, it
+stayed down. The executor kept running and reporting in, and the status page
+would still have read it as operational. Nothing was paid wrongly: the portal
+holds payouts back while the reports carry no balance, and one already handed
+out failed before anything was sent. But payouts would have stopped until
+someone restarted the machine.
+
+The fix is built and in review: phoenixd runs under the same restart supervisor
+as the executor, the status page reads a report with no Lightning node behind it
+as degraded, and a shutdown stops the executor before phoenixd. The rehearsal
+ran it on the same machine and it passed, including a stop during a payment,
+where the payment was held on restart and never paid twice. The status page part
+reaches production when it lands, and the restart part with the next executor
+deploy.
 
 ## No-KYC walk-through
 
@@ -223,7 +232,7 @@ when its check is done.
 | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1` | not before 2026-11-10 04:20:41 UTC                 |
 | The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor restarted mid-batch  | after the second sitting                           |
-| The executor start-script changes above                                                                                 | in review                                          |
+| The phoenixd restart fix above                                                                                          | in review; then the next executor deploy           |
 | The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                         |
 | Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started   |
 | The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                          |

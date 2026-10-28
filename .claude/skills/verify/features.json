@@ -12,7 +12,7 @@
             "id": "check:lint",
             "kind": "lint",
             "run": "yarn lint",
-            "script": "eslint"
+            "script": "node scripts/lint-guards.mjs && eslint . --pass-on-unpruned-suppressions"
         },
         {
             "id": "check:format",
@@ -1056,6 +1056,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/agent-core/functions/authoredReasonProblem",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/functions/authoredReasonProblem.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/functions/authoredReasonProblem",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/agent-core/functions/canonicalActionBytes",
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/functions/canonicalActionBytes.mdx",
@@ -1164,6 +1172,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/functions/computeSubdelegationId.mdx",
             "reach": "https://ochk.io/docs/sdk/agent-core/functions/computeSubdelegationId",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/agent-core/functions/contentBoundScope",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/functions/contentBoundScope.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/functions/contentBoundScope",
             "area": "sdk",
             "tests": []
         },
@@ -1280,6 +1296,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/agent-core/functions/shownReason",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/functions/shownReason.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/functions/shownReason",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/agent-core/functions/subdelegationCanonicalBytes",
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/functions/subdelegationCanonicalBytes.mdx",
@@ -1380,6 +1404,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/interfaces/ActionContent.mdx",
             "reach": "https://ochk.io/docs/sdk/agent-core/interfaces/ActionContent",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/agent-core/interfaces/ActionContentFacts",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/interfaces/ActionContentFacts.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/interfaces/ActionContentFacts",
             "area": "sdk",
             "tests": []
         },
@@ -1488,6 +1520,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/agent-core/interfaces/RegisteredScope",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/interfaces/RegisteredScope.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/interfaces/RegisteredScope",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/agent-core/interfaces/RevocationCanonicalInput",
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/interfaces/RevocationCanonicalInput.mdx",
@@ -1500,6 +1540,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/interfaces/RevocationEnvelope.mdx",
             "reach": "https://ochk.io/docs/sdk/agent-core/interfaces/RevocationEnvelope",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/agent-core/interfaces/RevocationsRead",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/interfaces/RevocationsRead.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/interfaces/RevocationsRead",
             "area": "sdk",
             "tests": []
         },
@@ -1688,6 +1736,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/agent-core/type-aliases/AuthoredReasonProblem",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/type-aliases/AuthoredReasonProblem.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/type-aliases/AuthoredReasonProblem",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/agent-core/type-aliases/ChainLink",
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/type-aliases/ChainLink.mdx",
@@ -1708,6 +1764,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/type-aliases/FederationVerifyResult.mdx",
             "reach": "https://ochk.io/docs/sdk/agent-core/type-aliases/FederationVerifyResult",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/agent-core/type-aliases/RevocationFlag",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/type-aliases/RevocationFlag.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/type-aliases/RevocationFlag",
             "area": "sdk",
             "tests": []
         },
@@ -1796,6 +1860,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/agent-core/variables/REGISTERED_SCOPES.mdx",
             "reach": "https://ochk.io/docs/sdk/agent-core/variables/REGISTERED_SCOPES",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/agent-core/variables/REVOCATION_REASON_MAX_BYTES",
+            "kind": "page",
+            "entry": "src/pages/sdk/agent-core/variables/REVOCATION_REASON_MAX_BYTES.mdx",
+            "reach": "https://ochk.io/docs/sdk/agent-core/variables/REVOCATION_REASON_MAX_BYTES",
             "area": "sdk",
             "tests": []
         },
@@ -2464,6 +2536,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-client/functions/newAccountsCapText",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-client/functions/newAccountsCapText.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-client/functions/newAccountsCapText",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-client/functions/otpNetworkCapText",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-client/functions/otpNetworkCapText.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-client/functions/otpNetworkCapText",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-client/functions/readTabSession",
             "kind": "page",
             "entry": "src/pages/sdk/auth-client/functions/readTabSession.mdx",
@@ -2984,6 +3072,30 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-core/functions/isDidOc",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/isDidOc.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/isDidOc",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/isFamilyOrigin",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/isFamilyOrigin.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/isFamilyOrigin",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/isReservedName",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/isReservedName.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/isReservedName",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-core/functions/loadPrivateKey",
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/functions/loadPrivateKey.mdx",
@@ -2996,6 +3108,22 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/functions/loadPublicKey.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/functions/loadPublicKey",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/nameProblem",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/nameProblem.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/nameProblem",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/normalizeEmail",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/normalizeEmail.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/normalizeEmail",
             "area": "sdk",
             "tests": []
         },
@@ -3020,6 +3148,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/functions/readBondClaim.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/functions/readBondClaim",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/readBondNeed",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/readBondNeed.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/readBondNeed",
             "area": "sdk",
             "tests": []
         },
@@ -3068,6 +3204,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/functions/resolveSessionFromRequest.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/functions/resolveSessionFromRequest",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/functions/retiredKeyVouches",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/functions/retiredKeyVouches.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/functions/retiredKeyVouches",
             "area": "sdk",
             "tests": []
         },
@@ -3136,6 +3280,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-core/interfaces/BondNeed",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/interfaces/BondNeed.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/interfaces/BondNeed",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-core/interfaces/CookieOptions",
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/interfaces/CookieOptions.mdx",
@@ -3156,6 +3308,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/interfaces/IntegratorRevocationOptions.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/interfaces/IntegratorRevocationOptions",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/interfaces/NameRuleOptions",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/interfaces/NameRuleOptions.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/interfaces/NameRuleOptions",
             "area": "sdk",
             "tests": []
         },
@@ -3240,6 +3400,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-core/type-aliases/DidOc",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/type-aliases/DidOc.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/type-aliases/DidOc",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-core/type-aliases/DisplayIdentityKind",
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/type-aliases/DisplayIdentityKind.mdx",
@@ -3252,6 +3420,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/type-aliases/IncomingRequestHeaders.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/type-aliases/IncomingRequestHeaders",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/type-aliases/NameProblem",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/type-aliases/NameProblem.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/type-aliases/NameProblem",
             "area": "sdk",
             "tests": []
         },
@@ -3296,6 +3472,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/auth-core/variables/FAMILY_ORIGINS",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/variables/FAMILY_ORIGINS.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/variables/FAMILY_ORIGINS",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/variables/HIDDEN_TEXT_CHARS",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/variables/HIDDEN_TEXT_CHARS.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/variables/HIDDEN_TEXT_CHARS",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/auth-core/variables/JWT_ALG",
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/variables/JWT_ALG.mdx",
@@ -3324,6 +3516,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-core/variables/TAB_SESSION_HEADER.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-core/variables/TAB_SESSION_HEADER",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-core/variables/TOKEN_MAX_LIFETIME_SEC",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-core/variables/TOKEN_MAX_LIFETIME_SEC.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-core/variables/TOKEN_MAX_LIFETIME_SEC",
             "area": "sdk",
             "tests": []
         },
@@ -6000,6 +6200,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/lock-device/functions/boundNostrKeys",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/functions/boundNostrKeys.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/functions/boundNostrKeys",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/lock-device/functions/buildBindingStatement",
             "kind": "page",
             "entry": "src/pages/sdk/lock-device/functions/buildBindingStatement.mdx",
@@ -6104,6 +6312,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/lock-device/functions/verifyDeviceRecords",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/functions/verifyDeviceRecords.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/functions/verifyDeviceRecords",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/lock-device/functions/verifyNostrEvent",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/functions/verifyNostrEvent.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/functions/verifyNostrEvent",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/lock-device/interfaces/AuthorizeOptions",
             "kind": "page",
             "entry": "src/pages/sdk/lock-device/interfaces/AuthorizeOptions.mdx",
@@ -6140,6 +6364,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/lock-device/interfaces/ParsedDeviceEvent.mdx",
             "reach": "https://ochk.io/docs/sdk/lock-device/interfaces/ParsedDeviceEvent",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/lock-device/interfaces/VerifyDeviceRecordsOptions",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-device/interfaces/VerifyDeviceRecordsOptions.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-device/interfaces/VerifyDeviceRecordsOptions",
             "area": "sdk",
             "tests": []
         },
@@ -6248,6 +6480,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/me-client/functions/isEventClass",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/functions/isEventClass.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/functions/isEventClass",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/functions/isInheritedName",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/functions/isInheritedName.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/functions/isInheritedName",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/me-client/functions/onTelemetry",
             "kind": "page",
             "entry": "src/pages/sdk/me-client/functions/onTelemetry.mdx",
@@ -6276,6 +6524,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/me-client/functions/refreshEnvelopeJwks.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/functions/refreshEnvelopeJwks",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/functions/safeReturnPath",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/functions/safeReturnPath.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/functions/safeReturnPath",
             "area": "sdk",
             "tests": []
         },
@@ -6800,6 +7056,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/me-client/server/functions/exchangeNativeCode",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/functions/exchangeNativeCode.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/functions/exchangeNativeCode",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/me-client/server/functions/getOcSession",
             "kind": "page",
             "entry": "src/pages/sdk/me-client/server/functions/getOcSession.mdx",
@@ -6844,6 +7108,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/me-client/server/functions/readBondClaim.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/server/functions/readBondClaim",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/server/functions/readBondNeed",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/functions/readBondNeed.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/functions/readBondNeed",
             "area": "sdk",
             "tests": []
         },
@@ -6968,6 +7240,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/me-client/server/interfaces/ExchangeNativeCodeInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/interfaces/ExchangeNativeCodeInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/interfaces/ExchangeNativeCodeInput",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/server/interfaces/ExchangeNativeCodeOptions",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/interfaces/ExchangeNativeCodeOptions.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/interfaces/ExchangeNativeCodeOptions",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/me-client/server/interfaces/JtiStore",
             "kind": "page",
             "entry": "src/pages/sdk/me-client/server/interfaces/JtiStore.mdx",
@@ -7084,6 +7372,30 @@
             "kind": "page",
             "entry": "src/pages/sdk/me-client/server/type-aliases/ConnectProvisionResult.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/server/type-aliases/ConnectProvisionResult",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/server/type-aliases/ExchangeNativeCodeRefusal",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/type-aliases/ExchangeNativeCodeRefusal.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/type-aliases/ExchangeNativeCodeRefusal",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/server/type-aliases/ExchangeNativeCodeResult",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/type-aliases/ExchangeNativeCodeResult.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/type-aliases/ExchangeNativeCodeResult",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/me-client/server/type-aliases/ExchangeNativeCodeUnavailable",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/server/type-aliases/ExchangeNativeCodeUnavailable.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/server/type-aliases/ExchangeNativeCodeUnavailable",
             "area": "sdk",
             "tests": []
         },
@@ -7368,6 +7680,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/me-client/variables/CUSTOM_EVENT_KEY_RE",
+            "kind": "page",
+            "entry": "src/pages/sdk/me-client/variables/CUSTOM_EVENT_KEY_RE.mdx",
+            "reach": "https://ochk.io/docs/sdk/me-client/variables/CUSTOM_EVENT_KEY_RE",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/me-client/variables/EVENT_SUBTYPES",
             "kind": "page",
             "entry": "src/pages/sdk/me-client/variables/EVENT_SUBTYPES.mdx",
@@ -7405,7 +7725,7 @@
             "entry": "src/pages/sdk/me-client/variables/config.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/variables/config",
             "area": "sdk",
-            "tests": []
+            "tests": ["src/__tests__/land-script.test.ts"]
         },
         {
             "id": "page:/sdk/me-client/variables/event",
@@ -7884,6 +8204,22 @@
             "kind": "page",
             "entry": "src/pages/sdk/pledge-core/functions/pledgeCanonicalInputFromEnvelope.mdx",
             "reach": "https://ochk.io/docs/sdk/pledge-core/functions/pledgeCanonicalInputFromEnvelope",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/pledge-core/functions/readAbandonmentInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/pledge-core/functions/readAbandonmentInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/functions/readAbandonmentInput",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/pledge-core/functions/readOutcomeInput",
+            "kind": "page",
+            "entry": "src/pages/sdk/pledge-core/functions/readOutcomeInput.mdx",
+            "reach": "https://ochk.io/docs/sdk/pledge-core/functions/readOutcomeInput",
             "area": "sdk",
             "tests": []
         },
@@ -9020,6 +9356,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/sdk/functions/queryRecent.mdx",
             "reach": "https://ochk.io/docs/sdk/sdk/functions/queryRecent",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/sdk/functions/readBondExtension",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/functions/readBondExtension.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/functions/readBondExtension",
             "area": "sdk",
             "tests": []
         },
@@ -10957,7 +11301,7 @@
             "entry": "src/pages/sdk/vote-core/functions/commit.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/functions/commit",
             "area": "sdk",
-            "tests": []
+            "tests": ["src/__tests__/land-script.test.ts"]
         },
         {
             "id": "page:/sdk/vote-core/functions/distinctBallotCopies",
@@ -11004,6 +11348,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vote-core/functions/mempoolBlockTimeSource.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/functions/mempoolBlockTimeSource",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vote-core/functions/nestedTooDeep",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-core/functions/nestedTooDeep.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-core/functions/nestedTooDeep",
             "area": "sdk",
             "tests": []
         },
@@ -11348,6 +11700,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vote-core/variables/BALLOT_VERSION.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/variables/BALLOT_VERSION",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vote-core/variables/MAX_NESTING_DEPTH",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-core/variables/MAX_NESTING_DEPTH.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-core/variables/MAX_NESTING_DEPTH",
             "area": "sdk",
             "tests": []
         },

@@ -72,6 +72,16 @@ state — never trust a published outcome envelope's `result` field without
 re-verifying against the witness. The protocol surfaces
 `E_OUTCOME_EVIDENCE_MISMATCH` for this case.
 
+On a `counterparty_signs` pledge only the counterparty's outcome settles it. The
+swearer may counter-claim against it, and the pledge is then `disputed`. Every
+date in an outcome or counter-claim is its signer's own claim and can be
+backdated, so a counter-claim counts at any time before `expires_at`, whatever
+window the counterparty set. A swearer can always turn a counterparty `broken`
+into `disputed`, or into `expired_unresolved` at `expires_at` when the pledge
+names no dispute mechanism. A counter-claim never settles the pledge. Only a
+named dispute mechanism gives the counterparty's outcome finality against the
+swearer.
+
 ### Bond-draining attacks
 
 The swearer can spend the bonded UTXO mid-pledge. The orangecheck attestation
@@ -137,8 +147,9 @@ A correct verifier MUST:
    published outcome envelope's result field without re-checking.
 3. **Validate the BIP-322 signature** byte-exact against the canonical message.
 4. **Consult ≥ 2 Nostr relays** before declaring an outcome envelope absent.
-5. **Honor the dispute window** — outcomes are not final until the window passes
-   without contradiction.
+5. **Honor the dispute window** — an outcome is not final until its window
+   passes without the resolver contradicting it, and on a `counterparty_signs`
+   pledge a swearer counter-claim can still dispute it until `expires_at`.
 
 A correct verifier SHOULD:
 

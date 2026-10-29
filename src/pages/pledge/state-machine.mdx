@@ -14,7 +14,7 @@ Every pledge is in **exactly one** of these states at any given time:
 | `resolvable`         | Past `resolves_at`, within `expires_at`, no outcome published yet.                                    |
 | `kept`               | Outcome published, outcome = kept. Provisional until the dispute window passes, then final.           |
 | `broken`             | Outcome published, outcome = broken (provisional until the dispute window passes), or an abandonment. |
-| `disputed`           | Contradicting outcomes within the earliest outcome's dispute window.                                  |
+| `disputed`           | A counter-claim before `expires_at`, or the resolver's own contradiction inside its window.           |
 | `expired_unresolved` | Past `expires_at` with no consistent outcome, or a dispute with no dispute mechanism.                 |
 
 State transitions are **pure functions** of
@@ -34,7 +34,7 @@ stateDiagram-v2
     pending --> broken: abandonment<br/>envelope
     resolvable --> kept: outcome verified<br/>(final after dispute window)
     resolvable --> broken: outcome verified<br/>(final after dispute window)
-    resolvable --> disputed: contradiction within<br/>the dispute window
+    resolvable --> disputed: counter-claim, or the resolver's<br/>contradiction inside its window
     resolvable --> expired_unresolved: now ≥ expires_at<br/>no outcome
     disputed --> kept: dispute mechanism resolves
     disputed --> broken: dispute mechanism resolves
@@ -88,12 +88,16 @@ protocol sets no default length.
 too. A verifier that wants to tell a provisional outcome from a final one
 compares `now` with `dispute_window_ends_at` itself.
 
-A contradicting outcome counts only when it is dated before the earliest
-outcome's `dispute_window_ends_at`. One dated later comes after the window, and
-the earliest outcome stands. `classifyState` reads every outcome earliest first,
-whatever order you pass them in. A dispute on a pledge that names a dispute
-mechanism stays `disputed`, referred to that mechanism; on one that names none,
-it times out to `expired_unresolved` at `expires_at`.
+The earliest settling outcome's window bounds only the resolver's own later
+contradictions: one dated after it does not count, and the earliest settling
+outcome stands. On a `counterparty_signs` pledge, a swearer counter-claim
+contradicts whenever it is dated before `expires_at`, whatever window the
+counterparty set. Every date in an outcome is its signer's own claim, so the
+counterparty's window cannot shut the swearer out. A counter-claim never settles
+the pledge. `classifyState` reads every outcome earliest first, whatever order
+you pass them in. A dispute on a pledge that names a dispute mechanism stays
+`disputed`, referred to that mechanism; on one that names none, it times out to
+`expired_unresolved` at `expires_at`.
 
 ## The `expired_unresolved` class is intentional
 

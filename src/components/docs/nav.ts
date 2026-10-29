@@ -154,7 +154,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/attest/bonds',
                 label: 'Bonds',
-                blurb: 'One coin backs one account. Apps see floors and a per-site nullifier, never the coin.',
+                blurb: 'Back an account with bitcoin you already hold: one coin of at least the sats an app asks for, left in your wallet. Apps see floors and a per-site nullifier, never the coin.',
             },
             {
                 href: '/attest/scoring',

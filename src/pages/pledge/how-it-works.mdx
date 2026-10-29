@@ -110,9 +110,11 @@ For `counterparty_signs`, the outcome requires a BIP-322 signature from the
 counterparty. Absence of that signature within `expires_at` →
 `expired_unresolved`.
 
-A `disputed` outcome is produced when a contradictory outcome envelope is
-published within the dispute window. Disputed pledges stay disputed until the
-named dispute mechanism resolves them, or time out to `expired_unresolved`.
+A pledge is `disputed` when a contradicting outcome is dated within the earliest
+outcome's dispute window; one dated after the window does not count. A disputed
+pledge that names a dispute mechanism stays disputed until that mechanism
+resolves it. One that names none times out to `expired_unresolved` at
+`expires_at`.
 
 ## The abandonment envelope
 

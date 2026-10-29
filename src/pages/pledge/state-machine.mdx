@@ -14,8 +14,8 @@ Every pledge is in **exactly one** of these states at any given time:
 | `resolvable`         | Past `resolves_at`, within `expires_at`, no outcome published yet.                                    |
 | `kept`               | Outcome published, outcome = kept. Provisional until the dispute window passes, then final.           |
 | `broken`             | Outcome published, outcome = broken (provisional until the dispute window passes), or an abandonment. |
-| `disputed`           | Contradictory outcome envelopes within dispute window — pending dispute.                              |
-| `expired_unresolved` | Past `expires_at` with no consistent outcome.                                                         |
+| `disputed`           | Contradicting outcomes within the earliest outcome's dispute window.                                  |
+| `expired_unresolved` | Past `expires_at` with no consistent outcome, or a dispute with no dispute mechanism.                 |
 
 State transitions are **pure functions** of
 `(pledge envelope, outcome envelope or absence, current time, relevant public state)`.
@@ -34,11 +34,11 @@ stateDiagram-v2
     pending --> broken: abandonment<br/>envelope
     resolvable --> kept: outcome verified<br/>(final after dispute window)
     resolvable --> broken: outcome verified<br/>(final after dispute window)
-    resolvable --> disputed: contradictory<br/>outcome envelope
+    resolvable --> disputed: contradiction within<br/>the dispute window
     resolvable --> expired_unresolved: now ≥ expires_at<br/>no outcome
     disputed --> kept: dispute mechanism resolves
     disputed --> broken: dispute mechanism resolves
-    disputed --> expired_unresolved: no resolution<br/>by expires_at
+    disputed --> expired_unresolved: no dispute mechanism,<br/>at expires_at
     kept --> [*]
     broken --> [*]
     expired_unresolved --> [*]
@@ -87,6 +87,13 @@ protocol sets no default length.
 `classifyState` returns an outcome as soon as it is in force, inside the window
 too. A verifier that wants to tell a provisional outcome from a final one
 compares `now` with `dispute_window_ends_at` itself.
+
+A contradicting outcome counts only when it is dated before the earliest
+outcome's `dispute_window_ends_at`. One dated later comes after the window, and
+the earliest outcome stands. `classifyState` reads every outcome earliest first,
+whatever order you pass them in. A dispute on a pledge that names a dispute
+mechanism stays `disputed`, referred to that mechanism; on one that names none,
+it times out to `expired_unresolved` at `expires_at`.
 
 ## The `expired_unresolved` class is intentional
 

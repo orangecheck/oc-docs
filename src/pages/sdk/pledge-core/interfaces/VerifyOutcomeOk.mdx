@@ -18,6 +18,7 @@ Defined in: [pledge-core/src/types.ts:460](https://github.com/orangecheck/oc-pac
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
 | &lt;a id="property-canonicalmessage">&lt;/a> `canonicalMessage` | `string` | - | [pledge-core/src/types.ts:463](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L463) |
+| &lt;a id="property-counterclaim">&lt;/a> `counterClaim` | `boolean` | True for the swearer's own outcome on a `counterparty_signs` pledge: a counter-claim (SPEC §4.5). It can contradict the counterparty's outcome, making the pledge `disputed`, but never settles the pledge by itself. Always false when verifyOutcome was not given the pledge. | [pledge-core/src/types.ts:478](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L478) |
 | &lt;a id="property-envelope">&lt;/a> `envelope` | [`OutcomeEnvelope`](OutcomeEnvelope) | - | [pledge-core/src/types.ts:462](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L462) |
 | &lt;a id="property-id">&lt;/a> `id` | `string` | - | [pledge-core/src/types.ts:464](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L464) |
 | &lt;a id="property-ok">&lt;/a> `ok` | `true` | - | [pledge-core/src/types.ts:461](https://github.com/orangecheck/oc-packages/blob/main/pledge-core/src/types.ts#L461) |

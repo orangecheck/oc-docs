@@ -100,7 +100,10 @@ only when its proof reaches the merkle root in the header of the block it names.
 ### Verify a record offline
 
 `GET https://me.ochk.io/api/envelope/<id>?format=wrapped` returns everything
-needed:
+needed. Event and payment receipts are the one exception to the family's rule
+that a record's id is the SHA-256 of its bytes: their `id` is a routing id
+(`id_scheme` is `routing`), and `digest_sha256` is their content address. Every
+other record's id is its digest.
 
 1. Base64-decode `canonical_b64`. Its SHA-256 must equal `digest_sha256`, and
    `id` too when `id_scheme` is `sha256`.

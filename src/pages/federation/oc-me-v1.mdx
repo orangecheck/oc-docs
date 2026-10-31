@@ -6,11 +6,12 @@ export const metadata = {
 
 # OC-Me Federation v1 — Charter
 
-> **Status: no federation runs under this charter today.**
-> [`/api/federations`](https://me.ochk.io/api/federations) lists no `oc-me-v1`,
-> and while it is in testing, OrangeCheck holds every user's accrued balance.
-> Read this page as the text a v1 guardian set would sign, not as a description
-> of today. [Federation custody](/me/federation) has the present tense.
+> **Status: draft. No federation runs under this charter.**
+> [`/api/federations`](https://me.ochk.io/api/federations) lists `oc-me-v1` as
+> recruiting, with no guardian seats and no charter hash on its record. While
+> ochk.app is in testing, OrangeCheck holds every user's accrued balance. Read
+> this page as the text a v1 guardian set would sign, not as a description of
+> today. [Federation custody](/me/federation) has the present tense.
 
 **Charter text v1.0.0 · 2026-05-12.**
 
@@ -35,7 +36,8 @@ and may not contradict it.
   transaction; fewer than 3 cannot.
 - **Target guardian count:** 4.
 - **Ratification version:** `v1.0.0`.
-- **Bound on:** `me.ochk.io` via `NEXT_PUBLIC_FEDIMINT_FEDERATION_INVITE`.
+- **Client:** orangecheck's executor, with its own Fedimint client. ochk.app has
+  none.
 
 ## 2. Custody promise
 
@@ -44,10 +46,9 @@ funds; fewer than 3 cannot. The threshold is strictly greater than ⌊N/2⌋ so 
 minority can defraud users.
 
 OrangeCheck (the company) holds zero key shares and is not a guardian. OC is a
-**client** of this federation, never an operator of it. Users provision a
-federation-held Bitcoin wallet on their first `/me/wallet` visit; the mnemonic
-stays in the user's browser (IndexedDB) and is never transmitted to OC or to the
-federation.
+**client** of this federation, never an operator of it. Users hold no Fedimint
+wallet of their own: orangecheck's executor holds each user's claim as ecash in
+the federation until it pays the user out (§6).
 
 ## 3. Guardian operator disclosure
 
@@ -88,20 +89,24 @@ deep-view.
 
 ## 6. Exit clause
 
-**If OrangeCheck sunsets, or this charter is breached, every user can:**
+> **Amended 2026-10-31 to match what is built.** This draft used to promise a
+> recovery from a mnemonic saved at `/me/wallet` and an export from a Fedimint
+> client in the browser. Neither exists: ochk.app has no Fedimint client, and no
+> user holds a mnemonic.
 
-- **(a)** sweep their balance to a self-custody Bitcoin wallet via on-chain
-  withdrawal. The withdrawal is threshold-signed by the federation's guardians
-  (not by OrangeCheck) and does not require OC's services to be online. The
-  user's saved mnemonic from `/me/wallet` is sufficient.
-- **(b)** export their wallet state from the Fedimint client in their browser
-  and import it into any Fedimint-compatible client (mutiny, fedimint-cli, Fedi
-  mobile, etc.).
-- **(c)** graduate to a different federation via the standard Fedimint
-  cross-federation flow (sweep → re-peg).
+orangecheck's executor holds each user's claim as ecash in the federation until
+it pays the user out. A user leaves by:
 
-OC publishing a sunset notice does not change any of the above. The federation
-continues operating as long as 3 of 4 guardians remain online.
+- **(a)** a payout to a Lightning wallet they choose. The executor pays it from
+  the ecash it holds; a gateway only routes the payment.
+- **(b)** following a successor federation: when this one is replaced, the
+  executor moves the float it holds to the successor.
+
+Both paths run through orangecheck's executor. A way out that works with
+OrangeCheck offline, such as users holding their own ecash in an external
+Fedimint wallet, is not built.
+[What if OC sunsets?](/me/federation#what-if-oc-sunsets) says what that means
+today.
 
 ## 7. Dispute resolution
 
@@ -121,8 +126,7 @@ the prior version at this URL and on the federation registry. Users are notified
 via:
 
 - the [ochk.app/changelog](https://ochk.app/changelog) entry
-- per-user [alerts on ochk.app](https://ochk.app/me/activity?alerts=open) if
-  they have a wallet provisioned against this federation
+- per-user [alerts on ochk.app](https://ochk.app/me/activity?alerts=open)
 - the operator [incidents feed](https://ochk.app/me/operator/incidents)
 
 Amendments that materially change the federation's operational posture

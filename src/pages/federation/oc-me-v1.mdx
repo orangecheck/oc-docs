@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OC-Me Federation v1 — Charter',
     description:
-        'The charter text for OC-Me Federation v1 — the Fedimint federation designed to hold ochk.app balances. No federation runs under it today. Guardians would sign the SHA-256 of its canonical bytes; users would verify that hash against /custody.',
+        'The charter text for OC-Me Federation v1 — the Fedimint federation designed to hold ochk.app balances. No federation runs under it today. Guardians would sign an envelope naming the SHA-256 of its canonical bytes; users would verify that hash against /custody.',
 };
 
 # OC-Me Federation v1 — Charter
@@ -17,8 +17,8 @@ export const metadata = {
 kept [below](#superseded-v100) as signed history.
 
 This is the charter for the Fedimint federation designed to hold
-[`ochk.app`](https://ochk.app) balances. Each guardian operator would sign the
-SHA-256 of this document's canonical bytes (the
+[`ochk.app`](https://ochk.app) balances. Each guardian operator would sign an
+envelope naming the SHA-256 of this document's canonical bytes (the
 [Canonical bytes](#canonical-bytes) section below) with a hardware-backed
 Ed25519 operator key. Those signatures would appear on
 [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) and
@@ -137,8 +137,9 @@ amendment to publish at least 14 days before activation.
 ## Canonical bytes
 
 The SHA-256 of the following canonical bytes is the federation's charter hash.
-Operators sign this hash with their hardware-backed Ed25519 key; the signature
-is the ratification. Every guardian signs v1.1.0 before their seat counts.
+Operators sign an envelope that names this hash with their hardware-backed
+Ed25519 key; that signature is the ratification. Every guardian signs v1.1.0
+before their seat counts.
 
 ```
 # OC-Me Federation Charter v1.1.0 · canonical bytes
@@ -175,13 +176,16 @@ A consumer verifying offline:
 3. Compares it with `meta.charter_hash` at
    [me.ochk.io/api/operator/charter?federation=oc-me-v1](https://me.ochk.io/api/operator/charter?federation=oc-me-v1).
    If that still names v1.0.0, check the superseded block below the same way.
-4. Verifies each operator's `sig_hex` (returned in the same JSON) against their
-   `operator_pubkey` and the hash using Ed25519.
+4. Reads each signature (`sig_hex`, with its `operator_pubkey`) in the same
+   JSON. A published signature can't be checked offline yet: `charter sign`
+   signs an envelope that names the hash, with the operator, version, time, a
+   nonce and an expiry, and the API doesn't return that envelope.
 
 The kit does not run this check for you. `oc-guardian charter fetch oc-me-v1`
-prints the version, hash and URL the API publishes, and how many ratifications
-it holds. `oc-guardian charter sign` signs the hash the API publishes without
-recomputing it from the bytes (see
+prints the version, hash and URL the API publishes, and how many signatures are
+recorded, superseded ones included. `oc-guardian charter sign` signs an envelope
+that names the hash the API publishes, with the operator, version, time, a nonce
+and an expiry, without recomputing the hash from the bytes (see
 [`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
 §06). The offline check is the `sha256` of the published bytes, steps 1 to 3
 above.

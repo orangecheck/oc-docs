@@ -33,7 +33,7 @@ UTC.
 | [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423                        | the block; a proof file you can verify                     |
 | [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run                      | seat claims citing block 972639; the C07 move              |
 | [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                                       | drill runs of 2026-10-28                                   |
-| [Charter](#charter)                                    | v1.1.0 published; no operator has signed it                             | its hash; each signature checkable offline                 |
+| [Charter](#charter)                                    | v1.1.0 published; no operator has signed it                             | its hash; an offline check no signature passes yet         |
 | [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; the new build waits on orangecheck's deploy         | rehearsals of 2026-10-28 and 2026-10-31                    |
 | [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator; operators' views masked | code read and a live walk, 2026-10-27; fixes of 2026-10-31 |
 | [Health routes](#health-routes)                        | one recent reading, whatever the query string                           | live reads, 2026-10-31                                     |
@@ -132,16 +132,13 @@ steps are on [the federation's page](/federation/oc-me-v1).
 
 - **No operator has signed 1.1.0.** The federation's trust posture reads
   "charter ratified by the guardians" as not met, "0/4 operator signature(s)
-  match the current charter hash", and
-  [ochk.app/custody](https://ochk.app/custody) shows "A ratified charter on
-  record" with "No charter has been ratified yet" (read 2026-10-31).
+  match the current charter hash" (read 2026-10-31).
 - **The one signature on record** is on the superseded 1.0.0, from 2026-05-21.
   Its envelope was not kept, so it cannot be checked offline, and the response
   says so.
 
 Live since 2026-10-31: the offline check and the served text in oc-me-web
-`e45f2598`, and the criterion's label and its /custody wording in oc-me-web
-`0ef14910` and oc-app-web `0daf0d2`.
+`9aac21ad` to `e45f2598`, and the criterion's label in oc-me-web `76ab9457`.
 
 ## Halt-and-restart drill
 
@@ -233,8 +230,9 @@ and passed all four parts:
 [me.ochk.io/api/health/deep](https://me.ochk.io/api/health/deep) still reports
 the deployment of 2026-10-26, `01M5X2T2VJK57GRY3PY6ZYW3JV` (oc-me-web
 `2fc3a6fd`), read 2026-10-31. The portal's side of these changes is live
-(oc-me-web `3eabf682`); the executor's side, phoenixd's restart supervisor
-included, reaches production only when orangecheck deploys the new build.
+(oc-me-web `d2e05d6c` to `2b5ad9a4`); the executor's side, phoenixd's restart
+supervisor included, reaches production only when orangecheck deploys the new
+build.
 
 ## No-KYC walk-through
 
@@ -310,27 +308,29 @@ that names the account, in its key or its value
 
 **What operators see.** On 2026-10-31 an audit of what orangecheck's own
 operators see about a person found the consoles showing more than they need.
-Fixed and live the same day:
+Fixed and live by that day:
 
-- **Accounts.** ochk.io's account list and its search answer masked emails and
-  Bitcoin addresses at the source (oc-www `da6094f`, `0416ada`, `01afcee`). Two
-  log lines that wrote an address now name none (oc-www `c066dc84`).
+- **Accounts.** ochk.io's account list answers masked emails and Bitcoin
+  addresses at the source (oc-www `da6094f`), and its search answers nothing
+  about an email (oc-www `8560134`). Two log lines that wrote an address now
+  name none (oc-www `c066dc84`).
 - **Payouts.** me.ochk.io's lists of held payouts and withheld instructions no
   longer carry the Lightning destination; an operator claim's audit row carries
-  none; a stored hold reason names no payee (oc-me-web `d2e05d6c` to `2b5ad9a4`,
-  then `17e96163` and `7e1925cf`).
+  none; a stored hold reason names no payee (oc-me-web `d2e05d6c` to
+  `2b5ad9a4`).
 - **Applications, lookups and hosting.** An operator application's contact email
   and a hosting request's contact are masked, and looking up one person's
   billing takes a reason and writes an audit row before it reads (oc-me-web
-  `d2e05d6c`, `0ef14910`; oc-app-web `e569d9b6`).
+  `d2e05d6c`, `76ab9457`; oc-app-web `e569d9b6`).
 
 Some of this has no live row to show it on: on 2026-10-31 production held no
 operator applications, no held payouts or claims, and no hosting request with an
 email, so those masks rest on their tests. Waiting on orangecheck: the
-executor's half (see [Executor on phoenixd](#executor-on-phoenixd)), rewriting
-the audit rows and hold reasons written before the fix, and the keys that put
-ochk.io's remaining internal lookups behind a recorded reason; until then those
-lookups still answer orangecheck's own servers without one.
+executor's half, where it journals the invoice's hash before paying (oc-me-web
+`17e96163`, `7e1925cf`; see [Executor on phoenixd](#executor-on-phoenixd)),
+rewriting the audit rows and hold reasons written before the fix, and the keys
+that put ochk.io's remaining internal lookups behind a recorded reason; until
+then those lookups still answer orangecheck's own servers without one.
 
 ## Health routes
 
@@ -340,11 +340,11 @@ string a caller adds:
 - **chat, cosign, btc and insights.** chat.ochk.io `/api/health`, cosign.ochk.io
   `/api/health/deep`, btc.ochk.io `/api/health` and insights.ochk.io
   `/api/health` read their database at most once a minute on each server
-  (oc-chat-web `572d217`, oc-cosign-web `9532383`, oc-btc-web `28bb6ef`,
-  oc-insights-web `96573af`).
+  (oc-chat-web `f71151c` + `572d217`, oc-cosign-web `dd775bd` + `9532383`,
+  oc-btc-web `2f2fbcb` to `28bb6ef`, oc-insights-web `92420f9` + `96573af`).
 - **me.ochk.io and ochk.app.** me.ochk.io `/api/health/deep` keeps one reading
-  for up to 30 seconds (oc-me-web `8964b14e`, `3c7bc741`), and ochk.app's status
-  page and the other pages that read it no longer force a fresh check per query
+  for up to 30 seconds (oc-me-web `8964b14e`), and ochk.app's status page and
+  the other pages that read it no longer force a fresh check per query
   (oc-app-web `937a2e1`).
 
 All live and read on 2026-10-31: requests with different query strings, each
@@ -361,6 +361,6 @@ each request into a fresh database read or check.
 | Rewriting the payout-claim audit rows and hold reasons written before 2026-10-31                                        | orangecheck; ready to run                                                     |
 | The keys that put ochk.io's remaining internal lookups behind a recorded reason                                         | orangecheck                                                                   |
 | The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                                                    |
-| Real operators who ratify the charter, with orangecheck holding no seat on [/custody](https://ochk.app/custody)         | orangecheck, choosing the operators; not started                              |
+| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started                              |
 | The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                                                     |
 | Balances orangecheck holds, into a federation                                                                           | orangecheck; after a mainnet federation and a Fedimint executor in production |

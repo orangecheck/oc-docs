@@ -178,9 +178,13 @@ A consumer verifying offline:
 4. Verifies each operator's `sig_hex` (returned in the same JSON) against their
    `operator_pubkey` and the hash using Ed25519.
 
-The kit ships this verification as `oc-guardian charter fetch oc-me-v1` (see
+The kit does not run this check for you. `oc-guardian charter fetch oc-me-v1`
+prints the version, hash and URL the API publishes, and how many ratifications
+it holds. `oc-guardian charter sign` signs the hash the API publishes without
+recomputing it from the bytes (see
 [`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
-§06).
+§06). The offline check is the `sha256` of the published bytes, steps 1 to 3
+above.
 
 ## Superseded: v1.0.0
 

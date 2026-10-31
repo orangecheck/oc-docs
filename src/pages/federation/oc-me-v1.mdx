@@ -8,10 +8,10 @@ export const metadata = {
 
 > **Status: draft. No federation runs under this charter.**
 > [`/api/federations`](https://me.ochk.io/api/federations) lists `oc-me-v1` as
-> recruiting, with no guardian seats and no charter hash on its record. While
-> ochk.app is in testing, OrangeCheck holds every user's accrued balance. Read
-> this page as the text a v1 guardian set would sign, not as a description of
-> today. [Federation custody](/me/federation) has the present tense.
+> recruiting, with no guardian seats and no ratified charter hash on its record.
+> While ochk.app is in testing, OrangeCheck holds every user's accrued balance.
+> Read this page as the text a v1 guardian set would sign, not as a description
+> of today. [Federation custody](/me/federation) has the present tense.
 
 **Charter text v1.1.0 · draft, 2026-10-31.** It supersedes v1.0.0 (2026-05-12),
 kept [below](#superseded-v100) as signed history.
@@ -193,7 +193,9 @@ As of 2026-10-31 no signature passes all four. The one recorded signature,
 `op-cf6d365829055b25` over the superseded v1.0.0, was kept without its envelope:
 it reads `offline_verifiable: false`, cannot be checked offline, and does not
 count toward ratification. The roster lists no seats, so step 4 cannot pass for
-any signature yet, and 0 of 4 seats have ratified v1.1.0.
+any signature yet. The same roster response reports the `charter_ratified`
+criterion in `trust_posture.criteria` as unmet: "0/4 operator signature(s) match
+the current charter hash".
 
 The kit does not run this check for you. `oc-guardian charter fetch oc-me-v1`
 prints the version, hash and URL the API publishes, and how many signatures are

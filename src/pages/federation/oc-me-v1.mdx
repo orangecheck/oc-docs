@@ -13,7 +13,8 @@ export const metadata = {
 > this page as the text a v1 guardian set would sign, not as a description of
 > today. [Federation custody](/me/federation) has the present tense.
 
-**Charter text v1.0.0 · 2026-05-12.**
+**Charter text v1.1.0 · draft, 2026-10-31.** It supersedes v1.0.0 (2026-05-12),
+kept [below](#superseded-v100) as signed history.
 
 This is the charter for the Fedimint federation designed to hold
 [`ochk.app`](https://ochk.app) balances. Each guardian operator would sign the
@@ -35,7 +36,7 @@ and may not contradict it.
 - **Threshold:** `3-of-4` · any 3 of 4 guardian seats authorize a Bitcoin
   transaction; fewer than 3 cannot.
 - **Target guardian count:** 4.
-- **Ratification version:** `v1.0.0`.
+- **Ratification version:** `v1.1.0` (draft).
 - **Client:** orangecheck's executor, with its own Fedimint client. ochk.app has
   none.
 
@@ -89,7 +90,7 @@ deep-view.
 
 ## 6. Exit clause
 
-> **Amended 2026-10-31 to match what is built.** This draft used to promise a
+> **New in v1.1.0 (2026-10-31), to match what is built.** v1.0.0 promised a
 > recovery from a mnemonic saved at `/me/wallet` and an export from a Fedimint
 > client in the browser. Neither exists: ochk.app has no Fedimint client, and no
 > user holds a mnemonic.
@@ -120,10 +121,10 @@ process (§8) or to legal counsel.
 
 ## 8. Charter amendment process
 
-This charter is amended by a 4-of-5 quorum of guardian operators signing the new
-version with their hardware-backed operator keys. The new SHA-256 hash replaces
-the prior version at this URL and on the federation registry. Users are notified
-via:
+This charter is amended by every seated guardian signing the new version with
+their hardware-backed operator keys, the same rule as ratification. The new
+SHA-256 hash replaces the prior version at this URL and on the federation
+registry. Users are notified via:
 
 - the [ochk.app/changelog](https://ochk.app/changelog) entry
 - per-user [alerts on ochk.app](https://ochk.app/me/activity?alerts=open)
@@ -137,7 +138,58 @@ amendment to publish at least 14 days before activation.
 
 The SHA-256 of the following canonical bytes is the federation's charter hash.
 Operators sign this hash with their hardware-backed Ed25519 key; the signature
-is the ratification.
+is the ratification. Every guardian signs v1.1.0 before their seat counts.
+
+```
+# OC-Me Federation Charter v1.1.0 · canonical bytes
+version: v1.1.0
+federation_slug: oc-me-v1
+name: OC-Me Federation v1
+threshold: 3-of-4
+target_guardian_count: 4
+oc_residual_bps: 0
+bootstrap_mode: false
+canonical_url: https://docs.ochk.io/federation/oc-me-v1
+drafted_at: 2026-10-31T00:00:00Z
+supersedes: v1.0.0 58f5ac7832e1854caf5f66e63459be2b6889661c0136cea51267d9e1ea72d4e8
+## commitments
+threshold > floor(N/2): true
+oc_is_a_guardian: false
+oc_residual_pct: 0
+exit_clause: a payout to a Lightning wallet the user chooses, or a move to a successor federation; both run through orangecheck's executor, and no exit works with OrangeCheck offline
+operator_key_diversity: distinct hardware-backed Ed25519 operator pubkey per seat
+amendment_quorum: every seated guardian
+amendment_notice_days: 14
+```
+
+The canonical bytes are the EXACT UTF-8 bytes of the block between the fenced
+code blocks above. Newlines are LF (`\n`). The block starts with
+`# OC-Me Federation Charter v1.1.0 · canonical bytes\n` and ends with the last
+commitment line followed by a single trailing `\n`. Its SHA-256 is
+`5fcb29717a3908c89024ed8ed507888cb069496f171eb233a9a4179ec9ec5f50`.
+
+A consumer verifying offline:
+
+1. Copies the v1.1.0 canonical bytes block above into a file.
+2. Computes `sha256(file)` and checks it is the v1.1.0 hash above.
+3. Compares it with `meta.charter_hash` at
+   [me.ochk.io/api/operator/charter?federation=oc-me-v1](https://me.ochk.io/api/operator/charter?federation=oc-me-v1).
+   If that still names v1.0.0, check the superseded block below the same way.
+4. Verifies each operator's `sig_hex` (returned in the same JSON) against their
+   `operator_pubkey` and the hash using Ed25519.
+
+The kit ships this verification as `oc-guardian charter fetch oc-me-v1` (see
+[`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
+§06).
+
+## Superseded: v1.0.0
+
+v1.0.0 is kept byte for byte as signed history. One operator signed it on
+2026-05-21 (`op-cf6d365829055b25`); no federation was seated under it. It is
+superseded because its exit clause, an on-chain withdrawal by every user through
+a threshold-signed transaction, describes a path that was never built. Its
+amendment quorum, 4 of 5 operators, also cannot be met with 4 seats. Its SHA-256
+is `58f5ac7832e1854caf5f66e63459be2b6889661c0136cea51267d9e1ea72d4e8`.
 
 ```
 # OC-Me Federation Charter v1.0.0 · canonical bytes
@@ -159,24 +211,6 @@ operator_key_diversity: distinct hardware-backed Ed25519 operator pubkey per sea
 amendment_quorum: 4-of-5 operators
 amendment_notice_days: 14
 ```
-
-The canonical bytes are the EXACT UTF-8 bytes of the block between the fenced
-code blocks above. Newlines are LF (`\n`). The block starts with
-`# OC-Me Federation Charter v1.0.0 · canonical bytes\n` and ends with the last
-commitment line followed by a single trailing `\n`.
-
-A consumer verifying offline:
-
-1. Copies the canonical bytes block above into a file.
-2. Computes `sha256(file)`.
-3. Compares the hex against the hash published at
-   [me.ochk.io/api/operator/charter?federation=oc-me-v1](https://me.ochk.io/api/operator/charter?federation=oc-me-v1).
-4. Verifies each operator's `sig_hex` (returned in the same JSON) against their
-   `operator_pubkey` and the hash using Ed25519.
-
-The kit ships this verification as `oc-guardian charter fetch oc-me-v1` (see
-[`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
-§06).
 
 ## Related
 

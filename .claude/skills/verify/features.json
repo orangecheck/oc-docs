@@ -752,6 +752,14 @@
             "tests": []
         },
         {
+            "id": "page:/me/operator/test-report",
+            "kind": "page",
+            "entry": "src/pages/me/operator/test-report.mdx",
+            "reach": "https://ochk.io/docs/me/operator/test-report",
+            "area": "me",
+            "tests": []
+        },
+        {
             "id": "page:/me/paying-users",
             "kind": "page",
             "entry": "src/pages/me/paying-users.mdx",
@@ -780,6 +788,14 @@
             "kind": "page",
             "entry": "src/pages/me/sdk.mdx",
             "reach": "https://ochk.io/docs/me/sdk",
+            "area": "me",
+            "tests": []
+        },
+        {
+            "id": "page:/me/test-report",
+            "kind": "page",
+            "entry": "src/pages/me/test-report.mdx",
+            "reach": "https://ochk.io/docs/me/test-report",
             "area": "me",
             "tests": []
         },

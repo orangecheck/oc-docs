@@ -40,7 +40,8 @@ as a machine-readable hint. What each one returns today:
 | Unexpected failure             | 500    | `{ "error": "server_error" }`                                          |
 
 `/api/publish-attestation` answers `{ "ok": false, "error": "<code>" }`
-(`missing_envelope`, `invalid_json`, `rate_limited`, …).
+(`missing_envelope`, `invalid_json`, `rate_limited`, …), and 502 `not_published`
+when fewer than 2 of the relays readers ask serve the attestation back.
 
 **`ochk.io` (auth host)**
 

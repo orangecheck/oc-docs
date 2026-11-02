@@ -61,6 +61,18 @@ Specifically:
 [ochk.app/custody](https://ochk.app/custody) checks each of these live, derived
 from the seat roster and the signed charter.
 
+A live federation's guardians also have to keep running. Each guardian's kit
+posts a signed runtime attestation every 5 minutes, and the newest one any of
+them posted dates the federation. With none in 7 days the charter check warns;
+with none in 30 it fails, and a project can't be rebound to that federation. A
+federation whose guardians haven't posted one yet fails the check as "no runtime
+attestation yet", not as stale, and a project can still be rebound to it, with a
+warning.
+[`/api/public/federations/<slug>`](https://me.ochk.io/api/public/federations/oc-me-v1)
+gives the time as `last_runtime_attestation_at`, apart from
+`invite_published_at`, when its invite was published. `last_attestation_at` is a
+deprecated copy of the runtime time.
+
 ## Where to find your federation's charter
 
 Once a federation is bound, the charter (with all of the above disclosed) is

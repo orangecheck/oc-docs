@@ -219,12 +219,14 @@ and return unrelated events. So:
   cut-off read is not an answer
   ([OC Lock §3.5](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md#35-rotation-and-revocation)).
   For revocations, "no revocation" needs at least the read floor of the relays
-  asked (the number asked, less 2, plus 1) answered in full and no relay cut
-  off. Otherwise the delegation is unchecked, never unrevoked. See
+  asked (the number asked, less 2, plus 1, and never fewer than one) answered in
+  full and no relay cut off. Otherwise the delegation is unchecked, never
+  unrevoked. See
   [OC Agent SPEC §10.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#104-reading-relay-replies).
-  The floor lets one relay go silent, so a revoking client should keep
-  publishing until at least two of the relays verifiers ask, each asked alone,
-  serve the revocation back
+  With two or more relays asked, the floor lets one go silent, so a revoking
+  client should keep publishing until at least two of the relays verifiers ask,
+  each asked alone, serve the revocation back, or every one of them does when
+  verifiers ask fewer than two
   ([§9.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#94-publication)).
 - **Treat every returned event as a candidate.** Anyone can publish an event
   tagged with anyone's address. Verify the envelope inside before using it.

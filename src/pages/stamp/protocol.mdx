@@ -95,6 +95,8 @@ The content is the tag name, the tag's object id and its tree id, so changing
 any of them breaks the stamp. Anyone with the repository and the stamp file runs
 `git-stamp verify v2.1.0`, or `--require-anchor` once the anchor is confirmed:
 authorship, priority and the tree are all checked, no GPG keyserver involved.
+That takes stamp-cli 0.3.2 or later, which checks the stamp against the tag as
+it is in the repository; earlier versions check only the stamp's signature.
 
 ## Flow 3 — Sybil-gated publishing feed
 

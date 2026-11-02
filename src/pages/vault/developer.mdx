@@ -73,7 +73,10 @@ oc-vault login --token "ocvt_…"      # caches ciphertext locally, once
 `login` fetches your escrow and ciphertext blobs and caches them — nothing
 plaintext is written. Every other command runs against that cache; the
 passphrase (from `$OCV_PASSPHRASE` or a hidden prompt) unwraps the key in memory
-only.
+only. From vault-cli 0.3.4, a `sync` that cannot fetch every entry it listed
+keeps the cache it had, and a `login` in that state caches nothing; each exits 1
+saying how many entries were missed. Earlier versions could cache the shorter
+set as the whole vault.
 
 ```bash
 oc-vault read ocv://personal/Stripe/key       # print one secret

@@ -60,6 +60,10 @@ while any escrow debit's outcome is unknown; it gives counts only. The platform
 owner lists those debits at `GET /api/admin/unresolved-debits`. A contact
 message the mail provider refuses gives the day's slot back.
 
+`/api/platform-fee-policy` and `/api/abuse-limits` answer
+`503 policy_unavailable`, not cached, when me.ochk.io cannot read its policy
+store. Treat that as "try again later", never as the defaults.
+
 ## Anchoring
 
 These signed records are anchored to a Bitcoin block with OpenTimestamps:
@@ -476,6 +480,10 @@ after you rotate) and your project's key set (`issuer_jwks_url`).
 | `GET`    | `/api/me/projects/[id]/events`      | live event stream for this project · owner-gated                                                                          |
 | `GET`    | `/api/me/projects/[id]/webhooks`    | list registered webhooks · owner-gated                                                                                    |
 | `POST`   | `/api/me/projects/[id]/webhooks`    | register a webhook URL · owner-gated                                                                                      |
+
+A write that sets prices, creating a project with a price config or updating
+one, answers `503 policy_unavailable` with `Retry-After: 30` and saves nothing
+when the platform's price bounds can't be read. Send it again.
 
 A project's name, a custom event's label, a drop's label and a directory tagline
 are text people read. None may hold a character that hides or reorders text, or

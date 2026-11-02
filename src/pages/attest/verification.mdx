@@ -22,7 +22,7 @@ Reject with `decode_error` if:
 - A required field is missing (`address`, `nonce`, `issued_at`, `ack`,
   `identities`)
 - Line endings aren't LF with exactly one trailing newline
-- Extensions (lines after the core fields, before `ack`) aren't
+- Extensions (lines after the seven core lines, so after `ack`) aren't
   lexicographically sorted by name
 - Any identifier in `identities:` contains a comma, newline, or CR
 - Any key appears twice

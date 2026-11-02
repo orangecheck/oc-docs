@@ -669,7 +669,7 @@
             "entry": "src/pages/me/index.mdx",
             "reach": "https://ochk.io/docs/me",
             "area": "me",
-            "tests": []
+            "tests": ["src/__tests__/backing-copy.test.ts"]
         },
         {
             "id": "page:/me/api",
@@ -2868,6 +2868,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/auth-client/type-aliases/OcSignInProps.mdx",
             "reach": "https://ochk.io/docs/sdk/auth-client/type-aliases/OcSignInProps",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/auth-client/type-aliases/OcSignOutResult",
+            "kind": "page",
+            "entry": "src/pages/sdk/auth-client/type-aliases/OcSignOutResult.mdx",
+            "reach": "https://ochk.io/docs/sdk/auth-client/type-aliases/OcSignOutResult",
             "area": "sdk",
             "tests": []
         },
@@ -10848,10 +10856,26 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/functions/createEncryptedBackup",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/createEncryptedBackup.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/createEncryptedBackup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/functions/decryptFields",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/functions/decryptFields.mdx",
             "reach": "https://ochk.io/docs/sdk/vault-core/functions/decryptFields",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/deviceFingerprint",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/deviceFingerprint.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/deviceFingerprint",
             "area": "sdk",
             "tests": []
         },
@@ -10888,6 +10912,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/functions/generateRecoveryCode",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/generateRecoveryCode.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/generateRecoveryCode",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/isEncryptedBackup",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/isEncryptedBackup.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/isEncryptedBackup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/functions/isLiveEntry",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/functions/isLiveEntry.mdx",
@@ -10908,6 +10948,22 @@
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/functions/matchEntryToPage.mdx",
             "reach": "https://ochk.io/docs/sdk/vault-core/functions/matchEntryToPage",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/normalizeRecoveryCode",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/normalizeRecoveryCode.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/normalizeRecoveryCode",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/openDeviceGrant",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/openDeviceGrant.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/openDeviceGrant",
             "area": "sdk",
             "tests": []
         },
@@ -10960,6 +11016,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/functions/restoreEncryptedBackup",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/restoreEncryptedBackup.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/restoreEncryptedBackup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/sealKeyToDevice",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/sealKeyToDevice.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/sealKeyToDevice",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/functions/toSummary",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/functions/toSummary.mdx",
@@ -10984,10 +11056,34 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/functions/unwrapKeyUnderKey",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/unwrapKeyUnderKey.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/unwrapKeyUnderKey",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/functions/unwrapVaultKey",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/functions/unwrapVaultKey.mdx",
             "reach": "https://ochk.io/docs/sdk/vault-core/functions/unwrapVaultKey",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/wrapKeyUnderKey",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/wrapKeyUnderKey.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/wrapKeyUnderKey",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/functions/wrapVaultKey",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/functions/wrapVaultKey.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/functions/wrapVaultKey",
             "area": "sdk",
             "tests": []
         },
@@ -11032,6 +11128,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/interfaces/DeviceGrant",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/interfaces/DeviceGrant.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/interfaces/DeviceGrant",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/interfaces/EncryptedBackup",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/interfaces/EncryptedBackup.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/interfaces/EncryptedBackup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/interfaces/EnvFields",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/interfaces/EnvFields.mdx",
@@ -11064,6 +11176,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/interfaces/KeyWrappedUnderKey",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/interfaces/KeyWrappedUnderKey.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/interfaces/KeyWrappedUnderKey",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/interfaces/KvFields",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/interfaces/KvFields.mdx",
@@ -11092,6 +11212,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/interfaces/PasswordHistoryItem.mdx",
             "reach": "https://ochk.io/docs/sdk/vault-core/interfaces/PasswordHistoryItem",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/interfaces/RestoredBackup",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/interfaces/RestoredBackup.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/interfaces/RestoredBackup",
             "area": "sdk",
             "tests": []
         },
@@ -11192,6 +11320,22 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/variables/BACKUP_FORMAT",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/variables/BACKUP_FORMAT.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/variables/BACKUP_FORMAT",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/variables/BACKUP_VERSION",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/variables/BACKUP_VERSION.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/variables/BACKUP_VERSION",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/variables/EXPORT_FORMAT",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/variables/EXPORT_FORMAT.mdx",
@@ -11220,6 +11364,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/variables/PRIMARY_FIELD.mdx",
             "reach": "https://ochk.io/docs/sdk/vault-core/variables/PRIMARY_FIELD",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vault-core/variables/SCRYPT_PARAMS",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/variables/SCRYPT_PARAMS.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/variables/SCRYPT_PARAMS",
             "area": "sdk",
             "tests": []
         },
@@ -11309,7 +11461,7 @@
             "entry": "src/pages/sdk/vote-core/functions/commit.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/functions/commit",
             "area": "sdk",
-            "tests": ["src/__tests__/land-script.test.ts"]
+            "tests": ["src/__tests__/key-fixtures.test.ts", "src/__tests__/land-script.test.ts"]
         },
         {
             "id": "page:/sdk/vote-core/functions/distinctBallotCopies",

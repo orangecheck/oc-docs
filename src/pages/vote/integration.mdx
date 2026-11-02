@@ -72,9 +72,9 @@ The CLI also casts a ballot:
 0.7.6 it exits 0 only once 2 relays serve the signed ballot back, and 2 while it
 isn't in yet. In an anchored poll the ballot's stamp has to be in too, since a
 final count needs it, and from vote-cli 0.7.7 a stamp that could not be made at
-all also exits 2. Both are in the next release. vote-cli 0.7.4, the version on
-npm now, can exit 0 with the ballot or its stamp missing, so a script on it
-should read the printed lines, not only the exit status.
+all also exits 2. Neither version is on npm yet. A version before 0.7.6 can exit
+0 with the ballot missing, and one before 0.7.7 with its stamp missing, so a
+script on one should read the printed lines, not only the exit status.
 
 The CLI pulls the poll + ballots from Nostr (`--relay` to pick relays), verifies
 every BIP-322 signature with `@orangecheck/bip322`, reads the UTXOs confirmed by

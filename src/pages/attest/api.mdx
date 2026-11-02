@@ -6,11 +6,12 @@ export const metadata = {
 
 # OC Attest HTTP API
 
-The hosted API at `https://attest.ochk.io/api/*` is a **reference deployment**
-of OC Attest. `https://ochk.io/api/check`, `/api/verify` and `/api/discover`
-forward there and answer the same. `/api/challenge` is served by `ochk.io`, the
-auth host. The same checks run in your own code through
-[`@orangecheck/sdk`](/sdk/sdk/README). Every route is documented here.
+The hosted API on `https://attest.ochk.io`, every route under `/api/`, is a
+**reference deployment** of OC Attest. `/api/check`, `/api/verify` and
+`/api/discover` on `https://ochk.io` forward there and answer the same.
+`/api/challenge` is served by `ochk.io`, the auth host. The same checks run in
+your own code through [`@orangecheck/sdk`](/sdk/sdk/README). Every route is
+documented here.
 
 Rate limits are per IP, per minute: `/api/check` and `/api/discover` 60,
 `/api/stats` 30, `/api/challenge` 30, `/api/verify` 10,

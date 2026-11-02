@@ -37,11 +37,6 @@ const TIMEOUT_MS = 20_000;
 
 /** URLs that are SUPPOSED to fail — illustrative, not navigational. */
 const EXPECTED_404 = new Map([
-    ['https://attest.ochk.io/api/*', 'a glob in prose describing the API surface, not a URL'],
-    [
-        'https://ochk.io/api/check',
-        'names the endpoint in prose; a bare GET is a 400 by design, since it needs addr, id or identity',
-    ],
     ['https://me.ochk.io/api/', 'prose reference to the API root, not an endpoint'],
     [
         'https://me.ochk.io/api/integrator/config?project_key=pk_live_yourco',

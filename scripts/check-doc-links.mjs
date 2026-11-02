@@ -13,10 +13,11 @@
  *   401 / 403  a gated surface answering correctly (owner consoles)
  *   405        a POST-only endpoint; this checker only issues GET
  *
- * Anything else fails the run, unless it is in EXPECTED_404 below — which is
- * for URLs the docs deliberately show as examples that cannot resolve (an
- * illustrative attestation id, a placeholder API key). Each entry needs a
- * reason, so the list cannot quietly become a dumping ground for real rot.
+ * Anything else fails the run, unless it is in EXPECTED_404 (doc-link-expect.mjs)
+ * — which is for URLs the docs deliberately show as examples that cannot resolve
+ * (an illustrative attestation id, a placeholder API key). Each entry needs a
+ * reason, so the list cannot quietly become a dumping ground for real rot, and
+ * one that names a live endpoint pins the status it answers.
  *
  * Relative links are checked too, resolved against SITE. That matters: this
  * repo carries deliberate 308 redirects from a 2026-05-09 SDK restructure, so
@@ -31,22 +32,11 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { classify, EXPECTED_404 } from './doc-link-expect.mjs';
+
 const PAGES = 'src/pages';
 const SITE = process.env.OC_DOCS_SITE ?? 'https://ochk.io/docs';
 const TIMEOUT_MS = 20_000;
-
-/** URLs that are SUPPOSED to fail — illustrative, not navigational. */
-const EXPECTED_404 = new Map([
-    ['https://me.ochk.io/api/', 'prose reference to the API root, not an endpoint'],
-    [
-        'https://me.ochk.io/api/integrator/config?project_key=pk_live_yourco',
-        'placeholder project key — pk_live_yourco is not a real integrator',
-    ],
-    [
-        'https://attest.ochk.io/api/check?addr=bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080',
-        'the quickstart deliberately shows the never-attested case, which is a 404 by design',
-    ],
-]);
 
 const PLACEHOLDER = /[<>{}$]|\.\.\.|…/;
 // \S excludes newlines: without it the match ran past the end of the line
@@ -105,17 +95,16 @@ for (const [url, files] of [...found].sort()) {
         status = 0; // network failure / timeout
     }
 
-    const acceptable =
-        (status >= 200 && status < 400) || status === 401 || status === 403 || status === 405;
-
-    if (acceptable) {
+    const verdict = classify(url, status);
+    if (verdict === 'ok') {
         ok++;
         if (verbose) console.log(`  ${status}  ${url}`);
-    } else if (EXPECTED_404.has(url)) {
+    } else if (verdict === 'expected') {
         skipped++;
-        if (verbose) console.log(`  ${status}  ${url}  (expected: ${EXPECTED_404.get(url)})`);
+        if (verbose)
+            console.log(`  ${status}  ${url}  (expected: ${EXPECTED_404.get(url).reason})`);
     } else {
-        failures.push({ url, status, files: [...files] });
+        failures.push({ url, status, pinned: EXPECTED_404.get(url)?.status, files: [...files] });
     }
 }
 
@@ -123,13 +112,15 @@ console.log(
     `\ndoc links: ${ok} ok · ${skipped} skipped (placeholder or expected) · ${failures.length} broken`
 );
 for (const f of failures) {
-    console.log(`\n  BROKEN ${f.status || 'no-response'}  ${f.url}`);
+    const pin = f.pinned === undefined ? '' : `  (pinned to ${f.pinned})`;
+    console.log(`\n  BROKEN ${f.status || 'no-response'}  ${f.url}${pin}`);
     for (const file of f.files) console.log(`      ${file}`);
 }
 if (failures.length > 0) {
     console.log(
         '\nIf a URL is meant to be illustrative rather than navigable, add it to\n' +
-            'EXPECTED_404 in this script with a reason.\n'
+            'EXPECTED_404 in doc-link-expect.mjs with a reason, and the status it\n' +
+            'answers if it names a live endpoint.\n'
     );
     process.exitCode = 1;
 }

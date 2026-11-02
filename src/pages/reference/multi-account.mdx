@@ -150,10 +150,12 @@ fields on top of the existing shape:
 
 ```tsx
 import { useOcSession } from '@orangecheck/auth-client';
+import { useState } from 'react';
 
 function Header() {
-    const { account, roster, switchAccount, addAccountUrl, signOut } =
+    const { account, roster, switchAccount, addAccountUrl, trySignOut } =
         useOcSession();
+    const [failed, setFailed] = useState(false);
 
     return (
         <nav>
@@ -167,14 +169,27 @@ function Header() {
                 </button>
             ))}
             <a href={addAccountUrl()}>add another account</a>
-            <button onClick={() => signOut({ scope: 'current' })}>
+            <button
+                onClick={async () =>
+                    setFailed(!(await trySignOut({ scope: 'current' })).ok)
+                }
+            >
                 leave this account
             </button>
-            <button onClick={() => signOut()}>sign out of everything</button>
+            <button onClick={async () => setFailed(!(await trySignOut()).ok)}>
+                sign out of everything
+            </button>
+            {failed ? (
+                <span role="alert">Couldn't sign you out. Try again.</span>
+            ) : null}
         </nav>
     );
 }
 ```
+
+Use `trySignOut` wherever a person signs out. It resolves to `{ ok: false }`
+when the auth host refused or didn't answer, and the session may then still be
+live, so say so. `signOut` resolves the same way either way and can't tell you.
 
 No family package renders the roster for you. `AccountMenu` from
 `@orangecheck/app-design/chrome` draws the account button with the items you

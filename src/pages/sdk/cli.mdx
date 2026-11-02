@@ -196,6 +196,12 @@ envelope, and 2 when a check fails (`E_BAD_SIG`, `E_BAD_CONTENT`, `E_BAD_ANCHOR`
 block header could not be read: nothing failed, so run it again later. `stamp anchor`
 exits 1 when it cannot reach a calendar or the header source.
 
+From stamp-cli 0.3.2, `git-stamp verify` rebuilds what `git-stamp tag` signed,
+the tag name, its object id and its tree, from the repository and checks the
+stamp against that. A tag moved after stamping, or a `.stamp` copied from
+another tag, then fails with exit 2. Earlier versions check only the stamp's own
+signature, so use 0.3.2 or later to verify a tag.
+
 ### `--headers-url`
 
 `stamp verify` and `stamp anchor` take `--headers-url <url>`: the Esplora API

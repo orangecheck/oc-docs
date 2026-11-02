@@ -67,6 +67,15 @@ npx -y @orangecheck/vote-cli tally <poll_id> --json
 The package's command is `oc-vote`: after `npm i -g @orangecheck/vote-cli`,
 `oc-vote tally <poll_id> --json` is the same.
 
+The CLI also casts a ballot:
+`oc-vote vote --poll <poll_id> --voter <address> --option <id>`. From vote-cli
+0.7.6 it exits 0 only once 2 relays serve the signed ballot back, and 2 while it
+isn't in yet. In an anchored poll the ballot's stamp has to be in too, since a
+final count needs it, and from vote-cli 0.7.7 a stamp that could not be made at
+all also exits 2. An earlier version can exit 0 with the ballot or its stamp
+missing, so a script on one should read the printed lines, not only the exit
+status.
+
 The CLI pulls the poll + ballots from Nostr (`--relay` to pick relays), verifies
 every BIP-322 signature with `@orangecheck/bip322`, reads the UTXOs confirmed by
 the snapshot block from an Esplora API (`--mempool-base`, default

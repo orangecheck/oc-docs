@@ -185,10 +185,11 @@ the event.
 - **A revocation is checked.** After it is in effect, lock.ochk.io reads the
   address's devices again and says it is done only when that read, at the floor,
   no longer shows the device. With too few answers it says "Not checked yet".
-- **Reads that rest on an absence need 4 of the 5.** Sealing to an address needs
-  them, because only then does a missing revocation mean there is none; with
-  fewer it sends nothing and says "Too few relays answered." The list of an
-  address's other devices needs them too.
+- **Reads that rest on an absence need 4 of the 5, with none cut off.** Sealing
+  to an address needs them, because only then does a missing revocation mean
+  there is none; with fewer, or with a relay that stopped partway, it sends
+  nothing and says "Too few relays answered." The list of an address's other
+  devices needs them too.
 
 ## Rotation
 

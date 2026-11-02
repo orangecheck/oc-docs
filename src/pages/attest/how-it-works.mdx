@@ -56,8 +56,9 @@ This blob is published to [Nostr kind-30078](/ecosystem/nostr-kind-30078) for
 durable public discovery. The `d`-tag is the attestation_id; a `t` tag carrying
 the Bitcoin address lets verifiers query by address with `#t`. A publisher keeps
 publishing until two of the relays verifiers ask, each asked alone, serve back a
-copy whose signature verifies. A verifier never assumes it did, since a holder
-can write an attestation to one relay alone (SPEC §6.1 rule 6).
+copy whose signature verifies (every one, when they ask fewer than two). A
+verifier never assumes it did, since a holder can write an attestation to one
+relay alone (SPEC §6.1 rule 6).
 
 The signer can also share the blob directly (URL, embedded badge, email, QR
 code). Publishing to Nostr is _optional_ — the blob verifies offline regardless.

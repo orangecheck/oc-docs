@@ -520,6 +520,16 @@ say the Connect key was not replaced, and the old owner stays listed as holding
 it until the new owner replaces it on the project's sign-in page. A Connect key
 cannot bill on its own.
 
+An accept cut short by an error never leaves the project half-moved. Short of
+the project's record moving, nothing moves: the offer stands, the old owner
+keeps the project and its signing secret, and accepting again starts over. Once
+the record has moved, the project is the new owner's, and the offer stays as
+accepted but not finished until they accept again. That accept finishes it as
+first chosen, with no second signing secret, and the audit row and each notice
+land once; finishing a `replace` needs a fresh identity check. Until then the
+transfer cannot be declined (`404`) or offered on (`409 accept_in_progress`),
+and it stays in the new owner's incoming list.
+
 ### Deleting a project
 
 Deleting a project takes everything that only served it: its key, its webhooks

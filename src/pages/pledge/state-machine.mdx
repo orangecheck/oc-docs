@@ -17,6 +17,11 @@ Every pledge is in **exactly one** of these states at any given time:
 | `disputed`           | A counter-claim before `expires_at`, or the resolver's own contradiction inside its window.           |
 | `expired_unresolved` | Past `expires_at` with no consistent outcome, or a dispute with no dispute mechanism.                 |
 
+A state that rests on an outcome, an abandonment or a counter-claim not being
+there holds only when the read floor of the relays asked (four of five) answered
+in full with none cut off; otherwise the state is unchecked, never the one the
+absence would give (SPEC §11 item 15).
+
 State transitions are **pure functions** of
 `(pledge envelope, outcome envelope or absence, current time, relevant public state)`.
 Two verifiers with the same inputs produce the same classification. This is a

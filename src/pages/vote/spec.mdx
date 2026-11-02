@@ -85,8 +85,9 @@ so relays keep a voter's earlier ballots; the tiebreak (§6 step 3 below) picks
 one. Talliers find ballots by `{"kinds":[30081],"#t":["<poll_id>"]}`. They
 verify each event under NIP-01, and each ballot's own signature, before
 de-duplicating by `ballot_id`, since `ballot_id` leaves `sig.value` out (SPEC
-§6.5, Discovering the ballots). A poll is rejected only when no copy of it
-verifies, and a reveal is taken from a copy that verifies (SPEC §10 item 1).
+§6.5, Discovering the ballots), and take them as complete only at the read floor
+(§10 below). A poll is rejected only when no copy of it verifies, and a reveal
+is taken from a copy that verifies (SPEC §10 item 1).
 
 ```
 kind    = 30081
@@ -334,6 +335,17 @@ A client is v0 compliant iff it:
 - implements `one_per_address`, `sats`, and `sats_days`
 - enforces `min_sats` / `min_days`
 - de-duplicates per voter per tiebreak
+- keeps publishing a poll, a ballot or a reveal until at least two of the relays
+  talliers ask, each asked alone, serve back a copy that verifies (every one,
+  when they ask fewer than two), and reports it as counted or published only
+  then (SPEC §3.4)
+- treats its ballots as complete, or a reveal as absent, only when the read
+  floor of the relays it asked answered in full, each read paged with `until`
+  until a page comes back short, and none was cut off: the number asked, less 2,
+  plus 1, never fewer than one (four of five). Below it, a clock-dated poll gets
+  no count, an anchored poll's tally is at most provisional, never final (a
+  secret-mode one stays `awaiting_reveal`), and a short reveal read never gives
+  `awaiting_reveal` (SPEC §6.5)
 - defers tally while the snapshot block is unknown or has < 6 confirmations
 - in an anchored poll, verifies ballot anchors against block headers, counts
   only ballots anchored at or below `H_close + G` in a final tally, and labels a

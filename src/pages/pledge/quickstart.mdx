@@ -127,6 +127,10 @@ const event = finalizeEvent(
 const results = await publishEvent(event); // one { relay, ok } per default relay
 ```
 
+A relay's `OK` is not a stored copy. Call the pledge published only once two
+relays, each asked on its own, serve back a copy that verifies (NIP Relay
+selection).
+
 ## 5. Record and classify the outcome
 
 pledge-core does not fetch public state. Once `resolves_at` has passed, you (or

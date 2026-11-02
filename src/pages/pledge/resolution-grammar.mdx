@@ -47,7 +47,9 @@ kind=<N> author=<npub_or_hex> tag(<name>)=<value> created_at_before=<ISO 8601 UT
 ```
 
 Implementations query ≥ 2 relays from the default set; an event is considered to
-exist if any relay returns it and it validates.
+exist if any relay returns it and it validates. It is considered absent only
+when the read floor of the relays asked (four of five) answered in full with
+none cut off; otherwise the outcome is unchecked (SPEC §11 item 15).
 
 ## stamp_published
 
@@ -60,7 +62,8 @@ stamp(content_hash=sha256:<hex>, signer=<addr>)
 The verifier consults the OC Stamp directory (Nostr kind-30083 under the
 `oc-stamp:*` d-tag namespace) and validates each matching envelope. The pledge
 is `kept` if at least one is authentic and its `signed_at` is before the
-pledge's `resolves_at`. This is the canonical way to pledge "I will publish X by
+pledge's `resolves_at`. No matching stamp counts only at the same read floor
+(SPEC §11 item 15). This is the canonical way to pledge "I will publish X by
 time T."
 
 ## http_get_hash

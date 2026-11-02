@@ -114,15 +114,17 @@ bumped `updated_at`, so the tombstone propagates like any other change — a
 delete on one device reaches the others. **Delete forever** from the trash
 removes the entry from this device and replaces its blob on the server with an
 empty, encrypted marker, which tells your other devices to delete the entry too.
-It goes up over the revision it was made from: if another device edited the
-entry first, that edit is kept and comes back here, and the sync says to delete
-it again if you still want it gone. The marker stays on the server for 90 days,
-then a web sync removes it. A browser whose last full sync is 89 days or more
-behind moves any entry the server stopped listing to its own Trash, never away.
-If that is 20 entries or more and over half of this browser's synced entries, or
-the server lists none at all, it asks you first. A device reads its whole list
-of blobs before it reconciles: a list it cannot read in full fails the sync,
-rather than leaving entries out.
+It goes up over the revision it was made from, or, for one made before Delete
+forever kept its revision, over the revision the server lists. If another device
+edited the entry first, that edit is kept and comes back here, and a notice
+names each entry kept this way, saying to delete it again if you still want it
+gone, until you dismiss it. The marker stays on the server for 90 days, then a
+web sync removes it. A browser whose last full sync is 89 days or more behind
+moves any entry the server stopped listing to its own Trash, never away. If that
+is 20 entries or more and over half of this browser's synced entries, or the
+server lists none at all, it asks you first. A device reads its whole list of
+blobs before it reconciles: a list it cannot read in full fails the sync, rather
+than leaving entries out.
 
 ## Team vaults · a different sync signal
 

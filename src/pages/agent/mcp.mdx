@@ -126,7 +126,8 @@ async function admit(params: ToolCall) {
     const delegation = registered.get(action?.delegation_id);
     if (!action || !delegation) return 'unsigned';
 
-    // Kind 30085 with "#t": [delegation.id]. Only a relay that answered counts.
+    // Kind 30085 with "#t": [delegation.id], each relay paged until a page comes back short.
+    // answered: the read floor of relays asked (asked - 2 + 1) answered in full, none cut off.
     const { answered, revocations } = await lookUpRevocations(delegation.id);
     if (!answered) return 'unchecked'; // never "not revoked"
 
@@ -169,12 +170,18 @@ What each check stops:
 | `content`                            | An action stamped over other arguments, another tool or another server (`E_BAD_ACTION_STAMP`)                                                                                                    |
 | Scope pinned to this server and tool | Authority granted for another tool or server, spent here                                                                                                                                         |
 | `createReplayGuard`                  | The same signed call sent twice                                                                                                                                                                  |
-| No relay answered                    | A call whose revocation status is unknown                                                                                                                                                        |
+| Revocation read below the floor      | A call whose revocation status is unknown                                                                                                                                                        |
 
 The relays the family reads and publishes to are listed on
-[relay infrastructure](/infrastructure/relay). A clear result may be cached for
-a short time, a minute for example, and only when at least one relay answered
-and each one that answered was read to the end.
+[relay infrastructure](/infrastructure/relay). "No revocation" needs at least
+the read floor of the relays asked (the number asked, less 2, plus 1) to have
+answered in full, each read paged with `until` until a page came back short, and
+no relay cut off. Otherwise the call is unchecked, never unrevoked
+([OC Agent SPEC §10.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#104-reading-relay-replies)).
+As
+[OC Lock §3.5](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md#35-rotation-and-revocation)
+puts it, a cut-off read is not an answer. A clear result may be cached for a
+short time, a minute for example, and only when it met that floor.
 
 ## Checking calls later
 

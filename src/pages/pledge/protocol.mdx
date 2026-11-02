@@ -130,7 +130,8 @@ as an OC Stamp at the deadline.
    proposition is human-legible in the signing UI.
 5. Her client computes `pledge_id = sha256(canonical_message)` and assembles the
    envelope. She publishes to Nostr kind-30078 with d-tag
-   `oc-pledge:<pledge_id>`.
+   `oc-pledge:<pledge_id>`; her client calls it published once two relays, each
+   asked on its own, serve it back.
 
 The pledge is now public. Anyone querying `oc-pledge:<pledge_id>` on a relay
 sees:

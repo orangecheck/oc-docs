@@ -185,7 +185,11 @@ For an anchored poll (deadline on or after 2026-11-15T00:00:00Z), also pass
 [tally algorithm](/vote/tally-algorithm#anchored-and-clock-dated-polls).
 
 `queryEvents` reports which relays answered in `relayStatus`; a relay that did
-not answer is not evidence that a ballot is missing.
+not answer is not evidence that a ballot is missing. A tally counts only when
+four of the five relays (the read floor) answered in full, each read paged with
+`until` until a page comes back shorter than the `limit`, and none was cut off;
+the sample above reads one page. Below the floor a clock-dated poll gets no
+count, and an anchored poll's tally is at most provisional (SPEC §6.5).
 
 ## publish a poll and a ballot from code
 
@@ -317,10 +321,11 @@ console.log(`https://vote.ochk.io/p/${id}`);
 
 `publishEvent` sends to the default relays and reports each one;
 `publishOutcome` says whether `none`, `some` (`partial`) or `all` accepted. A
-relay's `OK` is not proof it stored the event: read it back with `queryEvents`
-before telling anyone the poll is live. A wallet can sign in place of a key you
-hold: `signMessage` takes the 64-hex id, as [`getSigner`](/stamp/quickstart)
-does in a browser.
+relay's `OK` is not proof it stored the event: read it back with `queryEvents`,
+asking each relay on its own, and tell anyone the poll is live only once two of
+them serve back a copy that verifies (SPEC §3.4). A wallet can sign in place of
+a key you hold: `signMessage` takes the 64-hex id, as
+[`getSigner`](/stamp/quickstart) does in a browser.
 
 ## gate a Discord bot
 

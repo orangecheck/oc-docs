@@ -101,6 +101,11 @@ pubkey:     <ephemeral nostr pubkey, see §3.4>
 created_at: <unix seconds>
 ```
 
+A client SHOULD keep publishing a device record, a bind or a revocation until at
+least two of the relays readers ask, each asked alone, serve back a copy that
+verifies, or every one of them does when readers ask fewer than two, and SHOULD
+NOT report the device as set up, or as revoked, until then.
+
 ### §3.4 Nostr authorship
 
 The Nostr `pubkey` isn't tied to the Bitcoin identity — authenticity is the
@@ -164,6 +169,16 @@ readable `revoked_at` retires every bind of its device, whatever that bind's
 bind whose signed `created_at` is later than the reader's clock plus a skew
 allowance (10 minutes recommended) is not live yet; list it anyway, so it can be
 revoked.
+
+**A revocation's absence needs the read floor.** Page each relay's answer for
+the address with `until` until a page comes back shorter than the `limit` you
+asked for; a relay whose read stopped at a full page, or that stopped answering,
+was cut off. The absence of a revocation counts only when the read floor of the
+relays queried answered in full: the number queried, less the write quorum of 2,
+plus one, and never fewer than one (four of five). While any relay queried was
+cut off it does not count at all: the result is unchecked, never "no
+revocation". A sender without the floor, or with any relay cut off, MUST NOT
+seal, and reports `E_RELAY_UNREACHABLE`.
 
 Conforming senders MUST seal only to live binds, and report `E_REVOKED` when
 none is left.
@@ -277,16 +292,16 @@ Reference: RFC 8785 JCS, with the additional `recipients[]` rule.
 
 ## §6 Errors
 
-| Code                  | Meaning                                                |
-| --------------------- | ------------------------------------------------------ |
-| `E_NO_DEVICE`         | No device key found for this browser.                  |
-| `E_NOT_ADDRESSED`     | Envelope does not include the recipient's `device_id`. |
-| `E_BAD_SIG`           | Sender BIP-322 signature did not verify.               |
-| `E_BAD_TAG`           | AEAD authentication failed (tampered or wrong key).    |
-| `E_EXPIRED`           | `expires_at` is in the past.                           |
-| `E_REVOKED`           | No device record for the address is live (§3.5).       |
-| `E_PAYMENT_UNMET`     | Relay could not verify required payment.               |
-| `E_RELAY_UNREACHABLE` | Relay did not respond.                                 |
+| Code                  | Meaning                                                     |
+| --------------------- | ----------------------------------------------------------- |
+| `E_NO_DEVICE`         | No device key found for this browser.                       |
+| `E_NOT_ADDRESSED`     | Envelope does not include the recipient's `device_id`.      |
+| `E_BAD_SIG`           | Sender BIP-322 signature did not verify.                    |
+| `E_BAD_TAG`           | AEAD authentication failed (tampered or wrong key).         |
+| `E_EXPIRED`           | `expires_at` is in the past.                                |
+| `E_REVOKED`           | No device record for the address is live (§3.5).            |
+| `E_PAYMENT_UNMET`     | Relay could not verify required payment.                    |
+| `E_RELAY_UNREACHABLE` | Too few relays answered in full, or one was cut off (§3.5). |
 
 ## §7 Security model
 

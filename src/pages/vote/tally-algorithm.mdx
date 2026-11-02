@@ -143,12 +143,13 @@ this step, not the relay, is what decides. Conformance vectors `v04`, `v06` and
 
 ### 3. Reveal (secret polls)
 
-Without an accepted reveal the result is `awaiting_reveal`. In an anchored poll,
-you accept a reveal only once your chain tip is at least `H_close + G + 6`, and
-never while `H_close` is `none`. In a clock-dated poll, only once your own clock
-reads at or after the deadline. The reveal's `revealed_at` decides neither. So a
-secret anchored poll is never provisional: until its tally can be final, it is
-`awaiting_reveal`.
+Without an accepted reveal the result is `awaiting_reveal`, but only on a reveal
+read at the read floor with no relay cut off; below it, report that you could
+not read the poll (SPEC §6.5). In an anchored poll, you accept a reveal only
+once your chain tip is at least `H_close + G + 6`, and never while `H_close` is
+`none`. In a clock-dated poll, only once your own clock reads at or after the
+deadline. The reveal's `revealed_at` decides neither. So a secret anchored poll
+is never provisional: until its tally can be final, it is `awaiting_reveal`.
 
 With an accepted reveal, each voter's chosen ballot is unsealed and its
 commitment checked; a voter whose ballot does not open to a valid option is

@@ -145,9 +145,12 @@ The reference app uses the `@orangecheck/nostr-core` default set:
 - `wss://nostr.oxtr.dev`
 - `wss://relay.ochk.io`
 
-Clients SHOULD publish to at least three diverse relays. A hostile relay set can
-refuse to publish or return your envelope, but cannot forge it — BIP-322
-verification is relay-independent.
+Clients SHOULD publish to at least three diverse relays, and SHOULD keep
+publishing until two of the relays verifiers ask, each asked alone, serve back a
+copy that verifies (every one, when they ask fewer than two), reporting the
+stamp as published only then (SPEC §7). A hostile relay set can refuse to
+publish or return your envelope, but cannot forge it — BIP-322 verification is
+relay-independent.
 
 ## Why Nostr is optional
 

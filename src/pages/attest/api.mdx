@@ -198,7 +198,11 @@ thresholds." Cached 60 s.
 Broadcast an envelope you built and signed with `createAttestation()`. The
 server recomputes the id, re-verifies the signature, builds the Nostr event from
 the signed message alone, signs that outer event with attest.ochk.io's service
-key, and sends it to its relays.
+key, and sends it to its relays. It then asks each relay attest.ochk.io's
+readers query (nos.lol, relay.primal.net, nostr.oxtr.dev and relay.ochk.io) on
+its own for the event. The attestation is published only once 2 of them serve
+back a copy whose Nostr id and signature verify and that carries the same
+attestation id, message and signature.
 
 ```json
 {
@@ -208,13 +212,17 @@ key, and sends it to its relays.
 }
 ```
 
-Response — 200:
+Response — 200, published:
 
 ```json
 {
     "ok": true,
-    "success_count": 3,
-    "total_count": 4,
+    "published": true,
+    "served_by": ["wss://...", "wss://..."],
+    "asked": 4,
+    "quorum": 2,
+    "success_count": 6,
+    "total_count": 6,
     "success": ["wss://..."],
     "failed": [{ "relay": "wss://...", "reason": "..." }],
     "event_id": "...",
@@ -222,7 +230,27 @@ Response — 200:
 }
 ```
 
-A 200 can carry `success_count: 0`, so read `success` and `failed`. The service
+Response — 502, when fewer than 2 of the relays readers ask serve it back:
+
+```json
+{
+    "ok": false,
+    "published": false,
+    "error": "not_published",
+    "served_by": ["wss://..."],
+    "asked": 4,
+    "quorum": 2,
+    "success_count": 6,
+    "total_count": 6,
+    "success": ["wss://..."],
+    "failed": [],
+    "event_id": "...",
+    "pubkey": "..."
+}
+```
+
+`served_by` is what counts: a relay's `OK`, in `success`, is not a stored copy.
+On a 502, send the same envelope again; nothing new needs signing. The service
 key vouches for delivery only; the BIP-322 signature inside is still the proof.
 An envelope that binds a `nostr:` identity is refused with 422
 `nostr_binding_requires_nip07`: that npub must sign the event itself. Other

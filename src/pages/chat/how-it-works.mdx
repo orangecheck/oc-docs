@@ -56,9 +56,10 @@ family's [write quorum](/infrastructure/relay#write-quorum-and-read-floor).
 Below that it says "Not in effect yet", and **Try again** sends the same signed
 event again. A device lookup always asks the five, as well as chat's four. What
 a lookup did not return (no revocation, no device) counts only at the family's
-read floor: 4 of the five read in full. A revocation any relay returns counts at
-once. Below the floor chat sends nothing and says "Too few relays answered to
-check" the recipient's devices; your message is kept.
+read floor: 4 of the five read in full, and none cut off partway (a relay that
+sends nothing is just silent). A revocation any relay returns counts at once.
+Below the floor chat sends nothing and says "Too few relays answered to check"
+the recipient's devices; your message is kept.
 
 ### 2. Discovery — fetch a device key by address
 

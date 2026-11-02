@@ -119,7 +119,9 @@ nostr-core's five `DEFAULT_RELAYS`:
   is not enough.
 - **Read floor.** A read that rests on an absence (no revocation of this device,
   no bind for this address) counts only when `readFloor(asked)` of the relays
-  asked have finished answering. Five asked: four.
+  asked have finished answering in full and none was cut off. Five asked: four.
+  A relay that stopped partway, or at a full page, leaves the read unchecked;
+  one that sent nothing is just silent.
 
 ```ts
 export const WRITE_QUORUM = 2;
@@ -133,7 +135,7 @@ The floor and the quorum add up to more than the relays asked
 (`readFloor + WRITE_QUORUM > asked`; with five, 4 + 2 > 5). So of the relays
 holding any write in effect, a read at the floor always hears from at least one.
 A write short of the quorum is reported as not in effect yet, never as done. A
-read short of the floor is not taken as an answer.
+read short of the floor, or with a relay cut off, is not taken as an answer.
 
 | App                                                              | Writes device records to                                         | In effect at  | Reads at the floor                                                                 |
 | ---------------------------------------------------------------- | ---------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------- |

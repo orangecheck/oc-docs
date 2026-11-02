@@ -52,6 +52,15 @@ runtime is not compromised, and randomness is strong.
 | **S13** | **Post-quantum.** X25519, secp256k1, and BLS12-381 are classically secure only. Long-range seals carry quantum risk over their lifetime.                                                                                                                                                                                                                                                                                                                                                                                      |
 | **S19** | **Acceptance is private; no "your request was opened" receipt.** Acceptance of a filtered/pending request is a client-local, revocable allowlist; clients MUST NOT emit an open/acceptance receipt (a read-receipt-style leak). The only acceptance signal a sender gets is an actual **reply**. The allowlist is never published, carried on the wire, or co-indexed with the directory. chat.ochk.io sends nothing when a request is opened or approved; **Approve** only updates the device's allowlist.                   |
 
+**On the device: the lock.** chat.ochk.io keeps your device key and your message
+history on the device. With the device lock on, your key and the contents of
+your messages are encrypted at rest under its passphrase: message text,
+attachments, seal blocks, postage receipts and the thread previews. Who you talk
+to and when stays readable on this device: the counterpart address, thread ids,
+direction and times are kept in the clear so the inbox can index them. With the
+lock off, chat.ochk.io encrypts none of that store, and what is left is the
+device's own and the operating system's disk encryption.
+
 ### The seal (`seal-til-block`)
 
 | #       | Non-protection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |

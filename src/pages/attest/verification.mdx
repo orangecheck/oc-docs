@@ -80,7 +80,10 @@ subject's tag, paging past the relay's limit (the SDK reads up to 2,000 per
 relay), since anyone can publish under those tags. When it finds several
 attestations, the one checked is the newest by the `issued_at` its message
 signs, skipping any dated more than two minutes ahead of the verifier's clock,
-and the first of those whose signature verifies (OC Attest SPEC §7.2).
+and the first of those whose signature verifies (OC Attest SPEC §7.2). Each
+event is verified under NIP-01 before the relays' answers are merged, and copies
+are never collapsed by `attestation_id` first: it leaves the signature out, so a
+newer copy can carry a junk one (§6.1 rule 4).
 
 If the caller passed `min_sats` and/or `min_days`, compare them against the
 computed metrics. Add `below_min_sats` / `below_min_days` to the codes list on

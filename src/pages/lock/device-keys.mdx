@@ -155,12 +155,14 @@ await publishEvent(
 ```
 
 A sender resolving the address collects the records from every relay it queried,
-drops any whose `binding_sig` does not verify, and seals only to binds that no
-revocation retires. A revocation of `(address, device_id)` retires each bind of
-that pair whose signed `created_at` is at or before its signed `revoked_at`,
-whichever key carried either record, and holds back a bind dated later than its
-own clock. `liveDevices` from `@orangecheck/lock-device` applies the rule, and
-`pendingDevices` lists the binds held back ([spec §3.5](/lock/spec)).
+verifying each event under NIP-01 before it merges them (the Nostr wrapper,
+never which key carried it), drops any whose `binding_sig` does not verify, and
+seals only to binds that no revocation retires. A revocation of
+`(address, device_id)` retires each bind of that pair whose signed `created_at`
+is at or before its signed `revoked_at`, whichever key carried either record,
+and holds back a bind dated later than its own clock. `liveDevices` from
+`@orangecheck/lock-device` applies the rule, and `pendingDevices` lists the
+binds held back ([spec §3.5](/lock/spec)).
 
 A revocation one relay holds retires the bind another relay still serves, so a
 sender that reads several relays needs only one of them to have it. A sender

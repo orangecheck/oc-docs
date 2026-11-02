@@ -82,7 +82,11 @@ has a working example.
 
 Publication (SPEC §4.5): kind `30081`. Each ballot event has its own Nostr key,
 so relays keep a voter's earlier ballots; the tiebreak (§6 step 3 below) picks
-one. Talliers find ballots by `{"kinds":[30081],"#t":["<poll_id>"]}`.
+one. Talliers find ballots by `{"kinds":[30081],"#t":["<poll_id>"]}`. They
+verify each event under NIP-01, and each ballot's own signature, before
+de-duplicating by `ballot_id`, since `ballot_id` leaves `sig.value` out (SPEC
+§6.5, Discovering the ballots). A poll is rejected only when no copy of it
+verifies, and a reveal is taken from a copy that verifies (SPEC §10 item 1).
 
 ```
 kind    = 30081

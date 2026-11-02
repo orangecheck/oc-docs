@@ -428,7 +428,9 @@ The envelope additionally carries:
 
 These three fields are outside the pledge id, so the relays can hold copies of
 one pledge that differ in them. A reader runs the whole check below on each
-copy, delegation included, and uses one that passes (SPEC §11.11).
+copy, delegation included, and uses one that passes (SPEC §11.11). Before it
+merges relay answers it also verifies each Nostr event under NIP-01 and drops
+one that fails (SPEC §11 item 14); that signature grants nothing.
 
 ### A verifier checks
 

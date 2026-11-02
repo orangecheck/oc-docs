@@ -104,10 +104,10 @@ local edit goes up only over the revision this browser last read, so it never
 writes over a change another device made since. When both sides changed, both
 are kept: the server's version keeps the entry, and your edit is saved beside it
 as "(conflict copy)". If another device deleted the entry and its row is gone,
-your edit is saved as a new entry, and the page says "This entry was deleted on
-another device, so your change was saved as a new entry." From its next release,
-the browser extension's updates also go over the revision they read; see
-[Browser extension](/vault/extension).
+your edit is saved as a new entry. When that happens as you save, the page says
+"This entry was deleted on another device, so your change was saved as a new
+entry." From its next release, the browser extension's updates also go over the
+revision they read; see [Browser extension](/vault/extension).
 
 Deletes are **soft**: a deleted entry keeps its row with `deleted_at` set and a
 bumped `updated_at`, so the tombstone propagates like any other change — a
@@ -119,8 +119,10 @@ entry first, that edit is kept and comes back here, and the sync says to delete
 it again if you still want it gone. The marker stays on the server for 90 days,
 then a web sync removes it. A browser whose last full sync is 89 days or more
 behind moves any entry the server stopped listing to its own Trash, never away.
-A device reads its whole list of blobs before it reconciles: a list it cannot
-read in full fails the sync, rather than leaving entries out.
+If that is 20 entries or more and over half of this browser's synced entries, or
+the server lists none at all, it asks you first. A device reads its whole list
+of blobs before it reconciles: a list it cannot read in full fails the sync,
+rather than leaving entries out.
 
 ## Team vaults · a different sync signal
 

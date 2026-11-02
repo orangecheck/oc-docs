@@ -99,14 +99,28 @@ It cannot read the entry name, the type, the tag list, or even the inner
 ciphertext's length-class. Both layers use the same vault key with independent
 nonces; that is safe — AES-GCM is IND-CPA secure under fresh nonces.
 
-Reconciliation is last-write-wins on `updated_at`. Deletes are **soft**: a
-deleted entry keeps its row with `deleted_at` set and a bumped `updated_at`, so
-the tombstone propagates like any other change — a delete on one device reaches
-the others. **Delete forever** from the trash removes the entry from this device
-and replaces its blob on the server with an empty, encrypted marker. The marker
-tells your other devices to delete the entry too, so it stays on the server. A
-device reads its whole list of blobs before it reconciles: a list it cannot read
-in full fails the sync, rather than leaving entries out.
+Reconciliation goes entry by entry. A newer copy on the server is pulled, and a
+local edit goes up only over the revision this browser last read, so it never
+writes over a change another device made since. When both sides changed, both
+are kept: the server's version keeps the entry, and your edit is saved beside it
+as "(conflict copy)". If another device deleted the entry and its row is gone,
+your edit is saved as a new entry, and the page says "This entry was deleted on
+another device, so your change was saved as a new entry." From its next release,
+the browser extension's updates also go over the revision they read; see
+[Browser extension](/vault/extension).
+
+Deletes are **soft**: a deleted entry keeps its row with `deleted_at` set and a
+bumped `updated_at`, so the tombstone propagates like any other change — a
+delete on one device reaches the others. **Delete forever** from the trash
+removes the entry from this device and replaces its blob on the server with an
+empty, encrypted marker, which tells your other devices to delete the entry too.
+It goes up over the revision it was made from: if another device edited the
+entry first, that edit is kept and comes back here, and the sync says to delete
+it again if you still want it gone. The marker stays on the server for 90 days,
+then a web sync removes it. A browser whose last full sync is 89 days or more
+behind moves any entry the server stopped listing to its own Trash, never away.
+A device reads its whole list of blobs before it reconciles: a list it cannot
+read in full fails the sync, rather than leaving entries out.
 
 ## Team vaults · a different sync signal
 
@@ -136,7 +150,7 @@ client-side machinery reflects that:
 | Reconciliation        | per-entry `synced_at` + `remote_rev`, pull/push              | compare-and-swap on the server `updated_at`, plus a poll loop                    |
 | Freshness model       | "are my local edits backed up yet?"                          | "how fresh is what I'm looking at relative to my teammates' writes?"             |
 | Loop                  | sync once per visibility/focus, then idle                    | 8-second background poll while the tab is visible                                |
-| Concurrent-edit guard | last-write-wins, conflict copies kept                        | advisory edit-locks (~90 s TTL, heartbeated every 30 s while the editor is open) |
+| Concurrent-edit guard | each write over the revision it read; conflict copies kept   | advisory edit-locks (~90 s TTL, heartbeated every 30 s while the editor is open) |
 | Surfaced state        | `cloud sync` stat tile · `<synced>/<total>` · last-sync time | `liveness` stat tile · last-refresh time · `live across teammates`               |
 
 The polling loop is index-gated and cheap, but it's still a poll — that's why

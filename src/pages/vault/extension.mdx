@@ -27,7 +27,10 @@ seed included. The vault key never touches disk and never reaches the page. See
   offered on an HTTP page.
 - **Capture.** Submit a login and the extension offers to save it — or update an
   existing entry if the password changed. Unchanged passwords are not
-  re-prompted.
+  re-prompted. From the extension's next release, an update goes over the
+  version it read: if another device changed the entry first, the update goes on
+  top of that change, and if the entry was deleted there, it is saved as a new
+  entry and the extension says so.
 - **Your vault in the popup.** Search, copy, reveal — the same actions the web
   app has. The popup syncs automatically; there is no manual refresh button.
 - **TOTP codes.** A TOTP entry, or a login that carries one, shows its current

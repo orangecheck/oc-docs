@@ -148,10 +148,11 @@ even with the advisory lock bypassed.
 Deletes are soft for teams too. A deleted team entry keeps its row with
 `deleted_at` set so the tombstone propagates to every member's browser. The team
 trash is reachable by owner / admin (the same role gate as management actions);
-restoring brings the entry back for everyone. An owner or admin can purge an
-entry from the team trash for good. A trashed entry more than 30 days old is
-also deleted for good, the next time someone opens the trash or deletes an
-entry.
+restoring brings the entry back for everyone, and it is the only way back: a
+write never brings back an entry a teammate moved to the trash. An owner or
+admin can purge an entry from the team trash for good. A trashed entry more than
+30 days old is also deleted for good, the next time someone opens the trash or
+deletes an entry.
 
 ## Folders
 

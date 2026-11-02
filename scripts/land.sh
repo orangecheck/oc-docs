@@ -12,7 +12,9 @@
 # A PR it opens carries every suppressions-init and suppressions-raise line in
 # the branch's commits. A PR it reuses keeps its body: close it to open a fresh one.
 # Refuses when a check fails on the PR, when the queue drops it, or when the PR
-# is closed. Rebase isn't needed first: the queue rebases onto main itself, so
+# is closed. Before it pushes, it refuses a branch whose commits add a
+# private-key header (scripts/check-key-fixtures.mjs): the history secret scan
+# fails on one for good, a fake one in a test included. Rebase isn't needed first: the queue rebases onto main itself, so
 # the commits main takes are new ones; a release tag goes on the commit main
 # holds, never the branch's.
 # Before it says a PR was dropped, it reads the PR again: one the queue has just
@@ -38,6 +40,11 @@ if [ -n "${LAND_PR:-}" ]; then
 else
     branch=${1:?usage: bash scripts/land.sh <branch>}
     sha=$(git rev-parse --verify "$branch^{commit}")
+    # A private-key header in a pushed commit fails the history secret scan for good.
+    # Without origin/main (a scratch checkout), the branch's whole history is checked.
+    base=$(git rev-parse -q --verify refs/remotes/origin/main) && range="$base..$sha" || range=$sha
+    node "$(dirname "$0")/check-key-fixtures.mjs" "$range" ||
+        refuse "a commit on $branch adds a private-key header; rewrite it before pushing"
     git push -q origin "$sha:refs/heads/$branch"
     if ! gh pr view "$branch" -R "$repo" --json number > /dev/null 2>&1; then
         # CI judges a pull request's suppressions lines on its body alone (lint-gate.md),

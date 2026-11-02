@@ -65,7 +65,9 @@ describe('moved docs pages', () => {
         expect(shadowed).toEqual([]);
     });
 
-    it('leave every live page alone', async () => {
+    // Every page through Next's matcher takes ~4 s on a loaded box and grows with each
+    // TypeDoc sync, so the 5 s default fails it with nothing wrong.
+    it('leave every live page alone', { timeout: 30_000 }, async () => {
         expect(live.length).toBeGreaterThan(1000);
         const redirected: string[] = [];
         for (const route of live) {

@@ -152,7 +152,9 @@ through `*`, or only the ones it names in `subscribed`:
 
 Both federation notices carry `migration_id`, `from` and `to`. The project's
 owner also sees each one in their ochk.app notifications, and by email when
-their account has one.
+their account has one, unless they turned notification emails off. The
+unsubscribe link in any such email turns them off for the whole account,
+accounts merged into it included.
 
 `@orangecheck/me-client` 0.41.0 or later types both:
 `FederationMigratingWebhookPayload` (with `flip_not_before`, an ISO time, and

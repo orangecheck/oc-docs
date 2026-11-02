@@ -122,7 +122,13 @@ detectable gap. See [Threading & attachments](/chat/threading).
    floor", or once you charge postage, a first message from a non-contact that
    does not clear it lands in **Requests** (filtered/pending), never dropped —
    you approve the sender to let them through thereafter, and may revoke at any
-   time.
+   time. A first message whose checks cannot run, for instance because the
+   device cannot read your inbox settings, also waits in Requests, marked that a
+   check couldn't run; it never reaches the inbox unchecked.
+5. While the device cannot read its list of forgotten threads, new messages wait
+   and the message list says so, so a thread you forgot does not come back. A
+   message that waits is not lost: the durable inbox keeps it for the next
+   drain, and relays send it again on the next start.
 
 ## Multi-device
 

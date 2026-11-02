@@ -61,6 +61,12 @@ direction and times are kept in the clear so the inbox can index them. With the
 lock off, chat.ochk.io encrypts none of that store, and what is left is the
 device's own and the operating system's disk encryption.
 
+"Device lock is on" shows only once your history is encrypted. A browser that
+cannot derive the message key does not turn the lock on, and history that could
+not all be encrypted at once is encrypted at the next unlock. While the lock is
+on, nothing new is written in the clear: a message that arrives before this tab
+can encrypt it waits, and the message list says new messages are waiting.
+
 ### The seal (`seal-til-block`)
 
 | #       | Non-protection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |

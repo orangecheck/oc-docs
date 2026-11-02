@@ -31,11 +31,14 @@ keeps the token they return in its own cookie.
 | `POST` | `/api/auth/email-otp/verify` | verify `{email, code, token}`, upsert account, set `oc_session` cookie |
 | `GET`  | `/api/challenge`             | issue a fresh BIP-322 challenge to sign                                |
 | `POST` | `/api/auth/signin`           | verify a signed BIP-322 challenge, upsert account, set `oc_session`    |
-| `POST` | `/api/auth/logout`           | clear the `oc_session` cookie                                          |
+| `POST` | `/api/auth/logout`           | end the session, clear `oc_session`; `503 sign_out_failed` keeps it    |
 | `GET`  | `/api/auth/me`               | crypto-only identity lookup; 401 otherwise                             |
 
 > The sign-in popup at `me.ochk.io/popup/signin` is the client for these
 > endpoints; `signInWithOc()` from `@orangecheck/me-client/popup` opens it.
+
+A sign-out that cannot finish answers `503 sign_out_failed` and keeps the
+cookie, so a retry ends the same session; it never reads as signed out.
 
 ## Public endpoints
 
@@ -50,7 +53,12 @@ keeps the token they return in its own cookie.
 | `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404      |
 | `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime      |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
-| `POST` | `/api/contact`                         | contact form submission (Resend-backed)                 |
+| `POST` | `/api/contact`                         | contact form; `500` when the mail provider refuses it   |
+
+`/api/health/deep` includes an `escrow debits · outcome known` row, degraded
+while any escrow debit's outcome is unknown; it gives counts only. The platform
+owner lists those debits at `GET /api/admin/unresolved-debits`. A contact
+message the mail provider refuses gives the day's slot back.
 
 ## Anchoring
 
@@ -300,12 +308,18 @@ Without the SDK, the header is
 | 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again                             |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                                             |
 | 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                                     |
+| 503    | `event_outcome_unknown`                                  | May or may not be recorded: retry with the same `Idempotency-Key` after `Retry-After` (below)                      |
 | 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                                                   |
 | 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text                              |
 | 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                                                 |
 | 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                                            |
 | 429    | `test_project_event_cap`                                 | A test project's 5,000 events in all are used                                                                      |
 | 429    | `test_events_ceiling`                                    | Every test project together used the 2,000 test events of the UTC day                                              |
+
+A `503 event_outcome_unknown` holds its `Idempotency-Key`: a retry with it
+answers `409 idempotency_key_in_flight` until the outcome is known, then returns
+the recorded event. One that never landed gives the key back, and the next retry
+records it once.
 
 The per-person cap on class A events counts only events billed against live
 escrow. A preview event spends nobody's allowance.
@@ -486,6 +500,25 @@ failed check changes nothing.
 Opening a move needs a fresh identity check, as revealing the signing secret
 does: without one the call answers 401 `identity_reproof_required`. A frozen
 project answers 409 `project_frozen`.
+
+### Handing a project over
+
+`POST /api/me/projects/[id]/transfer` with `{ to_did }` offers the project to
+another account for 7 days, after a fresh identity check. Nothing moves until
+that account answers at `POST /api/me/project-transfers/[id]`, with its own
+session: `{ action: 'decline' }`, or `{ action: 'accept', keys }`. Escrow and
+users' payouts go with the project, and the old owner loses access at once.
+
+The old owner holds copies of the project's signing secret and Connect key, so
+an accept says what becomes of them, with no default. `keys: 'keep'` leaves both
+working. `keys: 'replace'` needs a fresh identity check, since the new values
+come back once: the new signing secret is written in the same write that moves
+the project, so the project changes hands with it or not at all. The Connect key
+is replaced after that, on the auth host. When that fails, the project is still
+accepted, `replaced.connect` is `null`, the answer, the notice and the audit row
+say the Connect key was not replaced, and the old owner stays listed as holding
+it until the new owner replaces it on the project's sign-in page. A Connect key
+cannot bill on its own.
 
 ### Deleting a project
 

@@ -166,8 +166,10 @@ chat.ochk.io keeps its own, and what its device lock encrypts is on
 | `chat_cursors`  | Per-thread "last read" timestamp | No                                        |
 
 Wiping a thread locally removes every row tagged with that thread_id but does
-not propagate anywhere — the underlying Nostr events on relays are untouched.
-Relays expire events according to their own policies (typically days to weeks).
+not propagate anywhere — the underlying Nostr events on relays are untouched. A
+local delete that does not land, of a message, a thread or a device, says it is
+still on this device and keeps it listed, so you can delete it again. Relays
+expire events according to their own policies (typically days to weeks).
 
 ## Privacy properties summarized
 

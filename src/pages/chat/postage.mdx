@@ -19,6 +19,13 @@ upgrade target it rides a `kind="chat"` envelope; in v0, which is what
 chat.ochk.io sends, it rides inside the encrypted body of an `identity`
 envelope. Contacts message for free; only stranger → inbox is gated.
 
+On chat.ochk.io, the receipt of postage you paid is kept until the message
+lands. A send that fails after the payment keeps it, so sending again reuses it
+rather than paying twice, and **Send to their requests instead** never discards
+a paid receipt, including one another tab stored. If the browser cannot store
+the receipt, chat.ochk.io says so and asks you to send again before you close or
+reload the page.
+
 ## Recipient policy
 
 A recipient MAY publish a postage policy: a `floor_sats` and a Lightning

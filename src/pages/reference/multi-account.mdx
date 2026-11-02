@@ -135,6 +135,14 @@ The existing logout endpoint, now scope-aware:
   the user signed in to that account. If the roster becomes empty, clear
   cookies.
 
+A sign-out that cannot finish never reads as done: if a session cannot be ended,
+logout answers `503 sign_out_failed` and keeps the cookie, so a retry ends the
+same session. A sign-out started from ochk.app that cannot finish lands on
+ochk.io's `/sign-out-incomplete` page, which offers to sign out of ochk.io
+again, instead of returning to ochk.app as if it had worked. An account counts
+as reachable only while its session is live: one whose sessions were ended
+elsewhere answers `403 not_in_roster` to a switch.
+
 ## The React surface
 
 [`useOcSession()`](/sdk/auth-client/functions/useOcSession) returns three new

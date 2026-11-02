@@ -54,9 +54,11 @@ your relays and to nostr-core's five (chat's own four relays are among them). It
 calls one done only once 2 of the five serve it back, each asked on its own: the
 family's [write quorum](/infrastructure/relay#write-quorum-and-read-floor).
 Below that it says "Not in effect yet", and **Try again** sends the same signed
-event again. A device lookup always asks the five, as well as chat's four. Chat
-does not apply the read floor: a lookup counts once any one relay finishes
-answering, so it can miss a revocation that only silent relays hold.
+event again. A device lookup always asks the five, as well as chat's four. What
+a lookup did not return (no revocation, no device) counts only at the family's
+read floor: 4 of the five read in full. A revocation any relay returns counts at
+once. Below the floor chat sends nothing and says "Too few relays answered to
+check" the recipient's devices; your message is kept.
 
 ### 2. Discovery — fetch a device key by address
 

@@ -19,9 +19,11 @@ export const EXPECTED_404 = new Map([
         },
     ],
     [
-        'https://attest.ochk.io/api/check?addr=bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080',
+        'https://attest.ochk.io/api/check?addr=bc1qhtl83u7jsf94lp70z0tzfmws7za0hv35n5zugm',
         {
             status: 404,
+            // Its witness program is sha256('orangecheck docs: an address nobody can sign for'),
+            // first 20 bytes: no known key hashes to it, so nobody can attest it and flip the 404.
             reason: 'the quickstart deliberately shows the never-attested case, which is a 404 by design',
         },
     ],

@@ -2,7 +2,7 @@
 // no request leaves the box: an EXPECTED_404 entry that pins a status fails the run on
 // any other answer, a 5xx or a timeout included, and a prose entry is still skipped.
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest';
 import { classify, EXPECTED_404 } from '../../scripts/doc-link-expect.mjs';
 
 const NEVER_ATTESTED =
-    'https://attest.ochk.io/api/check?addr=bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080';
+    'https://attest.ochk.io/api/check?addr=bc1qhtl83u7jsf94lp70z0tzfmws7za0hv35n5zugm';
 const INTEGRATOR = 'https://me.ochk.io/api/integrator/config?project_key=pk_live_yourco';
 const API_ROOT = 'https://me.ochk.io/api/';
 
@@ -32,19 +32,23 @@ function run(statuses: Record<string, number>) {
     mkdirSync(join(dir, 'src/pages'), { recursive: true });
     writeFileSync(join(dir, 'src/pages/page.mdx'), Object.keys(statuses).join('\n\n') + '\n');
     writeFileSync(join(dir, 'stub.mjs'), STUB);
-    return spawnSync(
-        'node',
-        [
-            '--import',
-            pathToFileURL(join(dir, 'stub.mjs')).href,
-            resolve('scripts/check-doc-links.mjs'),
-        ],
-        {
-            cwd: dir,
-            encoding: 'utf8',
-            env: { ...process.env, STUB_STATUS: JSON.stringify(statuses) },
-        }
-    );
+    try {
+        return spawnSync(
+            'node',
+            [
+                '--import',
+                pathToFileURL(join(dir, 'stub.mjs')).href,
+                resolve('scripts/check-doc-links.mjs'),
+            ],
+            {
+                cwd: dir,
+                encoding: 'utf8',
+                env: { ...process.env, STUB_STATUS: JSON.stringify(statuses) },
+            }
+        );
+    } finally {
+        rmSync(dir, { recursive: true, force: true });
+    }
 }
 
 describe('scripts/check-doc-links.mjs expected entries', () => {

@@ -64,7 +64,10 @@ kit. The guardian's `fedimintd` does hold its own key share on that machine, and
 it signs liveness reports with a key orangecheck made, which counts for your
 seat only while you delegate to it. A hosted guardian is only as independent as
 orangecheck, which runs the machine. Where that matters, run it on hardware you
-control.
+control. Once your federation has run its key ceremony, the machine's volume
+holds a key share your operator mnemonic cannot restore, so orangecheck can
+decommission it, while the federation is not retired, only with a typed reason
+written to its audit log first.
 
 ## Architectural invariants
 

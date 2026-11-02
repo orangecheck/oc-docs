@@ -140,8 +140,11 @@ sharpest failure mode: anything that stops a check-in from landing (an app or
 relay outage, a lost device) can false-fire an irreversible disclosure. A relay
 that drops a check-in can make the switch fire but cannot suppress it. The spec
 RECOMMENDS a **second, non-app check-in channel** for institutional use;
-chat.ochk.io says so in its copy and does not enforce it. v0 caps each arm at
-~30 days (4320 blocks), so a live standing delivery needs a check-in at least
+chat.ochk.io says so in its copy and does not enforce it. chat.ochk.io saves the
+switch on the device before the sealed message goes out, and a save that fails
+sends nothing. Until the send returns, the switch reads **Not confirmed sent**,
+since the message may already be out; a check-in arms it again. v0 caps each arm
+at ~30 days (4320 blocks), so a live standing delivery needs a check-in at least
 that often, and offers no multi-year seal: one would depend on the named beacon
 existing and cooperating that far out (the drand `fastnet` sunset, which
 permanently bricked its ciphertexts, is the cautionary precedent). Full

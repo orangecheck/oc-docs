@@ -151,11 +151,13 @@ reject one whose `binding_sig` verifies because its `addr`, `device_id` or
 `device_pk` tag is missing or says something else, or because of its `d` tag.
 
 **Which binds are live.** Collect the device records for the address from every
-relay you queried and drop each one whose `binding_sig` does not verify. A bind
-of `(address, device_id)` is live unless a remaining revocation of that pair has
-a signed `revoked_at` at or after the bind's signed `created_at`. That holds
-whichever Nostr key carried each record and whichever relay served it, so a
-revocation one relay holds retires the bind another relay still serves.
+relay you queried and drop each one whose `binding_sig` does not verify. Before
+merging what the relays returned, verify each event under NIP-01 and drop one
+that fails; that checks the Nostr wrapper, never which key carries the record. A
+bind of `(address, device_id)` is live unless a remaining revocation of that
+pair has a signed `revoked_at` at or after the bind's signed `created_at`. That
+holds whichever Nostr key carried each record and whichever relay served it, so
+a revocation one relay holds retires the bind another relay still serves.
 `event.created_at` orders nothing. A revocation that verifies but signs no
 readable `revoked_at` retires every bind of its device, whatever that bind's
 `created_at`. A revocation whose signature does not verify retires nothing. A

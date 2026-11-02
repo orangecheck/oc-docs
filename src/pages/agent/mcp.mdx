@@ -181,8 +181,10 @@ never unrevoked
 ([OC Agent SPEC §10.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#104-reading-relay-replies)).
 As
 [OC Lock §3.5](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md#35-rotation-and-revocation)
-puts it, a cut-off read is not an answer. A clear result may be cached for a
-short time, a minute for example, and only when it met that rule.
+puts it, a cut-off read is not an answer. Each relay event is verified under
+NIP-01 before the relays' answers are merged, and every revocation whose signed
+bytes verify is kept, never one per stated `id`. A clear result may be cached
+for a short time, a minute for example, and only when it met that rule.
 
 ## Checking calls later
 

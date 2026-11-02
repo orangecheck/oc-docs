@@ -230,6 +230,21 @@ and return unrelated events. So:
   ([§9.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#94-publication)).
 - **Treat every returned event as a candidate.** Anyone can publish an event
   tagged with anyone's address. Verify the envelope inside before using it.
+- **Verify each event before you merge relays.** Check every event under NIP-01
+  (its `id` is the SHA-256 of its serialized fields, and its `sig` verifies for
+  its `pubkey`) before you merge or deduplicate answers from different relays,
+  and drop one that fails, so it never takes the place of another relay's copy.
+  Nor collapse copies under an envelope id before checking them: most family ids
+  leave the signature out (an attestation, stamp or delegation id, a poll,
+  ballot or reveal id), so a copy with a junk signature shares the id. Consider
+  each copy and use one that verifies
+  ([OC Agent §10.4](https://github.com/orangecheck/oc-agent-protocol/blob/main/SPEC.md#104-reading-relay-replies),
+  [OC Lock §3.5](https://github.com/orangecheck/oc-lock-protocol/blob/main/SPEC.md#35-rotation-and-revocation),
+  [OC Stamp §7.2](https://github.com/orangecheck/oc-stamp-protocol/blob/main/SPEC.md#72-republishing-after-upgrade),
+  [OC Vote §6.5](https://github.com/orangecheck/oc-vote-protocol/blob/main/SPEC.md#65-discovering-the-ballots-in-a-poll),
+  [OC Pledge §11](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SPEC.md#11-security-relevant-requirements),
+  [OC Attest §7.2](https://github.com/orangecheck/oc-attest-protocol/blob/main/SPEC.md#72-choosing-among-attestations-normative),
+  [OC Chat §8](https://github.com/orangecheck/oc-chat-protocol/blob/main/SPEC.md#8-transport)).
 
 `@orangecheck/sdk` wraps the attestation query as `getAttestationsForAddress`.
 `@orangecheck/nostr-core`'s `queryEvents` checks each event's id, signature and

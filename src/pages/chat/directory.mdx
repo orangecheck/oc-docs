@@ -134,16 +134,17 @@ listing again takes a new claim, behind every claim anchored before it.
 To find a user, a client computes the `d`-tag from the queried handle and reads
 the kind-30114 events for it: the deployment's directory relay
 (`wss://relay.ochk.io`) completely, and 2 or more public relays as a bounded
-audit. It orders the live claims by **(anchor height, `claim_id`)** and walks
-that order. Each address's state is its freshest record by `created_at`,
-compared only within that one address; a tombstone signed by a bound key ends
-the claim it names. The first claim whose binding and backing coin stand holds
-the handle. A read that gets no answer stops the walk with `E_DIR_UNRESOLVED`
-rather than pass a claim over. On success the client surfaces `address` +
-profile + a **trust tier** so the user can start a thread. First-contact still
-passes the recipient's [anti-spam policy](/chat/modes) — **being listed is not a
-free-message bypass.** Privacy-sensitive resolution SHOULD query relays
-**directly**, not a third-party indexer (which would learn
+audit, verifying each event under NIP-01 before it drops a duplicate or merges
+the relays' answers (SPEC §8). It orders the live claims by **(anchor height,
+`claim_id`)** and walks that order. Each address's state is its freshest record
+by `created_at`, compared only within that one address; a tombstone signed by a
+bound key ends the claim it names. The first claim whose binding and backing
+coin stand holds the handle. A read that gets no answer stops the walk with
+`E_DIR_UNRESOLVED` rather than pass a claim over. On success the client surfaces
+`address` + profile + a **trust tier** so the user can start a thread.
+First-contact still passes the recipient's [anti-spam policy](/chat/modes) —
+**being listed is not a free-message bypass.** Privacy-sensitive resolution
+SHOULD query relays **directly**, not a third-party indexer (which would learn
 who-searches-for-whom).
 
 ## The honest disclosures

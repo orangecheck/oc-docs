@@ -67,7 +67,7 @@ esac
  * nothing can reach the real one. gh answers the compare for main...topic with
  * `messages` (or fails when it is null) and records the arguments `gh pr create` gets.
  */
-function open(messages: string[] | null) {
+function open(messages: string[] | null, file?: [string, string]) {
     const dir = mkdtempSync(join(tmpdir(), 'land-open-'));
     const bare = join(dir, 'bare.git');
     spawnSync('git', ['init', '-q', '--bare', bare]);
@@ -75,6 +75,10 @@ function open(messages: string[] | null) {
     const git = (...a: string[]) => spawnSync('git', ['-C', work, ...a], { encoding: 'utf8' });
     git('config', 'remote.origin.pushurl', bare);
     git('checkout', '-q', '-b', 'topic');
+    if (file) {
+        writeFileSync(join(work, file[0]), file[1]);
+        git('add', file[0]);
+    }
     git(
         '-c',
         'user.name=land-test',
@@ -209,6 +213,17 @@ describe('scripts/land.sh', () => {
         const r = open(['Fix a link', '', 'The guide moved.']);
         expect(r.code).toBe(0);
         expect(r.body).toBe('Landed by scripts/land.sh through the merge queue.');
+    });
+
+    it('refuses before pushing a branch whose commits add a private-key header', () => {
+        // Built from parts, so this file adds no key header itself.
+        const header = ['-----BEGIN', 'RSA', 'PRIVATE KEY-----'].join(' ');
+        const r = open(['Fix a link'], ['fixture.test.ts', `const K = ['${header}'];\n`]);
+        expect(r.code).toBe(1);
+        expect(r.out).toContain('fixture.test.ts');
+        expect(r.out).toContain('land: a commit on topic adds a private-key header');
+        expect(r.pushed).toBe(false);
+        expect(r.body).toBeNull();
     });
 
     it('opens no PR when it cannot read the range', () => {

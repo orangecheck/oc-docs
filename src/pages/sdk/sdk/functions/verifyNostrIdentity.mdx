@@ -18,14 +18,16 @@ function verifyNostrIdentity(
 relays?: string[]): Promise<NostrVerificationResult>;
 ```
 
-Defined in: [identity/nostr.ts:232](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/identity/nostr.ts#L232)
+Defined in: [identity/nostr.ts:234](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/identity/nostr.ts#L234)
 
 Verify that a user controls a Nostr identity
 
 Verification method:
 1. Query Nostr relays for kind 1 (text note) events from the claimed npub
-2. Check if any event content contains the attestation ID
-3. Verify the event signature
+2. Keep only kind 1 events whose pubkey is the claimed npub's: a relay may
+   return notes by other keys
+3. Check if any event content contains the attestation ID
+4. Verify the event signature
 
 ## Parameters
 

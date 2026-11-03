@@ -15,9 +15,16 @@ export const metadata = {
 function deviceFingerprint(devicePkHex: string): string;
 ```
 
-Defined in: [vault-core/src/device-grant.ts:75](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/device-grant.ts#L75)
+Defined in: [vault-core/src/device-grant.ts:89](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/device-grant.ts#L89)
 
-A short fingerprint of a device public key for people to compare: `ABCD-1234`.
+The fingerprint a person compares before a vault key is sealed to a device:
+the first 10 bytes of sha256(device public key) in Crockford base32, as four
+groups of four (`XVER-GFD0-N52H-B4YW`). Show this same form on both devices.
+
+The key being checked usually comes from a server, so the comparison is all
+that stands between the vault key and a key the server chose. Matching 4
+bytes, the length before 0.5.0, takes about 2^32 tries; 10 bytes take about
+2^80. Crockford's alphabet has no I, L, O or U.
 
 ## Parameters
 

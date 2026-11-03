@@ -591,12 +591,12 @@ export const DOCS_NAV: DocsSection[] = [
     {
         slug: 'vault',
         label: 'OC Vault',
-        blurb: 'Consumer commercial product · Bitcoin-bound encrypted secrets vault. Your wallet is your master password.',
+        blurb: 'Consumer commercial product · encrypted secrets vault. Entries open with a passphrase only you hold.',
         items: [
             {
                 href: '/vault',
                 label: 'Overview',
-                blurb: 'What vault.ochk.io is — OC Lock Flow 4 productized. Entry types, tooling, pricing.',
+                blurb: 'What vault.ochk.io is: entries sealed with OC Lock primitives under one vault key. Entry types, tooling, pricing.',
             },
             {
                 href: '/vault/quickstart',
@@ -611,7 +611,7 @@ export const DOCS_NAV: DocsSection[] = [
             {
                 href: '/vault/protocol',
                 label: 'Protocol',
-                blurb: 'Flow 4, the entry envelope, the double-encrypted cloud blob, the portable export format.',
+                blurb: 'The vault key, the entry record, the double-encrypted cloud blob, the portable export, the signed .lock export.',
             },
             {
                 href: '/vault/teams',

@@ -75,6 +75,26 @@ GET /api/check?identity=github:alice&min_sats=50000
 { "ok": false, "reasons": ["not_found"] }
 ```
 
+### Response — not a Bitcoin address (400)
+
+`addr` is parsed before any lookup. A typo, or an address whose checksum fails,
+answers 400 and is never looked up, so a 404 always means a real address with no
+attestation. A bech32 address in capitals, as a QR code carries it, is looked up
+in lowercase.
+
+```json
+{
+    "error": "bad_request",
+    "issues": [
+        {
+            "code": "custom",
+            "message": "not a Bitcoin address",
+            "path": ["addr"]
+        }
+    ]
+}
+```
+
 Cached 60 s by default.
 
 ## `POST /api/verify`
@@ -108,7 +128,8 @@ signature's bytes decide which it is.
 }
 ```
 
-`metrics` is present only when `ok` is true. No cache.
+`metrics` is present only when `ok` is true. An `addr` that is not a Bitcoin
+address answers 400 `{ "error": "bad_request" }`. No cache.
 
 ## `/api/challenge`
 
@@ -166,7 +187,8 @@ GET /api/discover?identity=github:alice
 ```
 
 `limit` caps the list, 1 to 100, default 50. `total` counts every match before
-the cap.
+the cap. An `addr` that is not a Bitcoin address answers 400, as on
+`/api/check`, rather than an empty list.
 
 Response:
 
@@ -297,15 +319,15 @@ signed messages (declared, not checked against the chain). Cached 10 minutes;
 The HTTP status tells you the request was processable; the `codes` / `reasons`
 fields tell you what the verification found. Don't conflate them.
 
-| HTTP | Meaning                                                  |
-| ---- | -------------------------------------------------------- |
-| 200  | Request was valid and the verifier ran                   |
-| 400  | Request shape was wrong (missing `addr`, malformed JSON) |
-| 401  | `/api/auth/*` session rejected                           |
-| 403  | Cross-site POST to a browser-only endpoint               |
-| 404  | `/api/check` subject not found                           |
-| 429  | Rate limit exceeded                                      |
-| 500  | Verifier crashed — file a bug                            |
+| HTTP | Meaning                                                                                   |
+| ---- | ----------------------------------------------------------------------------------------- |
+| 200  | Request was valid and the verifier ran                                                    |
+| 400  | Request shape was wrong (missing `addr`, an address whose checksum fails, malformed JSON) |
+| 401  | `/api/auth/*` session rejected                                                            |
+| 403  | Cross-site POST to a browser-only endpoint                                                |
+| 404  | `/api/check` subject not found                                                            |
+| 429  | Rate limit exceeded                                                                       |
+| 500  | Verifier crashed — file a bug                                                             |
 
 ## See also
 

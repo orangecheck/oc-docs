@@ -35,6 +35,7 @@ authenticated requests ride the cookie; the server reads
 ## Server implementation
 
 ```ts
+import { normalizeAddress } from '@orangecheck/bip322';
 import { issueChallenge, verifyChallenge } from '@orangecheck/sdk';
 import express from 'express';
 import session from 'express-session';
@@ -65,7 +66,14 @@ app.use(
 
 // 1. Issue
 app.get('/auth/challenge', (req, res) => {
-    const addr = String(req.query.addr);
+    // A typo or a failed checksum is a bad request, never a challenge for an
+    // address nobody holds. normalizeAddress also lowercases a scanned bech32.
+    const addr = normalizeAddress(String(req.query.addr ?? ''));
+    if (!addr) {
+        return res
+            .status(400)
+            .json({ error: 'bad_request', reason: 'not a Bitcoin address' });
+    }
     const c = issueChallenge({
         address: addr,
         ttlSeconds: 300,

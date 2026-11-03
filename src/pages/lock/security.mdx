@@ -273,7 +273,7 @@ one Nostr publish). On rotation, envelopes sealed to the old key are permanently
 unrecoverable from the new device.
 
 If you need Signal-grade per-message forward secrecy (double ratchet), OC Lock
-is not yet the right tool. It's on the v3 list.
+is not the right tool. v2 leaves the ratchet out on purpose; use Signal.
 
 ### Post-quantum is not addressed
 
@@ -307,8 +307,10 @@ can.
 
 All browser tabs at `lock.ochk.io` share the same IndexedDB and localStorage. If
 an attacker can get JavaScript execution on any page at that origin, they can
-read your device_sk. This is why our CSP is strict and we don't embed
-third-party scripts.
+read your device_sk. The CSP limits where scripts come from:
+`script-src 'self' 'unsafe-inline' https://insights.ochk.io https://plausible.io`.
+Every page runs two analytics scripts: an inline Plausible snippet and the
+family's pulse script from `insights.ochk.io`.
 
 ### The Lock domain itself
 
@@ -332,9 +334,8 @@ Covered above. Summary: your Bitcoin wallet is an in-scope trust anchor.
 
 - **Typo to a wrong address.** Envelopes are irrevocable once sealed and
   delivered. If you seal to `bc1q…abce` instead of `bc1q…abcd`, you've encrypted
-  to a different person (if they have a Lock device) or no one. Always verify
-  the lookup result before typing the message — the address auto-lookup now
-  shows a green check when the record is verified.
+  to a different person (if they have a Lock device) or no one. Always check the
+  address before you send.
 - **Lost browser / device.** `device_sk` is local-only. Without an export,
   envelopes addressed to that device are unrecoverable. Export after
   registration; store the export like a wallet seed.

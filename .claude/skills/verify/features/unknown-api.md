@@ -20,7 +20,7 @@ Static: `src/lib/unknown-api-route.test.ts` (GET, POST, PUT and DELETE answer th
 Runtime:
 
 ```sh
-for m in POST GET PUT; do curl -s -X $m -w " %{http_code} %{content_type}\n" https://ochk.io/docs/api/zz-no-such-route; done
+for m in POST GET PUT; do curl -s -X $m -w " %{http_code} %{content_type}\n" https://ochk.io/docs/api/zz-no-such-route; done   # owner only: a POST and a PUT to production
 curl -s -D - -o /dev/null https://ochk.io/docs/api/zz-no-such-route | grep -i '^cache-control'
 curl -s -o /dev/null -w 'existing route: %{http_code} %{content_type}\n' 'https://ochk.io/docs/api/og?page=%2Flock%2Fspec'
 ```

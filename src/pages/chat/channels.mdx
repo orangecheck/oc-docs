@@ -144,8 +144,8 @@ Normative rules a conforming client MUST honor:
 | `open`           | `false`  | fails           | Anyone with a valid device posts. Legal but defaulted-against.                                                                                                                       |
 | `pay-to-post`    | —        | (reserved)      | Lightning postage per post — a **kind-30115 registry extension, NOT v1-canonical** (needs an invoice round-trip + spent-ledger, so it is not offline-verifiable).                    |
 
-The `utxo-floor` `write_proof` is **self-contained and height-anchored**, so
-verification is offline and needs no per-post live point-query:
+The `utxo-floor` `write_proof` is **height-anchored** and names one coin, which
+a reader checks against public chain data (its own node or explorer):
 
 ```jsonc
 "write_proof": {
@@ -159,8 +159,15 @@ verification is offline and needs no per-post live point-query:
 
 A reader verifies `control_sig` over `post_id`, `value_sats >= utxo_floor_sats`,
 and `current_tip_height - anchor_block_height + 1 >= utxo_floor_confs` using the
-reader's own tip (one tip read per render batch, not per post). Below-floor or
-bad-signature ⇒ `E_CHAN_FLOOR`.
+reader's own tip (one tip read per render batch, not per post). chat.ochk.io
+also reads the coin itself, once per distinct `outpoint` and never per post: the
+transaction's output at `vout` must pay `author_address` exactly `value_sats`,
+be confirmed at `anchor_block_height` in the block `anchor_block_hash` names,
+and be unspent (a spend still in the mempool counts as spent). Below-floor,
+bad-signature, or a coin that is missing, spent or different ⇒ `E_CHAN_FLOOR`. A
+read with no answer (a rate limit, a server error, a timeout) leaves the post
+**unchecked**: it is not shown and not refused, and chat.ochk.io says how many
+posts it could not check.
 
 > **Only `utxo-floor` (and the deferred `pay-to-post`) carry the Bitcoin
 > claim.** The `rooted:false` flag is structural, and a conforming client MUST

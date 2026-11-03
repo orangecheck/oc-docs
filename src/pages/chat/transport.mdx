@@ -104,6 +104,17 @@ The bootstrap queue carries the same recipient-linkability the relay `p` tag
 does and MUST be disclosed as such; it is used **only** until a per-conversation
 queue is established.
 
+Because anyone can derive `bootstrap_id`, the id alone does not let a party read
+or acknowledge the queue. A device proves the queue is its own with a BIP-340
+signature by its inbox key over the action (`drain` or `ack`), the
+`bootstrap_id` and a time, plus, for an ack, a digest of the envelope ids it
+acknowledges. The operator checks the proof against its own clock (within 600
+seconds) and stores no key. Once a queue holding messages has been proven, a
+drain without a proof gets nothing from it and an ack without one is refused. A
+queue never proven, and every per-conversation queue, is drained and
+acknowledged by its id alone. chat.ochk.io sends a proof with every drain and
+ack of its bootstrap queue.
+
 ### Handshake — migrating off bootstrap
 
 Each party advertises **its own** receiving `queue_id` inside the encrypted
@@ -123,7 +134,8 @@ A store-and-forward inbox operator MUST:
    detached `recipients[]` merge and MUST NOT recompute the signed `id`.
 2. Route **solely** on the opaque `queue_id` / `bootstrap_id` — never require,
    store, or index a Bitcoin address, device pubkey, or plaintext thread
-   metadata.
+   metadata. The one exception: it checks, and never stores, the inbox pubkey of
+   a bootstrap proof (above).
 3. Hold **no** key material of any party.
 4. Treat the queue as **availability, not authority**: a draining recipient
    re-verifies authenticity from the artifact alone (BIP-322 device-record

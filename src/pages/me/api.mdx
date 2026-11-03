@@ -609,11 +609,15 @@ The same rules hold when orangecheck deletes a project.
 ## Response shapes
 
 All authenticated 401s are `{ ok: false }` with
-`Cache-Control: no-store, private` and `Vary: Cookie`. The event, batch and
-trust endpoints and `GET /api/payment/[id]` refuse with a code in `error`, and
-the same in words in `reason` or `detail` when there is more to say: match on
-`error`. `/api/integrator/config` puts its code in `reason` and its words in
-`detail`. A refused price config answers
+`Cache-Control: no-store, private` and `Vary: Cookie`. Every endpoint on this
+page except `/api/integrator/config` and `/api/health`, and outside `/api/me/*`,
+`/api/admin/*`, `/api/auth/*` and `/api/contact`, refuses with a snake_case code
+in `error`, such as `project_key_required` or `method_not_allowed`, and the same
+in words in `reason` or `detail` when there is more to say: match on `error`.
+`/api/integrator/config` has no `error`: it puts its code in `reason` and its
+words in `detail`. `/api/health` answers a failed probe with 503 and
+`status: 'degraded'`. The signed-in, admin and sign-in routes are not held to
+this yet and may put a sentence in `error`; a refused price config answers
 `{ error: 'config invalid', details: [{ subtype?: string, message: string }] }`.
 All 429 rate-limit responses include a `Retry-After` header in seconds.
 

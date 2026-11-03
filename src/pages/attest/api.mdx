@@ -153,6 +153,11 @@ Response:
 `expiresAt` is epoch milliseconds. An optional `ttl` sets the lifetime in
 seconds, 30 to 3600.
 
+`addr` must decode as a Bitcoin address. One whose checksum fails answers 400
+`{ "error": "invalid_address" }` rather than a message no wallet can sign. A
+testnet address still gets a challenge, and a bech32 address in capitals is
+issued in lowercase.
+
 ### `POST /api/challenge`
 
 Verify a signed response.

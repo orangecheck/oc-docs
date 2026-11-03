@@ -11,7 +11,7 @@ export const metadata = {
 
 # Class: VaultClient
 
-Defined in: [vault-core/src/sync.ts:62](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L62)
+Defined in: [vault-core/src/sync.ts:83](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L83)
 
 A thin, transport-agnostic client for the vault.ochk.io ciphertext API.
 
@@ -23,7 +23,7 @@ A thin, transport-agnostic client for the vault.ochk.io ciphertext API.
 new VaultClient(opts?: VaultClientOptions): VaultClient;
 ```
 
-Defined in: [vault-core/src/sync.ts:69](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L69)
+Defined in: [vault-core/src/sync.ts:90](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L90)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: [vault-core/src/sync.ts:69](https://github.com/orangecheck/oc-packag
 deleteBlob(envelopeId: string): Promise<void>;
 ```
 
-Defined in: [vault-core/src/sync.ts:182](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L182)
+Defined in: [vault-core/src/sync.ts:223](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L223)
 
 Hard-delete one blob.
 
@@ -65,9 +65,10 @@ Hard-delete one blob.
 fetchBlob(envelopeId: string): Promise<string | null>;
 ```
 
-Defined in: [vault-core/src/sync.ts:135](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L135)
+Defined in: [vault-core/src/sync.ts:160](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L160)
 
-One blob's packed ciphertext, or null when it is gone.
+One blob's packed ciphertext, or null when it is gone (a 404: deleted
+since the listing). Any other failure throws: it is not an absence.
 
 #### Parameters
 
@@ -87,11 +88,15 @@ One blob's packed ciphertext, or null when it is gone.
 fetchBlobs(refs: BlobRef[], concurrency?: number): Promise<FetchedBlob[]>;
 ```
 
-Defined in: [vault-core/src/sync.ts:151](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L151)
+Defined in: [vault-core/src/sync.ts:181](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L181)
 
 Fetch many blobs with bounded concurrency — fast, but not a thundering
-herd against the rate limiter. A blob that fails transiently is
-omitted; the next sync re-fetches it.
+herd against the rate limiter. A blob that is gone is left out. If any
+other blob could not be read, this throws `BlobsUnread` once every fetch
+has settled, so a partial pull is never returned as the whole vault. A
+session that ended (`NotSignedIn`) or sync that isn't paid
+(`SyncNotPaid`) partway through is thrown as itself, so a caller that
+asks for a new sign-in on those still sees them.
 
 #### Parameters
 
@@ -112,7 +117,7 @@ omitted; the next sync re-fetches it.
 fetchEscrow(): Promise<WrappedKey | null>;
 ```
 
-Defined in: [vault-core/src/sync.ts:109](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L109)
+Defined in: [vault-core/src/sync.ts:131](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L131)
 
 The escrowed, passphrase-wrapped vault key, or null when no vault exists.
 
@@ -128,7 +133,7 @@ The escrowed, passphrase-wrapped vault key, or null when no vault exists.
 fetchIdentity(): Promise<string | null>;
 ```
 
-Defined in: [vault-core/src/sync.ts:117](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L117)
+Defined in: [vault-core/src/sync.ts:139](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L139)
 
 The signed-in OrangeCheck identity (`did:oc:…`), or null.
 
@@ -144,7 +149,7 @@ The signed-in OrangeCheck identity (`did:oc:…`), or null.
 listBlobs(): Promise<BlobRef[]>;
 ```
 
-Defined in: [vault-core/src/sync.ts:129](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L129)
+Defined in: [vault-core/src/sync.ts:151](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L151)
 
 The change manifest — envelope ids + timestamps, no ciphertext.
 
@@ -160,7 +165,7 @@ The change manifest — envelope ids + timestamps, no ciphertext.
 putBlob(envelopeId: string, ciphertext: string): Promise<void>;
 ```
 
-Defined in: [vault-core/src/sync.ts:174](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L174)
+Defined in: [vault-core/src/sync.ts:215](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/sync.ts#L215)
 
 Upsert one blob's packed ciphertext.
 

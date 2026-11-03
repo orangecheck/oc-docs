@@ -29,7 +29,7 @@ Defined in: [vault-core/src/vault.ts:32](https://github.com/orangecheck/oc-packa
 find(item: string): DecryptedEntry | null;
 ```
 
-Defined in: [vault-core/src/vault.ts:105](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L105)
+Defined in: [vault-core/src/vault.ts:106](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L106)
 
 Find one decrypted entry by its id or its name (case-insensitive).
 
@@ -51,7 +51,7 @@ Find one decrypted entry by its id or its name (case-insensitive).
 list(): VaultEntrySummary[];
 ```
 
-Defined in: [vault-core/src/vault.ts:100](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L100)
+Defined in: [vault-core/src/vault.ts:101](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L101)
 
 Metadata summaries for every entry — no secret values.
 
@@ -67,7 +67,7 @@ Metadata summaries for every entry — no secret values.
 resolve(ref: string | SecretRef): string;
 ```
 
-Defined in: [vault-core/src/vault.ts:115](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L115)
+Defined in: [vault-core/src/vault.ts:116](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L116)
 
 Resolve one `ocv://` reference to its value.
 
@@ -89,7 +89,7 @@ Resolve one `ocv://` reference to its value.
 resolveAll(refs: Record<string, string>): Record<string, string>;
 ```
 
-Defined in: [vault-core/src/vault.ts:129](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L129)
+Defined in: [vault-core/src/vault.ts:130](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L130)
 
 Resolve a map of `{ name: ocv://reference }` to `{ name: value }` —
 the shape an `.env`-style file or a CI matrix uses.
@@ -112,7 +112,7 @@ the shape an `.env`-style file or a CI matrix uses.
 static fromEntries(entries: VaultEntry[], key: Uint8Array): OcVault;
 ```
 
-Defined in: [vault-core/src/vault.ts:77](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L77)
+Defined in: [vault-core/src/vault.ts:78](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L78)
 
 Open from entries and a raw key you already hold (e.g. the extension).
 
@@ -138,7 +138,7 @@ static fromExport(
    passphrase: string): OcVault;
 ```
 
-Defined in: [vault-core/src/vault.ts:63](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L63)
+Defined in: [vault-core/src/vault.ts:64](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L64)
 
 Open from a portable export file — fully offline, no network. The
 export holds ciphertext only, so the escrowed `WrappedKey` and the
@@ -167,10 +167,11 @@ static open(opts: {
 }): Promise<OcVault>;
 ```
 
-Defined in: [vault-core/src/vault.ts:46](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L46)
+Defined in: [vault-core/src/vault.ts:47](https://github.com/orangecheck/oc-packages/blob/main/vault-core/src/vault.ts#L47)
 
 Open a live vault over a `VaultClient`: fetch the escrow, unwrap the
-key with the passphrase, pull every blob, decrypt.
+key with the passphrase, pull every blob, decrypt. A blob that could not
+be read throws `BlobsUnread`; the vault never opens with entries missing.
 
 #### Parameters
 

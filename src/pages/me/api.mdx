@@ -250,6 +250,18 @@ or the token from the sign-in popup as `Authorization: Bearer`. Every event in a
 batch earns for that person. A backend that names who earns fires
 `/api/integrator/event` once per event.
 
+A batch answers `{ ok, results }`, one entry per event with its `index`.
+`status` is `recorded` or `duplicate` (with the `event`), `not_paying`, or
+`rejected`. A rejected entry carries a `code` and the same in words in `reason`.
+The codes are the single endpoint's (`subtype_required`, `invalid_note`,
+`invalid_action_label`, `event_not_enabled`, `event_class_invalid`,
+`payment_amount_sats_required`, `agent_refused`, `earning_below_one_sat`,
+`site_cap_exceeded`, `idempotency_key_too_long`, `idempotency_key_in_flight`,
+`identity_cap_reached`, `escrow_depleted`), plus three of the batch's own:
+`duplicate_idempotency_key` (the same key twice in one batch; the earlier entry
+counts), `write_failed` (nothing was recorded; send it again) and
+`outcome_unknown` (it may have been recorded; retry with the same key).
+
 ### Signing an event
 
 The request body is JSON. The fields, in any order:
@@ -312,6 +324,9 @@ Without the SDK, the header is
 | 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project                         |
 | 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: nothing recorded or charged                                                              |
 | 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
+| 400    | `project_key_required`, `subtype_required`               | A required field is missing                                                                                        |
+| 400    | `payment_amount_sats_required`                           | The event is priced as a share of a payment and `payment_amount_sats` is missing                                   |
+| 400    | `idempotency_key_too_long`                               | `Idempotency-Key` is longer than 200 characters                                                                    |
 | 401    | `invalid_signature`                                      | The header is there but does not verify (`stale_timestamp`, `future_timestamp`, `bad_signature`, `invalid_format`) |
 | 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                                            |
 | 401    | `project_auth_required`                                  | Unsigned, and not from the project owner's own session                                                             |
@@ -322,9 +337,11 @@ Without the SDK, the header is
 | 403    | `earner_not_member`                                      | A live project's event names someone who never signed in to it or granted it anything                              |
 | 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again                             |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                                             |
+| 404    | `project_not_found`                                      | No project has this key. Only a signed-in caller is told; anyone else gets `401 project_auth_required`             |
 | 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                                     |
 | 503    | `event_outcome_unknown`                                  | May or may not be recorded: retry with the same `Idempotency-Key` after `Retry-After` (below)                      |
-| 422    | the event key, `earning_below_one_sat`                   | Not a defined, enabled event; or it would pay the person nothing                                                   |
+| 422    | `event_not_enabled`, `event_class_invalid`               | Not a defined, enabled event, or one saved without class A, B or C                                                 |
+| 422    | `earning_below_one_sat`                                  | It would pay the person nothing                                                                                    |
 | 422    | `invalid_note`, `invalid_action_label`                   | Longer than 280 characters, not text, or with a character that hides or reorders text                              |
 | 429    | `identity_cap_reached`, `site_cap_exceeded`, rate limits | A per-person or per-site cap, or too many requests                                                                 |
 | 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                                            |
@@ -459,20 +476,26 @@ revoked statement stays revoked.
 
 ### What the trust endpoint answers
 
-| Status | `error`                                                         | Meaning                                                                     |
-| ------ | --------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| 200    |                                                                 | Recorded: `{ attestation, reused, verify_url }`                             |
-| 400    | `expires_at_required`, `expires_at_out_of_range`                | No expiry, or one in the past or more than a year ahead                     |
-| 400    | `invalid_did`, a malformed `occurred_at`, `expires_at` or `sig` | Not in the one form it is signed in                                         |
-| 401    | `issuer_signature_invalid`                                      | `sig` does not verify under your project's registered key over these fields |
-| 401    | `signature_required`, `invalid_signature`                       | `X-OC-Signature` is missing or does not verify                              |
-| 403    | `test_project_cannot_attest`                                    | A test project publishes no statements                                      |
-| 403    | `domain_unverified`, `project_frozen`                           | Your domain is not verified, or the project is frozen                       |
-| 403    | `subject_not_linked`                                            | That person never granted your project a scope                              |
-| 404    | `project not found`                                             | No project has this key                                                     |
-| 409    | `issuer_key_required`                                           | Your project has registered no public key                                   |
-| 422    | `invalid_status`, `note_*`, `occurred_at_not_now`               | A status outside the three, a note breaking the rules, or a stale time      |
-| 429    | rate limits                                                     | Too many requests                                                           |
+| Status | `error`                                                    | Meaning                                                                     |
+| ------ | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
+| 200    |                                                            | Recorded: `{ attestation, reused, verify_url }`                             |
+| 400    | `expires_at_required`, `expires_at_out_of_range`           | No expiry, or one in the past or more than a year ahead                     |
+| 400    | `project_key_required`, `subject_address_required`         | A required field is missing                                                 |
+| 400    | `invalid_did`, `invalid_occurred_at`, `invalid_expires_at` | Not in the one form it is signed in                                         |
+| 400    | `invalid_sig`                                              | `sig` is not 128 lowercase hex characters                                   |
+| 400    | `note_not_text`                                            | `note` is not a string                                                      |
+| 401    | `issuer_signature_invalid`                                 | `sig` does not verify under your project's registered key over these fields |
+| 401    | `signature_required`, `invalid_signature`                  | `X-OC-Signature` is missing or does not verify                              |
+| 403    | `test_project_cannot_attest`                               | A test project publishes no statements                                      |
+| 403    | `domain_unverified`, `project_frozen`                      | Your domain is not verified, or the project is frozen                       |
+| 403    | `subject_not_linked`                                       | That person never granted your project a scope                              |
+| 404    | `project_not_found`                                        | No project has this key                                                     |
+| 409    | `issuer_key_required`                                      | Your project has registered no public key                                   |
+| 422    | `invalid_status`, `note_*`, `occurred_at_not_now`          | A status outside the three, a note breaking the rules, or a stale time      |
+| 429    | rate limits                                                | Too many requests                                                           |
+
+Revoking a statement that does not exist, or one another project published,
+answers the same `404 trust_attestation_not_found`.
 
 The wrapped envelope names who signed (`signature.signer: "issuer"`), the key it
 was signed with (`signature.issuer_jwk`, kept on the record so it still checks
@@ -586,8 +609,11 @@ The same rules hold when orangecheck deletes a project.
 ## Response shapes
 
 All authenticated 401s are `{ ok: false }` with
-`Cache-Control: no-store, private` and `Vary: Cookie`. A 422 names what is wrong
-in `error` or `reason`; a refused price config answers
+`Cache-Control: no-store, private` and `Vary: Cookie`. The event, batch and
+trust endpoints and `GET /api/payment/[id]` refuse with a code in `error`, and
+the same in words in `reason` or `detail` when there is more to say: match on
+`error`. `/api/integrator/config` puts its code in `reason` and its words in
+`detail`. A refused price config answers
 `{ error: 'config invalid', details: [{ subtype?: string, message: string }] }`.
 All 429 rate-limit responses include a `Retry-After` header in seconds.
 

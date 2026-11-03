@@ -268,7 +268,7 @@ A client is OC Chat v0 compliant iff it:
   endpoint (`vc22`–`vc25`).
 - For `pay-to-reach`: carries `postage` in the payload and runs the full §6.3
   verification (re-deriving the description-hash binding itself, over verbatim
-  bytes, and checking the preimage, amount, expiry, identifier and the local
+  bytes, and checking the preimage, amount, identifier and the local
   spent-ledger), routes a failing/replayed message to filtered/pending (never
   dropped), and never claims transferable third-party proof.
 - For `seal-til-block`: follows the v0 drand-tlock profile (§7.6). The seal

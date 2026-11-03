@@ -18,9 +18,8 @@ OC Lock's envelope crypto (X25519 ECDH + AES-256-GCM, BIP-322 identity binding,
 RFC 8785 canonicalization) verbatim and adds a thin threading / postage / seal
 layer. The spec also defines new envelope `kind` values as its upgrade target;
 chat.ochk.io sends every message as a base OC Lock `identity` envelope with
-`hint: "oc-chat/v1"` ([Envelope](/chat/envelope)). The way
-[vault.ochk.io](/vault/) is OC Lock Flow 4 + Lightning, chat.ochk.io is OC
-Lock + threads + postage + a block-height seal.
+`hint: "oc-chat/v1"` ([Envelope](/chat/envelope)). chat.ochk.io is OC Lock plus
+threads, postage and a block-height seal.
 
 ## The three send modes
 

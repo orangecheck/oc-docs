@@ -136,9 +136,9 @@ See [Threading](/chat/threading).
 We name the gaps rather than paper over them:
 
 - **Per-message forward secrecy.** Compromising a device key decrypts that
-  device's whole history; we provide only coarse forward secrecy via ~90-day key
-  rotation. A real gap against Signal — forward-secrecy-critical users should
-  use Signal.
+  device's whole history; we provide only coarse forward secrecy: a manual key
+  rotation the client suggests after 90 days; keys never rotate on their own. A
+  real gap against Signal — forward-secrecy-critical users should use Signal.
 - **A consensus-enforced seal** (CLTV-witness). Pre-wired, not shipped.
 - **Group chat without social-graph leakage at the relay.** Held until an
   MLS-grade group protocol is production-ready; private channels are reserved

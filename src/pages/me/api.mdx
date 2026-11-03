@@ -62,6 +62,11 @@ only. The platform owner lists the debits with no known outcome at
 `GET /api/admin/unresolved-debits`. A contact message the mail provider refuses
 gives the day's slot back.
 
+`/api/stats/earned` reads every event in full about once a minute, across all
+instances, and its answer carries `computed_at`. While one instance recomputes,
+or a recompute fails, the others answer the last totals kept, which can be up to
+a day old. A query string answers `308` to the bare path.
+
 `/api/platform-fee-policy` and `/api/abuse-limits` answer
 `503 policy_unavailable`, not cached, when me.ochk.io cannot read its policy
 store. Treat that as "try again later", never as the defaults.
@@ -592,6 +597,7 @@ All 429 rate-limit responses include a `Retry-After` header in seconds.
 | `projects.test-fire`        | 20    | 60s    |
 | `developer.projects.create` | 5     | 60s    |
 | `verify-domain:<addr>`      | 5     | 60s    |
+| `stats.earned`              | 60    | 60s    |
 
 Limits are per IP, per bucket (except `verify-domain` which is per-account so
 DNS retries don't get throttled by a noisy neighbor). Headers

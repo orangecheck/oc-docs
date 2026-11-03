@@ -1,20 +1,24 @@
 export const metadata = {
     title: 'relay.ochk.io — first-party Nostr relay',
     description:
-        "OrangeCheck's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, never the only copy. strfry on Fly.io. Source: orangecheck/oc-relay-infra.",
+        "OrangeCheck's family Nostr relay. Kind-allowlisted, d-tag-prefix-gated, archived daily. strfry on Fly.io. Source: orangecheck/oc-relay-infra.",
 };
 
 # relay.ochk.io — the orangecheck family Nostr relay
 
 `wss://relay.ochk.io` is the family's first-party Nostr relay. Every OC web app
-publishes to it (alongside ≥4 public relays), and every OC client app reads from
-it (alongside the public set). It exists for reliability and family-curated
-indexing — not as a trust anchor.
+publishes to it (alongside three or more public relays), and every OC client app
+reads from it (alongside the public set). It exists for reliability and
+family-curated indexing — not as a trust anchor.
 
-> **Hard architectural invariant: relay.ochk.io is never the only copy of
-> anything.** Every event is also published to public relays. Every read also
-> queries public relays. If relay.ochk.io disappeared tomorrow, every OC
-> envelope is still verifiable from any public relay. See
+> **The aim: relay.ochk.io is never the only copy of anything.** Every event is
+> also published to public relays, and every read also queries them. Today that
+> does not hold: publishing to a public relay is not storage, and public relays
+> have dropped family events. So the second copy is kept in git: the daily
+> `Archive` workflow commits every family event the relay stores, its id and
+> signature checked, to the
+> [`archive` branch](https://github.com/orangecheck/oc-relay-infra/tree/archive).
+> See
 > [BYPASS.md](https://github.com/orangecheck/oc-relay-infra/blob/main/BYPASS.md).
 
 ## What it does
@@ -54,8 +58,10 @@ family kind and a family `d` tag**. On top of them:
 
 - **Two kinds are checked further.** A kind-30114 directory event must meet OC
   Chat's claim rule, and a kind-30078 OC Lock device record (`oc-lock:device:`)
-  must carry a valid BIP-322 signature. A sidecar runs both checks; a late or
-  failed check is a refusal.
+  must carry a valid BIP-322 signature by the address its `d` tag names. A key
+  that already holds a record there may also replace it with a revocation of its
+  own device, signed or not. A sidecar runs both checks; a late or failed check
+  is a refusal.
 - **Each source has write limits.** A source (an IPv4 address, or an IPv6
   address by its /64) may send 30 events at once and then one every 2 seconds,
   and at most 1,000 events and 4 MiB of event JSON per UTC day. A source with 60
@@ -173,8 +179,8 @@ or any equivalent client that races multiple public relays.
 
 If you're operating an enterprise integration where uptime matters and you want
 a deterministic write target, do publish to relay.ochk.io as one of many — but
-don't publish to relay.ochk.io alone. The same architectural invariant applies
-to consumers as it does to OC's own apps.
+don't publish to relay.ochk.io alone. The same aim applies to consumers as it
+does to OC's own apps.
 
 ## NIP support
 
@@ -182,6 +188,6 @@ NIP-11 self-report from the live relay: `[1, 2, 4, 9, 11, 20, 22, 28, 40, 70]`.
 Notably **NIP-45 (COUNT) is not supported** — strfry doesn't ship it. If you
 need event counts, use a REQ with `limit` and count client-side.
 
-NIP-77 (negentropy sync) is supported. We expect to backfill historical OC
-envelopes from public relays via `strfry sync` once a meaningful share of the
-public set ships negentropy support — most don't yet (mid-2026).
+NIP-77 (negentropy sync) is supported. The relay's backups are Fly's volume
+snapshots, kept five days, and the daily `Archive` workflow's copy on the
+[`archive` branch](https://github.com/orangecheck/oc-relay-infra/tree/archive).

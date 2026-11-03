@@ -76,7 +76,7 @@ don't collide on overlapping kinds.
 | Protocol  | Kind    | `d` tag format                                                            |
 | --------- | ------- | ------------------------------------------------------------------------- |
 | OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)                                  |
-| OC Lock   | `30078` | `oc-lock:device:<btc_address>` (or `<addr>:<device_id>` for multi-device) |
+| OC Lock   | `30078` | `oc-lock:device:<btc_address>` (all of its devices, told apart by pubkey) |
 | OC Pledge | `30078` | `oc-pledge:<pledge_id>`                                                   |
 | OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                                           |
 | OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                                       |

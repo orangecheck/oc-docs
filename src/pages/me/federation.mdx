@@ -87,7 +87,9 @@ as `last_runtime_attestation_at`. `seats_attested_within_window` is
 `{ attested, of, window_days }`: the distinct signing keys whose newest
 attestation is inside 7 days, out of the roster's seats. `invite_published_at`
 is when the invite was published, and `last_attestation_at` is a deprecated copy
-of `last_runtime_attestation_at`.
+of `last_runtime_attestation_at`. Both answer a query string with `308` to the
+bare path and allow 60 reads a minute per IP. A slug no federation has answers
+`404` with `federation_not_found`.
 
 ## Where to find your federation's charter
 

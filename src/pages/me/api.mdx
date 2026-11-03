@@ -52,6 +52,7 @@ cookie, so a retry ends the same session; it never reads as signed out.
 | `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
 | `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404      |
 | `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime      |
+| `GET`  | `/api/federations`                     | every federation: seats, invite, custody state          |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
 | `POST` | `/api/contact`                         | contact form; `500` when the mail provider refuses it   |
 
@@ -66,6 +67,9 @@ gives the day's slot back.
 instances, and its answer carries `computed_at`. While one instance recomputes,
 or a recompute fails, the others answer the last totals kept, which can be up to
 a day old. A query string answers `308` to the bare path.
+
+`/api/federations` answers a query string with `308` to the bare path too, and
+allows 60 reads a minute per IP.
 
 `/api/platform-fee-policy` and `/api/abuse-limits` answer
 `503 policy_unavailable`, not cached, when me.ochk.io cannot read its policy
@@ -598,6 +602,7 @@ All 429 rate-limit responses include a `Retry-After` header in seconds.
 | `developer.projects.create` | 5     | 60s    |
 | `verify-domain:<addr>`      | 5     | 60s    |
 | `stats.earned`              | 60    | 60s    |
+| `public.federations`        | 60    | 60s    |
 
 Limits are per IP, per bucket (except `verify-domain` which is per-account so
 DNS retries don't get throttled by a noisy neighbor). Headers

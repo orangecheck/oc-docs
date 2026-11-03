@@ -18,6 +18,14 @@ Rate limits are per IP, per minute: `/api/check` and `/api/discover` 60,
 `/api/publish-attestation` 5. Response shape is stable; new optional fields may
 be added, existing fields will not change meaning.
 
+`/api/check` and `/api/discover` answer each question at one URL. A key the
+route doesn't read, a key given twice, a second subject (`id` is read over
+`addr`, and `addr` over `identity`), or another spelling of a value (an id or a
+bech32 address in capitals, a protocol name in capitals, a number with a leading
+zero, or `/api/discover`'s default `limit=50` spelled out) answers `308` to that
+URL, with no lookup. The order of the keys doesn't matter. The redirect is kept
+an hour, so follow it (`curl -L`).
+
 ## `GET /api/check`
 
 The load-bearing sybil-gate primitive. One call, one answer.
@@ -78,9 +86,8 @@ GET /api/check?identity=github:alice&min_sats=50000
 ### Response — not a Bitcoin address (400)
 
 `addr` is parsed before any lookup. A typo, or an address whose checksum fails,
-answers 400 and is never looked up, so a 404 always means a real address with no
-attestation. A bech32 address in capitals, as a QR code carries it, is looked up
-in lowercase.
+answers 400 and is never looked up, so a 404 is never a typo. A bech32 address
+in capitals, as a QR code carries it, answers 308 to its lowercase spelling.
 
 ```json
 {
@@ -95,7 +102,8 @@ in lowercase.
 }
 ```
 
-Cached 60 s by default.
+A 200 is kept 60 s. A 404 is not kept: a lookup that no relay answered also
+finds nothing and answers 404, so ask again before you treat one as final.
 
 ## `POST /api/verify`
 
@@ -327,6 +335,7 @@ fields tell you what the verification found. Don't conflate them.
 | HTTP | Meaning                                                                                   |
 | ---- | ----------------------------------------------------------------------------------------- |
 | 200  | Request was valid and the verifier ran                                                    |
+| 308  | `/api/check` or `/api/discover` asked in another spelling: `Location` is its one URL      |
 | 400  | Request shape was wrong (missing `addr`, an address whose checksum fails, malformed JSON) |
 | 401  | `/api/auth/*` session rejected                                                            |
 | 403  | Cross-site POST to a browser-only endpoint                                                |

@@ -6,7 +6,7 @@ export const metadata = {
 
 # ochk.app · Federation Charter
 
-**The oc-me-v1 charter is v1.0.0, at
+**The oc-me-v1 charter is v1.1.0 (draft), at
 [/federation/oc-me-v1](/federation/oc-me-v1).**
 
 Every guardian on an orangecheck federation ratifies its charter before going
@@ -18,7 +18,7 @@ and its seats' operator keys. Operators verify the hash before signing.
 > **Status.** The operator program is not open, and no federation has guardian
 > seats yet: while the system is in testing, orangecheck holds every role
 > ([ochk.app/custody](https://ochk.app/custody)). A federation with no charter
-> of its own reads version `v0-pending`; **do not sign against that**.
+> of its own answers `meta: null`: there is nothing to sign.
 
 ## How to verify before signing
 
@@ -45,90 +45,6 @@ Either path produces a byte-identical `charter-sign` envelope. The federation
 verifies the Ed25519 signature against your operator pubkey and adds you to its
 ratification roster. From that moment on, your commitment is public and
 recoverable from any node that has the envelope.
-
-## The Charter
-
-> _Note: the text below illustrates what a charter covers. It is not in force:
-> no federation has guardian seats. The oc-me-v1 charter text is at
-> [/federation/oc-me-v1](/federation/oc-me-v1)._
-
-### Article 1 · Custody
-
-Each guardian on this federation holds a share of the threshold key. No single
-guardian holds the funds; no out-of-band key escrow exists. The federation as a
-whole can move funds only with a threshold-quorum of guardian signatures
-(specifics in §3 below).
-
-OC the company is not a guardian on this federation unless explicitly listed in
-the federation record's guardian roster. When OC operates a guardian node on
-this federation, it is one of N — never a majority of M in any M-of-N quorum.
-
-### Article 2 · Operator obligations
-
-A guardian on this federation commits to:
-
-- **Uptime ≥ 99.5%** rolling 30-day window. Maintenance windows publishable via
-  `oc-guardian alerts post` with `--severity info`.
-- **Incident disclosure within 72 hours** for any event that affects threshold
-  availability or share security. Public, operator-signed, permanent.
-- **Charter ratification** before joining; **re-ratification** within 14 days of
-  any charter amendment (new version, new hash).
-- **No share-pull without quorum** — guardians cannot execute share recovery /
-  rotation without an M-of-N envelope authorizing the action.
-- **Hardware key control** — the operator key authorizing federation actions
-  stays on operator-controlled storage (browser IDB, kit OS keychain, hardware
-  token, etc.). OC the company cannot sign as you.
-
-### Article 3 · Threshold
-
-The federation operates an M-of-N threshold scheme as recorded in the federation
-directory entry (e.g. "3-of-4"). Any state-changing federation action requires M
-valid signatures from distinct guardian operator keys.
-
-A guardian whose key is compromised discloses it within 24 hours. Guardian
-membership is fixed once keys are generated, so a compromised share is not
-rotated in place: the federation moves to a successor federation with a fresh
-key ceremony.
-
-### Article 4 · User-facing properties
-
-The federation guarantees to its users (the consumers signing in via
-[ochk.app](https://ochk.app)):
-
-- **Self-custody graduation** is always available. A user can sweep their
-  balance to a self-held BIP-322 wallet or to an external Fedimint client
-  without OC's permission, federation-quorum-signed.
-- **Verifiable transactions.** Every billable event the federation issues
-  carries an Ed25519 signature anchored periodically to Bitcoin via OTS and
-  published on Nostr. Users verify offline.
-- **Privacy.** The federation does not collect user PII beyond what's
-  cryptographically necessary (Ed25519 pubkey, BIP-322 verification payload). No
-  KYC by default; KYC tiers (when activated) route through a third-party
-  verifier; OC never holds the PII.
-
-### Article 5 · Exit
-
-Guardians may exit via a signed `exit-handoff` envelope. The federation must
-accept the exit within 14 days, redistribute the share to a replacement guardian
-(or shrink the threshold via `charter-sign` to a new version), and publish the
-transition publicly.
-
-Forced exit (federation removing a guardian for charter violation) requires
-M-of-N quorum of remaining guardians and a public incident
-(`oc-guardian alerts post --severity critical`) naming the violation.
-
-### Article 6 · Amendment
-
-This charter can be amended by `charter-sign` ratification of a new version by ≥
-M of the N current guardians. Amendments are versioned (v1, v1.1, v2, …); old
-signatures stay valid for their version. Operators are notified of new versions
-via the email on file and have 14 days to re-ratify or initiate exit.
-
-### Article 7 · Bitcoin loadbearing
-
-The federation's economic loop closes on Bitcoin sats — no token, no points, no
-airdrop. All settlement is in sats; USD displays are derived from current spot
-for human readability only.
 
 ## Signature roster
 

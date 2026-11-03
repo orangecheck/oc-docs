@@ -120,8 +120,10 @@ ownership matters.
 
 ## Kind 30078
 
-The Nostr event kind the orangecheck ecosystem uses for publishing.
-Parameterized replaceable per
+The original family Nostr event kind. It carries OC Attest attestations, OC Lock
+and OC Chat device records, and OC Pledge envelopes; the other protocols publish
+on kinds of their own, in the family range 30078–30115. Parameterized
+replaceable per
 [NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md)
 (application-specific data). See
 [Nostr kind-30078](/ecosystem/nostr-kind-30078).

@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'OrangeCheck Charter',
     description:
-        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — ochk.app, vault.ochk.io, and every protocol sibling.',
+        'Eight commitments OrangeCheck makes to its customers, the open protocol family, and the Bitcoin community. Single source of truth for the whole product family — ochk.app, vault.ochk.io, chat.ochk.io, cosign.ochk.io, and every protocol sibling.',
 };
 
 # Charter
@@ -14,10 +14,10 @@ publicly. The full text is committed to git so the diff is auditable; this page
 is the canonical published version.
 
 The charter binds the **whole company**. Every product that ships under the
-OrangeCheck name — `ochk.app`, `vault.ochk.io`, and every sibling protocol site
-(`attest`, `lock`, `vote`, `stamp`, `agent`, `pledge`) — operates under these
-eight commitments. There is one charter, in one place, at ochk.io/docs. Product
-subdomains link here.
+OrangeCheck name — `ochk.app`, `vault.ochk.io`, `chat.ochk.io`,
+`cosign.ochk.io`, and every sibling protocol site (`attest`, `lock`, `vote`,
+`stamp`, `agent`, `pledge`) — operates under these eight commitments. There is
+one charter, in one place, at ochk.io/docs. Product subdomains link here.
 
 ## The eight commitments
 
@@ -51,9 +51,9 @@ worth less than one that names its own exception.
 The wire format, scope grammar, audit-bundle structure, and Bitcoin-anchoring
 rules are defined by the open `oc-*-protocol` specs (`oc-attest-protocol`,
 `oc-lock-protocol`, `oc-vote-protocol`, `oc-stamp-protocol`,
-`oc-agent-protocol`, `oc-pledge-protocol`). Every change OrangeCheck makes lands
-as a public commit in that spec's repository, and each spec keeps a changelog.
-No private extensions, no closed conformance vectors.
+`oc-agent-protocol`, `oc-pledge-protocol`, `oc-chat-protocol`). Every change
+OrangeCheck makes lands as a public commit in that spec's repository, and each
+spec keeps a changelog. No private extensions, no closed conformance vectors.
 
 ### 04 · The protocol sites stay free.
 
@@ -81,11 +81,10 @@ real authority — which is human work being elevated, not erased.
 
 Sat-paid customers are not a footnote. Every USD price is published with its sat
 equivalent on the same row. We do not require a fiat onramp and do not treat
-sat-paid customers as a niche segment. Payments to OrangeCheck are made
-on-chain: Lightning has been off across the family since 2026-09-02. On
-`ochk.app` specifically, every billable event has its price, OC's platform fee
-and what the user earns published in sats — USD shown alongside, never as the
-canonical unit.
+sat-paid customers as a niche segment. Payments to OrangeCheck are made on-chain
+today; OrangeCheck takes no Lightning payment. On `ochk.app` specifically, every
+billable event has its price, OC's platform fee and what the user earns
+published in sats — USD shown alongside, never as the canonical unit.
 
 ### 08 · Spec stewardship is public.
 
@@ -104,15 +103,27 @@ review window, and a versioned re-ratification.
   fee is a fixed 20% of the price. Commitments **02** (custody you can move out
   of), **05** (every receipt verifies offline), and **07** (sats first-class)
   bind this product specifically.
-- **`vault.ochk.io`** — consumer commercial product. Bitcoin-bound encrypted
-  secrets storage built on OC Lock Flow 4. OC holds ciphertext only — no entry
+- **`vault.ochk.io`** — consumer commercial product. An end-to-end encrypted
+  password manager, sealed with OC Lock's primitives under a vault key that
+  opens with a passphrase only you hold. OC holds ciphertext only — no entry
   name, type, or payload is ever readable server-side, and there is no recovery
-  backdoor by construction. Commitments **02** (no custody — the vault key never
-  leaves the user's device, OC cannot decrypt), **03/04** (`oc-lock-protocol` is
-  open and free forever), **05** (every entry exports as a portable artifact any
-  holder of the key can decrypt offline via `@orangecheck/lock-crypto`), and
-  **07** (paid in sats on-chain, into a watch-only wallet, no fiat) bind this
-  product specifically.
+  backdoor by construction. Commitments **02** (no custody — the vault key
+  reaches OC only wrapped under your passphrase and recovery code, so OC cannot
+  decrypt), **03/04** (`oc-lock-protocol` is open and free forever), **05**
+  (every entry exports as a portable artifact any holder of the key can decrypt
+  offline via `@orangecheck/lock-crypto`), and **07** (paid in sats on-chain,
+  into a watch-only wallet, no fiat) bind this product specifically.
+- **`chat.ochk.io`** — consumer commercial product, in testing. Encrypted
+  messages to a Bitcoin address or an orangecheck account, on the open
+  `oc-chat-protocol` (a mode of OC Lock). OC Chat never holds your coins:
+  postage a stranger pays goes straight to your own wallet. Commitments **02**
+  (no custody) and **03** (`oc-chat-protocol` is open) bind this product
+  specifically.
+- **`cosign.ochk.io`** — consumer commercial product. Builders post what they
+  are making and what they need; others cosign it as a co-founder or a patron.
+  Backing and zaps go from the backer's wallet straight to the founder's own
+  Lightning address, when the project has a working one; OC Cosign never holds a
+  sat. Commitment **02** (no custody) binds this product specifically.
 - **Protocol siblings** — every `oc-*-protocol` spec repo + the matching
   `*.ochk.io` reference site. Commitments **03** (open spec), **04** (free
   forever), and **05** (offline-verifiable) bind these specifically.
@@ -134,10 +145,10 @@ spec, and to this page, is a public commit there.
 These commitments are made by the OrangeCheck founding team. Names will be
 appended here as public commitments are formalized.
 
-| Field            | Value                                                    |
-| ---------------- | -------------------------------------------------------- |
-| Ratified         | v1 · 2026-04-28                                          |
-| Corrected        | 2026-10-20 · facts in 03, 07, vault, licenses            |
-| Next review      | 2026-12-01 (or earlier if material change proposed)      |
-| Source of truth  | `oc-docs/src/pages/charter.mdx`                          |
-| Governance forum | [github.com/orangecheck](https://github.com/orangecheck) |
+| Field            | Value                                                     |
+| ---------------- | --------------------------------------------------------- |
+| Ratified         | v1 · 2026-04-28                                           |
+| Corrected        | 2026-11-03 · facts in 03, 07, vault, and the product list |
+| Next review      | 2026-12-01 (or earlier if material change proposed)       |
+| Source of truth  | `oc-docs/src/pages/charter.mdx`                           |
+| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)  |

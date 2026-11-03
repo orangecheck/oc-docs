@@ -127,7 +127,10 @@ The relay has a long-lived X25519 device key. Its URL and pubkey are public.
 1. Opens the link. The app shows price + relay URL.
 2. Bob pays 10k sats to `bc1qalice…`.
 3. Bob authenticates to the relay via orangecheck sign-in.
-4. App submits `{ envelope_id, tx_id }` to the relay.
+4. The app asks the relay for release with
+   `{ envelope_id, unlock_address, tx_proof }` (SPEC §4.4): `tx_proof`
+   identifies Bob's confirmed payment, and `unlock_address` is the address he
+   paid from.
 5. Relay verifies the tx (amount, confirmations, recipient), unwraps the content
    key with its own device secret, re-wraps it for Bob's device key fetched from
    Nostr, returns the new recipient entry.

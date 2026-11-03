@@ -8,7 +8,7 @@ The TypeDoc reference for every `@orangecheck/*` package, under `/sdk`.
 
 - `/sdk`: the package index.
 - `/sdk/<package>/README` and one page per exported function, interface, type and
-  variable: about 1,270 pages, generated.
+  variable, generated.
 - A few written pages sit beside them (`/sdk/cli`, `/sdk/python`).
 
 ## How to reach it

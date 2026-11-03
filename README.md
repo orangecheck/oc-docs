@@ -13,13 +13,16 @@ One site, every protocol — six verbs of sovereign sociality:
 - **OC Agent** _(delegate)_ — scoped, bonded, revocable delegation authority
 - **OC Pledge** _(swear)_ — bonded commitments to future-verifiable propositions
 
+It also documents OC Chat, a mode of OC Lock with its own spec, and the products
+built on the protocols: ochk.app, OC Vault and OC Cosign.
+
 Shared concepts (canonical message, BIP-322, Nostr kind-30078, conformance
 vectors, SDKs, security model) live in one `Ecosystem` section so they're
 written once and cross-linked everywhere — no per-protocol duplication.
 
 ## Stack
 
-- Next.js 15 (Pages Router) + MDX via `@next/mdx`
+- Next.js 16 (Pages Router) + MDX via `@next/mdx`
 - Tailwind 4 — same design tokens as `ochk.io` (cypherpunk / terminal aesthetic)
 - Radix primitives for the sidebar drawer and separators
 - Static export-friendly; all pages SSR'd at build time

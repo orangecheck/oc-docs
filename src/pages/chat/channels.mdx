@@ -157,17 +157,19 @@ a reader checks against public chain data (its own node or explorer):
 }
 ```
 
-A reader verifies `control_sig` over `post_id`, `value_sats >= utxo_floor_sats`,
-and `current_tip_height - anchor_block_height + 1 >= utxo_floor_confs` using the
-reader's own tip (one tip read per render batch, not per post). chat.ochk.io
-also reads the coin itself, once per distinct `outpoint` and never per post: the
+Every reader checks four things against its own node or explorer, and fails
+closed: a post whose proof it cannot check is not shown. First, the coin: the
 transaction's output at `vout` must pay `author_address` exactly `value_sats`,
 be confirmed at `anchor_block_height` in the block `anchor_block_hash` names,
-and be unspent (a spend still in the mempool counts as spent). Below-floor,
-bad-signature, or a coin that is missing, spent or different ⇒ `E_CHAN_FLOOR`. A
-read with no answer (a rate limit, a server error, a timeout) leaves the post
-**unchecked**: it is not shown and not refused, and chat.ochk.io says how many
-posts it could not check.
+and be unspent (a spend still in the mempool counts as spent). Then
+`control_sig` over `post_id`, `value_sats >= utxo_floor_sats`, and
+`current_tip_height - anchor_block_height + 1 >= utxo_floor_confs` using the
+reader's own tip. Below-floor, bad-signature, or a coin that is missing, spent
+or different ⇒ `E_CHAN_FLOOR`. chat.ochk.io reads each coin once per distinct
+`outpoint` and the tip once per render batch, never per post. A read with no
+answer (a rate limit, a server error, a timeout) leaves the post **unchecked**:
+it is not shown and not refused, and chat.ochk.io says how many posts it could
+not check.
 
 > **Only `utxo-floor` (and the deferred `pay-to-post`) carry the Bitcoin
 > claim.** The `rooted:false` flag is structural, and a conforming client MUST

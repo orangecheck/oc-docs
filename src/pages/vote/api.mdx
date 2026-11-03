@@ -36,6 +36,7 @@ from mempool.space, runs the pure tally function, and returns JSON.
     "turnout": { "voters": 1, "weight": 12311 },
     "tallies": { "yes": 12311, "no": 0 },
     "counted": ["5d0c…"],
+    "deadline": "2026-05-05T02:33:00Z",
     "ballot_count": 1,
     "counted_at": "2026-11-03T09:19:28.688Z",
     "reveal_published": false,
@@ -54,7 +55,9 @@ result also carries `close_height`, and its tally is `state: "provisional"`,
 with an `unanchored` count, until the tip reaches `H_close + G + 6` (see
 [tally algorithm](/vote/tally-algorithm)). A tally carries `counted`, the
 `ballot_id` that stood for each voter, in ascending order, and `counted_at`,
-when the oldest voter's coins it counted were read.
+when the oldest voter's coins it counted were read. Both 200 answers carry the
+poll's own `deadline` (ISO 8601 UTC), so a caller can tell a closed poll from an
+open one without reading the poll event.
 
 **200 awaiting_reveal (secret-mode poll pre-close):**
 
@@ -63,6 +66,7 @@ when the oldest voter's coins it counted were read.
     "poll_id": "cc27…",
     "state": "awaiting_reveal",
     "basis": "voter_clocks",
+    "deadline": "2026-10-20T00:00:00Z",
     "ballot_count": 3,
     "relays": [{ "relay": "wss://relay.ochk.io", "answered": true, "events": 3 }, …]
 }

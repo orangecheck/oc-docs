@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: computeEnvelopeId()",
+    description: "Auto-generated API reference for Function: computeEnvelopeId(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-core**](../README)
+
+***
+
+[@orangecheck/lock-core](../README) / computeEnvelopeId
+
+# Function: computeEnvelopeId()
+
+```ts
+function computeEnvelopeId(env: LockEnvelope): Uint8Array;
+```
+
+Defined in: [lock-core/src/seal.ts:66](https://github.com/orangecheck/oc-packages/blob/main/lock-core/src/seal.ts#L66)
+
+Compute the final envelope id: SHA-256 of the canonical envelope with
+`sig.value` stripped to empty. The `id` field itself is excluded from the
+hash input (we set it to empty before hashing). This is the id `unseal`
+checks and the sender's BIP-322 signature covers, so a reader holding a
+kept envelope can check its content still matches the id it signed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `env` | [`LockEnvelope`](../interfaces/LockEnvelope) |
+
+## Returns
+
+`Uint8Array`

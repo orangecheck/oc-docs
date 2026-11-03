@@ -9,13 +9,13 @@ export const metadata = {
 Every orangecheck sibling publishes its public artifacts as
 [NIP-78](https://github.com/nostr-protocol/nips/blob/master/78.md)
 parameterized-replaceable addressable events. The original kind, **30078**, is
-the namespake of this page and still carries Attest attestations, Lock device
+the namesake of this page and still carries Attest attestations, Lock device
 records, and Pledge envelopes. As more siblings shipped, the family expanded
 into the **30078–30115 range** with one kind per artifact type. This page is the
 public roll-up.
 
-> **Source of truth:** the family kind registry (`KINDS.md` in the workspace).
-> Each protocol's own spec normatively claims the kind(s) it owns.
+> **This page is the family kind registry.** Each protocol's own spec is the
+> source of truth for the kinds it claims; the table below rolls them up.
 
 ## Kind registry
 
@@ -24,7 +24,7 @@ public roll-up.
 | `30078`         | OC Attest | Attestation envelope (the original family event kind)                                                                 |
 | `30078`         | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                                       |
 | `30078`         | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                                    |
-| `30078`         | OC Chat   | Device record (`oc-chat:device:`)                                                                                     |
+| `30078`         | OC Chat   | Session device record of a `did:oc` identity (`oc-chat:device:<did_oc>`, OC Chat SPEC §8.6)                           |
 | `30079`         | —         | Archived; do not use                                                                                                  |
 | `30080`         | OC Vote   | Poll                                                                                                                  |
 | `30081`         | OC Vote   | Ballot                                                                                                                |
@@ -48,8 +48,8 @@ OC Chat direct messages travel as NIP-59 gift wraps (kind 1059), a standard
 Nostr kind rather than a family allocation.
 
 If you're allocating a new kind for a new sibling, claim the next free number
-(currently `30088`), update the family registry, and claim it normatively in the
-owning spec. Kinds are never reused across sub-protocols.
+(currently `30088`), claim it normatively in the owning spec, and add it to this
+page. Kinds are never reused across sub-protocols.
 
 ## Why NIP-78 / kind 30078
 
@@ -73,21 +73,28 @@ having to post-filter on the `d` tag.
 Each protocol reserves a `d`-tag namespace so events from different siblings
 don't collide on overlapping kinds.
 
-| Protocol  | Kind    | `d` tag format                                                            |
-| --------- | ------- | ------------------------------------------------------------------------- |
-| OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)                                  |
-| OC Lock   | `30078` | `oc-lock:device:<btc_address>` (or `<addr>:<device_id>` for multi-device) |
-| OC Pledge | `30078` | `oc-pledge:<pledge_id>`                                                   |
-| OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                                           |
-| OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                                       |
-| OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                                                  |
-| OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                                        |
-| OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                                                |
-| OC Stamp  | `30083` | `oc-stamp:<envelope_id>`                                                  |
-| OC Agent  | `30083` | `oc-agent-del:<delegation_id>` (co-claim with OC Stamp; disjoint prefix)  |
-| OC Agent  | `30084` | `oc-agent-act:<action_id>`                                                |
-| OC Agent  | `30085` | `oc-agent-rev:<revocation_id>`                                            |
-| OC Agent  | `30086` | `oc-agent-sub:<subdelegation_id>` _(v1.1)_                                |
+| Protocol  | Kind    | `d` tag format                                                                                                                                                     |
+| --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)                                                                                                                           |
+| OC Lock   | `30078` | `oc-lock:device:<btc_address>` (or `<addr>:<device_id>` for multi-device)                                                                                          |
+| OC Pledge | `30078` | `oc-pledge:<pledge_id>`                                                                                                                                            |
+| OC Pledge | `30078` | `oc-pledge-outcome:<pledge_id>`                                                                                                                                    |
+| OC Pledge | `30078` | `oc-pledge-abandonment:<pledge_id>`                                                                                                                                |
+| OC Vote   | `30080` | `oc-vote:poll:<poll_id>`                                                                                                                                           |
+| OC Vote   | `30081` | `oc-vote:ballot:<poll_id>:<voter>`                                                                                                                                 |
+| OC Vote   | `30082` | `oc-vote:reveal:<poll_id>`                                                                                                                                         |
+| OC Stamp  | `30083` | `oc-stamp:<envelope_id>`                                                                                                                                           |
+| OC Agent  | `30083` | `oc-agent-del:<delegation_id>` (co-claim with OC Stamp; disjoint prefix)                                                                                           |
+| OC Agent  | `30084` | `oc-agent-act:<action_id>`                                                                                                                                         |
+| OC Agent  | `30085` | `oc-agent-rev:<revocation_id>`                                                                                                                                     |
+| OC Agent  | `30086` | `oc-agent-sub:<subdelegation_id>` _(v1.1)_                                                                                                                         |
+| OC Chat   | `30078` | `oc-chat:device:<did_oc>`, a `did:oc` session device (SPEC §8.6); a Bitcoin-address device uses OC Lock's record                                                   |
+| OC Chat   | `30110` | `oc-lock-chat-ch:<descriptor_id>`, one per channel version                                                                                                         |
+| OC Chat   | `30111` | `oc-lock-chat-msg:<base64url(SHA-256(channel_id ‖ ":" ‖ post_id))>`                                                                                                |
+| OC Chat   | `30112` | `oc-lock-chat-seal:` (prefix only; the spec fixes no suffix yet)                                                                                                   |
+| OC Chat   | `30114` | `oc-lock-chat-dir:<salted handle hash>` for people, `oc-lock-chat-chdir:<salted handle hash>` for channels                                                         |
+| OC Me     | `30087` | `oc-me-drop:<id>`                                                                                                                                                  |
+| OC Me     | `30087` | `oc-me-event:`, `oc-me-payment:`, `oc-me-rebind:`, `oc-me-trust:`, `oc-me-payout-binding:`, `oc-me-distribution:`, `oc-me-distribution-void:`, each `<commitment>` |
 
 A public relay doesn't enforce any of this — `d` is just a string. Tag filters
 match exactly, so `#d` finds one artifact when you know its full `d` value;

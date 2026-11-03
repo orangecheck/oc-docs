@@ -143,20 +143,23 @@ through `*`, or only the ones it names in `subscribed`:
 | Subtype                          | When                                                                                                                                                                                                                                           |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `escrow.low`                     | Your balance fell below its floor                                                                                                                                                                                                              |
-| `escrow.depleted`                | Nothing is left to spend: billable events are refused until you top up                                                                                                                                                                         |
+| `escrow.depleted`                | Your available balance reached 0: billable events are refused until you top up                                                                                                                                                                 |
 | `escrow.recovered`               | Your balance is back above its floor                                                                                                                                                                                                           |
 | `drop.closed`                    | A drop window closed: see [Drops](/me/drops)                                                                                                                                                                                                   |
 | `connect.claimed`                | A person claimed the account your Connect app made for them                                                                                                                                                                                    |
 | `federation.migrating`           | Your project's federation is being replaced. Top-ups pause now; events and sign-in carry on. The project and its balance move no sooner than `flip_not_before`. `successor` names the new federation, its threshold, charter and guardian keys |
 | `federation.migration_cancelled` | That move is off, and top-ups work again                                                                                                                                                                                                       |
 
-The three escrow notices come once for each change of state. The state is
-checked after an event's debit settles. Once the balance is empty no debit
-settles, so an event refused with `402 escrow_depleted` checks it too, at most
-once a minute per project. When events arriving together see different states,
-the later state is announced too, not only the first. The project's owner sees
-each change in their ochk.app notifications, and `escrow.depleted` ("billing
-paused") also by email when their account has a verified one, unless they turned
+The three escrow notices come once for each change of state: `escrow.low` when
+the available balance falls below its floor, `escrow.depleted` when it
+reaches 0. Billable events are refused with `402 escrow_depleted` as soon as the
+balance cannot cover one event's fee, which can come before 0; that refusal has
+no notice of its own today. The state is checked after an event's debit settles,
+and, since no debit settles while events are refused, after a refused event too,
+at most once a minute per project. When events arriving together see different
+states, the later state is announced too, not only the first. The project's
+owner sees each change in their ochk.app notifications, and `escrow.depleted`
+also by email when their account has a verified one, unless they turned
 notification emails off.
 
 Both federation notices carry `migration_id`, `from` and `to`. The project's

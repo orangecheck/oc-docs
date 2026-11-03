@@ -116,9 +116,13 @@ the kit on that machine holds it, or a delegated attestation key
 arrive, [/me/operator/guardians](https://ochk.app/me/operator/guardians) shows
 **Signed heartbeat, current**.
 
-These reports also date your federation. If none of its guardians sends one for
-7 days, its charter check warns; after 30 days it fails, and no project can be
-rebound to it until a report arrives.
+These reports also date your federation, by quorum: its time is when
+threshold-many distinct signing keys, the keys that signed the reports, had each
+sent one. If fewer than that many send one for 7 days, its charter check warns;
+after 30 days it fails, and no project can be rebound to it until enough report
+again. Each machine with its own delegated attestation key counts on its own, so
+seats one operator runs in bootstrap can still make a quorum; whether the
+operators are independent is checked separately.
 
 You can also check locally:
 

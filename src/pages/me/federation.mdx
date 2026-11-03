@@ -62,16 +62,32 @@ Specifically:
 from the seat roster and the signed charter.
 
 A live federation's guardians also have to keep running. Each guardian's kit
-posts a signed runtime attestation every 5 minutes, and the newest one any of
-them posted dates the federation. With none in 7 days the charter check warns;
-with none in 30 it fails, and a project can't be rebound to that federation. A
-federation whose guardians haven't posted one yet fails the check as "no runtime
-attestation yet", not as stale, and a project can still be rebound to it, with a
-warning.
+posts a signed runtime attestation every 5 minutes, and a quorum of them dates
+the federation, since one guardian alone can sign nothing. What counts is the
+signing key, the machine key that signed: a delegated attestation key, or the
+operator key if that signed. Each signing key counts once, at its newest
+attestation, and the federation's time is the M-th newest of those, M being the
+threshold's M of M-of-N. A seat that changes hands stops counting the
+attestation made before. With no quorum in 7 days the charter check warns; with
+none in 30 it fails, and a project can't be rebound to that federation. A
+federation where fewer than M signing keys have posted one yet fails the check
+as "no quorum of runtime attestations yet", not as stale, and a project can
+still be rebound to it, with a warning.
+
+This measures machines being alive, not operators being independent. That is the
+diversity check's job: two seats with one operator key fail it outside
+bootstrap. So a §1A bootstrap federation, one operator with a separate
+attestation key on each machine, can reach a quorum.
+
 [`/api/public/federations/<slug>`](https://me.ochk.io/api/public/federations/oc-me-v1)
-gives the time as `last_runtime_attestation_at`, apart from
-`invite_published_at`, when its invite was published. `last_attestation_at` is a
-deprecated copy of the runtime time.
+and
+[`/api/public/charter-compliance`](https://me.ochk.io/api/public/charter-compliance)
+give the quorum's time as `quorum_attestation_at` and the newest from any seat
+as `last_runtime_attestation_at`. `seats_attested_within_window` is
+`{ attested, of, window_days }`: the distinct signing keys whose newest
+attestation is inside 7 days, out of the roster's seats. `invite_published_at`
+is when the invite was published, and `last_attestation_at` is a deprecated copy
+of `last_runtime_attestation_at`.
 
 ## Where to find your federation's charter
 

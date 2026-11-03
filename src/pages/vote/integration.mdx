@@ -54,9 +54,10 @@ const top = Object.entries(tally.tallies).sort((a, b) => b[1] - a[1])[0];
 // top = [optionId, weight], e.g. ['yes', 12311]
 ```
 
-The endpoint is cached 60s at the edge and verifies every BIP-322 signature
-before returning. For higher-value decisions, **verify independently** with the
-CLI — see below.
+The endpoint verifies every BIP-322 signature before returning. A counted answer
+is kept for up to 60 seconds and voters' coins for up to two minutes, so a spend
+can show about three minutes late; `counted_at` says when the coins were read.
+For higher-value decisions, **verify independently** with the CLI — see below.
 
 ## independent verification (the right way for high-value decisions)
 

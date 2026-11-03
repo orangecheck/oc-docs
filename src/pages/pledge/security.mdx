@@ -146,9 +146,10 @@ A correct verifier MUST:
 2. **Re-execute the resolution** for deterministic mechanisms — do not trust a
    published outcome envelope's result field without re-checking.
 3. **Validate the BIP-322 signature** byte-exact against the canonical message.
-4. **Declare an outcome envelope absent only at the read floor**: four of the
-   five relays asked answered in full, with none cut off. Otherwise the state is
-   unchecked (SPEC §11 item 15).
+4. **Declare an outcome envelope absent only at the read floor**: at least the
+   number of relays asked, less the write quorum of 2, plus one (never fewer
+   than one, so four of the default five) answered in full, with none cut off.
+   Otherwise the state is unchecked (SPEC §11 item 15).
 5. **Honor the dispute window** — an outcome is not final until its window
    passes without the resolver contradicting it, and on a `counterparty_signs`
    pledge a swearer counter-claim can still dispute it until `expires_at`.

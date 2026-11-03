@@ -147,9 +147,9 @@ Verifiers query Nostr by d-tag pattern:
 
 The default relay set is the family's, from `@orangecheck/nostr-core`;
 integrators can override. A verifier asks at least two relays and finds an event
-if any of them returns it. A missing outcome counts as absent only at the read
-floor of the relays asked (four of five), all answering in full with none cut
-off; otherwise the state is unchecked (SPEC §11 item 15).
+if any of them returns one that verifies. A missing outcome counts as absent
+only at the read floor of the relays asked (four of five), all answering in full
+with none cut off; otherwise the state is unchecked (SPEC §11 item 15).
 
 ## See also
 

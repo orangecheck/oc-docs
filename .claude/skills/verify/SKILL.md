@@ -60,21 +60,17 @@ locally.
 ## Doctor
 
 ```sh
-# Production serves the commit you think it does. The token is in the workspace .env, two levels above the repo's git dir.
-ENV="$(git rev-parse --path-format=absolute --git-common-dir)/../../.env"
-T=$(grep -E '^VERCEL_TOKEN=' "$ENV" | cut -d= -f2- | tr -d '"')
-TEAM=$(curl -s -H "Authorization: Bearer $T" https://api.vercel.com/v2/teams \
-  | python3 -c "import sys,json;print(next(t['id'] for t in json.load(sys.stdin)['teams'] if t['slug']=='xaxis-projects'))")
-curl -s -H "Authorization: Bearer $T" \
-  "https://api.vercel.com/v6/deployments?app=oc-docs&target=production&limit=1&teamId=$TEAM" \
-  | python3 -c "import sys,json;d=json.load(sys.stdin)['deployments'][0];print(d['meta']['githubCommitSha'][:7],d['state'])"
-git rev-parse --short origin/main
+# Production serves the commit you think it does: GitHub's Production deployment for it. No token.
+SHA=$(git rev-parse origin/main)
+D=$(gh api "repos/orangecheck/oc-docs/deployments?environment=Production&sha=$SHA" --jq '.[0].id')
+gh api "repos/orangecheck/oc-docs/deployments/$D/statuses" --jq '.[0].state'   # success
 curl -s -o /dev/null -w '%{http_code}\n' https://ochk.io/docs/lock/spec   # 200
 ```
 
-The two shas match and the state is READY. The bot's TypeDoc sync PRs land on main
-often; a sync commit above yours carries your change too, so compare ancestry
-(`git merge-base --is-ancestor <yours> <deployed>`), not equality.
+The state is success. The bot's TypeDoc sync PRs land on main
+often; a sync commit above yours carries your change too, so check ancestry
+(`git merge-base --is-ancestor <yours> origin/main`) and read the deployment of
+origin/main, not of your own sha.
 
 ## Drive
 

@@ -150,6 +150,15 @@ through `*`, or only the ones it names in `subscribed`:
 | `federation.migrating`           | Your project's federation is being replaced. Top-ups pause now; events and sign-in carry on. The project and its balance move no sooner than `flip_not_before`. `successor` names the new federation, its threshold, charter and guardian keys |
 | `federation.migration_cancelled` | That move is off, and top-ups work again                                                                                                                                                                                                       |
 
+The three escrow notices come once for each change of state. The state is
+checked after an event's debit settles. Once the balance is empty no debit
+settles, so an event refused with `402 escrow_depleted` checks it too, at most
+once a minute per project. When events arriving together see different states,
+the later state is announced too, not only the first. The project's owner sees
+each change in their ochk.app notifications, and `escrow.depleted` ("billing
+paused") also by email when their account has a verified one, unless they turned
+notification emails off.
+
 Both federation notices carry `migration_id`, `from` and `to`. The project's
 owner also sees each one in their ochk.app notifications, and by email when
 their account has one, unless they turned notification emails off. The
@@ -181,12 +190,12 @@ if (notice.subtype === 'federation.migrating') {
 
 ## Delivery semantics
 
-|                    |                                                                                                                                                                                                                                                                                                     |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Guarantee**      | At-least-once. Deduplicate a billable event on its `id`, from the signed body: the signature has no timestamp, so that is also your replay protection. A system notice has no `id` in its body; deduplicate it on `OC-Envelope-Id`, which is not signed, and handle it so a repeat changes nothing. |
-| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                            |
-| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due.                                                                                                                            |
-| **After that**     | The delivery is dead-lettered and listed with your webhooks, where you can requeue it. The endpoint is not muted, and the event stays at `/api/envelope/[id]`.                                                                                                                                      |
+|                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Guarantee**      | At-least-once. Deduplicate a billable event on its `id`, from the signed body: the signature has no timestamp, so that is also your replay protection. A system notice has no `id` in its body; deduplicate it on `OC-Envelope-Id`, which is not signed, and handle it so a repeat changes nothing.                                                                                                                                                                                                                                 |
+| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due.                                                                                                                                                                                                                                                                                                                                                            |
+| **After that**     | The delivery is dead-lettered: listed with your webhooks for 30 days, where you can requeue it, and the project's owner gets a `webhook.dead_letter` notice in their ochk.app notifications. A failed delivery whose retry cannot be queued is dead-lettered at once, with the same notice. System notices take the same path. If neither can be written, the delivery is lost; orangecheck counts each one for its operators (`webhooks.deliveries_lost`). The endpoint is not muted, and the event stays at `/api/envelope/[id]`. |
 
 ## The raw-body trap
 

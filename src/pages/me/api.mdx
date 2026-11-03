@@ -56,9 +56,11 @@ cookie, so a retry ends the same session; it never reads as signed out.
 | `POST` | `/api/contact`                         | contact form; `500` when the mail provider refuses it   |
 
 `/api/health/deep` includes an `escrow debits · outcome known` row, degraded
-while any escrow debit's outcome is unknown; it gives counts only. The platform
-owner lists those debits at `GET /api/admin/unresolved-debits`. A contact
-message the mail provider refuses gives the day's slot back.
+while any escrow debit's outcome is unknown, or while a recorded event's queued
+debit waits for its project to top up ("N waiting on funds"); it gives counts
+only. The platform owner lists the debits with no known outcome at
+`GET /api/admin/unresolved-debits`. A contact message the mail provider refuses
+gives the day's slot back.
 
 `/api/platform-fee-policy` and `/api/abuse-limits` answer
 `503 policy_unavailable`, not cached, when me.ochk.io cannot read its policy
@@ -319,6 +321,12 @@ Without the SDK, the header is
 | 429    | `test_project_daily_cap`                                 | Your test projects' 500 events for the UTC day are used                                                            |
 | 429    | `test_project_event_cap`                                 | A test project's 5,000 events in all are used                                                                      |
 | 429    | `test_events_ceiling`                                    | Every test project together used the 2,000 test events of the UTC day                                              |
+
+A recorded event's answer from `/api/integrator/event` also carries
+`webhooks_queued`: how many of your webhooks it was queued for, sent after the
+answer. It does not say whether they got through; the project's webhooks page
+and its retry queue show that. `webhooks_fired` is the same number under its old
+name, deprecated.
 
 A `503 event_outcome_unknown` holds its `Idempotency-Key`: a retry with it
 answers `409 idempotency_key_in_flight` until the outcome is known, then returns

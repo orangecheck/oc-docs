@@ -227,7 +227,10 @@ signature is accepted too
 ([which forms](/ecosystem/bip322#what-the-verifier-accepts)). Open
 [attest.ochk.io](https://attest.ochk.io), connect it, and sign one short
 canonical message — your Bitcoin never moves and no private key leaves your
-wallet. [How it works](/attest/how-it-works) is the whole protocol on one page.
+wallet. Use a single-key address: `bc1q…`, `bc1p…`, `3…` (P2SH-P2WPKH) or `1…`.
+The address step refuses a script (P2WSH) address, which no wallet can sign the
+message for, and an address whose checksum fails.
+[How it works](/attest/how-it-works) is the whole protocol on one page.
 
 ## The machine-readable contract
 

@@ -51,9 +51,9 @@ if (r.ok) {
 }
 ```
 
-`OCHK_CONNECT_KEY` is the API key from the console. `userId` is your own stable
-id for the user. That is everything — no token to forward, no provider to name,
-no keypair, no redirect.
+`OCHK_CONNECT_KEY` is the API key from your project's **Sign-in** page at
+ochk.app. `userId` is your own stable id for the user. That is everything — no
+token to forward, no provider to name, no keypair, no redirect.
 
 In Python:
 
@@ -498,7 +498,8 @@ you describe your sign-in, in your words, and keep these facts:
 - **Unknown options are refused** before anything is sent: me-client throws, and
   Python raises `TypeError`.
 - **The key is shown once.** Save it when you register the app. Lost it?
-  **Replace** it in the console; the old key stops working immediately.
+  **Replace** it on your project's **Sign-in** page at ochk.app; the old key
+  stops working immediately.
 - **Optional `email` and `email_verified`.** Pass the user's email, and
   `email_verified: true` only when you verified it, to let them claim by signing
   in with it (above). We keep only a keyed hash of the address, never the

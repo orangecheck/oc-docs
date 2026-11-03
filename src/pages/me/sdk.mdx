@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'ochk.app · SDK reference',
     description:
-        '@orangecheck/me-client SDK reference. Three entry points: the main one (oc.* calls and types, no React), /server (withOcAuth for Next.js, ocAuthExpress, ocAuthHono, checkOcToken, verifyOcToken) and /popup (signInWithOc, browser only). Sign-in, events, webhooks, price configs, what users share, and other signals.',
+        '@orangecheck/me-client SDK reference. Entry points: the main one (oc.* calls and types, no React), /server (withOcAuth for Next.js, ocAuthExpress, ocAuthHono, checkOcToken, verifyOcToken) and /popup (signInWithOc, browser only), plus /react, /button, /button-auto, /connect-consent and /integrator. Sign-in, events, webhooks, price configs, what users share, and other signals.',
 };
 
 # `@orangecheck/me-client` · SDK reference
@@ -13,7 +13,7 @@ export const metadata = {
 > is the source of truth for every export, type and signature.
 
 **MIT.** One package for signing people in with orangecheck and, if you choose,
-paying them. Three entry points:
+paying them. Its entry points:
 
 - **`@orangecheck/me-client`**: the `oc.*` namespaces (event, webhook, config,
   scope, session, payment, identity) and every type. No React, so a Node backend
@@ -32,6 +32,10 @@ paying them. Three entry points:
   [`signInWithOc()`](/sdk/me-client/popup/functions/signInWithOc) opens the
   orangecheck sign-in popup and resolves with a token bound to your origin, the
   way Google's and GitHub's popups do.
+- **The rest:** `/react`, `/button`, `/button-auto` and `button.css` are
+  [the sign-in button](/integration/sign-in-button); `/connect-consent` holds
+  the words for the [Connect](/connect) opt-in box; `/integrator` holds the
+  price config helpers, with no DOM, for scripts and CI.
 
 ## install
 
@@ -42,22 +46,6 @@ your own session replaces the token: then your server also needs
 `@orangecheck/auth-core` 2.12.0 or later, for `integratorRevocationCheck`
 ([how](#if-your-own-session-replaces-the-token)). `@orangecheck/auth-client` is
 for orangecheck's own sites; integrators use me-client.
-
-## What changed in 0.32
-
-- **`OcSignInButton` is gone.** It was the only React code in the main entry, so
-  a Node backend that imported `oc` crashed looking for `react`. Sign in with
-  `signInWithOc()` from `/popup`. `react`, `react-dom` and
-  `@orangecheck/auth-client` are no longer peer dependencies.
-- **A `projectKey` that names no project answers `500 unknown_project_key`**,
-  and logs which key, once. It used to read as an outage
-  (`503 bond_policy_unavailable`) on every request.
-- **Typed sessions.** `req.ocSession` is typed on Express's own `Request`, and
-  `new Hono<OcHonoEnv>()` types `c.get('ocSession')`. No casts.
-- **`oc.webhook.verify` takes a missing header** (as `req.header()` returns it)
-  and answers `ok: false`.
-
-The first published 0.32 is 0.32.1.
 
 ## sign-in in the browser
 

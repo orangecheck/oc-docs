@@ -125,8 +125,10 @@ Given an envelope and a local `(device_id, device_sk)`:
 
 1. Recompute `id` from the envelope and compare against `envelope.id`. Reject on
    mismatch.
-2. Verify `sig.value` using BIP-322 against `sig.pubkey` and `envelope.id`.
-   (Self-seals may skip.)
+2. Reject unless `sig.pubkey` equals `from.address`. Verify `sig.value` using
+   BIP-322 against `sig.pubkey` and `envelope.id`. (Self-seals may skip.) A
+   client that skips it, or holds an empty `sig.value`, MUST NOT show
+   `from.address` as the authenticated sender.
 3. Find the `recipients[]` entry matching your local `device_id`. If none —
    `E_NOT_ADDRESSED`.
 4. `shared := X25519(device_sk, eph_pk)`.

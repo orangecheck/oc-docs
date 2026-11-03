@@ -97,8 +97,11 @@ The event:
   same device always publishes under the same Nostr pubkey without needing to
   manage a separate Nostr keypair
 
-Replacing the event (same `d` tag) updates the device record. Useful when
-rotating keys or fixing a mistake.
+Publishing again from the same device (same key, same `d` tag) takes the old
+event's place at each relay that accepts it; a relay that missed it still serves
+the old one. A rotated key derives a new Nostr pubkey, so its record replaces
+nothing: to rotate, bind the new device under a new `device_id`, then revoke the
+old one ([Revocation](#revocation)).
 
 ## Multiple devices per address
 

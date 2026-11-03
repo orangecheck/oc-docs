@@ -145,9 +145,8 @@ Honest summary:
   there's no server-side scrollback — a _newly registered_ device starts with an
   empty inbox and only picks up messages still cached on the relays (typically
   days to weeks).
-- **Group DMs are not in v1.** Adding groups properly means sender keys, group
-  state events, and a membership change protocol. 1:1 works today; groups will
-  land later.
+- **No group DMs.** Adding groups properly means sender keys, group state
+  events, and a membership change protocol. 1:1 works today.
 - **No chain payments gating chat messages.** We deliberately kept payment-mode
   out of chat — Bitcoin transactions per message is absurd. lock.ochk.io has no
   stake gate on threads either; an app that wants one can check the sender with
@@ -204,12 +203,5 @@ delivery) AND made available as a share URL / `.lock` file / QR on the resulting
 bubble (for out-of-band hand-off). Recipients with a Lock device get it
 automatically; anyone else can still decrypt the URL. Closing the tab stops the
 subscription; opening `/app` again with an unlocked device resumes it.
-
-## What's next
-
-- Groups (sender-keys model, proper ratchet)
-- Typing indicators and read receipts (opt-in per thread, since these leak
-  metadata)
-- Mobile push via a user-operated relay
 
 See [`/reference/faq`](/reference/faq) for quick answers about the chat flow.

@@ -11,18 +11,19 @@ export const metadata = {
 
 # Interface: CheckResult
 
-Defined in: [check.ts:44](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L44)
+Defined in: [check.ts:52](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L52)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address of the attestation. | [check.ts:56](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L56) |
-| &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (if one was found). | [check.ts:54](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L54) |
-| &lt;a id="property-days">&lt;/a> `days` | `number` | Days since the youngest UTXO in the bonded set was confirmed. | [check.ts:50](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L50) |
-| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding)[] | Self-asserted identity bindings. Verify independently. | [check.ts:58](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L58) |
-| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network) | Network the address belongs to. | [check.ts:60](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L60) |
-| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff signature valid AND thresholds met. | [check.ts:46](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L46) |
-| &lt;a id="property-reasons">&lt;/a> `reasons?` | `string`[] | Present when `ok === false`. Codes explain why. | [check.ts:62](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L62) |
-| &lt;a id="property-sats">&lt;/a> `sats` | `number` | Sats bonded on-chain for the bonded UTXO set. | [check.ts:48](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L48) |
-| &lt;a id="property-score">&lt;/a> `score` | `number` | Reference `score_v0` for this attestation. | [check.ts:52](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L52) |
+| &lt;a id="property-address">&lt;/a> `address?` | `string` | Bitcoin address of the attestation. | [check.ts:71](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L71) |
+| &lt;a id="property-attestation_id">&lt;/a> `attestation_id?` | `string` | Attestation ID (if one was found). | [check.ts:69](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L69) |
+| &lt;a id="property-chain_status">&lt;/a> `chain_status?` | `number` | The HTTP status a chain API refused the lookup with, beside `provider_refused_unread` only. | [check.ts:97](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L97) |
+| &lt;a id="property-days">&lt;/a> `days` | `number` | Days since the youngest UTXO in the bonded set was confirmed. Not a reading when `reasons` holds any `*_unread`. | [check.ts:65](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L65) |
+| &lt;a id="property-identities">&lt;/a> `identities?` | [`IdentityBinding`](IdentityBinding)[] | Self-asserted identity bindings. Verify independently. | [check.ts:73](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L73) |
+| &lt;a id="property-network">&lt;/a> `network?` | [`Network`](../type-aliases/Network) | Network the address belongs to. | [check.ts:75](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L75) |
+| &lt;a id="property-ok">&lt;/a> `ok` | `boolean` | True iff signature valid AND thresholds met. | [check.ts:54](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L54) |
+| &lt;a id="property-reasons">&lt;/a> `reasons?` | `string`[] | Present when `ok === false`. Codes explain why: verify()'s codes, and `not_found` (no attestation, on a read the relays finished), `attestation_unread` (none found, but too few relays finished the read, so one may be there, or more copies whose signature fails came first than check() verifies, so a real one may be behind them; ask again), `below_min_sats`, `below_min_days`, `stake_shared` (the address also backs another identity on the protocol) and `stake_unread` (the address's other attestations could not be read in full, or checked within the budget, so one address, one bond was not checked; ask again). The stake is read only when everything else passed, so `stake_shared` and `stake_unread` only ever come alone. When the coins could not be read (1.21.0): `chain_unread` beside the signature code and `bad_request` (no chain API answered; ask again), or `utxo_cap_unread` or `provider_refused_unread` alone (the address holds more coins than the chain APIs list, or one refused the lookup). None of these comes with `below_min_*`. Decode with `unreadReason` before mapping a reason to words. | [check.ts:95](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L95) |
+| &lt;a id="property-sats">&lt;/a> `sats` | `number` | Sats bonded on-chain for the bonded UTXO set. Not a reading when `reasons` holds any `*_unread` (see `unreadReason`): 0 there means the coins were not read, never that there are none. | [check.ts:60](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L60) |
+| &lt;a id="property-score">&lt;/a> `score` | `number` | Reference `score_v0` for this attestation. Not a reading when `reasons` holds any `*_unread`. | [check.ts:67](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/check.ts#L67) |

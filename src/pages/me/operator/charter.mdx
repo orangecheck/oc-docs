@@ -135,7 +135,10 @@ for human readability only.
 Signatures on a federation's charter are public at
 `https://me.ochk.io/api/operator/charter?federation=<slug>`. Anyone can verify
 the roster by checking each signature against the corresponding operator pubkey
-from the public registry. A signer's own queue of charters waiting for their key
+from the public registry. The answer is never cached
+(`Cache-Control: no-store`), so it always carries the live hash; it allows 60
+reads a minute per IP, and a slug no federation has answers `404` with
+`federation_not_found`. A signer's own queue of charters waiting for their key
 is [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
 
 ## Where the kit lives

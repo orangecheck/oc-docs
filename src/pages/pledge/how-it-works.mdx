@@ -145,9 +145,11 @@ Verifiers query Nostr by d-tag pattern:
 - `oc-pledge-outcome:<pledge_id>` — the outcome
 - `oc-pledge-abandonment:<pledge_id>` — the abandonment
 
-Default relay set is reused from OC Lock; integrators can override. A
-client-side verifier MUST consult ≥ 2 relays before declaring a missing outcome
-a true absence.
+The default relay set is the family's, from `@orangecheck/nostr-core`;
+integrators can override. A verifier asks at least two relays and finds an event
+if any of them returns it. A missing outcome counts as absent only at the read
+floor of the relays asked (four of five), all answering in full with none cut
+off; otherwise the state is unchecked (SPEC §11 item 15).
 
 ## See also
 

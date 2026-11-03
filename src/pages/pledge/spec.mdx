@@ -9,10 +9,11 @@ export const metadata = {
 <SpecCard
     repo="oc-pledge-protocol"
     kind="spec"
-    note="SPEC.md is the authoritative rules. The full normative set — four documents plus the required-pass conformance vectors — is laid out below."
+    note="SPEC.md is the authoritative rules. The full normative set — seven documents plus the required-pass conformance vectors — is laid out below."
 />
 
-The normative spec is one repo, four documents and a set of conformance vectors:
+The normative spec is one repo, seven documents and a set of conformance
+vectors:
 
 | Document                                                                                                             | What it covers                                                        |
 | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -22,6 +23,7 @@ The normative spec is one repo, four documents and a set of conformance vectors:
 | [`REGISTRY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/REGISTRY.md)                             | Resolution mechanisms, extension policy, change process               |
 | [`WHY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/WHY.md)                                       | Design rationale + the rejected-design log                            |
 | [`SECURITY.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/SECURITY.md)                             | Threat model, verifier obligations, mitigations                       |
+| [`LIFECYCLE.md`](https://github.com/orangecheck/oc-pledge-protocol/blob/main/LIFECYCLE.md)                           | After publishing: what a swearer may do, and what a verifier must do  |
 | [`/test-vectors/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/test-vectors)                         | Conformance vectors — required-pass for any impl                      |
 | [`/examples/`](https://github.com/orangecheck/oc-pledge-protocol/tree/main/examples)                                 | Three runnable example envelopes                                      |
 
@@ -45,6 +47,7 @@ The vectors, by group:
 | Malformed-input rejection | v28, v41–v45          | Empty `nonce` — implementation MUST reject before computing canonical; a line feed in `evidence.result`, the string `"null"` for a null field, non-ASCII digits in a time |
 | Field tolerance           | v34–v38, v40          | Abandonment reasons and outcome evidence a verifier MUST NOT refuse (long, empty, line breaks); a lone surrogate's canonical bytes                                        |
 | Delegation scope check    | v46                   | 31 `pledge:create` scope cases                                                                                                                                            |
+| Address spelling          | v55–v58               | A bech32 address with a capital is rejected in `swearer.address`, `agent_address` and `counterparty`, and in an outcome's `resolved_by`                                   |
 
 Every vector is a `(inputs, expected_outputs)` JSON tuple. Implementations ship
 a harness that runs all vectors and reports pass/fail. **CI must run the
@@ -62,9 +65,9 @@ explicit version bumps. Adding a new resolution mechanism is a MINOR version
 (existing pledges still verify); changing field order or serialization is MAJOR
 (existing pledges may need re-canonicalization in clients).
 
-The protocol freezes the canonical-message format at `v1.0.0` once GA criteria
-are met (see
-[CHANGELOG](https://github.com/orangecheck/oc-pledge-protocol/blob/main/CHANGELOG.md)).
+`v1.0.0` was released in 2026-05. SPEC.md is marked Draft until implementations
+conform to the changes listed under Unreleased in the
+[CHANGELOG](https://github.com/orangecheck/oc-pledge-protocol/blob/main/CHANGELOG.md).
 Future MINOR bumps add fields without breaking existing verifiers; future MAJOR
 bumps require coordinated upgrade across the family.
 

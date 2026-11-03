@@ -143,15 +143,16 @@ A client is OC Stamp v1 compliant if and only if:
 - Verifies sender BIP-322 signatures before trusting envelope contents.
 - Queries relays with the §7.1 filters only, whole values in `#d` and `#t`, and
   treats a relay that did not answer as not heard back, per §7.3.
-- Verifies each event under NIP-01 before merging relay answers, and never
-  collapses copies by `id` before verifying them: the `id` covers neither the
-  signature nor the OTS proof (§7.2, §7.3).
 - When enforcing a stake policy, re-resolves `stake` and requires the
   attestation's address to equal `signer.address` (§8.1 step 7).
 - Produces error codes per §10.
 - Rejects unknown `v`; preserves unknown fields on relay.
 - Passes every committed test vector in
   [`test-vectors/`](https://github.com/orangecheck/oc-stamp-protocol/tree/main/test-vectors).
+
+§7.2 and §7.3 also require a reader to verify each event under NIP-01 before
+merging relay answers, and never to collapse copies by `id` before verifying
+them: the `id` covers neither the signature nor the OTS proof.
 
 ## Read the full spec
 

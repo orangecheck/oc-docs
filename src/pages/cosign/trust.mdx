@@ -11,8 +11,9 @@ architecture, not policy.
 
 ## OC never touches the money
 
-When you back or zap a project, you pay the **founder’s own Lightning address**
-directly. OrangeCheck records the gesture for display and notifications — it
+When you back or zap a project that has a working Lightning address, you send
+the sats yourself, from your own wallet to the **founder’s own Lightning
+address**. OrangeCheck records the gesture for display and notifications — it
 **never takes custody of a single sat.** There is no OC wallet in the middle, no
 escrow, no balance to withdraw. If `cosign.ochk.io` vanished tomorrow, the
 payments you already made are unaffected, because they never went through OC.
@@ -21,6 +22,11 @@ A backing amount shown on a project is a **pledge** until the founder **confirms
 they received it**, at which point it becomes **settled**. Only settled sats
 move a goal bar or earn recognition — the headline conviction signal is the sats
 that actually moved between wallets, not a number OC holds.
+
+A zap on a project with no working Lightning address sends nothing: it is a
+public thank-you with no sats. Any zap shows on the project as soon as it is
+recorded, before anything is paid, and is settled only when the founder confirms
+they received it.
 
 **Back monthly** is the same promise extended in time: a standing _reminder_ to
 send sats yourself each period. OC stores no card and no credential, holds no

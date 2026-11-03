@@ -11,9 +11,9 @@ AES-256-GCM). This page describes how vault entries are sealed, how cloud sync
 stays metadata-blind, how a new device gets the key, what the portable export
 contains, and how an entry leaves as a signed `.lock` file.
 [`@orangecheck/vault-core`](/sdk/vault-core/README) on npm implements the entry
-record, the cloud blob, the export and unwrapping the vault key, for the CLI,
-the SDK and the extension. Wrapping a key, team keys, device grants and the
-encrypted backup file are implemented in vault.ochk.io.
+record, the cloud blob, the export, wrapping and unwrapping the vault key, team
+keys, device grants and the encrypted backup file, for vault.ochk.io, the CLI,
+the SDK and the extension.
 
 ## Why not OC Lock envelopes
 
@@ -38,8 +38,10 @@ random bytes. It is the AES-256-GCM key for every entry.
   to its X25519 device key (see below).
 - A blob that names scrypt factors outside N 2^14–2^20, r ≤ 16, p ≤ 4 is refused
   before any key is derived, by the server, vault.ochk.io, the extension and
-  `@orangecheck/vault-core` from 0.3.1. The published `oc-vault` CLI and the
-  GitHub Action install an earlier vault-core that does not check.
+  `@orangecheck/vault-core` from 0.3.1, which the published `oc-vault` CLI
+  installs. Until its next release, the GitHub Action's default `cli-version`
+  still installs a 0.2 CLI, whose vault-core does not check; set `cli-version`
+  to `^0.3.3` once npm serves it.
 
 Lose both the passphrase and the recovery code, with no encrypted backup file,
 and the entries are unrecoverable — by construction.
@@ -137,8 +139,15 @@ receives it through an invite URL whose fragment (`#…`) carries the key**. A
 browser does not send the fragment when it opens the link, so vault.ochk.io
 holds the team key only wrapped under each member's personal vault key, as it
 holds the personal key only wrapped. An invite that vault.ochk.io emails for you
-is the exception: the full link, key included, passes through vault.ochk.io and
-its mail provider.
+carries the key sealed. The inviter's browser makes a one-time code (16
+Crockford characters, 80 random bits), seals the team key under it with
+vault-core's passphrase wrap (scrypt N = 2^17, r = 8, p = 1, then AES-256-GCM),
+and sends only `c1.<salt>.<nonce>.<ciphertext>`, which goes in the emailed
+link's fragment. The code is shown to the inviter alone, who tells it to the
+invitee another way; the invitee's browser opens the seal. vault.ochk.io and its
+mail provider see the sealed key, never the code, so learning the key from an
+emailed invite takes both the email and the code. An emailed invite joins only
+with its code: a link rewritten to carry a plain key is refused.
 
 Team entries reuse the same `packEntryForCloud` envelope as the personal
 double-encrypted blob, only with the team key in both layers. They are stored on
@@ -190,8 +199,9 @@ vault key. Anyone holding the key can decrypt them with
 AES-256-GCM, b64url and JSON conventions are all documented and stable. The
 **encrypted backup** file carries the key too, sealed under a passphrase you
 choose (scrypt, then AES-256-GCM), so it restores on a new device without the
-server's copy of the wrapped key. **Import** on vault.ochk.io restores it; no
-published package reads the backup file.
+server's copy of the wrapped key. **Import** on vault.ochk.io restores it, and
+`@orangecheck/vault-core` writes and reads it (`createEncryptedBackup`,
+`restoreEncryptedBackup`).
 
 ## Signed .lock export
 
@@ -320,10 +330,10 @@ TTL expiry (1 h / 24 h / 7 d).
 
 ## SDK surface
 
-| Package                                               | Role                                                                                                                 |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives.                                                   |
-| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: unwrapping the vault key, entries, cloud blobs, export, TOTP.                                      |
-| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to; the Bitcoin tier's binding and revocation records. |
-| [`@orangecheck/lock-core`](/sdk/lock-core/README)     | `seal` and `unseal`: the signed `.lock` export.                                                                      |
-| [`@orangecheck/nostr-core`](/sdk/nostr-core/README)   | The five relays device records are read from and written to.                                                         |
+| Package                                               | Role                                                                                                                                         |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README) | X25519, HKDF-SHA256, AES-256-GCM, b64url, random — the primitives.                                                                           |
+| [`@orangecheck/vault-core`](/sdk/vault-core/README)   | The vault format: wrapping and unwrapping the vault key, team keys, device grants, entries, cloud blobs, export, the encrypted backup, TOTP. |
+| [`@orangecheck/lock-device`](/sdk/lock-device/README) | Per-browser X25519 device key — what a key hand-off is sealed to; the Bitcoin tier's binding and revocation records.                         |
+| [`@orangecheck/lock-core`](/sdk/lock-core/README)     | `seal` and `unseal`: the signed `.lock` export.                                                                                              |
+| [`@orangecheck/nostr-core`](/sdk/nostr-core/README)   | The five relays device records are read from and written to.                                                                                 |

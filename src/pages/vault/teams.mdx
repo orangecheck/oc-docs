@@ -46,20 +46,26 @@ only.
    does not send the fragment when it opens the link, the same primitive
    [one-time share links](/vault/protocol#one-time-share-links) use. Copy the
    link and send it yourself, and the key stays off our server. **Send invite**
-   has vault.ochk.io email the link for you instead: the full link, team key
-   included, then passes through vault.ochk.io and its mail provider.
-3. **They open the link.** Their browser extracts the team key from the
-   fragment, claims the invite under their signed-in session, and joins. The
-   token is consumed; the team key now lives in their IndexedDB.
+   has vault.ochk.io email a link for you instead, with the key sealed under a
+   one-time code: the fragment is `#c1.<salt>.<nonce>.<ciphertext>`, not the
+   plain key. Your browser makes the code and shows it to you alone; tell it to
+   the invitee yourself, by phone, text or in person. vault.ochk.io and its mail
+   provider see the sealed key, never the code. An emailed invite joins only
+   with its code.
+3. **They open the link.** Their browser takes the team key from the fragment
+   (from an emailed link, they type the code and their browser opens the seal),
+   claims the invite under their signed-in session, and joins. The token is
+   consumed; the team key now lives in their IndexedDB.
 4. **They get a team-key escrow for free.** As soon as your browser holds a team
    key, it wraps that key under your **personal** vault key and stores it on the
    server. If you clean-install vault.ochk.io tomorrow, the team key is
    recoverable from escrow the moment you unlock your personal vault. The escrow
    blob is opaque to OC; only your personal vault key opens it.
 
-> **Send the invite link over a channel only the recipient has.** A leaked link
-> is a leaked team key. Treat it like a password share — Signal, an in-person
-> AirDrop, or a chat platform you both trust.
+> **Send a copied invite link, or an emailed invite's code, over a channel only
+> the recipient has.** A leaked copy-link is a leaked team key, and so is an
+> emailed link with its code. Treat it like a password share — Signal, an
+> in-person AirDrop, or a chat platform you both trust.
 
 ## Roles
 
@@ -176,19 +182,19 @@ folder-fetch failure never disrupts the entry list.
 
 ## What OC sees, and what it doesn't
 
-| OC sees                                                                                                      | OC does **not** see                                          |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Which OC identities are members of which teams                                                               | The team key, unless vault.ochk.io emails an invite for you  |
-| How many encrypted blobs each team has, when each was last updated, the rough byte-size                      | Entry names, types, tags, payloads, the team's "shape"       |
-| Who is the owner of each team and the role assignment of each member (the server enforces role-gated writes) | Whose browsers actually decrypt entries (no usage telemetry) |
-| Email addresses members opted to publish so teammates can see them in management                             | Email addresses members did not opt to publish               |
-| Payment receipts for Family Circle billing                                                                   | Anything correlating a payment to specific entry contents    |
+| OC sees                                                                                                                     | OC does **not** see                                                                 |
+| --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Which OC identities are members of which teams                                                                              | The team key, or the code that opens an emailed invite                              |
+| How many encrypted blobs each team has, when each was last updated, the rough byte-size                                     | Entry names, types, tags, payloads, the team's "shape"                              |
+| Who is the owner of each team and the role assignment of each member (the server enforces role-gated writes)                | Whose browsers actually decrypt entries (no usage telemetry)                        |
+| Email addresses members opted to publish so teammates can see them in management, and each address an invite was emailed to | Email addresses members did not opt to publish, unless an invite was emailed to one |
+| Payment receipts for Family Circle billing                                                                                  | Anything correlating a payment to specific entry contents                           |
 
 The auditable claim is the cryptographic one: **our server holds the team key
-only wrapped under each member's personal vault key**, which it cannot open. The
-exception is an invite you have vault.ochk.io email: that link, team key
-included, passes through our server and its mail provider on the way out.
-Everything else falls out of that.
+only wrapped under each member's personal vault key**, which it cannot open. An
+invite you have vault.ochk.io email passes through our server and its mail
+provider with the key sealed under a code neither of them sees. Everything else
+falls out of that.
 
 ## Where things live
 

@@ -22,11 +22,11 @@ there is no entry name, no type, no payload to read.
 
 ## Three structural differences from a conventional password manager
 
-|                                               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **A sign-in, and a passphrase only you hold** | You sign in to your orangecheck account with an email code, Google, GitHub or a Bitcoin wallet (BIP-322). The vault opens with your vault passphrase, which orangecheck never receives and cannot reset; your recovery code is the only other way in. There is no decryption backdoor.                                                                                                                                                                                                             |
-| **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                                                                                                                                                                                                                                                |
-| **Zero lock-in by construction**              | An encrypted backup file holds your vault key and every entry under a passphrase you choose (scrypt, AES-256-GCM); vault.ochk.io makes it and restores it on a new device, in the browser. A portable export holds the entry ciphertext, which anyone holding the vault key decrypts with the open [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README). [`@orangecheck/vault-core`](/sdk/vault-core/README) reads the wrapped key, the entries and the export; it does not read the backup file. |
+|                                               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A sign-in, and a passphrase only you hold** | You sign in to your orangecheck account with an email code, Google, GitHub or a Bitcoin wallet (BIP-322). The vault opens with your vault passphrase, which orangecheck never receives and cannot reset; your recovery code is the only other way in. There is no decryption backdoor.                                                                                                                                                                                            |
+| **Cryptographic contract = product contract** | The promise "only the passphrase decrypts" is not a policy — it is the architecture. The server stores opaque AES-256-GCM ciphertext keyed by a random envelope id.                                                                                                                                                                                                                                                                                                               |
+| **Zero lock-in by construction**              | An encrypted backup file holds your vault key and every entry under a passphrase you choose (scrypt, AES-256-GCM); vault.ochk.io makes it and restores it on a new device, in the browser. A portable export holds the entry ciphertext, which anyone holding the vault key decrypts with the open [`@orangecheck/lock-crypto`](/sdk/lock-crypto/README). [`@orangecheck/vault-core`](/sdk/vault-core/README) reads the wrapped key, the entries, the export and the backup file. |
 
 ## What you can store
 
@@ -73,12 +73,14 @@ Every type but **file** also takes arbitrary **custom fields**.
 
 ## Team vaults · share with people you trust
 
-The **Family Circle** tier opens a parallel vault you _share_ with up to 10
-identities. Each team is sealed under its own 32-byte **team key**; you hand
-that key to a new member through an **invite URL whose fragment carries the
-key** (a browser does not send the fragment when it opens the link, so OC does
-not see the key, unless you have vault.ochk.io email the invite). Roles — owner,
-admin, member, viewer — gate writes and management. See [Teams](/vault/teams).
+The **Family Circle** tier opens a parallel vault you _share_: 10 seats are
+included, yours among them, and you can buy more. Each team is sealed under its
+own 32-byte **team key**; you hand that key to a new member through an **invite
+URL whose fragment carries the key** (a browser does not send the fragment when
+it opens the link, so OC does not see the key). An invite vault.ochk.io emails
+for you carries the key only sealed under a one-time code, which you tell the
+invitee yourself. Roles — owner, admin, member, viewer — gate writes and
+management. See [Teams](/vault/teams).
 
 The collaborative signal is different from personal sync. Personal asks _"are my
 local edits backed up yet?"_ — team asks _"how fresh is what I'm looking at

@@ -194,8 +194,9 @@ As of 2026-10-31 no signature passes all four. The one recorded signature,
 it reads `offline_verifiable: false`, cannot be checked offline, and does not
 count toward ratification. The roster lists no seats, so step 4 cannot pass for
 any signature yet. The same roster response reports the `charter_ratified`
-criterion in `trust_posture.criteria` as unmet: "0/4 operator signature(s) match
-the current charter hash".
+criterion ("charter ratified by every operator") in `trust_posture.criteria` as
+unmet: "0 of 4 seats have a seated guardian, so not every guardian is there to
+sign".
 
 The kit does not run this check for you. `oc-guardian charter fetch oc-me-v1`
 prints the version, hash and URL the API publishes, and how many signatures are

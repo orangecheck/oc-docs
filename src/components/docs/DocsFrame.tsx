@@ -88,6 +88,13 @@ function useHeaderAccount(): Pick<DocsShellProps, 'cta' | 'signIn' | 'actions'> 
             actions: <SessionAccount />,
         };
     }
+    // A failed check is not signed out: the account link works either way, as on ochk.app.
+    if (status === 'error') {
+        return {
+            cta: { label: YOUR_ACCOUNT, href: OCHK_APP_ACCOUNT, reserve: [GET_AN_ACCOUNT.label] },
+            signIn: false,
+        };
+    }
     // Sign in only once the check says signed out: while it runs, nothing in the bar links.
     return {
         cta: { pending: status === 'loading', reserve: [YOUR_ACCOUNT] },

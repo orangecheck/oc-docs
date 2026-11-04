@@ -78,7 +78,11 @@ seated guardian" needs every seated operator to ratify, so one reject decides
 it; an M-of-N line needs M, as written. A charter with no `amendment_quorum`
 line takes every seated guardian. A line that cannot be read decides nothing:
 the vote is recorded, and the tally's `reason` says why. An amendment is
-rejected once the operators left cannot reach the quorum.
+rejected once it can no longer reach its quorum: under every seated guardian,
+once one seated operator rejects; under M-of-N, once the rejects leave fewer
+than M of the charter's N, or of the seated operators where more are seated. The
+count runs against the charter's N even while seats are unfilled, so a 3-of-5
+charter with 4 seated stays open after 2 rejects.
 
 A seat keeps its latest vote: an older vote sent from it after a newer one is
 refused with `409 vote_superseded`. Every rule counts operators, not seats, so

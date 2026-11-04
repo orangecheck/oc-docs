@@ -70,8 +70,28 @@ POST https://me.ochk.io/api/operator/federations/<slug>/amendments/<id>/vote
 
 The first vote opens the ballot, and the vote that decides it moves the
 amendment to `ratified` or `rejected`. A `200` carries the proposal and its
-tally. A seat counts once, by its latest vote: an older vote sent after a newer
-one is refused with `409 vote_superseded`.
+tally.
+
+How many ratify votes it takes comes from the charter in force, its
+`amendment_quorum` line, never from the federation's signing threshold. "Every
+seated guardian" needs every seated operator to ratify, so one reject decides
+it; an M-of-N line needs M, as written. A charter with no `amendment_quorum`
+line takes every seated guardian. A line that cannot be read decides nothing:
+the vote is recorded, and the tally's `reason` says why. An amendment is
+rejected once the operators left cannot reach the quorum.
+
+A seat keeps its latest vote: an older vote sent from it after a newer one is
+refused with `409 vote_superseded`. Every rule counts operators, not seats, so
+M-of-N counts distinct operators: one key on several seats is one operator, and
+it counts once, by its latest vote across those seats; a key's opposite votes at
+one block count as reject. When fewer than M distinct operators are seated, a
+ratify vote is refused with `409 quorum_unreachable` and the reason (for example
+"needs 3 distinct operators; 1 is seated"), and nothing is recorded; a reject is
+still taken.
+
+A seat held for an invited operator who has not taken it yet is no seated
+guardian: a vote from it is refused with `422 seat_reserved`, and nothing is
+recorded.
 
 The vote and each move of the ballot are written over the proposal's record.
 When another write keeps changing that record, the route answers `503` with one
@@ -92,10 +112,12 @@ send it again.
 
 The list of a federation's amendments
 (`GET https://me.ochk.io/api/operator/federations/<slug>/amendments`) needs no
-sign-in. Each tally in it is counted when the list is built, from the votes
-against the federation's seats as they are then; a built list is kept up to 15
-seconds, and a vote clears it. No answer carries the record's write nonce or its
-raw votes.
+sign-in. It names the quorum in `amendment_quorum` (its rule, the line's text,
+how many are `needed` of how many `seats`, and a `reason` when it cannot
+decide), and marks each held seat `reserved: true`. Each tally in it is counted
+when the list is built, from the votes against the federation's seats as they
+are then; a built list is kept up to 15 seconds, and a vote clears it. No answer
+carries the record's write nonce or its raw votes.
 
 ## Where the kit lives
 

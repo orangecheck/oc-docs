@@ -57,6 +57,28 @@ reads a minute per IP, and a slug no federation has answers `404` with
 `federation_not_found`. A signer's own queue of charters waiting for their key
 is [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
 
+The roster's answer also carries `ratification`, the count the server decides
+by, and so does the `201` that takes a signature for a federation the portal
+keeps. `ratified` and `required` count distinct seated operators, one per key
+however many seats it fills, so a key on two seats signs once. `done` turns true
+once every one of them has signed the live hash, and the federation's record
+then carries that `charter_hash`. A bootstrap federation, with one key on every
+seat, is ratified by that key's one signature. The roster has to be whole first:
+while fewer seats have a seated guardian than the threshold's N, less any
+guardian who left after the key ceremony and still holds a share, `done` stays
+false whoever signs, and a `reason` says how many seats are filled. A seat held
+for an invited operator is not filled. When publishing the federation's invite
+is refused with `charter_not_ratified`, its `detail` is that reason, and the
+go-live check's charter line shows it too.
+
+The federation's trust posture decides its `charter_ratified` criterion,
+"charter ratified by every operator", by the same count. `/api/federations`,
+`/api/public/federations/<slug>` and the custody page's data serve that posture,
+but no `ratification` field of their own. The criterion's `detail` gives
+`ratified`/`required`, or the `reason`, and when a key holds more than one seat
+it adds how many operators hold them all. The `key_diversity` criterion is
+unchanged.
+
 ## Voting on an amendment
 
 A seat holder votes on a proposed amendment from a signed-in operator session,

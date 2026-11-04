@@ -160,6 +160,29 @@ A guardian then leaves by an exit, and the trust posture keeps counting the
 share it still holds. A failed guardian is replaced by moving to a successor
 federation.
 
+An exit is a signed `exit-handoff` envelope sent to `POST /api/operator/exits`,
+with your reason in it, and the guardians staying ratify it. It needs the
+charter threshold's M of them, or all of them when fewer than M stay, counted as
+distinct operators: one key on two staying seats is one operator and ratifies
+once. A seat held for an invited operator is no one staying. So before the key
+ceremony a lone other operator ratifies an exit alone; no key share exists yet
+to move. Once ratified, the charter's 14-day handover clock runs before the exit
+can complete. Before the key ceremony, completion counts the operators staying
+by key. After it, completion counts seats, since every seat staying holds a key
+share: with fewer than M of them it refuses with `threshold_lost`, and with none
+it refuses with `sole_guardian_not_retired` until the federation has moved to a
+successor and been retired.
+
+Seat holders and admins, signed in, read a federation's exits at
+`GET /api/operator/exits?federation_slug=<slug>`. Each row is the exit as filed,
+its `reason` the leaver's own, with `ratified_count`, `required`,
+`ratified_by_you` and `post_dkg`. `required` is null, never 0, when the
+federation's threshold cannot be read: no number of ratifications moves that
+exit, and completion is refused while anyone stays. When no ratification can
+move it, the row adds `unratifiable_reason`: the federation's threshold cannot
+be read, or no other seated operator stays to ratify. Such an exit stays
+requested; with nobody staying, it closes at completion before the key ceremony.
+
 ## Troubleshooting
 
 | Symptom                                                | Likely cause                                                                | Fix                                                                      |

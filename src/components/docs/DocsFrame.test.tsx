@@ -60,14 +60,17 @@ describe('the docs header', () => {
         const html = header(SIGNED_IN);
         expect(links(html)).toContain(`Your account -> ${ACCOUNT}`);
         expect(html).not.toContain('Sign in');
+        // The account menu beside the CTA is this header's only way to sign out.
+        expect(html).toMatch(/<button[^>]*>(?:(?!<\/button>)[\s\S])*Satoshi/);
         // "Get an account" stays only as the CTA's hidden reserve, which keeps the bar one width.
         expect(links(html).filter((l) => l.startsWith('Get an account'))).toEqual([]);
     });
 
-    it('while the session is checked, the CTA keeps its place and links nowhere', () => {
+    it('while the session is checked, the CTA keeps its place and nothing in the bar links to sign-in', () => {
         const html = header({ status: 'loading' });
         expect(html).toContain('data-oca-cta');
         expect(html).not.toMatch(/<a data-oca-cta/);
+        expect(links(html).filter((l) => l.endsWith(`-> ${SIGN_IN}`))).toEqual([]);
     });
 
     it('draws one lockup', () => {

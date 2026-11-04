@@ -74,10 +74,10 @@ go-live check's charter line shows it too.
 The federation's trust posture decides its `charter_ratified` criterion,
 "charter ratified by every operator", by the same count. `/api/federations`,
 `/api/public/federations/<slug>` and the custody page's data serve that posture,
-but no `ratification` field of their own. The criterion's `detail` gives
-`ratified`/`required`, or the `reason`, and when a key holds more than one seat
-it adds how many operators hold them all. The `key_diversity` criterion is
-unchanged.
+but no `ratification` field of their own. The criterion's `detail` gives the
+`reason` when there is one. Otherwise it gives `ratified` of `required`, and
+only then, when a key holds more than one seat, it adds how many operators hold
+them all. The `key_diversity` criterion is unchanged.
 
 ## Voting on an amendment
 

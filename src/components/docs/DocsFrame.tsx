@@ -10,7 +10,7 @@ import {
     SiteHeader,
     SkipLink,
 } from '@orangecheck/app-design/chrome';
-import { Breadcrumbs, DocsPager, TextLink } from '@orangecheck/app-design/components';
+import { Breadcrumbs, DocsPager, PageFrame, TextLink } from '@orangecheck/app-design/components';
 import { GET_AN_ACCOUNT, OCHK_IO } from '@orangecheck/app-design/family';
 import { SessionAccount } from '@orangecheck/app-design/session';
 import { useOptionalOcSession } from '@orangecheck/auth-client';
@@ -132,9 +132,10 @@ export function DocsFrame({
                     search={search}
                     {...account}
                 />
-                <main id="main-content" className="flex-1">
+                {/* The page's one framed column, as DocsShell draws for every other page. */}
+                <PageFrame id="main-content" className="flex-1">
                     {children}
-                </main>
+                </PageFrame>
                 <OchkIoFooter />
             </div>
         );

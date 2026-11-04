@@ -84,10 +84,11 @@ A seat keeps its latest vote: an older vote sent from it after a newer one is
 refused with `409 vote_superseded`. Every rule counts operators, not seats, so
 M-of-N counts distinct operators: one key on several seats is one operator, and
 it counts once, by its latest vote across those seats; a key's opposite votes at
-one block count as reject. When fewer than M distinct operators are seated, a
-ratify vote is refused with `409 quorum_unreachable` and the reason (for example
-"needs 3 distinct operators; 1 is seated"), and nothing is recorded; a reject is
-still taken.
+one block count as reject. An amendment that cannot reach M says so: when fewer
+than M distinct operators are seated, the tally stays open with a `reason` (for
+example "needs 3 distinct operators; 1 is seated"), and a ratify vote is refused
+with `409 quorum_unreachable` and that reason, and nothing is recorded; a reject
+is still taken.
 
 A seat held for an invited operator who has not taken it yet is no seated
 guardian: a vote from it is refused with `422 seat_reserved`, and nothing is

@@ -53,7 +53,11 @@
             "entry": "src/pages/api/[...unknown].ts",
             "reach": "https://ochk.io/docs/api/[...unknown]",
             "area": "home",
-            "tests": ["src/lib/seo/og-card.test.ts", "src/lib/unknown-api-route.test.ts"]
+            "tests": [
+                "src/__tests__/doc-link-expect.test.ts",
+                "src/lib/seo/og-card.test.ts",
+                "src/lib/unknown-api-route.test.ts"
+            ]
         },
         {
             "id": "api:ANY /api/og",
@@ -2332,6 +2336,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/airdrop-gate/README.mdx",
             "reach": "https://ochk.io/docs/sdk/airdrop-gate/README",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/airdrop-gate/classes/AirdropUnreadError",
+            "kind": "page",
+            "entry": "src/pages/sdk/airdrop-gate/classes/AirdropUnreadError.mdx",
+            "reach": "https://ochk.io/docs/sdk/airdrop-gate/classes/AirdropUnreadError",
             "area": "sdk",
             "tests": []
         },
@@ -7741,7 +7753,7 @@
             "entry": "src/pages/sdk/me-client/variables/config.mdx",
             "reach": "https://ochk.io/docs/sdk/me-client/variables/config",
             "area": "sdk",
-            "tests": ["src/__tests__/land-script.test.ts"]
+            "tests": ["src/__tests__/doc-link-expect.test.ts", "src/__tests__/land-script.test.ts"]
         },
         {
             "id": "page:/sdk/me-client/variables/event",
@@ -8973,7 +8985,7 @@
             "entry": "src/pages/sdk/sdk/functions/check.mdx",
             "reach": "https://ochk.io/docs/sdk/sdk/functions/check",
             "area": "sdk",
-            "tests": []
+            "tests": ["src/__tests__/doc-link-expect.test.ts"]
         },
         {
             "id": "page:/sdk/sdk/functions/checkBondCoin",
@@ -9376,6 +9388,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/sdk/functions/readAttestations",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/functions/readAttestations.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/functions/readAttestations",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/sdk/functions/readBondExtension",
             "kind": "page",
             "entry": "src/pages/sdk/sdk/functions/readBondExtension.mdx",
@@ -9420,6 +9440,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/sdk/functions/supportsAutomaticVerification.mdx",
             "reach": "https://ochk.io/docs/sdk/sdk/functions/supportsAutomaticVerification",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/sdk/functions/unreadReason",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/functions/unreadReason.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/functions/unreadReason",
             "area": "sdk",
             "tests": []
         },
@@ -9516,6 +9544,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/sdk/interfaces/AttestationEnvelope.mdx",
             "reach": "https://ochk.io/docs/sdk/sdk/interfaces/AttestationEnvelope",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/sdk/interfaces/AttestationsRead",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/interfaces/AttestationsRead.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/interfaces/AttestationsRead",
             "area": "sdk",
             "tests": []
         },
@@ -9780,6 +9816,22 @@
             "kind": "page",
             "entry": "src/pages/sdk/sdk/type-aliases/StatusCode.mdx",
             "reach": "https://ochk.io/docs/sdk/sdk/type-aliases/StatusCode",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/sdk/type-aliases/SubjectReadState",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/type-aliases/SubjectReadState.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/type-aliases/SubjectReadState",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/sdk/type-aliases/UnreadReason",
+            "kind": "page",
+            "entry": "src/pages/sdk/sdk/type-aliases/UnreadReason.mdx",
+            "reach": "https://ochk.io/docs/sdk/sdk/type-aliases/UnreadReason",
             "area": "sdk",
             "tests": []
         },
@@ -10784,6 +10836,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/classes/BlobsUnread",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/classes/BlobsUnread.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/classes/BlobsUnread",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/classes/NotSignedIn",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/classes/NotSignedIn.mdx",
@@ -11352,6 +11412,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vault-core/variables/FINGERPRINT_BYTES",
+            "kind": "page",
+            "entry": "src/pages/sdk/vault-core/variables/FINGERPRINT_BYTES.mdx",
+            "reach": "https://ochk.io/docs/sdk/vault-core/variables/FINGERPRINT_BYTES",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vault-core/variables/OCV_SCHEME",
             "kind": "page",
             "entry": "src/pages/sdk/vault-core/variables/OCV_SCHEME.mdx",
@@ -11380,6 +11448,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vote-core/README.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/README",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vote-core/classes/UtxoUnreadError",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-core/classes/UtxoUnreadError.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-core/classes/UtxoUnreadError",
             "area": "sdk",
             "tests": []
         },
@@ -11728,6 +11804,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vote-core/interfaces/UnreadResult",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-core/interfaces/UnreadResult.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-core/interfaces/UnreadResult",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vote-core/interfaces/Utxo",
             "kind": "page",
             "entry": "src/pages/sdk/vote-core/interfaces/Utxo.mdx",
@@ -11796,6 +11880,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/vote-core/type-aliases/UtxoLookup.mdx",
             "reach": "https://ochk.io/docs/sdk/vote-core/type-aliases/UtxoLookup",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/vote-core/type-aliases/UtxoUnreadReason",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-core/type-aliases/UtxoUnreadReason.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-core/type-aliases/UtxoUnreadReason",
             "area": "sdk",
             "tests": []
         },

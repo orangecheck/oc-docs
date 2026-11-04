@@ -26,6 +26,19 @@ function header(state: Partial<OcSessionState>, bare = false): string {
     return html.slice(html.indexOf('<header'), html.indexOf('</header>'));
 }
 
+/** The whole docs page for a path, signed out. */
+function page(bare: boolean): string {
+    session = { status: 'anonymous' };
+    const router = { pathname: '/attest/api', basePath: '/docs', query: {}, asPath: '/attest/api' };
+    return renderToStaticMarkup(
+        <RouterContext.Provider value={router as never}>
+            <DocsFrame path="/attest/api" bare={bare}>
+                page
+            </DocsFrame>
+        </RouterContext.Provider>
+    );
+}
+
 /** Each link as "words -> href", with what is hidden from a reader (aria-hidden leaves) dropped. */
 function links(html: string): string[] {
     return [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(([, attrs, inner]) => {
@@ -83,5 +96,22 @@ describe('the docs header', () => {
     it('draws one lockup', () => {
         // The flat lockup's swoosh is a 16 by 8 drawing; the app icon's tile is never in chrome.
         expect(header({ status: 'anonymous' }).match(/viewBox="0 0 16 8"/g)).toHaveLength(1);
+    });
+});
+
+/** A page frame's own attribute (its class also names it, for the nested-frame rule). */
+const FRAMES = /\sdata-oca-page-frame=""/g;
+
+describe('the docs page frame', () => {
+    it('puts a bare page (404, 500) in one framed column, its main', () => {
+        const html = page(true);
+        expect(html.match(FRAMES)).toHaveLength(1);
+        expect(html).toMatch(
+            /<main(?=[^>]*\bid="main-content")(?=[^>]*\sdata-oca-page-frame="")[^>]*>/
+        );
+    });
+
+    it('draws one framed column on a docs page too, never one inside another', () => {
+        expect(page(false).match(FRAMES)).toHaveLength(1);
     });
 });

@@ -225,9 +225,34 @@ Response:
 ```
 
 Each summary leaves out the message and the signature, and nothing is verified:
-use `/api/check` or `/api/verify` for that. Use this when you need to see
-historical attestations for an address, not just "does the latest meet
-thresholds." Cached 60 s.
+use `/api/check` or `/api/verify` for that. Only attestations whose signed
+message names the subject are listed or counted. Relays match on unsigned tags,
+so one can send an attestation for another address, or one that binds no such
+handle; the endpoint drops those, as `/api/check` does. Use this when you need
+to see historical attestations for an address, not just "does the latest meet
+thresholds."
+
+A read the relays finished answers 200, cached 60 s.
+
+Response — 503, when the relays did not finish the read:
+
+```json
+{
+    "count": 0,
+    "total": 0,
+    "attestations": [],
+    "reasons": ["attestation_unread"]
+}
+```
+
+The body carries what was read, so `count` and `total` count what came back, not
+every match, and an empty list does not mean there are none. It is sent with
+`Cache-Control: no-store` and `Retry-After: 30`: ask again after 30 seconds. By
+id, a copy whose signature verifies is a finished answer, since the id is the
+hash of the one message. In your own code,
+[`readAttestations()`](/sdk/sdk/functions/readAttestations) from
+`@orangecheck/sdk` reads the same way and sets `unread` to
+`"attestation_unread"` when the read did not finish.
 
 ## `POST /api/publish-attestation`
 

@@ -22,7 +22,7 @@ Each hosted endpoint has a published counterpart you call in-process:
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `GET /api/check`    | `check()` from `@orangecheck/sdk`, or `@orangecheck/gate` in front of a route                                                       |
 | `POST /api/verify`  | `verify({ addr, msg, sig })` from `@orangecheck/sdk`                                                                                |
-| `GET /api/discover` | `getAttestationsForAddress()`, `getAttestationsForIdentity()`, `discoverAttestations()` from `@orangecheck/sdk`                     |
+| `GET /api/discover` | `readAttestations()` from `@orangecheck/sdk`, which says when the relays did not finish (`unread`)                                  |
 | `/api/challenge`    | `issueChallenge()` and `verifyChallenge()` from `@orangecheck/sdk`; see [Sign in with Bitcoin](/attest/guides/sign-in-with-bitcoin) |
 
 None of these needs a database. They read attestations from Nostr relays and

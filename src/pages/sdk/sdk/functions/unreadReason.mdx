@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: unreadReason()",
+    description: "Auto-generated API reference for Function: unreadReason(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README)
+
+***
+
+[@orangecheck/sdk](../README) / unreadReason
+
+# Function: unreadReason()
+
+```ts
+function unreadReason(reasonsOrCodes: readonly string[] | undefined): UnreadReason | null;
+```
+
+Defined in: [unread.ts:42](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/unread.ts#L42)
+
+Which unread a check() `reasons` or a verify() `codes` list holds, or null
+when the answer is a reading. Decode with this before mapping any other
+reason to words: beside `chain_unread`, `bad_request` means the chain did not
+answer, never that the attestation is malformed.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `reasonsOrCodes` | readonly `string`[] \| `undefined` |
+
+## Returns
+
+[`UnreadReason`](../type-aliases/UnreadReason) \| `null`

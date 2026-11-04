@@ -137,9 +137,11 @@ the one returned. Check the handle yourself before you rely on it, or gate on
 curl -s 'https://attest.ochk.io/api/discover?addr=bc1pezn…&limit=5'
 ```
 
-Returns every attestation for that subject, each with its `attestation_id`,
-`scheme` (`bip322`), and bound identities. Use it when you want the history
-rather than a yes/no.
+Returns every attestation whose signed message names that subject, each with its
+`attestation_id`, `scheme` (`bip322`), and bound identities. Use it when you
+want the history rather than a yes/no. If the relays do not finish the read, it
+answers `503` with what came back and `reasons: ["attestation_unread"]`: ask
+again after 30 seconds.
 
 ## Then: gate your own thing
 

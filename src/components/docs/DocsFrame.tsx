@@ -88,7 +88,11 @@ function useHeaderAccount(): Pick<DocsShellProps, 'cta' | 'signIn' | 'actions'> 
             actions: <SessionAccount />,
         };
     }
-    return { cta: { pending: status === 'loading', reserve: [YOUR_ACCOUNT] }, signIn: true };
+    // Sign in only once the check says signed out: while it runs, nothing in the bar links.
+    return {
+        cta: { pending: status === 'loading', reserve: [YOUR_ACCOUNT] },
+        signIn: status === 'anonymous',
+    };
 }
 
 /**

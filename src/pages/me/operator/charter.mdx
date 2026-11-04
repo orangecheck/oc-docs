@@ -57,6 +57,46 @@ reads a minute per IP, and a slug no federation has answers `404` with
 `federation_not_found`. A signer's own queue of charters waiting for their key
 is [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
 
+## Voting on an amendment
+
+A seat holder votes on a proposed amendment from a signed-in operator session,
+with the key that fills the seat, signing the amendment's exact text and a
+recent Bitcoin block:
+
+```
+POST https://me.ochk.io/api/operator/federations/<slug>/amendments/<id>/vote
+{ "vote": { … } }
+```
+
+The first vote opens the ballot, and the vote that decides it moves the
+amendment to `ratified` or `rejected`. A `200` carries the proposal and its
+tally. A seat counts once, by its latest vote: an older vote sent after a newer
+one is refused with `409 vote_superseded`.
+
+The vote and each move of the ballot are written over the proposal's record.
+When another write keeps changing that record, the route answers `503` with one
+of two codes:
+
+| Code          | What happened                                                                | What to do                                              |
+| ------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `row_busy`    | Nothing was written: not the vote, not the move. Sent with `Retry-After: 5`. | Wait the `Retry-After` seconds and send the vote again. |
+| `partly_done` | The vote was recorded; the move of the ballot after it was not.              | Send the same vote again.                               |
+
+Sending the same signed vote again is safe: the seat already holds it, so it is
+accepted and counted once, and the route then finishes the move.
+
+Opening the ballot or withdrawing an amendment by hand
+(`POST …/amendments/<id>/transition` with `next_state`) is one write, so it
+answers only `503 row_busy`, never `partly_done`: nothing was written, and you
+send it again.
+
+The list of a federation's amendments
+(`GET https://me.ochk.io/api/operator/federations/<slug>/amendments`) needs no
+sign-in. Each tally in it is counted when the list is built, from the votes
+against the federation's seats as they are then; a built list is kept up to 15
+seconds, and a vote clears it. No answer carries the record's write nonce or its
+raw votes.
+
 ## Where the kit lives
 
 - **Source:**

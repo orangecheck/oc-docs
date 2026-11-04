@@ -73,6 +73,13 @@ describe('the docs header', () => {
         expect(links(html).filter((l) => l.endsWith(`-> ${SIGN_IN}`))).toEqual([]);
     });
 
+    it('when the session check failed, offers the account as ochk.app does and never guesses signed out', () => {
+        const html = header({ status: 'error' });
+        expect(links(html)).toContain(`Your account -> ${ACCOUNT}`);
+        expect(links(html).filter((l) => l.includes('ochk.io/signin'))).toEqual([]);
+        expect(html).not.toContain('Sign in');
+    });
+
     it('draws one lockup', () => {
         // The flat lockup's swoosh is a 16 by 8 drawing; the app icon's tile is never in chrome.
         expect(header({ status: 'anonymous' }).match(/viewBox="0 0 16 8"/g)).toHaveLength(1);

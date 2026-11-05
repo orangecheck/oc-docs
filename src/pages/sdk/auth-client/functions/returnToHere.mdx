@@ -21,9 +21,7 @@ This page as a return address: its path and query, never its fragment,
 which is kept and restored on return. For a site that builds
 `/signin?return_to=` itself:
 
-```
-`/signin?return_to=${encodeURIComponent(returnToHere())}`
-```
+  `/signin?return_to=${encodeURIComponent(returnToHere())}`
 
 ## Returns
 

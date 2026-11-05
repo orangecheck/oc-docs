@@ -21,25 +21,27 @@ Wrap a tool() definition so its execute path is scope-checked and
 envelope-emitting. The exact glue depends on which AI-SDK release you're
 on — the typical pattern is:
 
-  const tools = &#123;
-    'invoice.create': tool(&#123;
-      description: '…',
-      parameters:  schema,
-      execute:     async (args, &#123; toolCallId &#125;) => &#123;
-        const &#123; result, action &#125; = await invoiceCreate.execute(args, &#123;
-          agent, delegation, callId: toolCallId,
-        &#125;);
-        await yourAuditPipeline.append(action);
-        return result;
-      &#125;,
-    &#125;),
-  &#125;;
+```
+const tools = {
+  'invoice.create': tool({
+    description: '…',
+    parameters:  schema,
+    execute:     async (args, { toolCallId }) => {
+      const { result, action } = await invoiceCreate.execute(args, {
+        agent, delegation, callId: toolCallId,
+      });
+      await yourAuditPipeline.append(action);
+      return result;
+    },
+  }),
+};
 
-  const invoiceCreate = ocTool(&#123;
-    verb: 'invoice.create',
-    parameters: schema,
-    execute: async (args) => myInvoiceCreateImpl(args),
-  &#125;);
+const invoiceCreate = ocTool({
+  verb: 'invoice.create',
+  parameters: schema,
+  execute: async (args) => myInvoiceCreateImpl(args),
+});
+```
 
 The `ocTool` value is provider/SDK-agnostic — bring your own glue around
 it. v1 of the adapter intentionally does not import `ai` so it works on

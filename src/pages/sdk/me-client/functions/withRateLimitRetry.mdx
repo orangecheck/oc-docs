@@ -19,11 +19,13 @@ Defined in: [me-client/src/transport.ts:180](https://github.com/orangecheck/oc-p
 
 Wrap a transport call with automatic 429 retry, honoring Retry-After.
 
-  import &#123; oc, withRateLimitRetry &#125; from '@orangecheck/me-client';
+```
+import { oc, withRateLimitRetry } from '@orangecheck/me-client';
 
-  const res = await withRateLimitRetry(() =>
-    oc.event.fireBatch(&#123; project_key, events &#125;)
-  );
+const res = await withRateLimitRetry(() =>
+  oc.event.fireBatch({ project_key, events })
+);
+```
 
 Retries ONLY on 429 (rate-limit) responses. All other errors throw
 immediately so the caller can handle them. Sleeps for `Retry-After`

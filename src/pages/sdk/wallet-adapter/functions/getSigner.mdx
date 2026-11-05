@@ -20,8 +20,10 @@ Defined in: [wallet-adapter/src/sign.ts:93](https://github.com/orangecheck/oc-pa
 Return a SignFn bound to a particular wallet. The returned function takes a
 canonical message string and resolves to a BIP-322 signature.
 
-  const sign = getSigner('unisat', &#123; address &#125;);
-  const signature = await sign(challenge.message);
+```
+const sign = getSigner('unisat', { address });
+const signature = await sign(challenge.message);
+```
 
 Throws on unknown wallet IDs or when the wallet isn't available on window.
 

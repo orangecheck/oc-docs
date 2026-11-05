@@ -21,16 +21,18 @@ Express / Connect middleware. Attaches `req.ocSession` (verified
 SessionPayload | null) and calls next(). Use it as a global middleware
 or per-route.
 
-  import express from 'express';
-  import &#123; ocAuthExpress &#125; from '@orangecheck/me-client/server';
+```
+import express from 'express';
+import { ocAuthExpress } from '@orangecheck/me-client/server';
 
-  const app = express();
-  app.use(ocAuthExpress());
+const app = express();
+app.use(ocAuthExpress());
 
-  app.get('/api/profile', (req, res) => &#123;
-    if (!req.ocSession) return res.status(401).json(&#123; error: 'sign in' &#125;);
-    res.json(&#123; address: req.ocSession.did_oc &#125;);
-  &#125;);
+app.get('/api/profile', (req, res) => {
+  if (!req.ocSession) return res.status(401).json({ error: 'sign in' });
+  res.json({ address: req.ocSession.did_oc });
+});
+```
 
 Pass `{ required: true }` to short-circuit unauthenticated requests
 with a 401 before they reach your handler.

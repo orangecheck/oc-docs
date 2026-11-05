@@ -24,21 +24,23 @@ graph against a persisted snapshot gets the same hash deterministically.
 
 Typical shape:
 
-  const createInvoice = ocToolNode(&#123;
-    verb: 'invoice.create',
-    execute: async (args) => myInvoiceCreateImpl(args),
-  &#125;);
+```
+const createInvoice = ocToolNode({
+  verb: 'invoice.create',
+  execute: async (args) => myInvoiceCreateImpl(args),
+});
 
-  const graph = new StateGraph(MyState)
-    .addNode('createInvoice', async (state) => &#123;
-      const args = pickToolArgs(state);
-      const callId = state.lastToolCallId;
-      const &#123; result, action &#125; = await createInvoice.execute(args, &#123;
-        agent, delegation, callId, graphState: state,
-      &#125;);
-      await audit.append(action);
-      return mergeResultIntoState(state, result);
-    &#125;);
+const graph = new StateGraph(MyState)
+  .addNode('createInvoice', async (state) => {
+    const args = pickToolArgs(state);
+    const callId = state.lastToolCallId;
+    const { result, action } = await createInvoice.execute(args, {
+      agent, delegation, callId, graphState: state,
+    });
+    await audit.append(action);
+    return mergeResultIntoState(state, result);
+  });
+```
 
 ## Type Parameters
 

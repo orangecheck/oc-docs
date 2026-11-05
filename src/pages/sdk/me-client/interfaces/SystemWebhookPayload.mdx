@@ -22,8 +22,10 @@ Carries no user identity, except connect.claimed. It has no `id`: the
 `OC-Envelope-Id` header is its only id, so deduplicate on that.
 Discriminate on `kind` first, then `subtype`:
 
-  const payload = JSON.parse(body) as WebhookPayload | SystemWebhookPayload;
-  if (payload.kind === 'oc-system-event' && payload.subtype === 'drop.closed') &#123; … &#125;
+```
+const payload = JSON.parse(body) as WebhookPayload | SystemWebhookPayload;
+if (payload.kind === 'oc-system-event' && payload.subtype === 'drop.closed') { … }
+```
 
 ## Extended by
 

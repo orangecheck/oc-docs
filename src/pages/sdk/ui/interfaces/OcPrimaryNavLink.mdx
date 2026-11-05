@@ -35,14 +35,16 @@ Defined in: [primary-nav.tsx:39](https://github.com/orangecheck/oc-packages/blob
 
 **Usage:**
 
-  &lt;OcPrimaryNav
-      activePath=&#123;router.pathname&#125;
-      links=&#123;[
-          &#123; href: '/dashboard', label: 'dashboard' &#125;,
-          &#123; href: 'https://docs.ochk.io/attest', label: 'docs', external: true &#125;,
-          &#123; href: 'https://github.com/orangecheck/oc-attest-protocol/blob/main/SPEC.md', label: 'spec', external: true &#125;,
-      ]&#125;
-  />
+```
+<OcPrimaryNav
+    activePath={router.pathname}
+    links={[
+        { href: '/dashboard', label: 'dashboard' },
+        { href: 'https://docs.ochk.io/attest', label: 'docs', external: true },
+        { href: 'https://github.com/orangecheck/oc-attest-protocol/blob/main/SPEC.md', label: 'spec', external: true },
+    ]}
+/>
+```
 
 ## Properties
 

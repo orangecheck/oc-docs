@@ -20,16 +20,18 @@ Defined in: [next.ts:70](https://github.com/orangecheck/oc-packages/blob/main/ga
 Framework-agnostic Fetch-style guard — for Next App Router route handlers,
 Cloudflare Workers, Hono, Bun, and friends.
 
-  export async function POST(req: Request) &#123;
-    const decision = await ocGateFetch(req, &#123;
-      minSats: 100_000,
-      address: &#123; from: 'header' &#125;,
-    &#125;);
-    if (!decision.ok) &#123;
-      return new Response(JSON.stringify(&#123; error: decision.reason &#125;), &#123; status: 403 &#125;);
-    &#125;
-    // ... proceed
-  &#125;
+```
+export async function POST(req: Request) {
+  const decision = await ocGateFetch(req, {
+    minSats: 100_000,
+    address: { from: 'header' },
+  });
+  if (!decision.ok) {
+    return new Response(JSON.stringify({ error: decision.reason }), { status: 403 });
+  }
+  // ... proceed
+}
+```
 
 ## Parameters
 

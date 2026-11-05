@@ -18,14 +18,16 @@ a billable event fires. Imported by integrator backends so the
 receive handler is type-checked end-to-end without re-declaring the
 shape.
 
-  import type &#123; WebhookPayload &#125; from '@orangecheck/me-client';
+```
+import type { WebhookPayload } from '@orangecheck/me-client';
 
-  export async function POST(req: Request) &#123;
-    const payload = (await req.json()) as WebhookPayload;
-    if (payload.subtype === 'payment_authorization') &#123;
-      creditUser(payload.sub, payload.user_earned_sats);
-    &#125;
-  &#125;
+export async function POST(req: Request) {
+  const payload = (await req.json()) as WebhookPayload;
+  if (payload.subtype === 'payment_authorization') {
+    creditUser(payload.sub, payload.user_earned_sats);
+  }
+}
+```
 
 Headers carry the signature and metadata (see WebhookHeaders below).
 Verify the signature with `oc.webhook.verify({ body, headers, jwks })`.

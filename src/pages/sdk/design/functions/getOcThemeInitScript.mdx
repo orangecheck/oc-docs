@@ -21,7 +21,9 @@ Blocking init script for `_document` (Pages Router) `<Head>`. Applies the
 cookie's skin to `<html>` before first paint so there is no flash of the
 default skin. Inject with:
 
-    &lt;script dangerouslySetInnerHTML=&#123;&#123; __html: getOcThemeInitScript() &#125;&#125; />
+```
+<script dangerouslySetInnerHTML={{ __html: getOcThemeInitScript() }} />
+```
 
 ## Parameters
 

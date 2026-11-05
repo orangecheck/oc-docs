@@ -21,8 +21,10 @@ Run the OrangeCheck lookup + threshold comparison for a request, without
 touching the response. Framework-agnostic. Use this directly in Fastify,
 Hono, Workers, or anywhere Express middleware doesn't fit.
 
-  const decision = await assertOc(req, &#123; minSats: 100_000, address: &#123; from: 'header' &#125; &#125;);
-  if (!decision.ok) return res.status(403).json(&#123; error: decision.reason &#125;);
+```
+const decision = await assertOc(req, { minSats: 100_000, address: { from: 'header' } });
+if (!decision.ok) return res.status(403).json({ error: decision.reason });
+```
 
 ## Parameters
 

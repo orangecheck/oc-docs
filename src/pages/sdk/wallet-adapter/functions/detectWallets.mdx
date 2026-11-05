@@ -21,8 +21,10 @@ Returns every supported wallet with a `detected` flag. Use in UIs to show
 "Install UniSat" vs "Sign with UniSat" depending on whether the extension
 is present.
 
-  const wallets = detectWallets();
-  wallets.find((w) => w.detected && !w.isManual)   // prefer installed ones
+```
+const wallets = detectWallets();
+wallets.find((w) => w.detected && !w.isManual)   // prefer installed ones
+```
 
 ## Returns
 

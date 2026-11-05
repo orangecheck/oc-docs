@@ -29,10 +29,12 @@ claims read back from your own store included: apply the rule in the route
 that starts your session, where you hold the verified one. It also throws
 on a missing rule or an option it does not read.
 
-  const session = await verifyOcToken(token, &#123; audience: 'https://your-site.example' &#125;);
-  if (!session) return res.status(401).json(&#123; ok: false &#125;);
-  const checked = await checkSignInRule(session, &#123; projectKey: process.env.OC_PROJECT_KEY! &#125;);
-  if (!checked.ok) return res.status(checked.status).json(checked.body);
+```
+const session = await verifyOcToken(token, { audience: 'https://your-site.example' });
+if (!session) return res.status(401).json({ ok: false });
+const checked = await checkSignInRule(session, { projectKey: process.env.OC_PROJECT_KEY! });
+if (!checked.ok) return res.status(checked.status).json(checked.body);
+```
 
 ## Parameters
 

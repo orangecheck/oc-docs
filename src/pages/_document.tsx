@@ -1,4 +1,5 @@
 import { FontPreloads } from '@orangecheck/app-design/fonts';
+import { THEME_COLOR } from '@orangecheck/app-design/tokens';
 import { FamilyAnalytics } from '@orangecheck/site-kit/analytics';
 import { Head, Html, Main, NextScript } from 'next/document';
 
@@ -42,8 +43,17 @@ export default function Document() {
                 />
                 <link rel="manifest" href={`${BASE}/favicons/site.webmanifest?v=2`} />
                 <meta name="application-name" content="orangecheck docs" />
-                <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa" />
-                <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0a0a0a" />
+                {/* The browser's chrome takes the page's own ground in each mode, from the tokens. */}
+                <meta
+                    name="theme-color"
+                    media="(prefers-color-scheme: light)"
+                    content={THEME_COLOR.light}
+                />
+                <meta
+                    name="theme-color"
+                    media="(prefers-color-scheme: dark)"
+                    content={THEME_COLOR.dark}
+                />
                 <meta name="color-scheme" content="light dark" />
 
                 {/* Plausible, each page reported as origin and path only. The docs

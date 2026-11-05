@@ -876,9 +876,9 @@
     "@orangecheck/auth-core" "^2.26.1"
 
 "@orangecheck/site-kit@^0.7.0":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.7.1.tgz#cd061a117cea9f76d68ec1ffb5f5ab8c11d9cac1"
-  integrity sha512-cI/lx9BUwSN0Au4wLMTkk6ZDoYEiO01AiSbsaElX8BtPijDuz3BGSQCDPeoM7Pj9Db+F2uaw2TmkHIQRLMlSvg==
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.7.2.tgz#a60132f3573219bde5b60e95d5ad5a3b3ec7dd74"
+  integrity sha512-d4bu6h2DMQNJwragzqbKyMwGTflFhlLuzfNCK/4EsrstKoGiR3cP2lEXONsGtEIJ1VYcgII41J4CXhsePK2NOQ==
 
 "@orangecheck/wallet-adapter@^0.7.0":
   version "0.7.2"

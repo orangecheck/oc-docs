@@ -11,13 +11,13 @@ export const metadata = {
 
 # Interface: UpgradeOptions
 
-Defined in: [upgrade.ts:24](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L24)
+Defined in: [stamp-ots/src/upgrade.ts:25](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L25)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | Optional custom fetch passed through to calendar clients. | [upgrade.ts:34](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L34) |
-| &lt;a id="property-headersource">&lt;/a> `headerSource` | [`BlockHeaderSource`](BlockHeaderSource) | Where block headers come from (`mempoolHeaderSource()`, your node, or a headers snapshot). Required: the proof is reported `confirmed` only when the header at its attested height has the proof's Merkle root, and that header gives `blockHash`. Until such a header is found the proof stays `pending`, with whatever the calendars added merged in. | [upgrade.ts:32](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L32) |
-| &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [upgrade.ts:37](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L37) |
-| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout per calendar. Default 30_000ms. | [upgrade.ts:36](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L36) |
+| &lt;a id="property-fetch">&lt;/a> `fetch?` | (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\&lt;`Response`\> | Optional custom fetch passed through to calendar clients. | [stamp-ots/src/upgrade.ts:35](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L35) |
+| &lt;a id="property-headersource">&lt;/a> `headerSource` | [`BlockHeaderSource`](BlockHeaderSource) | Where block headers come from (`mempoolHeaderSource()`, your node, or a headers snapshot). Required: the proof is reported `confirmed` only when the header at its attested height has the proof's Merkle root, and that header gives `blockHash`. Until such a header is found the proof stays `pending`, with whatever the calendars added merged in. | [stamp-ots/src/upgrade.ts:33](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L33) |
+| &lt;a id="property-signal">&lt;/a> `signal?` | `AbortSignal` | - | [stamp-ots/src/upgrade.ts:38](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L38) |
+| &lt;a id="property-timeoutms">&lt;/a> `timeoutMs?` | `number` | Request timeout per calendar. Default 30_000ms. | [stamp-ots/src/upgrade.ts:37](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L37) |

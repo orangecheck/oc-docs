@@ -22,8 +22,11 @@ GET /api/tally?poll=<64-char hex poll_id>
 Any query parameter besides `poll` answers `308` to `/api/tally?poll=<id>`.
 
 Fetches the poll from the default Nostr relay set, pulls every matching ballot,
-verifies every BIP-322 signature, resolves the snapshot block, looks up UTXOs
-from mempool.space, runs the pure tally function, and returns JSON.
+verifies every BIP-322 signature, resolves the snapshot block, looks up each
+voter's coins at mempool.space, runs the pure tally function, and returns JSON.
+When mempool.space answers without a coin list (its cap answer, a 429 or a 5xx)
+or cannot be reached, blockstream.info is asked once, while the tally's minute
+has time left.
 
 **200 tallied:**
 
@@ -42,7 +45,7 @@ from mempool.space, runs the pure tally function, and returns JSON.
     "reveal_published": false,
     "relays": [{ "relay": "wss://relay.ochk.io", "answered": true, "events": 1 }, …],
     "utxo_source": {
-        "explorer": "mempool.space",
+        "explorer": "mempool.space, then blockstream.info",
         "counts": "coins unspent now and confirmed at or before snapshot_block",
         "not_counted": "coins spent after snapshot_block"
     }
@@ -87,13 +90,17 @@ open one without reading the poll event.
 - `503` — no relay finished answering the poll, ballot, reveal or (for an
   anchored poll) stamp query, or the block at the deadline could not be read. A
   tally over a ballot set no relay finished sending would be a guess.
+- `503` — `state: "unread"`: a counted voter's coins could not be read from
+  either explorer, so nothing is counted. The body names `unread_count` and
+  `unread_reasons` (`utxo_cap_unread`, `chain_unread`,
+  `provider_refused_unread`). A list that was not read is never an empty list.
 - `500` — `tally_failed`: the tally itself threw.
 
 A counted answer is kept for up to 60 seconds, at the edge and in the browser,
-and any other answer for up to 15 seconds. Voters' coins are read at most every
-two minutes, so a coin spent just now can still count for about three minutes;
-`counted_at` says when they were read. Live tallies on the poll page recompute
-client-side against the same function.
+and any other answer for up to 15 seconds, except an unread one, which is not
+kept. Voters' coins are read at most every two minutes, so a coin spent just now
+can still count for about three minutes; `counted_at` says when they were read.
+Live tallies on the poll page recompute client-side against the same function.
 
 ## library
 

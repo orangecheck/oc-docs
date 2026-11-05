@@ -64,9 +64,12 @@ only. The platform owner lists the debits with no known outcome at
 gives the day's slot back.
 
 `/api/stats/earned` reads every event in full about once a minute, across all
-instances, and its answer carries `computed_at`. While one instance recomputes,
-or a recompute fails, the others answer the last totals kept, which can be up to
-a day old. A query string answers `308` to the bare path.
+instances, and its answer carries `computed_at`. It counts only the events a
+live project was billed for against live escrow: test projects' events and
+preview events are left out, so while escrow runs in simulation every figure is
+`0`. While one instance recomputes, or a recompute fails, the others answer the
+last totals kept, which can be up to a day old. A query string answers `308` to
+the bare path.
 
 `/api/federations` answers a query string with `308` to the bare path too, and
 allows 60 reads a minute per IP.

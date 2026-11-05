@@ -19,12 +19,10 @@ Defined in: [index.ts:381](https://github.com/orangecheck/oc-packages/blob/main/
 
 Which audience a verifier accepts.
 
-```
-omitted   → a FAMILY session only: the token must carry no `aud`.
-a string  → a token bound to that audience (or one of several).
-"*"       → either. For the routes built to receive tokens that
-            integrators forward.
-```
+  omitted   → a FAMILY session only: the token must carry no `aud`.
+  a string  → a token bound to that audience (or one of several).
+  "*"       → either. For the routes built to receive tokens that
+              integrators forward.
 
 Omitted is the strict default: a token bound to a relying party is that
 party's credential and never a family sign-in. Tokens minted before

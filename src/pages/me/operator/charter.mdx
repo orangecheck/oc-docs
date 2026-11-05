@@ -57,6 +57,95 @@ reads a minute per IP, and a slug no federation has answers `404` with
 `federation_not_found`. A signer's own queue of charters waiting for their key
 is [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies).
 
+The roster's answer also carries `ratification`, the count the server decides
+by, and so does the `201` that takes a signature for a federation the portal
+keeps. `ratified` and `required` count distinct seated operators, one per key
+however many seats it fills, so a key on two seats signs once. `done` turns true
+once every one of them has signed the live hash, and the federation's record
+then carries that `charter_hash`. A bootstrap federation, with one key on every
+seat, is ratified by that key's one signature. The roster has to be whole first:
+while fewer seats have a seated guardian than the threshold's N, less any
+guardian who left after the key ceremony and still holds a share, `done` stays
+false whoever signs, and a `reason` says how many seats are filled. A seat held
+for an invited operator is not filled. When publishing the federation's invite
+is refused with `charter_not_ratified`, its `detail` is that reason, and the
+go-live check's charter line shows it too.
+
+The federation's trust posture decides its `charter_ratified` criterion,
+"charter ratified by every operator", by the same count. `/api/federations`,
+`/api/public/federations/<slug>` and the custody page's data serve that posture,
+but no `ratification` field of their own. The criterion's `detail` gives the
+`reason` when there is one. Otherwise it gives `ratified` of `required`, and
+only then, when a key holds more than one seat, it adds how many operators hold
+them all. The `key_diversity` criterion is unchanged.
+
+## Voting on an amendment
+
+A seat holder votes on a proposed amendment from a signed-in operator session,
+with the key that fills the seat, signing the amendment's exact text and a
+recent Bitcoin block:
+
+```
+POST https://me.ochk.io/api/operator/federations/<slug>/amendments/<id>/vote
+{ "vote": { … } }
+```
+
+The first vote opens the ballot, and the vote that decides it moves the
+amendment to `ratified` or `rejected`. A `200` carries the proposal and its
+tally.
+
+How many ratify votes it takes comes from the charter in force, its
+`amendment_quorum` line, never from the federation's signing threshold. "Every
+seated guardian" needs every seated operator to ratify, so one reject decides
+it; an M-of-N line needs M, as written. A charter with no `amendment_quorum`
+line takes every seated guardian. A line that cannot be read decides nothing:
+the vote is recorded, and the tally's `reason` says why. An amendment is
+rejected once it can no longer reach its quorum: under every seated guardian,
+once one seated operator rejects; under M-of-N, once the rejects leave fewer
+than M of the charter's N, or of the seated operators where more are seated. The
+count runs against the charter's N even while seats are unfilled, so a 3-of-5
+charter with 4 seated stays open after 2 rejects.
+
+A seat keeps its latest vote: an older vote sent from it after a newer one is
+refused with `409 vote_superseded`. Every rule counts operators, not seats, so
+M-of-N counts distinct operators: one key on several seats is one operator, and
+it counts once, by its latest vote across those seats; a key's opposite votes at
+one block count as reject. An amendment that cannot reach M says so: when fewer
+than M distinct operators are seated, the tally stays open with a `reason` (for
+example "needs 3 distinct operators; 1 is seated"), and a ratify vote is refused
+with `409 quorum_unreachable` and that reason, and nothing is recorded; a reject
+is still taken.
+
+A seat held for an invited operator who has not taken it yet is no seated
+guardian: a vote from it is refused with `422 seat_reserved`, and nothing is
+recorded.
+
+The vote and each move of the ballot are written over the proposal's record.
+When another write keeps changing that record, the route answers `503` with one
+of two codes:
+
+| Code          | What happened                                                                | What to do                                              |
+| ------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `row_busy`    | Nothing was written: not the vote, not the move. Sent with `Retry-After: 5`. | Wait the `Retry-After` seconds and send the vote again. |
+| `partly_done` | The vote was recorded; the move of the ballot after it was not.              | Send the same vote again.                               |
+
+Sending the same signed vote again is safe: the seat already holds it, so it is
+accepted and counted once, and the route then finishes the move.
+
+Opening the ballot or withdrawing an amendment by hand
+(`POST …/amendments/<id>/transition` with `next_state`) is one write, so it
+answers only `503 row_busy`, never `partly_done`: nothing was written, and you
+send it again.
+
+The list of a federation's amendments
+(`GET https://me.ochk.io/api/operator/federations/<slug>/amendments`) needs no
+sign-in. It names the quorum in `amendment_quorum` (its rule, the line's text,
+how many are `needed` of how many `seats`, and a `reason` when it cannot
+decide), and marks each held seat `reserved: true`. Each tally in it is counted
+when the list is built, from the votes against the federation's seats as they
+are then; a built list is kept up to 15 seconds, and a vote clears it. No answer
+carries the record's write nonce or its raw votes.
+
 ## Where the kit lives
 
 - **Source:**

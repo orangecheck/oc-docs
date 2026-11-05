@@ -805,10 +805,10 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz#3dc35ba0f1e66b403c00b39344f870298ebb1c8e"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
-"@orangecheck/app-design@^1.18.1":
-  version "1.29.3"
-  resolved "https://registry.yarnpkg.com/@orangecheck/app-design/-/app-design-1.29.3.tgz#86f984f257b364077c2d12a5102d5a56711794e4"
-  integrity sha512-7x+NuE3IXmYOzvs9QUzFdrpiGOz97ckzvnWjVzh/ObZJ9gy4MiSpV4sbOJgHT+1vA5JjGNSWFgzIsGI8X9V46g==
+"@orangecheck/app-design@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@orangecheck/app-design/-/app-design-2.0.1.tgz#968f2d9b647d94ab27226d25882d362df2d9aff9"
+  integrity sha512-npnRphXI0MZpZyPGR9ZHfHYVN2jybM7SHOUgAUbRnbzArdE7S2/r2pOfD9bgSIY4yNEYeveB5LziQ2ovbx6s/g==
   dependencies:
     "@orangecheck/mark" "^0.3.0"
     "@radix-ui/react-checkbox" "^1.3.3"
@@ -819,6 +819,7 @@
     "@radix-ui/react-radio-group" "^1.3.8"
     "@radix-ui/react-select" "^2.2.6"
     "@radix-ui/react-separator" "^1.1.7"
+    "@radix-ui/react-slider" "^1.6.1"
     "@radix-ui/react-slot" "^1.2.3"
     "@radix-ui/react-switch" "^1.2.6"
     "@radix-ui/react-tabs" "^1.1.13"
@@ -829,10 +830,10 @@
     sonner "^2.0.7"
     tailwind-merge "^3.3.1"
 
-"@orangecheck/auth-client@^2.35.2":
-  version "2.41.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.41.0.tgz#8a90f3be1fc83eb8973c1541dd8a164d0daa4a02"
-  integrity sha512-u9mWKBPEMOlQu2Njx44PGpfV1t8fSrr/15z/krHHklHBKbNMzJaH1cL3N1Swd3/bntJpx8OaIhCstNxPOmfOBw==
+"@orangecheck/auth-client@^2.42.1":
+  version "2.42.1"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.42.1.tgz#9e758fd475e146b3dffe9ec50da9e6e896c711d9"
+  integrity sha512-S/UF+s4cZHUG6wHFwYDvxVkMT9sB2UMidUxdhixyvvw0cLC7FMXy8AfLVvxO0pCC8/TAA4E8qPkk2gvB0O3TtA==
   dependencies:
     "@orangecheck/bip322" "^1.1.2"
     "@orangecheck/wallet-adapter" "^0.7.0"
@@ -1170,6 +1171,22 @@
   integrity sha512-1jUAap0wZEqVP05Ou7kJgRxe/W+Qftng+rUNWGa0qkKbv9r5pWTG3E7a3ELKo2eJoHKMECnzuYrZpSyO1YgcYQ==
   dependencies:
     "@radix-ui/react-primitive" "2.2.0"
+
+"@radix-ui/react-slider@^1.6.1":
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-slider/-/react-slider-1.6.1.tgz#22f72efd64cce1bd21117ca5544484d265509b9d"
+  integrity sha512-IRNRR90moPqxfwCJ0XbMJIxo70W0/1ZExT/sNCxEHMaPx0SF9HoQrcPEC75+H28cFKa0b+KH63anfLYJmwKacw==
+  dependencies:
+    "@radix-ui/number" "1.1.3"
+    "@radix-ui/primitive" "1.2.0"
+    "@radix-ui/react-collection" "1.2.0"
+    "@radix-ui/react-compose-refs" "1.1.5"
+    "@radix-ui/react-context" "1.3.0"
+    "@radix-ui/react-direction" "1.2.0"
+    "@radix-ui/react-primitive" "2.2.0"
+    "@radix-ui/react-use-controllable-state" "1.3.0"
+    "@radix-ui/react-use-layout-effect" "1.1.4"
+    "@radix-ui/react-use-size" "1.1.5"
 
 "@radix-ui/react-slot@1.5.0", "@radix-ui/react-slot@^1.2.3":
   version "1.5.0"

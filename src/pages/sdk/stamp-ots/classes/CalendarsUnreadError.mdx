@@ -1,0 +1,60 @@
+export const metadata = {
+    title: "Class: CalendarsUnreadError",
+    description: "Auto-generated API reference for Class: CalendarsUnreadError. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/stamp-ots**](../README)
+
+***
+
+[@orangecheck/stamp-ots](../README) / CalendarsUnreadError
+
+# Class: CalendarsUnreadError
+
+Defined in: [stamp-ots/src/upgrade.ts:48](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L48)
+
+No calendar a pending proof names answered, so nothing was learned: the
+proof may be anchored already. Thrown by `upgradeProof` instead of
+returning the proof as still `pending`.
+
+## Extends
+
+- `Error`
+
+## Constructors
+
+### Constructor
+
+```ts
+new CalendarsUnreadError(failures: {
+  calendar: string;
+  reason: string;
+}[]): CalendarsUnreadError;
+```
+
+Defined in: [stamp-ots/src/upgrade.ts:49](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L49)
+
+#### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `failures` | \&#123; `calendar`: `string`; `reason`: `string`; \&#125;[] | The calendars asked, with why each did not answer. |
+
+#### Returns
+
+`CalendarsUnreadError`
+
+#### Overrides
+
+```ts
+Error.constructor
+```
+
+## Properties
+
+| Property | Modifier | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-failures">&lt;/a> `failures` | `readonly` | \&#123; `calendar`: `string`; `reason`: `string`; \&#125;[] | The calendars asked, with why each did not answer. | - | [stamp-ots/src/upgrade.ts:51](https://github.com/orangecheck/oc-packages/blob/main/stamp-ots/src/upgrade.ts#L51) |
+| &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | - | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
+| &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | - | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
+| &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | - | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

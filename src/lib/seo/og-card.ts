@@ -22,3 +22,12 @@ export function docsCard(
         ? { headline: title.slice(0, cut), eyebrow: title.slice(cut + 3) }
         : { headline: title, eyebrow: 'Docs' };
 }
+
+/** Every docs page's card by its path, for the share-card route: `?page=<path>` draws it. */
+export const DOCS_CARDS: Readonly<Record<string, { title: string; eyebrow: string }>> =
+    Object.fromEntries(
+        Object.keys(sources).flatMap((page) => {
+            const card = docsCard(page);
+            return card ? [[page, { title: card.headline, eyebrow: card.eyebrow }]] : [];
+        })
+    );

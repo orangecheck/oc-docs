@@ -246,7 +246,10 @@ then `429 test_project_event_cap`. Every test project together records at most
 2,000 events a UTC day, then `429 test_events_ceiling` until midnight UTC; live
 projects never count toward it. A refused event records nothing and counts
 toward none of these. To record events for your users, verify your domain and go
-live.
+live. A test project's events are never billed against live escrow, whatever
+mode the platform runs in: that is decided when each event comes in. Its live
+top-up stays open, because going live needs a funded live balance, which the
+project spends once it is live.
 
 `/event/batch` takes the person's own session, not `user_address`: the cookie,
 or the token from the sign-in popup as `Authorization: Bearer`. Every event in a

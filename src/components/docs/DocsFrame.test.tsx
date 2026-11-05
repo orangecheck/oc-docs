@@ -61,36 +61,41 @@ const SIGNED_IN: Partial<OcSessionState> = {
 };
 
 describe('the docs header', () => {
-    it.each([false, true])('signed out, offers Sign in and Get an account (bare %s)', (bare) => {
-        const html = header({ status: 'anonymous' }, bare);
-        expect(links(html)).toEqual(
-            expect.arrayContaining([`Sign in -> ${SIGN_IN}`, `Get an account -> ${SIGN_IN}`])
-        );
-        expect(html).toContain('data-oca-cta');
-    });
+    it.each([false, true])(
+        'signed out, holds one way in, to ochk.io and back (bare %s)',
+        (bare) => {
+            const html = header({ status: 'anonymous' }, bare);
+            const ways = links(html).filter((l) => l.includes(`-> ${SIGN_IN}`));
+            expect(ways).toHaveLength(1);
+            expect(ways[0]).toMatch(/^Sign in/);
+            expect(html.match(/data-oca-account="out"/g)).toHaveLength(1);
+            expect(html).not.toContain('Get an account');
+            expect(html).not.toContain('data-oca-cta');
+        }
+    );
 
-    it('signed in, its CTA goes to the account on ochk.app and Sign in is gone', () => {
+    it('signed in, is one trigger named for the account, with no "Your account" beside it', () => {
         const html = header(SIGNED_IN);
-        expect(links(html)).toContain(`Your account -> ${ACCOUNT}`);
-        expect(html).not.toContain('Sign in');
-        // The account menu beside the CTA is this header's only way to sign out.
+        expect(html.match(/data-oca-account="[^"]*"/g)).toEqual(['data-oca-account="in"']);
         expect(html).toMatch(/<button[^>]*>(?:(?!<\/button>)[\s\S])*Satoshi/);
-        // "Get an account" stays only as the CTA's hidden reserve, which keeps the bar one width.
-        expect(links(html).filter((l) => l.startsWith('Get an account'))).toEqual([]);
+        expect(html).not.toContain('Your account');
+        expect(html).not.toContain('data-oca-cta');
+        expect(links(html).filter((l) => l.includes(SIGN_IN))).toEqual([]);
+        expect(links(html).filter((l) => l.includes(ACCOUNT))).toEqual([]);
     });
 
-    it('while the session is checked, the CTA keeps its place and nothing in the bar links to sign-in', () => {
+    it('while the session is checked, holds a placeholder that links nowhere', () => {
         const html = header({ status: 'loading' });
-        expect(html).toContain('data-oca-cta');
-        expect(html).not.toMatch(/<a data-oca-cta/);
-        expect(links(html).filter((l) => l.endsWith(`-> ${SIGN_IN}`))).toEqual([]);
+        expect(html).toMatch(/<span[^>]*data-oca-account="pending"[^>]*aria-hidden="true"/);
+        expect(links(html).filter((l) => l.includes(SIGN_IN))).toEqual([]);
     });
 
-    it('when the session check failed, offers the account as ochk.app does and never guesses signed out', () => {
+    it('when the session check failed, never guesses signed out and never says "Your account"', () => {
         const html = header({ status: 'error' });
-        expect(links(html)).toContain(`Your account -> ${ACCOUNT}`);
-        expect(links(html).filter((l) => l.includes('ochk.io/signin'))).toEqual([]);
-        expect(html).not.toContain('Sign in');
+        expect(html).toMatch(/<span[^>]*data-oca-account="unknown"[^>]*aria-hidden="true"/);
+        expect(links(html).filter((l) => l.includes(SIGN_IN))).toEqual([]);
+        expect(links(html).filter((l) => l.includes(ACCOUNT))).toEqual([]);
+        expect(html).not.toContain('Your account');
     });
 
     it('draws one lockup', () => {

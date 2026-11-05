@@ -1,19 +1,17 @@
-import type { DocsNavSection, DocsShellProps } from '@orangecheck/app-design/chrome';
+import type { DocsNavSection } from '@orangecheck/app-design/chrome';
 import type { Crumb, PagerLink, TocItem } from '@orangecheck/app-design/components';
 import type { ReactNode } from 'react';
 
 import {
     DOCS_HEADER_NAV,
     DocsShell,
-    OCHK_APP_ACCOUNT,
     OchkIoFooter,
     SiteHeader,
     SkipLink,
 } from '@orangecheck/app-design/chrome';
 import { Breadcrumbs, DocsPager, PageFrame, TextLink } from '@orangecheck/app-design/components';
-import { GET_AN_ACCOUNT, OCHK_IO } from '@orangecheck/app-design/family';
+import { OCHK_IO } from '@orangecheck/app-design/family';
 import { SessionAccount } from '@orangecheck/app-design/session';
-import { useOptionalOcSession } from '@orangecheck/auth-client';
 
 import { DocsSearch } from '@/components/docs/DocsSearch';
 import { DOCS_NAV, findDocsPage, findSectionFor, prevNextFor } from '@/components/docs/nav';
@@ -70,37 +68,8 @@ function pagerFor(path: string): { prev?: PagerLink; next?: PagerLink } {
 
 const search = <DocsSearch />;
 
-/** The label the signed-in CTA carries; the signed-out one is the family's GET_AN_ACCOUNT. */
-const YOUR_ACCOUNT = 'Your account';
-
-/**
- * The header's account parts, as on ochk.io. Signed out: "Sign in" and the deep "Get an account" CTA,
- * both to ochk.io's sign-in, which returns to this page. Signed in: the CTA goes to the account on
- * ochk.app and the menu beside it signs out. The CTA reserves the other label, so the bar keeps one
- * width whichever way the session check answers.
- */
-function useHeaderAccount(): Pick<DocsShellProps, 'cta' | 'signIn' | 'actions'> {
-    const status = useOptionalOcSession()?.status ?? 'anonymous';
-    if (status === 'authenticated') {
-        return {
-            cta: { label: YOUR_ACCOUNT, href: OCHK_APP_ACCOUNT, reserve: [GET_AN_ACCOUNT.label] },
-            signIn: false,
-            actions: <SessionAccount />,
-        };
-    }
-    // A failed check is not signed out: the account link works either way, as on ochk.app.
-    if (status === 'error') {
-        return {
-            cta: { label: YOUR_ACCOUNT, href: OCHK_APP_ACCOUNT, reserve: [GET_AN_ACCOUNT.label] },
-            signIn: false,
-        };
-    }
-    // Sign in only once the check says signed out: while it runs, nothing in the bar links.
-    return {
-        cta: { pending: status === 'loading', reserve: [YOUR_ACCOUNT] },
-        signIn: status === 'anonymous',
-    };
-}
+/** The one account control: the way in, to ochk.io's sign-in and back to this page, or the account menu. */
+const account = <SessionAccount />;
 
 /**
  * The docs in ochk.io's frame: its header with Docs marked, the sections on
@@ -120,7 +89,6 @@ export function DocsFrame({
     toc?: TocItem[];
     children: ReactNode;
 }) {
-    const account = useHeaderAccount();
     if (bare) {
         return (
             <div className="bg-background flex min-h-dvh flex-col">
@@ -130,7 +98,7 @@ export function DocsFrame({
                     family="docs"
                     nav={DOCS_HEADER_NAV}
                     search={search}
-                    {...account}
+                    account={account}
                 />
                 {/* The page's one framed column, as DocsShell draws for every other page. */}
                 <PageFrame id="main-content" className="flex-1">
@@ -149,7 +117,7 @@ export function DocsFrame({
             current={path}
             navCurrent={navItemFor(path)}
             search={search}
-            {...account}
+            account={account}
             breadcrumbs={
                 crumbs ? (
                     <Breadcrumbs

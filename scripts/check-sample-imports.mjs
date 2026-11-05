@@ -23,6 +23,8 @@ import { join } from 'node:path';
 
 import ts from 'typescript';
 
+import { latestServed } from './npm-latest.mjs';
+
 const PAGES = 'src/pages';
 // Generated TypeDoc pages quote the package's own JSDoc; oc-packages owns those.
 const GENERATED = /^src\/pages\/sdk\/[^/]+\//;
@@ -77,15 +79,12 @@ const failures = [];
 // 1. Every named package must be on npm; imports must not use deprecated ones.
 const meta = new Map();
 for (const pkg of [...mentions.keys()].sort()) {
-    const res = await fetch(`https://registry.npmjs.org/${pkg.replace('/', '%2f')}`);
-    if (res.status === 404) {
+    const found = await latestServed(pkg);
+    if (!found) {
         for (const f of mentions.get(pkg)) failures.push(`${f}  ${pkg}  (not a published package)`);
         continue;
     }
-    if (!res.ok) throw new Error(`registry ${res.status} for ${pkg}`);
-    const doc = await res.json();
-    const latest = doc['dist-tags'].latest;
-    meta.set(pkg, { latest, deprecated: doc.versions[latest]?.deprecated });
+    meta.set(pkg, found);
 }
 
 const pkgOf = (spec) => spec.split('/').slice(0, 2).join('/');

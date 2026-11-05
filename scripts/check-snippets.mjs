@@ -28,6 +28,7 @@ import { join } from 'node:path';
 
 import ts from 'typescript';
 
+import { latestServed } from './npm-latest.mjs';
 import { allFences, kindOf, NO_CHECK, pyImports, tsImports } from './snippets.mjs';
 
 const args = process.argv.slice(2);
@@ -106,8 +107,8 @@ async function checkTs(list) {
         }
         // The latest as npm itself says, so a release racing this check is read
         // from the registry it was published to, not a lagging mirror.
-        const res = await fetch(`https://registry.npmjs.org/${p.replace('/', '%2f')}`);
-        if (res.status === 404) {
+        const found = await latestServed(p);
+        if (!found) {
             for (const b of list.filter((x) => tsImports(x.code).some((s) => pkgOf(s) === p)))
                 failures.push({
                     file: b.file,
@@ -117,8 +118,7 @@ async function checkTs(list) {
                 });
             continue;
         }
-        if (!res.ok) throw new Error(`registry ${res.status} for ${p}`);
-        specs.push(`${p}@${(await res.json())['dist-tags'].latest}`);
+        specs.push(`${p}@${found.latest}`);
     }
     // A local build's own local dependencies (an unpublished auth-core under a
     // local me-client) go in too, so npm resolves them from the same place.

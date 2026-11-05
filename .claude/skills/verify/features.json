@@ -55,6 +55,7 @@
             "area": "home",
             "tests": [
                 "src/__tests__/doc-link-expect.test.ts",
+                "src/components/docs/DocsFrame.test.tsx",
                 "src/lib/seo/og-card.test.ts",
                 "src/lib/unknown-api-route.test.ts"
             ]
@@ -201,7 +202,7 @@
             "entry": "src/pages/attest/index.mdx",
             "reach": "https://ochk.io/docs/attest",
             "area": "attest",
-            "tests": []
+            "tests": ["src/components/docs/DocsFrame.test.tsx"]
         },
         {
             "id": "page:/attest/api",
@@ -209,7 +210,7 @@
             "entry": "src/pages/attest/api.mdx",
             "reach": "https://ochk.io/docs/attest/api",
             "area": "attest",
-            "tests": []
+            "tests": ["src/components/docs/DocsFrame.test.tsx"]
         },
         {
             "id": "page:/attest/bonds",
@@ -673,7 +674,10 @@
             "entry": "src/pages/me/index.mdx",
             "reach": "https://ochk.io/docs/me",
             "area": "me",
-            "tests": ["src/__tests__/backing-copy.test.ts"]
+            "tests": [
+                "src/__tests__/backing-copy.test.ts",
+                "src/components/docs/DocsFrame.test.tsx"
+            ]
         },
         {
             "id": "page:/me/api",
@@ -681,7 +685,7 @@
             "entry": "src/pages/me/api.mdx",
             "reach": "https://ochk.io/docs/me/api",
             "area": "me",
-            "tests": []
+            "tests": ["src/components/docs/DocsFrame.test.tsx"]
         },
         {
             "id": "page:/me/custody",
@@ -5936,6 +5940,14 @@
             "kind": "page",
             "entry": "src/pages/sdk/lock-core/functions/canonicalize.mdx",
             "reach": "https://ochk.io/docs/sdk/lock-core/functions/canonicalize",
+            "area": "sdk",
+            "tests": []
+        },
+        {
+            "id": "page:/sdk/lock-core/functions/computeEnvelopeId",
+            "kind": "page",
+            "entry": "src/pages/sdk/lock-core/functions/computeEnvelopeId.mdx",
+            "reach": "https://ochk.io/docs/sdk/lock-core/functions/computeEnvelopeId",
             "area": "sdk",
             "tests": []
         },
@@ -12020,6 +12032,14 @@
             "tests": []
         },
         {
+            "id": "page:/sdk/vote-react/interfaces/PollContent",
+            "kind": "page",
+            "entry": "src/pages/sdk/vote-react/interfaces/PollContent.mdx",
+            "reach": "https://ochk.io/docs/sdk/vote-react/interfaces/PollContent",
+            "area": "sdk",
+            "tests": []
+        },
+        {
             "id": "page:/sdk/vote-react/interfaces/TallyResponse",
             "kind": "page",
             "entry": "src/pages/sdk/vote-react/interfaces/TallyResponse.mdx",
@@ -12505,7 +12525,7 @@
             "entry": "src/pages/vote/api.mdx",
             "reach": "https://ochk.io/docs/vote/api",
             "area": "vote",
-            "tests": []
+            "tests": ["src/components/docs/DocsFrame.test.tsx"]
         },
         {
             "id": "page:/vote/integration",

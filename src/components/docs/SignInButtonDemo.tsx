@@ -46,6 +46,13 @@ const HOST_CSS = `
 [data-demo-host='lantern'] .host-btn.host-icon { min-width: 46px; }
 :is(.dark *) [data-demo-host='lantern'] { background: #17120a; color: #f8ecd6; border-color: #3a2c12; }
 :is(.dark *) [data-demo-host='lantern'] .host-btn.quiet { color: #f8ecd6; box-shadow: inset 0 0 0 1px #6b5023; }
+
+/* A 320px phone gives the column 286px: Ledger's orangecheck button (279px) in a 20px padded card scrolled the page
+   sideways. Below 360px the cards and the worded buttons take less padding, so every row fits. */
+@media (max-width: 22.5rem) {
+  [data-demo-host] { padding: 12px; }
+  [data-demo-host] .host-btn:not(.host-icon) { padding-left: 8px; padding-right: 8px; }
+}
 `;
 
 function useOutcome() {

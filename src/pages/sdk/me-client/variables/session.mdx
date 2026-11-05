@@ -29,38 +29,44 @@ the events that earn them sats.
 
 Three entry points for three audiences:
 
-  import &#123; ... &#125; from '@orangecheck/me-client'         // events, config,
-                                                         webhooks (no React)
-  import &#123; ... &#125; from '@orangecheck/me-client/server'  // server-side
-                                                         verification
-                                                         (Next.js, Express,
-                                                          Hono — all without
-                                                          env vars or JWK
-                                                          handling)
-  import &#123; signInWithOc &#125; from '@orangecheck/me-client/popup'
-                                                      // browser-only popup
-                                                         orchestrator
+```
+import { ... } from '@orangecheck/me-client'         // events, config,
+                                                       webhooks (no React)
+import { ... } from '@orangecheck/me-client/server'  // server-side
+                                                       verification
+                                                       (Next.js, Express,
+                                                        Hono — all without
+                                                        env vars or JWK
+                                                        handling)
+import { signInWithOc } from '@orangecheck/me-client/popup'
+                                                    // browser-only popup
+                                                       orchestrator
+```
 
 Server-side verification example:
 
-  // pages/api/me.ts
-  import &#123; withOcAuth &#125; from '@orangecheck/me-client/server';
+```
+// pages/api/me.ts
+import { withOcAuth } from '@orangecheck/me-client/server';
 
-  export default withOcAuth(async (req, res) => &#123;
-    if (!req.ocSession) return res.status(401).json(&#123; ok: false &#125;);
-    res.status(200).json(&#123; address: req.ocSession.did_oc &#125;);
-  &#125;);
+export default withOcAuth(async (req, res) => {
+  if (!req.ocSession) return res.status(401).json({ ok: false });
+  res.status(200).json({ address: req.ocSession.did_oc });
+});
+```
 
 Popup signin example:
 
-  import &#123; signInWithOc &#125; from '@orangecheck/me-client/popup';
+```
+import { signInWithOc } from '@orangecheck/me-client/popup';
 
-  button.addEventListener('click', async () => &#123;
-    const result = await signInWithOc();
-    if (!result) return; // user cancelled
-    localStorage.setItem('oc-token', result.token);
-    location.assign('/dashboard');
-  &#125;);
+button.addEventListener('click', async () => {
+  const result = await signInWithOc();
+  if (!result) return; // user cancelled
+  localStorage.setItem('oc-token', result.token);
+  location.assign('/dashboard');
+});
+```
 
 ## Type Declaration
 

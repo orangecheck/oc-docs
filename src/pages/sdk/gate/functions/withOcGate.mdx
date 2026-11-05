@@ -19,18 +19,20 @@ Defined in: [next.ts:27](https://github.com/orangecheck/oc-packages/blob/main/ga
 
 Next.js Pages Router API wrapper.
 
-  import &#123; withOcGate &#125; from '@orangecheck/gate';
+```
+import { withOcGate } from '@orangecheck/gate';
 
-  async function handler(req, res) &#123;
-    // The decision is attached to req when the gate lets the call through.
-    res.json(&#123; hello: (req as any).orangecheck.sats &#125;);
-  &#125;
+async function handler(req, res) {
+  // The decision is attached to req when the gate lets the call through.
+  res.json({ hello: (req as any).orangecheck.sats });
+}
 
-  export default withOcGate(handler, &#123;
-    minSats: 100_000,
-    minDays: 30,
-    address: &#123; from: 'query', name: 'addr' &#125;,
-  &#125;);
+export default withOcGate(handler, {
+  minSats: 100_000,
+  minDays: 30,
+  address: { from: 'query', name: 'addr' },
+});
+```
 
 ## Type Parameters
 

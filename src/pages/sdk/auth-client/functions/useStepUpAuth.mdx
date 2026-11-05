@@ -31,11 +31,13 @@ Never throws. It resolves `{ ok: false, reason }`, and sets `error`, when:
 Caller pattern. Test `ok`: the result is an object on failure too, so a
 check like `if (!r)` never stops anything.
 
-  const &#123; stepUp &#125; = useStepUpAuth();
-  const r = await stepUp(&#123; purpose: 'spend_over_1m' &#125;);
-  if (!r.ok) return; // r.reason says why: 'cancelled', 'verify_failed', …
-  // …proceed with the sensitive action. On success stepUp has already
-  // refreshed the session, so it carries the new step_up_at.
+```
+const { stepUp } = useStepUpAuth();
+const r = await stepUp({ purpose: 'spend_over_1m' });
+if (!r.ok) return; // r.reason says why: 'cancelled', 'verify_failed', …
+// …proceed with the sensitive action. On success stepUp has already
+// refreshed the session, so it carries the new step_up_at.
+```
 
 A server still decides with `verifyStepUpClaim`; this check only keeps the
 page from going on after a failed step-up.

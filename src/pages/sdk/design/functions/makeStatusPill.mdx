@@ -29,12 +29,14 @@ This is the ergonomic that www
 (StateBadge severity), and me (compliance/severity) each hand-roll. Instead
 of re-deriving tone-class logic per site, declare the map once:
 
-  const AgentStatusPill = makeStatusPill(&#123;
-      online:  &#123; tone: 'success' &#125;,
-      offline: &#123; tone: 'destructive', label: 'down' &#125;,
-      pending: &#123; tone: 'warning' &#125;,
-  &#125;);
-  &lt;AgentStatusPill status=&#123;agent.status&#125; />
+```
+const AgentStatusPill = makeStatusPill({
+    online:  { tone: 'success' },
+    offline: { tone: 'destructive', label: 'down' },
+    pending: { tone: 'warning' },
+});
+<AgentStatusPill status={agent.status} />
+```
 
 Pass `{ variant: 'bordered' }` for the uppercase-badge form (pledge
 states, www state badges, me compliance/severity).

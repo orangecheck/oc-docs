@@ -28,9 +28,11 @@ Convenience wrapper · the most common consumer pattern is "if the
 fetch response's body has `reason === 'sudo_required'`, redirect."
 Use this to keep that idiom one line:
 
-  const r = await fetch(...);
-  const j = await r.json();
-  if (handleSudoRequired(j, &#123; purpose: 'register hardware key' &#125;)) return;
+```
+const r = await fetch(...);
+const j = await r.json();
+if (handleSudoRequired(j, { purpose: 'register hardware key' })) return;
+```
 
 Returns `true` if a redirect happened (and the caller should
 short-circuit), `false` otherwise.

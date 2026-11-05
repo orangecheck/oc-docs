@@ -19,17 +19,19 @@ Defined in: [express.ts:25](https://github.com/orangecheck/oc-packages/blob/main
 
 Express / Connect / Next-pages-API middleware.
 
-  import &#123; ocGate &#125; from '@orangecheck/gate';
+```
+import { ocGate } from '@orangecheck/gate';
 
-  app.post(
-    '/post',
-    ocGate(&#123;
-      minSats: 100_000,
-      minDays: 30,
-      address: &#123; from: 'header' &#125;,   // reads X-OC-Address
-    &#125;),
-    postHandler,
-  );
+app.post(
+  '/post',
+  ocGate({
+    minSats: 100_000,
+    minDays: 30,
+    address: { from: 'header' },   // reads X-OC-Address
+  }),
+  postHandler,
+);
+```
 
 On block: answers 401 for `no_subject`, otherwise 403, with
 `{ error: 'orangecheck_gate_blocked', reason, reasons? }` (and `subject` /

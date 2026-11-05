@@ -23,8 +23,10 @@ Queries below use Promise.allSettled, so a fan-out used to take as long as
 its SLOWEST relay — and with a dead relay in DEFAULT_RELAYS that meant the
 per-relay 10s timeout, every single call. Measured on 1.4.0:
 
-    check(&#123; addr &#125;)  with the old defaults   10.4s
-    check(&#123; addr &#125;)  with the dead relay out   1.0s
+```
+check({ addr })  with the old defaults   10.4s
+check({ addr })  with the dead relay out   1.0s
+```
 
 That is not merely slow, it broke a dependent outright: @orangecheck/gate
 races check() against a 5s lookupTimeoutMs, so a 10.4s lookup lost the race

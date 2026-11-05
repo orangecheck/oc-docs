@@ -1,25 +1,21 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { createOgHandler } from '@orangecheck/site-kit/og';
 
-import { OG_SIZE, OgCard, ogFonts } from '@orangecheck/app-design/og';
-import { ImageResponse } from 'next/og';
-
-import { docsCard } from '@/lib/seo/og-card';
+import { DOCS_CARDS } from '@/lib/seo/og-card';
 
 /**
- * The docs share card, 1200×630 PNG. `?page=<path>` draws that docs page's own
- * title, with its section above; anything else, `?title=` included, draws the
- * default card, so a card never carries a caller's text.
+ * The docs share card, 1200×630 PNG: the family's card from site-kit, kept a
+ * day by the browser and the edge.
  *
- * A Pages route on the node runtime: a returned Response would be ignored,
- * so the image is copied onto `res`, headers included.
+ * `?page=<path>` draws that docs page's own title, with its section above; the
+ * route alone draws the default. Any other query is sent there with a 308,
+ * under /docs, so no request puts its own words on a card, nor makes the site
+ * render on demand.
  */
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const page = new URL(req.url ?? '/', 'http://docs.invalid').searchParams.get('page');
-    const card = docsCard(page) ?? { headline: 'the orangecheck handbook.', eyebrow: 'Docs' };
-    const image = new ImageResponse(
-        <OgCard product="docs" eyebrow={card.eyebrow} title={card.headline} host="ochk.io/docs" />,
-        { ...OG_SIZE, fonts: ogFonts() }
-    );
-    image.headers.forEach((value, key) => res.setHeader(key, value));
-    res.status(image.status).send(Buffer.from(await image.arrayBuffer()));
-}
+export default createOgHandler({
+    cards: DOCS_CARDS,
+    defaultTitle: 'the orangecheck handbook.',
+    product: 'docs',
+    eyebrow: 'Docs',
+    host: 'ochk.io/docs',
+    basePath: '/docs',
+});

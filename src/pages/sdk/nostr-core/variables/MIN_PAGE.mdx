@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Variable: MINPAGE",
+    description: "Auto-generated API reference for Variable: MINPAGE. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / MIN\_PAGE
+
+# Variable: MIN\_PAGE
+
+```ts
+const MIN_PAGE: 100 = 100;
+```
+
+Defined in: [pages.ts:68](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L68)
+
+The smallest page a relay is taken to send when it holds more. A page under
+it (or under `limit`, when that is smaller) ends a relay's read; a relay
+whose NIP-11 document declares a `max_limit` below it is cut off.

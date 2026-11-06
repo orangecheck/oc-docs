@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Type Alias: PagedReadState",
+    description: "Auto-generated API reference for Type Alias: PagedReadState. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / PagedReadState
+
+# Type Alias: PagedReadState
+
+```ts
+type PagedReadState = "complete" | "cut_off" | "no_answer";
+```
+
+Defined in: [pages.ts:14](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L14)
+
+How one relay's paged read ended. complete: it sent all it holds for the
+filter. cut_off: it sent something and could not be read to the end (it
+stopped answering, a bound stopped it, or it may hold more at one second
+than it sends in a page). no_answer: it sent nothing and no EOSE.

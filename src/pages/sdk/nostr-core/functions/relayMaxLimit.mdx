@@ -1,0 +1,34 @@
+export const metadata = {
+    title: "Function: relayMaxLimit()",
+    description: "Auto-generated API reference for Function: relayMaxLimit(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / relayMaxLimit
+
+# Function: relayMaxLimit()
+
+```ts
+function relayMaxLimit(url: string, timeoutMs?: number): Promise<number | undefined>;
+```
+
+Defined in: [pages.ts:358](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L358)
+
+The `max_limit` relay `url`'s NIP-11 document declares, or undefined when it
+declares none or the document cannot be read. A redirect is not followed: it
+is a document that cannot be read. A declared limit is kept for the life of
+the process; a failed read is tried again next time.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `url` | `string` | `undefined` |
+| `timeoutMs` | `number` | `3000` |
+
+## Returns
+
+`Promise`\&lt;`number` \| `undefined`\>

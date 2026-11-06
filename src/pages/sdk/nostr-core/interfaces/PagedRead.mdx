@@ -1,0 +1,25 @@
+export const metadata = {
+    title: "Interface: PagedRead",
+    description: "Auto-generated API reference for Interface: PagedRead. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / PagedRead
+
+# Interface: PagedRead
+
+Defined in: [pages.ts:50](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L50)
+
+A read paged to its end: every event it read, and how each relay's read ended.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-events">&lt;/a> `events` | [`NostrEvent`](NostrEvent)[] | Every distinct event read, newest first. | [pages.ts:52](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L52) |
+| &lt;a id="property-pages">&lt;/a> `pages` | `number` | REQs made. | [pages.ts:60](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L60) |
+| &lt;a id="property-relaystatus">&lt;/a> `relayStatus?` | \&#123; `eose`: `boolean`; `relay?`: `string`; `state`: [`PagedReadState`](../type-aliases/PagedReadState); \&#125;[] | Per relay, how its read ended. Absent when the query named no relay. | [pages.ts:54](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L54) |
+| &lt;a id="property-truncated">&lt;/a> `truncated` | `boolean` | A relay that may hold more was stopped: by a bound, by a second holding more than it sends in a page, or by a page size it declares below the page that ends a read (MIN_PAGE, or `limit` when smaller). | [pages.ts:58](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L58) |

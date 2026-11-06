@@ -1,0 +1,28 @@
+export const metadata = {
+    title: "Interface: PageAnswer",
+    description: "Auto-generated API reference for Interface: PageAnswer. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / PageAnswer
+
+# Interface: PageAnswer
+
+Defined in: [pages.ts:21](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L21)
+
+One relay's answer to one REQ: whether it sent EOSE and, where known, what
+it sent (`events` kept and `rejected`, as queryEvents counts them). A reader
+that paged the relay itself gives `state` instead.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-eose">&lt;/a> `eose` | `boolean` | [pages.ts:23](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L23) |
+| &lt;a id="property-events">&lt;/a> `events?` | `number` | [pages.ts:25](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L25) |
+| &lt;a id="property-rejected">&lt;/a> `rejected?` | `number` | [pages.ts:26](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L26) |
+| &lt;a id="property-relay">&lt;/a> `relay?` | `string` | [pages.ts:22](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L22) |
+| &lt;a id="property-state">&lt;/a> `state?` | [`PagedReadState`](../type-aliases/PagedReadState) | [pages.ts:24](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L24) |

@@ -13,6 +13,9 @@ export const metadata = {
 
 - [Filter](interfaces/Filter)
 - [NostrEvent](interfaces/NostrEvent)
+- [PageAnswer](interfaces/PageAnswer)
+- [PageBounds](interfaces/PageBounds)
+- [PagedRead](interfaces/PagedRead)
 - [PublishOutcome](interfaces/PublishOutcome)
 - [PublishResult](interfaces/PublishResult)
 - [QueryResult](interfaces/QueryResult)
@@ -24,11 +27,14 @@ export const metadata = {
 
 - [AuthSigner](type-aliases/AuthSigner)
 - [IndexableTagFilter](type-aliases/IndexableTagFilter)
+- [PagedReadState](type-aliases/PagedReadState)
+- [PageQuery](type-aliases/PageQuery)
 - [SubscriptionState](type-aliases/SubscriptionState)
 
 ## Variables
 
 - [DEFAULT\_RELAYS](variables/DEFAULT_RELAYS)
+- [MIN\_PAGE](variables/MIN_PAGE)
 
 ## Functions
 
@@ -40,5 +46,8 @@ export const metadata = {
 - [publishEvent](functions/publishEvent)
 - [publishOutcome](functions/publishOutcome)
 - [queryEvents](functions/queryEvents)
+- [readPages](functions/readPages)
+- [readRelays](functions/readRelays)
+- [relayMaxLimit](functions/relayMaxLimit)
 - [subscribe](functions/subscribe)
 - [verifyEvent](functions/verifyEvent)

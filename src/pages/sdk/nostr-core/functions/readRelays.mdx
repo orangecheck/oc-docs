@@ -1,0 +1,62 @@
+export const metadata = {
+    title: "Function: readRelays()",
+    description: "Auto-generated API reference for Function: readRelays(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / readRelays
+
+# Function: readRelays()
+
+```ts
+function readRelays(
+   filter: Filter, 
+   relays?: readonly string[], 
+   opts?: Omit<PageBounds, "budget"> & {
+  query?: (filter: Filter, relays: readonly string[], timeoutMs: number) => Promise<{
+     events: NostrEvent[];
+     relayStatus?: readonly PageAnswer[];
+  }>;
+  timeoutMs?: number;
+}): Promise<{
+  events: NostrEvent[];
+  relayStatus: {
+     eose: boolean;
+     relay: string;
+     state: PagedReadState;
+  }[];
+  truncated: boolean;
+}>;
+```
+
+Defined in: [index.ts:1012](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/index.ts#L1012)
+
+`filter` read on each relay alone with readPages, so one relay's flood or
+silence touches only its own read, every page of one relay sharing one
+deadline (`timeoutMs`, default 4000). A relay that does not finish by then
+is cut off and the read truncated, or no answer if it sent nothing. NIP-11
+`max_limit` is read with relayMaxLimit; with your own `query`, pass
+`maxLimit` too. `eose` is true only for a relay whose read is complete.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `filter` | [`Filter`](../interfaces/Filter) | `undefined` |
+| `relays` | readonly `string`[] | `DEFAULT_RELAYS` |
+| `opts` | `Omit`\&lt;[`PageBounds`](../interfaces/PageBounds), `"budget"`\> & \&#123; `query?`: (`filter`: [`Filter`](../interfaces/Filter), `relays`: readonly `string`[], `timeoutMs`: `number`) => `Promise`\&lt;\&#123; `events`: [`NostrEvent`](../interfaces/NostrEvent)[]; `relayStatus?`: readonly [`PageAnswer`](../interfaces/PageAnswer)[]; \&#125;\>; `timeoutMs?`: `number`; \&#125; | `{}` |
+
+## Returns
+
+`Promise`\&lt;\&#123;
+  `events`: [`NostrEvent`](../interfaces/NostrEvent)[];
+  `relayStatus`: \&#123;
+     `eose`: `boolean`;
+     `relay`: `string`;
+     `state`: [`PagedReadState`](../type-aliases/PagedReadState);
+  \&#125;[];
+  `truncated`: `boolean`;
+\&#125;\>

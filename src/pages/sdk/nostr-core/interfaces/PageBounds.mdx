@@ -1,0 +1,27 @@
+export const metadata = {
+    title: "Interface: PageBounds",
+    description: "Auto-generated API reference for Interface: PageBounds. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/nostr-core**](../README)
+
+***
+
+[@orangecheck/nostr-core](../README) / PageBounds
+
+# Interface: PageBounds
+
+Defined in: [pages.ts:36](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L36)
+
+How far one paged read goes.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-budget">&lt;/a> `budget?` | \&#123; `left`: `number`; \&#125; | REQs left across several reads: each takes one, and a read stops when none is left. | [pages.ts:44](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L44) |
+| `budget.left` | `number` | - | [pages.ts:44](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L44) |
+| &lt;a id="property-limit">&lt;/a> `limit?` | `number` | Events asked for per page; default 500. | [pages.ts:38](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L38) |
+| &lt;a id="property-maxevents">&lt;/a> `maxEvents?` | `number` | Distinct events read before the read stops; default 2,000. | [pages.ts:40](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L40) |
+| &lt;a id="property-maxlimit">&lt;/a> `maxLimit?` | (`relay`: `string`) => `Promise`\&lt;`number` \| `undefined`\> | The `max_limit` a relay's NIP-11 document declares, if any (`relayMaxLimit`). | [pages.ts:46](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L46) |
+| &lt;a id="property-maxpages">&lt;/a> `maxPages?` | `number` | REQs made before the read stops, so a relay that sends a few at a time still ends; default 16. | [pages.ts:42](https://github.com/orangecheck/oc-packages/blob/main/nostr-core/src/pages.ts#L42) |

@@ -98,9 +98,13 @@ describe('the docs header', () => {
         expect(html).not.toContain('Your account');
     });
 
-    it('draws one lockup', () => {
-        // The flat lockup's swoosh is a 16 by 8 drawing; the app icon's tile is never in chrome.
-        expect(header({ status: 'anonymous' }).match(/viewBox="0 0 16 8"/g)).toHaveLength(1);
+    it('draws one lockup in each logo', () => {
+        // Classic and pixel, one shown by the page's switch. Each flat check is a 16 by 8
+        // drawing; the app icon's tile is never in chrome.
+        const html = header({ status: 'anonymous' });
+        expect(html.match(/\sdata-oca-logo="classic"/g)).toHaveLength(1);
+        expect(html.match(/\sdata-oca-logo="pixel"/g)).toHaveLength(1);
+        expect(html.match(/viewBox="0 0 16 8"/g)).toHaveLength(2);
     });
 });
 

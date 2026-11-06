@@ -12,16 +12,17 @@ export const metadata = {
 # Type Alias: SubjectReadState
 
 ```ts
-type SubjectReadState = "complete" | "cut_off" | "no_answer";
+type SubjectReadState = PagedReadState;
 ```
 
-Defined in: [nostr.ts:349](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/nostr.ts#L349)
+Defined in: [nostr.ts:376](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/nostr.ts#L376)
 
-How one relay's read of a subject ended. complete: its last page came back
-short, so it sent every event it holds there. cut_off: it sent a full page
-that could not be read past (a page that added nothing, which is stuck on one
-second, or the page bound), or it stopped (a timeout, a CLOSED, a dropped
-socket) after sending something. no_answer: it sent nothing.
+How one relay's read of a subject ended. Each relay is paged alone by
+nostr-core's `readPages`, 500 asked a page, newest first, up to 2,000 events
+or 16 REQs. complete: it sent every event it holds there. cut_off: it may
+hold more (a full page at one second, which is stepped past so what lies
+below it is still read, or the bound), or it stopped (a timeout, a CLOSED, a
+dropped socket) after sending something. no_answer: it sent nothing.
 
 Anyone can publish under a subject's tags, and relays answer newest first up
-to their cap, so only a complete read says what a relay does not hold.
+to their own cap, so only a complete read says what a relay does not hold.

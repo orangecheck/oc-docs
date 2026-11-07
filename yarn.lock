@@ -831,9 +831,9 @@
     tailwind-merge "^3.3.1"
 
 "@orangecheck/auth-client@^2.42.1":
-  version "2.42.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.42.1.tgz#9e758fd475e146b3dffe9ec50da9e6e896c711d9"
-  integrity sha512-S/UF+s4cZHUG6wHFwYDvxVkMT9sB2UMidUxdhixyvvw0cLC7FMXy8AfLVvxO0pCC8/TAA4E8qPkk2gvB0O3TtA==
+  version "2.42.3"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.42.3.tgz#6152ccc290a4b713e91c7b8b5165069c81a802f2"
+  integrity sha512-klZiV3Bbzq9Zza0u7qtAdB+Bm3bOTdvOKQJu0MW9h0kGjNl+EmxnYFflIREsm/xXkH1SbUaJ6Q2+YNQoQFVMDg==
   dependencies:
     "@orangecheck/bip322" "^1.1.2"
     "@orangecheck/wallet-adapter" "^0.7.0"
@@ -877,9 +877,9 @@
     "@orangecheck/auth-core" "^2.26.1"
 
 "@orangecheck/site-kit@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.8.1.tgz#ef972356a5c1c9c00008b03778d1b66dbfb3547d"
-  integrity sha512-VTE8dwGYUjnUA/JNWrYgYpFe8iddxGaLK1oL3h5tsaRVqDb10nk75/IemO9ttFrRNNS4TFPGU0TS2oOFWMLxwQ==
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.8.3.tgz#02c71477cc9177661ff2bcedbf68b0b372075c1a"
+  integrity sha512-Rx2yaXeE1sSMey0qnBIDSordRZjPhvSiY0NcoOPMijM6Y3QrsVb5FhiZSLML0TsMucoRFFi1eR0Do4z/rUUcmQ==
 
 "@orangecheck/wallet-adapter@^0.7.0":
   version "0.7.2"

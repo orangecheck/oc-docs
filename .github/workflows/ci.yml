@@ -115,3 +115,9 @@ jobs:
 
             - name: Build
               run: yarn build
+
+            # Serves the build and reads every page against its own policy: each
+            # inline script it runs is listed by hash, with no 'unsafe-inline'.
+            # A theme script that changes with a next-themes bump fails here.
+            - name: Inline scripts run by their hashes
+              run: yarn oc-site-kit csp-check

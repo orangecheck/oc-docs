@@ -3,12 +3,12 @@ import { THEME_COLOR } from '@orangecheck/app-design/tokens';
 import { FamilyAnalytics } from '@orangecheck/site-kit/analytics';
 import { Head, Html, Main, NextScript } from 'next/document';
 
+import { ANALYTICS } from '@/lib/inline-scripts';
 import { SITE_CONFIG } from '@/lib/site.config';
 
-// Raw paths in this file do not get basePath, so it is added by hand here
-// and on the favicons. Analytics post to the first-party proxy under it.
+// Raw paths in this file do not get basePath, so it is added by hand on the
+// favicons. Analytics post to the first-party proxy under it (ANALYTICS).
 const BASE = SITE_CONFIG.basePath;
-const PLAUSIBLE_API = process.env.NEXT_PUBLIC_PLAUSIBLE_API ?? `${BASE}/oc-insights/event`;
 
 export default function Document() {
     return (
@@ -57,8 +57,9 @@ export default function Document() {
                 <meta name="color-scheme" content="light dark" />
 
                 {/* Plausible, each page reported as origin and path only. The docs
-                    never loaded oc-pulse, and still don't. */}
-                <FamilyAnalytics api={PLAUSIBLE_API} pulseSrc="" />
+                    never loaded oc-pulse, and still don't. script-src runs it by hash,
+                    from the same props (lib/inline-scripts.ts). */}
+                <FamilyAnalytics {...ANALYTICS} />
             </Head>
             <body>
                 <Main />

@@ -105,6 +105,5 @@ PID=$(ss -ltnp | grep ":$PORT " | grep -o 'pid=[0-9]*' | cut -d= -f2)
 [ "$(readlink /proc/$PID/cwd)" = "$PWD" ] && kill $PID
 ```
 
-Other sessions run Next servers on this machine; kill nothing else. `yarn build` rewrites `public/sitemap.xml` and
-`src/generated/doc-sources.json`; restore them (`git checkout -- <file>`) unless the
-change meant to regenerate them.
+Other sessions run Next servers on this machine; kill nothing else. `yarn build` writes `public/sitemap.xml` and
+`src/generated/doc-sources.json`; neither is committed, so a build leaves the tree clean.

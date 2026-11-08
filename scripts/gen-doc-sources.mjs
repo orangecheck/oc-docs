@@ -11,7 +11,8 @@
  * emit an exact map. Same philosophy as sitemap.xml.ts.
  *
  * Output: src/generated/doc-sources.json  { "/vote/spec": "src/pages/vote/spec.mdx", ... }
- * Committed so type-check/build always have it; `prebuild` keeps it fresh.
+ * Not committed: predev, pretype-check, pretest and prebuild write it, so every
+ * reader sees the pages as they are.
  */
 import { mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';

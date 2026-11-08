@@ -16,3 +16,8 @@ tsconfig.tsbuildinfo
 public/search-index.json
 # written by scripts/me-client-sri.mjs before dev, test and build
 src/generated/me-client-cdn.mdx
+# The route to source-file map. Written by scripts/gen-doc-sources.mjs before
+# dev, type-check, test and build, from the pages themselves.
+src/generated/doc-sources.json
+# Written by scripts/gen-sitemap.mjs on every build.
+public/sitemap.xml

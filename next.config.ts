@@ -5,8 +5,11 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 
 import createMDX from '@next/mdx';
 import { rehypeCode } from '@orangecheck/app-design/code';
+import { inlineHashes, themeScript } from '@orangecheck/site-kit/csp';
+import { inlineSources } from '@orangecheck/site-kit/headers';
 import rehypeSlug from 'rehype-slug';
 
+import { HEAD_SCRIPTS } from './src/lib/inline-scripts';
 import { recmaToc, rehypeToc } from './src/lib/mdx-toc.mjs';
 import { MOVED_PAGES } from './src/lib/moved-pages';
 import rehypeKeepIds from './src/lib/rehype-keep-ids.mjs';
@@ -14,6 +17,17 @@ import rehypeTypedoc from './src/lib/rehype-typedoc.mjs';
 import { SITE_CONFIG } from './src/lib/site.config';
 
 const isDev = process.env.NODE_ENV !== 'production';
+
+/**
+ * script-src's inline sources: the hash of each inline script a page runs (the
+ * head's and the theme's), so no other inline script runs. next dev prints the
+ * theme script unminified, so it keeps 'unsafe-inline' instead.
+ */
+const inlineScripts = () =>
+    inlineSources({
+        scriptHashes: inlineHashes([...HEAD_SCRIPTS, themeScript()]),
+        dev: isDev,
+    }).join(' ');
 
 // The old host. Every address on it moves to the same path under ochk.io/docs.
 const OLD_HOST = [{ type: 'host' as const, value: 'docs.ochk.io' }];
@@ -184,10 +198,11 @@ const nextConfig: NextConfig = {
                             "default-src 'self'",
                             // Next dev (react-refresh / HMR) evaluates code via
                             // eval and talks to the dev server over a websocket;
-                            // production stays strict (no 'unsafe-eval', no ws:).
+                            // production stays strict (no 'unsafe-eval', no ws:)
+                            // and runs inline scripts by hash only.
                             isDev
                                 ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-                                : "script-src 'self' 'unsafe-inline'",
+                                : `script-src 'self' ${inlineScripts()}`,
                             "style-src 'self' 'unsafe-inline'",
                             "img-src 'self' data: https:",
                             "font-src 'self' data:",

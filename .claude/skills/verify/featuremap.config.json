@@ -1,6 +1,14 @@
 {
     "url": "https://ochk.io/docs",
+    "ignore": ["src/pages/sdk/*/*"],
     "manual": [
+        {
+            "kind": "page",
+            "label": "/sdk/<package>/<page>",
+            "entry": "src/lib/rehype-typedoc.mjs",
+            "reach": "/sdk/<package>/README and a page per export, written by oc-packages' gen-docs on each release",
+            "area": "sdk"
+        },
         {
             "kind": "ui",
             "label": "search",

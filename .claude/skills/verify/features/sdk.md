@@ -8,7 +8,9 @@ The TypeDoc reference for every `@orangecheck/*` package, under `/sdk`.
 
 - `/sdk`: the package index.
 - `/sdk/<package>/README` and one page per exported function, interface, type and
-  variable, generated.
+  variable, generated. The map holds them as one entry, `page:/sdk/<package>/<page>`,
+  whose entry file is the renderer `src/lib/rehype-typedoc.mjs`: the config ignores
+  `src/pages/sdk/*/*`, so a sync PR never leaves the map behind.
 - A few written pages sit beside them (`/sdk/cli`, `/sdk/python`).
 
 ## How to reach it

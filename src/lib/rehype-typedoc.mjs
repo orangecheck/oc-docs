@@ -29,7 +29,7 @@ function text(value) {
         out.push({
             type: 'element',
             tagName: 'span',
-            properties: { id: m[1], className: ['scroll-mt-28'] },
+            properties: { id: m[1] },
             children: [],
         });
         last = m.index + m[0].length;

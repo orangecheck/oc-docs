@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Verify the orangecheck docs (ochk.io/docs, Next.js Pages Router with MDX pages under basePath /docs; repo oc-docs, public). Has the feature map of every page, redirect and the search, how to check the deploy, and a proven recipe for each. Use to prove a docs change works, to find which file serves a docs URL, or to see what a change could break.
+description: Verify the orangecheck docs (ochk.io/docs, Next.js Pages Router with MDX pages under basePath /docs; repo oc-docs, public). Has the feature map of every written page, the generated SDK reference, every redirect and the search, how to check the deploy, and a proven recipe for each. Use to prove a docs change works, to find which file serves a docs URL, or to see what a change could break.
 ---
 
 # Verify the docs
@@ -9,12 +9,15 @@ description: Verify the orangecheck docs (ochk.io/docs, Next.js Pages Router wit
 
 - **Where does a page live?** Look its URL up in `features.json` (`id`, `entry`), then
   read `features/<area>.md` for its recipe. `src/generated/doc-sources.json` maps
-  every route to its source file too.
+  every route to its source file too. The generated SDK reference is one entry,
+  `page:/sdk/<package>/<page>`; its files are `src/pages/sdk/<package>/<page>.mdx`.
 - **What did my change touch?** `$FM affected` (add `--since <base>` on a branch).
 - **Keeping it current:** a new or moved page is picked up by `$FM generate --write`
   (MDX pages count because `pageExtensions` lists them). Update the matching
   `features/<area>.md` if it adds a section or a redirect, and confirm `$FM check`
-  exits 0. Commit this with the page change.
+  exits 0. Commit this with the page change. A TypeDoc sync PR needs none of this:
+  `featuremap.config.json` ignores `src/pages/sdk/*/*`, so an export added or dropped
+  by a release leaves the map current.
 
 ## Static checks
 

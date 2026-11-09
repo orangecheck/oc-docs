@@ -11,14 +11,15 @@ export const metadata = {
 
 # Interface: PaymentAuthorizeOptions
 
-Defined in: [me-client/src/types.ts:619](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L619)
+Defined in: [me-client/src/types.ts:608](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L608)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-amount_sats">&lt;/a> `amount_sats?` | `number` | - | [me-client/src/types.ts:622](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L622) |
-| &lt;a id="property-description">&lt;/a> `description` | `string` | - | [me-client/src/types.ts:624](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L624) |
-| &lt;a id="property-external_ref">&lt;/a> `external_ref?` | `string` | - | [me-client/src/types.ts:625](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L625) |
-| &lt;a id="property-identity">&lt;/a> ~~`identity?`~~ | `string` | **Deprecated** Ignored: the server takes the account from the session. | [me-client/src/types.ts:621](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L621) |
-| &lt;a id="property-usd_cents">&lt;/a> `usd_cents?` | `number` | - | [me-client/src/types.ts:623](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L623) |
+| &lt;a id="property-amount_sats">&lt;/a> `amount_sats?` | `number` | - | [me-client/src/types.ts:611](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L611) |
+| &lt;a id="property-bearertoken">&lt;/a> `bearerToken?` | `string` | The person's oc_session JWT (the `token` from the sign-in result), for this call only. Pass it on a server that serves many people: setBearerToken is one value for the whole process, so two payments in flight would share it. Sent as Authorization, never in the body. | [me-client/src/types.ts:619](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L619) |
+| &lt;a id="property-description">&lt;/a> `description` | `string` | - | [me-client/src/types.ts:613](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L613) |
+| &lt;a id="property-external_ref">&lt;/a> `external_ref?` | `string` | - | [me-client/src/types.ts:614](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L614) |
+| &lt;a id="property-identity">&lt;/a> ~~`identity?`~~ | `string` | **Deprecated** Ignored: the server takes the account from the session. | [me-client/src/types.ts:610](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L610) |
+| &lt;a id="property-usd_cents">&lt;/a> `usd_cents?` | `number` | - | [me-client/src/types.ts:612](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L612) |

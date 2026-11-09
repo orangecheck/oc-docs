@@ -475,24 +475,25 @@ A backend in Python, Go or anything else checks the token itself. It is a JWT
 signed by the auth host, ochk.io. Its claims are
 [`SessionPayload`](/sdk/auth-core/interfaces/SessionPayload) in the reference:
 
-| Part                                                           | What to check                                                                                                                                                                                                                                |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Key set                                                        | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                    |
-| `alg`                                                          | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                              |
-| `iss`                                                          | `https://ochk.io`                                                                                                                                                                                                                            |
-| [`aud`](/sdk/auth-core/interfaces/SessionPayload#property-aud) | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it. |
-| [`iat`](/sdk/auth-core/interfaces/SessionPayload#property-iat) | Unix seconds: when ochk.io minted this token, at the end of the sign-in in the popup. The popup runs a full sign-in every time, so it is not when the person's ochk.io session began.                                                        |
-| [`exp`](/sdk/auth-core/interfaces/SessionPayload#property-exp) | Unix seconds: the earlier of the person's ochk.io session's end and `iat` + 30 days. Never refreshed.                                                                                                                                        |
-| `sub`                                                          | The person's account id.                                                                                                                                                                                                                     |
-| `did_oc`                                                       | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                             |
-| `jti`                                                          | The token's own id.                                                                                                                                                                                                                          |
-| [`rh`](/sdk/auth-core/interfaces/SessionPayload#property-rh)   | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                               |
-| `oc_bond`                                                      | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                 |
+| Part                                                           | What to check                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key set                                                        | `https://ochk.io/.well-known/jwks.json`: Ed25519 keys (`kty: OKP`), picked by the header's `kid`. Cache it, and fetch again when a token names a `kid` you have not seen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Retired key                                                    | A key the set marks `"status": "retired"` vouches only for a token it signed before it retired: `iat` earlier than its `retired_at` (unix seconds), and `exp` later than `iat` by at most 30 days (2592000 seconds). Refuse every other token it signed, and all of them when `retired_at` is missing or not a number. Read the set again at least hourly, so a key retired since you cached it stops vouching. [`retiredKeyVouches`](/sdk/auth-core/functions/retiredKeyVouches) is the rule in code, and its [test vectors](https://github.com/orangecheck/oc-packages/blob/main/auth-core/test-vectors/retired-key.json) give it case by case. |
+| `alg`                                                          | `EdDSA`. Refuse anything else, `none` included.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `iss`                                                          | `https://ochk.io`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [`aud`](/sdk/auth-core/interfaces/SessionPayload#property-aud) | The origin of the page that opened the popup, exactly: `https://your-site.example`, or `http://localhost:5173` while you develop. Not your API's origin. A token with no `aud` is an orangecheck family session, not one for you: refuse it.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| [`iat`](/sdk/auth-core/interfaces/SessionPayload#property-iat) | Unix seconds: when ochk.io minted this token, at the end of the sign-in in the popup. The popup runs a full sign-in every time, so it is not when the person's ochk.io session began.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [`exp`](/sdk/auth-core/interfaces/SessionPayload#property-exp) | Unix seconds: the earlier of the person's ochk.io session's end and `iat` + 30 days. Never refreshed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `sub`                                                          | The person's account id.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `did_oc`                                                       | The person, `did:oc:` and 32 hex digits. Keep it beside your user row; it is the `user_address` you name when you fire an event.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `jti`                                                          | The token's own id.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| [`rh`](/sdk/auth-core/interfaces/SessionPayload#property-rh)   | The token's handle on your project's list of ended sessions, with `aud` as one string. Refuse a token without it: nothing could end its session. The SDKs refuse it from me-client 0.40 and `orangecheck` 3.0.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `oc_bond`                                                      | Present only when the person backed their account with a coin: its floors and a nullifier, never the coin. See [require a backed account](/me/require-bond).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 The token carries no email address and no name.
 
-**Python**, with [`orangecheck`](/sdk/python) 3.0 or later, which also refuses a
-token without `rh`:
+**Python**, with [`orangecheck`](/sdk/python) 3.15 or later, which also refuses
+a token without `rh` and applies the retired-key rule above:
 
 ```python
 from orangecheck import InvalidSession, verify_session
@@ -502,29 +503,66 @@ token: str  # the token your page posted
 try:
     session = verify_session(token, audience="https://your-site.example")
 except InvalidSession as err:
-    print(err.reason)  # audience, expired, signature, unknown_key, …
+    print(err.reason)  # audience, expired, retired_key, signature, unknown_key, …
     raise
 session.did_oc  # who signed in
 ```
 
-Or with [PyJWT](https://pyjwt.readthedocs.io) 2.7 or later and `cryptography`:
+Or with [PyJWT](https://pyjwt.readthedocs.io) 2.7 or later and `cryptography`.
+PyJWT's key client doesn't expose a key's `status` or `retired_at`, so this
+reads the key set itself:
 
 ```python
+import json
+import time
+import urllib.request
+from typing import Any
+
 import jwt
 
-keys = jwt.PyJWKClient("https://ochk.io/.well-known/jwks.json")
+JWKS_URL = "https://ochk.io/.well-known/jwks.json"
+MAX_LIFETIME = 30 * 24 * 60 * 60  # the longest ochk.io signs any token for
+_jwks: dict[str, Any] = {"keys": {}, "at": float("-inf"), "tried": float("-inf")}
 
 
-def verify(token: str) -> dict:
-    key = keys.get_signing_key_from_jwt(token).key
-    claims = jwt.decode(
+def published_key(kid: str) -> dict[str, Any]:
+    """The key set's entry for kid. Read again hourly and for an unseen kid, at most once a minute."""
+    now = time.monotonic()
+    due = now - _jwks["at"] > 3600 or kid not in _jwks["keys"]
+    if due and now - _jwks["tried"] > 60:
+        _jwks["tried"] = now
+        with urllib.request.urlopen(JWKS_URL, timeout=10) as res:
+            doc = json.load(res)
+        _jwks["keys"] = {k["kid"]: k for k in doc["keys"] if isinstance(k.get("kid"), str)}
+        _jwks["at"] = now
+    if kid not in _jwks["keys"]:
+        raise jwt.InvalidTokenError("unknown kid")
+    entry: dict[str, Any] = _jwks["keys"][kid]
+    return entry
+
+
+def verify(token: str) -> dict[str, Any]:
+    kid = jwt.get_unverified_header(token).get("kid")
+    if not isinstance(kid, str):
+        raise jwt.InvalidTokenError("no kid")
+    entry = published_key(kid)
+    claims: dict[str, Any] = jwt.decode(
         token,
-        key,
+        jwt.PyJWK(entry, "EdDSA").key,
         algorithms=["EdDSA"],
         audience="https://your-site.example",
         issuer="https://ochk.io",
         options={"require": ["exp", "iat", "iss", "aud", "sub", "jti"]},
     )
+    if entry.get("status") == "retired":
+        # A retired key vouches only for a token it signed before retired_at,
+        # valid for at most 30 days.
+        retired_at = entry.get("retired_at")
+        if not isinstance(retired_at, (int, float)) or isinstance(retired_at, bool):
+            retired_at = 0
+        lifetime = claims["exp"] - claims["iat"]
+        if not (claims["iat"] < retired_at and 0 < lifetime <= MAX_LIFETIME):
+            raise jwt.InvalidTokenError("signed by a retired key")
     if not claims.get("did_oc"):
         raise jwt.InvalidTokenError("no did_oc")
     if not isinstance(claims.get("rh"), str) or not claims["rh"]:

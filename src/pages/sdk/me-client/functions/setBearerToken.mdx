@@ -15,11 +15,13 @@ export const metadata = {
 function setBearerToken(token: string | null): void;
 ```
 
-Defined in: [me-client/src/transport.ts:29](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L29)
+Defined in: [me-client/src/transport.ts:31](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/transport.ts#L31)
 
 Cross-domain integrators: store the JWT returned by `signInWithOc()`
  here so subsequent SDK calls can authenticate via Authorization
  header. Same-origin integrators don't need this (the cookie rides).
+ It is one value for the whole process: a server serving many people
+ passes `bearerToken` per call (event.fire, payment.authorize) instead.
 
 ## Parameters
 

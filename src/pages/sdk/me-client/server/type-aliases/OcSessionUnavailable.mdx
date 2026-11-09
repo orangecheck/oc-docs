@@ -12,9 +12,14 @@ export const metadata = {
 # Type Alias: OcSessionUnavailable
 
 ```ts
-type OcSessionUnavailable = "key_set_unavailable" | "revocations_unavailable";
+type OcSessionUnavailable = 
+  | "key_set_unavailable"
+  | "revocations_unavailable"
+  | "revocation_feed_unconfigured";
 ```
 
-Defined in: [me-client/src/server.ts:355](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L355)
+Defined in: [me-client/src/server.ts:373](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/server.ts#L373)
 
-Why a session can't be told right now: the key set, or the list of ended sessions.
+Why a session can't be told right now: the key set, the list of ended
+sessions, or, for a family session, no `OC_REVOCATION_FEED_TOKEN` to read
+ochk.io's feed with.

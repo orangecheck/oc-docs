@@ -24,6 +24,7 @@ type BatchEventResult =
   status: "duplicate";
 }
   | {
+  code?: BatchRejectCode;
   index: number;
   reason: string;
   status: "rejected";
@@ -34,14 +35,59 @@ type BatchEventResult =
 };
 ```
 
-Defined in: [me-client/src/event.ts:258](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L258)
+Defined in: [me-client/src/event.ts:279](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L279)
 
-Per-event result inside the batch response. Status codes:
- - `recorded` · the event landed; `event` is the canonical billable
-   payload exactly as a per-event POST would return.
- - `duplicate` · idempotency-key matched a prior event; `event` is
-   the prior payload.
- - `rejected` · validation or site-cap failure; `reason` is human-
-   readable. The other events in the batch are unaffected.
- - `not_paying` · the project isn't paying its users now; nothing was
-   recorded or charged.
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  event: BillableEvent;
+  index: number;
+  status: "recorded";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  event: BillableEvent;
+  index: number;
+  status: "duplicate";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  code?: BatchRejectCode;
+  index: number;
+  reason: string;
+  status: "rejected";
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `code?` | [`BatchRejectCode`](BatchRejectCode) | Absent from a server older than the codes. | [me-client/src/event.ts:294](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L294) |
+| `index` | `number` | - | [me-client/src/event.ts:291](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L291) |
+| `reason` | `string` | - | [me-client/src/event.ts:295](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L295) |
+| `status` | `"rejected"` | - | [me-client/src/event.ts:292](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L292) |
+
+***
+
+### Type Literal
+
+```ts
+{
+  index: number;
+  status: "not_paying";
+}
+```

@@ -22,7 +22,7 @@ type Scope =
   | "trust_attestation_count";
 ```
 
-Defined in: [me-client/src/scope.ts:53](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L53)
+Defined in: [me-client/src/scope.ts:65](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/scope.ts#L65)
 
 Catalog of valid scopes · keep in sync with SCOPE_IDS in
  oc-me-web/src/lib/privacy/scopes.ts.
@@ -36,3 +36,7 @@ Catalog of valid scopes · keep in sync with SCOPE_IDS in
  trust_attestation_count · per OCHK-V3-PLAN §6 phase-2 · four-int
    selective-disclosure quad summarizing reputation-graph attestations.
    Use parseTrustAttestationCount() to decode the wire-format string.
+
+ display_name · deprecated: it shares nothing. Signing in already gives your
+   site the person's display name, so ochk.app no longer offers it; asking
+   for it still works, and it never appears in `scopes`.

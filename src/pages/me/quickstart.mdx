@@ -38,8 +38,13 @@ verified. You verify it for two things:
   domain before you deploy: until it is verified the list is refused, and the
   SDKs then refuse writes from signed-in sessions (reads go on). The same holds
   on any host outside the domain, such as a `*.vercel.app` preview: test the
-  whole flow on a subdomain of your domain, or on localhost with a test project
-  ([previews](/me/sdk#when-someone-ends-every-session)).
+  whole flow on a subdomain of your domain, or on localhost with a test project.
+  For localhost, enter `http://localhost:<port>` as the test project's
+  development origin first (its **Sign-in** page, under **Local development**,
+  or `PATCH /api/me/projects/[id]` with `{ dev_origin }`). Until you do, the
+  list for it answers `403 dev_origin_not_declared` and every write from a
+  signed-in session `503 revocations_unavailable`
+  ([while you build](/me/sdk#when-someone-ends-every-session)).
 - **[Going live](#5--go-live) with paying.**
 
 For a project that only signs people in, verifying changes nothing else: no
@@ -329,7 +334,11 @@ Each line is a way an integration has gone wrong, with why it matters.
 On your project's **Paying** tab, under **Pay your users**: **Off** (the
 default), **Always**, or **Promos**, each a named stretch with a start and an
 end. Outside a pay period an event earns nothing, costs nothing and leaves no
-record, so sending events from code that runs all the time is safe. Details:
+record, so on a live project sending events from code that runs all the time is
+safe. A test project is stricter: it records events only for you, its owner. An
+event for anyone else throws `MeClientError` with `status` 403 and `errorCode`
+`earner_not_project_owner`, paying or not, and records nothing, so try events
+signed in as yourself, or catch that error, until you go live. Details:
 [Paying your users](/me/paying-users).
 
 ### 2 · what each event earns

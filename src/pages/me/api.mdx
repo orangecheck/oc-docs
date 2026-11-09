@@ -522,7 +522,7 @@ after you rotate) and your project's key set (`issuer_jwks_url`).
 | `POST`   | `/api/me/projects`                  | create a project, rate-limited 5/min, at most 25 per account. Pays nobody unless `pay: { action: 'add', … }` asks it to   |
 | `GET`    | `/api/me/projects/[id]`             | per-project state · owner-gated                                                                                           |
 | `POST`   | `/api/me/projects/[id]`             | update IntegratorPriceConfig (prices only; a name or domain in the body is ignored) · owner-gated, validates              |
-| `PATCH`  | `/api/me/projects/[id]`             | rename: `{ display_name }`, 1–80 characters · owner-gated                                                                 |
+| `PATCH`  | `/api/me/projects/[id]`             | one change per request ([below](#changing-a-project)) · owner-gated                                                       |
 | `POST`   | `/api/me/projects/[id]/domain`      | change the domain: `{ domain }`. Never verified: replaced at once. Verified: opens a move (see below)                     |
 | `DELETE` | `/api/me/projects/[id]/domain`      | cancel an open move · owner-gated                                                                                         |
 | `DELETE` | `/api/me/projects/[id]`             | delete project; refused while it holds sats or owes a step ([below](#deleting-a-project)) · owner-gated                   |
@@ -555,6 +555,19 @@ not hold one of those as a word: "OrangeCheck Fans" is refused, "orangecheckers"
 is not. A label or tagline may mention orangecheck. A name breaking the rule
 answers `409 name_reserved` at create and rename; a label, a `422` naming it. An
 account holds at most 25 projects (`409 project_limit_reached`).
+
+### Changing a project
+
+`PATCH /api/me/projects/[id]` makes one change per request. A field that belongs
+to another change answers `400 unexpected_field`.
+
+| Body                              | Does                                                                                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{ display_name }`                | Renames the project, 1–80 characters.                                                                                                                                                                                     |
+| `{ dev_origin }`                  | Sets a test project's development origin: `http://localhost:<port>` or `http://127.0.0.1:<port>`, with no path. `null` clears it. A live project answers `409 dev_origin_test_only`, anything else `422` with the reason. |
+| `{ native_sign_in }`              | `true` or `false`: [native sign-in](/integration/native-sign-in). A live project without a verified domain answers `409 native_sign_in_needs_verified_domain`.                                                            |
+| `{ discoverable, earn_tagline? }` | Lists the project, or stops listing it, where people find apps that pay, with a tagline cut to 120 characters. Only a live project with a verified domain is shown.                                                       |
+| `{ mode }`                        | `'test'` or `'live'`. Going live checks what [go live](/me/quickstart#5--go-live) lists and answers `422` with what is missing; back to test always works.                                                                |
 
 ### Moving a verified domain
 

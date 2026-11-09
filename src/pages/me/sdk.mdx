@@ -1255,7 +1255,10 @@ sharing any time at [ochk.app/me/apps](https://ochk.app/me/apps).
 
 ### Valid scopes
 
-`oc.scope.request` takes these seven (me-client 0.57.0):
+`oc.scope.request` takes these twelve (me-client 0.58.0). Earlier versions throw
+on `cross_integrator_lifetime_sats`, `cross_integrator_distinct_count`,
+`cross_integrator_oldest_event_at`, `cross_integrator_active_days` and
+`trust_attestations_bundle`.
 
 | Scope                                | Reveals                                                           | Use case                                       |
 | ------------------------------------ | ----------------------------------------------------------------- | ---------------------------------------------- |
@@ -1263,18 +1266,24 @@ sharing any time at [ochk.app/me/apps](https://ochk.app/me/apps).
 | `bitcoin_address`                    | The Bitcoin address on the account, if it has one, bare (`bc1q…`) | Checking holdings, refunds or payouts on-chain |
 | `cross_integrator_event_count`       | One number: the person's events across every app                  | Telling people from bots                       |
 | `cross_integrator_human_event_count` | The same count, without events an agent fired for them            | The same, when you treat agents differently    |
+| `cross_integrator_lifetime_sats`     | One number: the sats apps have paid them across every app         | A strong sign of a real person                 |
+| `cross_integrator_distinct_count`    | One number: how many different apps have recorded events for them | Telling people from bots                       |
+| `cross_integrator_oldest_event_at`   | The date and time of their first recorded event in any app        | Asking for, say, 90 days of history            |
+| `cross_integrator_active_days`       | One number: on how many days they did something in any app        | Telling a regular from a one-day account       |
 | `trust_attestation_count`            | Four numbers about statements other apps made about them          | A stronger sign than activity alone            |
+| `trust_attestations_bundle`          | The statements other apps made about them, each one in full       | When a count is not enough                     |
 | `attest_tier`                        | Deprecated: `anonymous` / `bonded`                                | None; see below                                |
 | `display_name`                       | Deprecated: nothing                                               | None: the sign-in already gives you the name   |
 
 Every value in `scopes` is a string. `trust_attestation_count` reads
 `total,good,distinct_good_issuers,caution`; `parseTrustAttestationCount(value)`
-decodes it. A value that can't be read at that moment is left out, so a missing
-one means unknown, not none. ochk.app knows five more scopes
-(`cross_integrator_lifetime_sats`, `cross_integrator_distinct_count`,
-`cross_integrator_oldest_event_at`, `cross_integrator_active_days` and
-`trust_attestations_bundle`); `oc.scope.request` in me-client 0.57.0 throws on
-them.
+decodes it. The other counts are whole numbers, and
+`cross_integrator_oldest_event_at` is an ISO 8601 time, empty before their first
+event. `trust_attestations_bundle` is a JSON array of statement ids: fetch each
+with `GET /api/envelope/<id>?format=wrapped` and check its signature (see
+[trust statements](/me/api)); the person picks which ones it holds at
+[ochk.app/me/apps](https://ochk.app/me/apps). A value that can't be read at that
+moment is left out, so a missing one means unknown, not none.
 
 `display_name` shares nothing: the sign-in token already carries the name
 (`req.ocSession.name`), so ochk.app no longer offers it. Asking for it still
@@ -1333,24 +1342,21 @@ your server, as it does to start a session, and your server forwards it.
 
 ```ts
 // server-side: the token your page posted after signInWithOc()
-import { clearBearerToken, oc, setBearerToken } from '@orangecheck/me-client';
+import { oc } from '@orangecheck/me-client';
 
 declare const token: string; // the person's sign-in token
-declare const didOc: string; // req.ocSession.did_oc, from that token
 
-setBearerToken(token);
-const pending = oc.payment.authorize({
-    identity: didOc, // the signed-in account's id
+const result = await oc.payment.authorize({
     amount_sats: 240_000,
     description: 'march invoice',
+    bearerToken: token, // for this call only (me-client 0.58.0)
 });
-clearBearerToken(); // read as the call starts; process-wide, so clear it at once
-const result = await pending;
 // result.id, result.user_envelope_id, result.verify_url
 ```
 
-The token decides whose payment it is: me.ochk.io uses its account's `did_oc`
-and ignores any other `identity`. Without a token the call answers
+`bearerToken` goes with this call alone, so two people paying at once never
+share one. The token decides whose payment it is: me.ochk.io uses its account's
+`did_oc` and ignores the old `identity` option. Without a token the call answers
 `401 payment_not_authenticated`. `user_envelope_id` is the receipt's id, the
 same as `id`, and `verify_url` opens that receipt. Today the call records the
 authorization and moves no sats, because paying is in testing.

@@ -65,6 +65,9 @@ consumer code never branches on how the user signed in.
    `{ message, signature, expectedNonce, expectedAudience, expectedPurpose: "login" }`
    (plus optional `scheme`: `"bip322"` or `"legacy"`, and `add`) → 200
    `{ ok, token, account }` + `oc_session` cookie set. The nonce works once.
+   `message` must be the text step 1 issued, byte for byte, final newline
+   included: any other text is refused with 401 `challenge_mismatch`, however
+   validly signed.
 
 **Email-OTP (lower-friction):**
 

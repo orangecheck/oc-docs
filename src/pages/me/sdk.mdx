@@ -1193,8 +1193,8 @@ uses the cached copy rather than rejecting every webhook.
 Signing in tells your app the account's `sub` and `did_oc`, and nothing about
 its email or Bitcoin address. Both ids are the same at every site, so sites that
 compare notes can match a user. Scope reads below carry a per-app subject
-instead. To read more (an email, a Bitcoin address, a display name) you ask, and
-the person decides.
+instead. To read more (an email, a Bitcoin address, counts that tell people from
+bots) you ask, and the person decides.
 
 ### `oc.scope.granted`
 
@@ -1239,7 +1239,7 @@ leaves the person on ochk.app.
 ```ts
 import { oc } from '@orangecheck/me-client';
 
-oc.scope.request(['email', 'display_name'], {
+oc.scope.request(['email', 'bitcoin_address'], {
     project_key: 'pk_live_yourapp',
     return_to: window.location.href,
 });
@@ -1254,12 +1254,30 @@ sharing any time at [ochk.app/me/apps](https://ochk.app/me/apps).
 
 ### Valid scopes
 
-| Scope             | Reveals                                            | Use case                                                   |
-| ----------------- | -------------------------------------------------- | ---------------------------------------------------------- |
-| `bitcoin_address` | Master `did:bip322:bc1q…` (BIP-322 users only)     | On-chain holdings verification, payment-channel co-signing |
-| `email`           | Email address (email-OTP users only)               | Transactional email · receipts, password reset             |
-| `attest_tier`     | Deprecated: `anonymous` / `bonded`                 | None; see below                                            |
-| `display_name`    | A user-chosen handle (separate from real identity) | Forum / social integrations where some name is needed      |
+`oc.scope.request` takes these seven (me-client 0.57.0):
+
+| Scope                                | Reveals                                                           | Use case                                       |
+| ------------------------------------ | ----------------------------------------------------------------- | ---------------------------------------------- |
+| `email`                              | The email address on the account, if it has one                   | Receipts, account recovery on your app         |
+| `bitcoin_address`                    | The Bitcoin address on the account, if it has one, bare (`bc1q…`) | Checking holdings, refunds or payouts on-chain |
+| `cross_integrator_event_count`       | One number: the person's events across every app                  | Telling people from bots                       |
+| `cross_integrator_human_event_count` | The same count, without events an agent fired for them            | The same, when you treat agents differently    |
+| `trust_attestation_count`            | Four numbers about statements other apps made about them          | A stronger sign than activity alone            |
+| `attest_tier`                        | Deprecated: `anonymous` / `bonded`                                | None; see below                                |
+| `display_name`                       | Deprecated: nothing                                               | None: the sign-in already gives you the name   |
+
+Every value in `scopes` is a string. `trust_attestation_count` reads
+`total,good,distinct_good_issuers,caution`; `parseTrustAttestationCount(value)`
+decodes it. A value that can't be read at that moment is left out, so a missing
+one means unknown, not none. ochk.app knows five more scopes
+(`cross_integrator_lifetime_sats`, `cross_integrator_distinct_count`,
+`cross_integrator_oldest_event_at`, `cross_integrator_active_days` and
+`trust_attestations_bundle`); `oc.scope.request` in me-client 0.57.0 throws on
+them.
+
+`display_name` shares nothing: the sign-in token already carries the name
+(`req.ocSession.name`), so ochk.app no longer offers it. Asking for it still
+works and adds nothing to `scopes`.
 
 Don't gate on `attest_tier` to keep bots out. It is deprecated, and `bonded`
 only ever meant one signature over an address, with no amount behind it. To let
@@ -1284,10 +1302,10 @@ The `user_address` field is retired from outgoing payloads in the matching
 me.ochk.io deploy. Existing rows in your database keyed on old `user_address`
 values stay valid; just expect new events to use `sub`.
 
-| Function                         | Signature                                    | Note                                                    |
-| -------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
-| `oc.scope.granted(opts)`         | `(GrantedOptions) => Promise<GrantedResult>` | What the signed-in person shares with your project now. |
-| `oc.scope.request(scopes, opts)` | `(Scope[], RequestOptions) => never`         | Navigates to the page that asks · throws after.         |
+| Function                         | Signature                                    | Note                                                           |
+| -------------------------------- | -------------------------------------------- | -------------------------------------------------------------- |
+| `oc.scope.granted(opts)`         | `(GrantedOptions) => Promise<GrantedResult>` | What a person shares with your project now. From your backend. |
+| `oc.scope.request(scopes, opts)` | `(Scope[], RequestOptions) => never`         | Navigates to the page that asks · throws after.                |
 
 ## `oc.session.*` · sessions (Per session)
 

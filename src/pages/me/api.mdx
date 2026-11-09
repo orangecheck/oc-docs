@@ -531,6 +531,15 @@ A write that sets prices, creating a project with a price config or updating
 one, answers `503 policy_unavailable` with `Retry-After: 30` and saves nothing
 when the platform's price bounds can't be read. Send it again.
 
+Four project writes need a fresh identity check, as revealing the signing secret
+does: going live (`PATCH` with `{ mode: 'live' }`, asked once the project is
+ready), saving prices on a live project, a pay-period change on a live project
+that pays sooner or longer (`add`, or `set_end` later or to no end), and
+registering a co-signing key (`POST /api/me/projects/[id]/jwk`). Without one
+they answer 401 `identity_reproof_required`. Returning to test, ending or
+shortening a period, removing the key, and a test project's prices and periods
+need none.
+
 A project's name, a custom event's label, a drop's label and a directory tagline
 are text people read. None may hold a character that hides or reorders text, or
 be orangecheck's own name (`orangecheck`, `ochk`, `ochk.io`, `ochk.app`, in any

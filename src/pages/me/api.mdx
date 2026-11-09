@@ -686,16 +686,18 @@ The same rules hold when orangecheck deletes a project.
 
 ## Response shapes
 
-All authenticated 401s are `{ ok: false }` with
-`Cache-Control: no-store, private` and `Vary: Cookie`. Every endpoint on this
-page except `/api/integrator/config` and `/api/health`, and outside `/api/me/*`,
-`/api/admin/*`, `/api/auth/*` and `/api/contact`, refuses with a snake_case code
-in `error`, such as `project_key_required` or `method_not_allowed`, and the same
-in words in `reason` or `detail` when there is more to say: match on `error`.
-`/api/integrator/config` has no `error`: it puts its code in `reason` and its
-words in `detail`. `/api/health` answers a failed probe with 503 and
-`status: 'degraded'`. The signed-in, admin and sign-in routes are not held to
-this yet and may put a sentence in `error`. A refused price config answers
+A signed-in, admin or operator endpoint called without a session answers
+`401 { ok: false, reason: 'not_authenticated' }`, with the endpoint's own
+`error` or `detail` beside it when it has one, and `Cache-Control: no-store`.
+Every endpoint on this page except `/api/integrator/config` and `/api/health`,
+and outside `/api/me/*`, `/api/admin/*`, `/api/auth/*` and `/api/contact`,
+refuses with a snake_case code in `error`, such as `project_key_required` or
+`method_not_allowed`, and the same in words in `reason` or `detail` when there
+is more to say: match on `error`. `/api/integrator/config` has no `error`: it
+puts its code in `reason` and its words in `detail`. `/api/health` answers a
+failed probe with 503 and `status: 'degraded'`. The signed-in, admin and sign-in
+routes are not held to this yet and may put a sentence in `error`. A refused
+price config answers
 `422 { error: 'config_invalid', reason, details: [{ subtype?: string, message: string }] }`,
 from the public check (`POST /api/integrator-config`) and from saving it alike:
 the check applies the platform's price bounds too, so a config it passes saves.

@@ -178,6 +178,10 @@ block header are all it takes; orangecheck does not need to be online.
 
 ## Authenticated · sessions (Per session)
 
+ochk.app's own: these take only an ochk.app session, so from any other site they
+answer `401`. An integration pays per session with the `session_creation` event
+instead.
+
 | Method | Path                      | Purpose                                 |
 | ------ | ------------------------- | --------------------------------------- |
 | `POST` | `/api/session/create`     | open a session — records no charge      |
@@ -190,6 +194,9 @@ block header are all it takes; orangecheck does not need to be online.
 | ------ | ------------------------ | ------------------------------------------------------------------------- |
 | `POST` | `/api/payment/authorize` | authorize a payment, at most 20 per account a UTC day · moves no sats yet |
 
+Call it from your server with the person's sign-in token as
+`Authorization: Bearer`: it sends no CORS headers, so a browser on another site
+can't call it, and without a session it answers `401 payment_not_authenticated`.
 The body takes `amount_sats` (or `usd_cents`) and a `description` of up to 280
 characters of text. The description is yours: it stays on the record, and is
 never signed, published or served by `GET /api/payment/[id]`. A 21st

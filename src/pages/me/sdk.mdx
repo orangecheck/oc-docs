@@ -709,7 +709,10 @@ the sign-in popup carries one. `requireHandle: false` (Python
 everywhere doesn't end it. `checkOcSession` answers it `signed_out` with that
 `reason`, and a wrapper with `required` answers `401 no_session_handle`. A site
 that sets `audience: '*'` also accepts family sessions, which carry no `rh`:
-your project's list can't end them. Name your own origin as `audience` instead.
+your project's list can't end them. Their own list needs a token only
+orangecheck's sites hold (`OC_REVOCATION_FEED_TOKEN`); without it a family
+session answers `503 revocation_feed_unconfigured` (me-client 0.57.0; earlier
+versions threw). Name your own origin as `audience` instead.
 
 **Python** ([`orangecheck`](/sdk/python) 2.8.0 or later): keep one list per
 process and pass it with the request's method.
@@ -1089,8 +1092,10 @@ your project's **Receipts** tab at ochk.app.
 Call it from your backend. `signingSecret` signs the request as your project
 (the SDK signs the exact bytes it sends), and `accountId` names who earns: the
 person's account id (`did_oc`), stored beside your own user row. Before
-me-client 0.30 this option was called `userAddress`; that name still works. No
-user session token is forwarded.
+me-client 0.30 this option was called `userAddress`; that name still works. It
+forwards no sign-in token unless you pass one as `bearerToken`, or have called
+`setBearerToken`: that one is process-wide, so on a server every later call
+carries it until `clearBearerToken()`.
 
 Paying your users is optional. An event earns only inside your project's
 [pay periods](/me/paying-users) (always, in promos, or never); outside them the
@@ -1193,14 +1198,20 @@ the person decides.
 
 ### `oc.scope.granted`
 
-Read what the signed-in person shares with your project now. Returns the per-app
-`sub` plus the values they share.
+Read what a person shares with your project now, from your backend: name them
+with `accountId` (their `did_oc`) and sign with your project's secret (me-client
+0.57.0 or later). Returns the per-app `sub` plus the values they share.
 
 ```ts
+// server-side only · the secret never reaches a browser
 import { oc } from '@orangecheck/me-client';
 
+declare const user: { did_oc: string }; // your user row
+
 const { sub, scopes_granted, scopes } = await oc.scope.granted({
-    project_key: 'pk_live_yourapp',
+    project_key: process.env.OC_PROJECT_KEY!,
+    accountId: user.did_oc,
+    signingSecret: process.env.OC_SIGNING_SECRET!,
 });
 
 // `sub` here is per-app: different at every project. It is NOT the
@@ -1211,6 +1222,11 @@ console.log(sub); // "sub_3K7xQ2mN1pYwB8tRvE…"
 // `scopes` holds only what the person shares.
 console.log(scopes.email); // "user@example.com" · or undefined
 ```
+
+`accountId` and `signingSecret` go together: one without the other, or an
+`accountId` that is not a `did:oc`, throws before any request. With neither, the
+call reads the session its request carries, which only ochk.app's own pages
+have, so from a browser on your site it answers `401`.
 
 ### `oc.scope.request`
 
@@ -1275,47 +1291,49 @@ values stay valid; just expect new events to use `sub`.
 
 ## `oc.session.*` · sessions (Per session)
 
-Apps that pay per session pay for the `session_creation` event, which your
-server sends with `oc.event.fire` (above) once per real session. `create()`
-opens a session and records no charge; `refresh()` and `invalidate()` are free,
-telemetry only.
+To pay per session, your server sends the `session_creation` event with
+`oc.event.fire` (above), once per real session. That is all an integration
+needs.
 
-```ts
-import { oc } from '@orangecheck/me-client';
+`oc.session.create`, `refresh` and `invalidate` are ochk.app's own: me.ochk.io
+takes them only with an ochk.app session, so from your site they answer `401`. A
+`Session` carries `issued_at` and `expires_at` (me-client 0.57.0; the type said
+`opens_at` before, which never arrived).
 
-const session = await oc.session.create({
-    scope: ['identity', 'payment'],
-    sessionPolicy: { duration_seconds: 7 * 86400, refresh: 'sliding' },
-});
-await oc.session.refresh(session.id);
-await oc.session.invalidate(session.id);
-```
-
-| Function                    | Signature                             | Note       |
-| --------------------------- | ------------------------------------- | ---------- |
-| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | No charge. |
-| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | Free.      |
-| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | Free.      |
+| Function                    | Signature                             | Note                      |
+| --------------------------- | ------------------------------------- | ------------------------- |
+| `oc.session.create(opts)`   | `(SignInOptions) => Promise<Session>` | ochk.app only. No charge. |
+| `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | ochk.app only. Free.      |
+| `oc.session.invalidate(id)` | `(string) => Promise<void>`           | ochk.app only. Free.      |
 
 ## `oc.payment.authorize` · a payment (Per action)
 
+Call it from your server, with the person's sign-in token. me.ochk.io answers no
+browser on another site, so your page posts the token from `signInWithOc()` to
+your server, as it does to start a session, and your server forwards it.
+
 ```ts
-import type { OcPopupAccount } from '@orangecheck/me-client/popup';
+// server-side: the token your page posted after signInWithOc()
+import { clearBearerToken, oc, setBearerToken } from '@orangecheck/me-client';
 
-import { oc } from '@orangecheck/me-client';
+declare const token: string; // the person's sign-in token
+declare const didOc: string; // req.ocSession.did_oc, from that token
 
-declare const account: OcPopupAccount; // from signInWithOc()
-
-const result = await oc.payment.authorize({
-    identity: account.did_oc, // the signed-in account's id
+setBearerToken(token);
+const pending = oc.payment.authorize({
+    identity: didOc, // the signed-in account's id
     amount_sats: 240_000,
     description: 'march invoice',
 });
+clearBearerToken(); // read as the call starts; process-wide, so clear it at once
+const result = await pending;
 // result.id, result.user_envelope_id, result.verify_url
 ```
 
-The signed-in session decides whose payment it is: me.ochk.io uses that
-account's `did_oc` and ignores any other `identity`. Today the call records the
+The token decides whose payment it is: me.ochk.io uses its account's `did_oc`
+and ignores any other `identity`. Without a token the call answers
+`401 payment_not_authenticated`. `user_envelope_id` is the receipt's id, the
+same as `id`, and `verify_url` opens that receipt. Today the call records the
 authorization and moves no sats, because paying is in testing.
 
 ## Other signals

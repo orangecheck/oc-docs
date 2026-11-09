@@ -56,7 +56,7 @@ declare const button: HTMLButtonElement; // your "Sign in with orangecheck" butt
 
 button.addEventListener('click', async () => {
     const result = await signInWithOc();
-    if (!result) return; // closed, blocked, or aborted
+    if (!result) return; // closed, blocked, aborted, or failed
     const r = await fetch('/api/auth/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,8 +68,9 @@ button.addEventListener('click', async () => {
 
 Call `signInWithOc()` inside a user gesture: browsers block `window.open`
 anywhere else. It resolves to `{ account, token }`, or `null` when the person
-closes the popup, the browser blocks it, or your `signal` aborts. Trust only the
-token; `account` is unsigned.
+closes the popup, the browser blocks it, your `signal` aborts, or it fails (not
+in a browser, or the popup's answer was malformed). Trust only the token;
+`account` is unsigned.
 
 To tell a blocked window from a closed one, use `signInWithOcOutcome()`
 (me-client 0.36.0 or later), which takes the same options and resolves with a
@@ -1183,7 +1184,7 @@ uses the cached copy rather than rejecting every webhook.
 [Webhooks](/me/webhooks) has a full receiver, in Python too.
 
 > Agent delegation (`oc.delegation.*`) is a separate primitive and lives on
-> [agent.ochk.io](https://agent.ochk.io) / [ochk.io/docs/agent](/agent), not on
+> [ochk.io/agent](https://ochk.io/agent) / [ochk.io/docs/agent](/agent), not on
 > orangecheck. me-client doesn't ship a delegation namespace; reach for
 > `@orangecheck/agent-signer` to issue or revoke agent delegations from your
 > integration, and `@orangecheck/agent-core` to verify them.
@@ -1381,9 +1382,11 @@ if (Date.parse(a.oldest_event_at!) > Date.now() - 90 * 86_400_000) {
 }
 ```
 
-It runs five checks: bundle shape, the canonical-bytes hash matches the
-content-addressed `id`, a key with the matching `kid` is in the receipt key set,
-the Ed25519 signature, and `now < expires_at`. Each check is a row in
+It runs seven checks: the bundle has `sig`, `kid` and `canonical_b64`;
+`canonical_b64` decodes; the bytes are an activity attestation in canonical
+form; the attestation matches the signed bytes and its `id` is their SHA-256; a
+key with the matching `kid` is in the receipt key set (or is the `jwk` you
+pass); the Ed25519 signature; and `now < expires_at`. Each check is a row in
 `result.checks` for logging.
 
 The receipt key set at `me.ochk.io/.well-known/oc-envelope-jwks.json` is fetched
@@ -1397,7 +1400,7 @@ needs separate apps, `oldest_event_at` can't be back-dated, active days need
 time) and cheap to check: one call, one signature, the same on Node 20+, Vercel
 Edge and the browser.
 
-> The same five checks run in the browser at
+> The same checks run in the browser at
 > [ochk.app/verify-activity](https://ochk.app/verify-activity), for anyone who
 > receives a forwarded attestation and doesn't want to write the verifier. The
 > SDK and the page give the same verdict on the same input.
@@ -1424,17 +1427,20 @@ the three groups: One-time, Per action and Per session.
 
 ## Constants and helpers
 
-| Export                                    | Signature                                            |
-| ----------------------------------------- | ---------------------------------------------------- |
-| `PLATFORM_FEE_POLICY`                     | `{ pct: 0.2; min_floor_sats: 1; ratified: string }`  |
-| `MIN_INTEGRATOR_PRICE_SATS`               | `1`                                                  |
-| `computeFees(cfg, payment_amount_sats?)`  | `(IntegratorEventConfig, number?) => ComputedFees`   |
-| `validateIntegratorConfig(cfg)`           | `(IntegratorPriceConfig) => ValidationResult`        |
-| `setBearerToken(token)`                   | `(string \| null) => void` · a token for later calls |
-| `getBearerToken()` / `clearBearerToken()` | `() => string \| null` / `() => void`                |
+| Export                                          | Signature                                                                   |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| `PLATFORM_FEE_POLICY`                           | `{ pct: 0.2; min_floor_sats: 1; ratified: string }`                         |
+| `MIN_INTEGRATOR_PRICE_SATS`                     | `1`                                                                         |
+| `computeFees(cfg, payment_amount_sats?, opts?)` | `(IntegratorEventConfig, number?, { is_agent?: boolean }?) => ComputedFees` |
+| `validateIntegratorConfig(cfg)`                 | `(IntegratorPriceConfig) => ValidationResult`                               |
+| `setBearerToken(token)`                         | `(string \| null) => void` · a token for later calls                        |
+| `getBearerToken()` / `clearBearerToken()`       | `() => string \| null` / `() => void`                                       |
 
 `MIN_INTEGRATOR_PRICE_SATS` is the smallest price the server takes. At 1 sat the
 whole price is the fee, so the smallest earning is 1 sat, and you pay 2.
+`computeFees` with `{ is_agent: true }` prices an event an agent fired by the
+config's `agent` override, and throws `agent_refused` when that override refuses
+agents.
 
 ## Where it lives
 

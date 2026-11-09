@@ -74,7 +74,7 @@ import { signInWithOc } from '@orangecheck/me-client/popup';
 
 document.querySelector('#signin')!.addEventListener('click', async () => {
     const result = await signInWithOc();
-    if (!result) return; // closed, or the popup was blocked
+    if (!result) return; // closed, blocked, or failed
     const r = await fetch('/api/auth/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -379,9 +379,11 @@ if (!res.earned) {
 Send from your backend, never the browser. The signing secret, on your project's
 **Keys & webhooks** tab, proves the call comes from your project; showing or
 replacing it asks you to confirm it's you. From Python, or without the SDK, see
-[signing an event](/me/api#signing-an-event). Every paid event gets a receipt
-anyone can check offline against Bitcoin: see
-[an example receipt](https://ochk.app/verify/example).
+[signing an event](/me/api#signing-an-event). Every event a live project is
+billed for gets a receipt anyone can check offline: its signature against
+orangecheck's published key, and, once a calendar commits it, an OpenTimestamps
+proof against Bitcoin. [An example receipt](https://ochk.app/verify/example)
+shows the signature check; it records no real event, so it has no timestamp.
 
 ### 4 · send a test event
 

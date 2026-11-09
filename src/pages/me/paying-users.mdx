@@ -41,7 +41,10 @@ creation, and answers **Off** unless you say otherwise.
 
 ## What the event API answers
 
-Firing events from code that runs all the time is safe. Outside a period:
+On a live project, firing events from code that runs all the time is safe. A
+test project records events only for its owner: an event for anyone else answers
+`403 earner_not_project_owner` whether or not a period is running, before the
+period is checked (the SDK throws it as a `MeClientError`). Outside a period:
 
 ```json
 {

@@ -15,10 +15,11 @@ export const metadata = {
 function otpNetworkCapText(retryAt: unknown, instead?: string): string;
 ```
 
-Defined in: [caps.ts:27](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/caps.ts#L27)
+Defined in: [caps.ts:28](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/caps.ts#L28)
 
 A network past its hour of sign-in codes (`otp_network_cap`, #344): its
 next code frees only as the hour rolls, so "wait a minute" would be false.
+`instead` is '' when no other way would help.
 
 ## Parameters
 

@@ -1,0 +1,38 @@
+export const metadata = {
+    title: "Function: capText()",
+    description: "Auto-generated API reference for Function: capText(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / capText
+
+# Function: capText()
+
+```ts
+function capText(
+   reason: string, 
+   retryAt: unknown, 
+   alternative?: string): string | null;
+```
+
+Defined in: [caps.ts:50](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/caps.ts#L50)
+
+The sentence for a cap's reason code, or null when `reason` is not one.
+`alternative` is what else the reader can do, as a clause ("sign in another
+way"), or '' when nothing else would help; a cap on new accounts offers
+none, since every way makes the account from the same network.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `reason` | `string` | `undefined` |
+| `retryAt` | `unknown` | `undefined` |
+| `alternative` | `string` | `'sign in another way'` |
+
+## Returns
+
+`string` \| `null`

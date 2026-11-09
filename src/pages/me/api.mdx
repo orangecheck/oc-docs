@@ -42,19 +42,20 @@ cookie, so a retry ends the same session; it never reads as signed out.
 
 ## Public endpoints
 
-| Method | Path                                   | Purpose                                                 |
-| ------ | -------------------------------------- | ------------------------------------------------------- |
-| `GET`  | `/api/health`                          | liveness probe                                          |
-| `GET`  | `/api/health/deep`                     | dependency probe                                        |
-| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event            |
-| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                        |
-| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                         |
-| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                   |
-| `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404      |
-| `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime      |
-| `GET`  | `/api/federations`                     | every federation: seats, invite, custody state          |
-| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig` (echoes on success) |
-| `POST` | `/api/contact`                         | contact form; `500` when the mail provider refuses it   |
+| Method | Path                                   | Purpose                                                                                            |
+| ------ | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `GET`  | `/api/health`                          | liveness probe                                                                                     |
+| `GET`  | `/api/health/deep`                     | dependency probe                                                                                   |
+| `GET`  | `/api/envelope/[id]`                   | canonical envelope JSON for a billable event                                                       |
+| `GET`  | `/api/payment/[id]`                    | canonical envelope for a payment                                                                   |
+| `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                                                                    |
+| `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                                                              |
+| `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404                                                 |
+| `GET`  | `/api/integrator/config?project_key=…` | a project's published config, drop schedules and `pay_periods`; CORS `*`, cached up to ten minutes |
+| `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime                                                 |
+| `GET`  | `/api/federations`                     | every federation: seats, invite, custody state                                                     |
+| `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig`: echoes it, or `422 config_invalid`                            |
+| `POST` | `/api/contact`                         | contact form; `500` when the mail provider refuses it                                              |
 
 `/api/health/deep` includes an `escrow debits · outcome known` row, degraded
 while any escrow debit's outcome is unknown, or while a recorded event's queued
@@ -133,10 +134,12 @@ other record's id is its digest.
 
 1. Base64-decode `canonical_b64`. Its SHA-256 must equal `digest_sha256`, and
    `id` too when `id_scheme` is `sha256`.
-2. Check `signature` with the Ed25519 key named by its `kid` in
-   `https://me.ochk.io/.well-known/oc-envelope-jwks.json`. A statement is signed
-   by the app that made it, not by orangecheck: `signature.signer` is `issuer`,
-   and the key is `signature.issuer_jwk`, which the project's JWKS at
+2. `signature.sig_hex` is a hex Ed25519 signature over the bytes from step 1,
+   not over the JSON. Check it with the key named by `signature.kid` in
+   `https://me.ochk.io/.well-known/oc-envelope-jwks.json`. `signature` is `null`
+   on a record that was never signed, such as a test event. A statement is
+   signed by the app that made it, not by orangecheck: `signature.signer` is
+   `issuer`, and the key is `signature.issuer_jwk`, which the project's JWKS at
    `signature.issuer_jwks_url` carries while that key is current.
 3. When `ots.status` is `anchored`, `ots.proof_b64` is an OpenTimestamps proof
    that starts at the digest. Wrap it in the standard `.ots` header and check it
@@ -569,6 +572,39 @@ to another change answers `400 unexpected_field`.
 | `{ discoverable, earn_tagline? }` | Lists the project, or stops listing it, where people find apps that pay, with a tagline cut to 120 characters. Only a live project with a verified domain is shown.                                                       |
 | `{ mode }`                        | `'test'` or `'live'`. Going live checks what [go live](/me/quickstart#5--go-live) lists and answers `422` with what is missing; back to test always works.                                                                |
 
+### Creating a project
+
+`POST /api/me/projects` takes:
+
+| Field              |                                                                                                                                                    |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                           |
+| `domain`           | Required. A DNS hostname.                                                                                                                          |
+| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                |
+| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                        |
+| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults. |
+| `user_share_pct`   | Optional, with `enabled_subtypes`: the share of each price your users earn, `0` to `0.8`. Missing or out of range, `0.8`.                          |
+| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                               |
+
+It answers `200 { ok: true, project }`. The signing secret is not in it: reveal
+it on the project's **Keys & webhooks** tab.
+
+### Pay periods
+
+`POST /api/me/projects/[id]/pay-periods` takes one change. Times are ISO 8601
+strings, and an `ends_at` of `null` means until you turn it off.
+
+| Body                                             | Does                                                                                 |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `{ action: 'add', name?, starts_at?, ends_at? }` | Pays from now, or from `starts_at`, until `ends_at`. `name` is up to 200 characters. |
+| `{ action: 'end', id }`                          | Stops a running period now.                                                          |
+| `{ action: 'set_end', id, ends_at }`             | Moves the end of a period that is not over.                                          |
+| `{ action: 'cancel', id }`                       | Removes a period that has not started.                                               |
+
+A body that is none of these answers `400 invalid_change`; a change the rules in
+[Paying your users](/me/paying-users) refuse, `422` with its `reason` and
+`detail`. It answers `200 { ok: true, project }`, with `project.pay_periods`.
+
 ### Moving a verified domain
 
 A verified domain is what consent screens name and what every receipt records,
@@ -652,8 +688,10 @@ in words in `reason` or `detail` when there is more to say: match on `error`.
 `/api/integrator/config` has no `error`: it puts its code in `reason` and its
 words in `detail`. `/api/health` answers a failed probe with 503 and
 `status: 'degraded'`. The signed-in, admin and sign-in routes are not held to
-this yet and may put a sentence in `error`; a refused price config answers
-`{ error: 'config invalid', details: [{ subtype?: string, message: string }] }`.
+this yet and may put a sentence in `error`. A refused price config answers
+`422 { error: 'config_invalid', reason, details: [{ subtype?: string, message: string }] }`,
+from the public check (`POST /api/integrator-config`) and from saving it alike:
+the check applies the platform's price bounds too, so a config it passes saves.
 All 429 rate-limit responses include a `Retry-After` header in seconds.
 
 ## Rate limits per bucket

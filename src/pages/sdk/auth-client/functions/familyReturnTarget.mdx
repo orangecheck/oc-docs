@@ -15,13 +15,14 @@ export const metadata = {
 function familyReturnTarget(input: string | null | undefined): string | undefined;
 ```
 
-Defined in: [signin.tsx:267](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L267)
+Defined in: [signin.tsx:268](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/signin.tsx#L268)
 
 Family-aware return target. Accepts a same-origin relative path
 (exactly like [safeReturnTo](safeReturnTo)) OR an absolute URL on a family site
 (`isFamilyOrigin` from `@orangecheck/auth-core/family-origins`; a name under
 .ochk.io that is not listed, such as btcpay.ochk.io, is not one). Returns
 `undefined` when the input is neither, so callers can layer fallbacks.
+Either way the target comes back without its fragment (return-to.ts).
 
 ## Parameters
 

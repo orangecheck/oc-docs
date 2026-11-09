@@ -110,7 +110,7 @@ const result = oc.event.verify(envelope, config, undefined, {
 // result.issues includes 'outside_pay_period' for an event billed outside every period
 ```
 
-The response is cached for a few minutes, so compare against your own clock
+The response is cached for up to ten minutes, so compare against your own clock
 rather than trusting a "paying now" you read earlier. orangecheck runs the same
 check in its own audit.
 

@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: revocationFeedState()",
+    description: "Auto-generated API reference for Function: revocationFeedState(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / revocationFeedState
+
+# Function: revocationFeedState()
+
+```ts
+function revocationFeedState(check?: RevocationCheck): Promise<RevocationFeedState>;
+```
+
+Defined in: [revocation.ts:466](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L466)
+
+The feed state of the process-wide check (or of one made by
+[createRevocationCheck](createRevocationCheck)), for a health route a signed-out GET can
+read. It names no secret and no count. Reading it fetches the list only
+when the copy is due, as a session check would.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `check` | [`RevocationCheck`](../interfaces/RevocationCheck) |
+
+## Returns
+
+`Promise`\&lt;[`RevocationFeedState`](../type-aliases/RevocationFeedState)\>

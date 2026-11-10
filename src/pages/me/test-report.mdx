@@ -10,7 +10,7 @@ export const metadata = {
 > every part below has passed, the small test with real amounts and real
 > operators included. This report covers each part. Several are still open, each
 > with its date or owner under [Still open](#still-open). This page changes as
-> they close. Last updated 2026-10-31.
+> they close. Last updated 2026-11-10.
 
 **What it covers.** The payouts, the anchor block, each handoff (from
 orangecheck to a federation, from one federation to its successor, from a
@@ -27,17 +27,17 @@ UTC.
 - **Not operator independence.** Every operator identity in these tests is held
   by orangecheck.
 
-| Part                                                   | State                                                                   | Evidence                                                   |
-| ------------------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [Operator suite on mutinynet](#operator-suite-phase-c) | C01–C06 and C08–C11 pass; C07 half done                                 | runs listed below; five mutinynet transactions             |
-| [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423                        | the block; a proof file you can verify                     |
-| [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run                      | seat claims citing block 972639; the C07 move              |
-| [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                                       | drill runs of 2026-10-28                                   |
-| [Charter](#charter)                                    | v1.1.0 published; no operator has signed it                             | its hash; an offline check no signature passes yet         |
-| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; the new build waits on orangecheck's deploy         | rehearsals of 2026-10-28 and 2026-10-31                    |
-| [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator; operators' views masked | code read and a live walk, 2026-10-27; fixes of 2026-10-31 |
-| [Health routes](#health-routes)                        | one recent reading, whatever the query string                           | live reads, 2026-10-31                                     |
-| [Still open](#still-open)                              | C07's second sitting, the mainnet test and more                         | each with its date or owner                                |
+| Part                                                   | State                                                                                        | Evidence                                                   |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [Operator suite on mutinynet](#operator-suite-phase-c) | C01–C06 and C08–C11 pass; C07 half done                                                      | runs listed below; five mutinynet transactions             |
+| [Anchor block](#anchor-block)                          | 14 test payouts anchored in Bitcoin block 973423                                             | the block; a proof file you can verify                     |
+| [Handoffs](#handoffs)                                  | three run on mutinynet, one half done; one not run                                           | seat claims citing block 972639; the C07 move              |
+| [Halt-and-restart drill](#halt-and-restart-drill)      | 8 of 8 on regtest                                                                            | drill runs of 2026-10-28                                   |
+| [Charter](#charter)                                    | v1.1.0 published; no operator has signed it                                                  | its hash; an offline check no signature passes yet         |
+| [Executor on phoenixd](#executor-on-phoenixd)          | passes on testnet3; the approved build runs in the C07 sitting before orangecheck deploys it | rehearsals of 2026-10-28 and 2026-10-31                    |
+| [No-KYC walk-through](#no-kyc-walk-through)            | no identity asked of a person or an integrator; operators' views masked                      | code read and a live walk, 2026-10-27; fixes to 2026-11-10 |
+| [Health routes](#health-routes)                        | one recent reading, whatever the query string                                                | live reads, 2026-10-31                                     |
+| [Still open](#still-open)                              | C07's second sitting, the mainnet test and more                                              | each with its date or owner                                |
 
 ## Operator suite (phase C)
 
@@ -49,14 +49,14 @@ passes only when both do. The full section, with what each step proves and the
 limits the run found, is the
 [operator suite test report](/me/operator/test-report).
 
-| Step                                                | Result                                       | Run                        |
-| --------------------------------------------------- | -------------------------------------------- | -------------------------- |
-| C01–C04                                             | Pass, 2026-10-26                             | `2026-10-26T17-00-11-634Z` |
-| C05, C06                                            | Pass, 2026-10-26                             | `2026-10-26T18-31-32-449Z` |
-| C08–C10                                             | Pass, 2026-10-26                             | `2026-10-26T19-05-48-205Z` |
-| C03, C04, C05, C08, C10 again                       | Pass on oc-me-web `2fc3a6fd`                 | `2026-10-26T21-04-10-930Z` |
-| C11 (payout to an invoice with no description hash) | Pass, 2026-10-26                             | `2026-10-26T21-40-11-790Z` |
-| C07 (moving to a successor)                         | First sitting passed; second from 2026-11-10 | `2026-10-27T06-32-36-960Z` |
+| Step                                                | Result                                   | Run                        |
+| --------------------------------------------------- | ---------------------------------------- | -------------------------- |
+| C01–C04                                             | Pass, 2026-10-26                         | `2026-10-26T17-00-11-634Z` |
+| C05, C06                                            | Pass, 2026-10-26                         | `2026-10-26T18-31-32-449Z` |
+| C08–C10                                             | Pass, 2026-10-26                         | `2026-10-26T19-05-48-205Z` |
+| C03, C04, C05, C08, C10 again                       | Pass on oc-me-web `2fc3a6fd`             | `2026-10-26T21-04-10-930Z` |
+| C11 (payout to an invoice with no description hash) | Pass, 2026-10-26                         | `2026-10-26T21-40-11-790Z` |
+| C07 (moving to a successor)                         | First sitting passed; second not yet run | `2026-10-27T06-32-36-960Z` |
 
 The payouts in this section are C04 (1,200 sats to a wallet orangecheck does not
 hold), C05 (a payout with one guardian of four down), C08 (a halt holds a
@@ -96,14 +96,16 @@ digests left it.
 The test deployment read these records as pending until the anchor run asked the
 calendar the proof names. It now does (oc-me-web `0002c5cd`, live 2026-10-27).
 On 2026-10-27 production held no records of this kind, so none of production's
-had been anchored yet.
+had been anchored yet; on 2026-11-10
+[me.ochk.io/api/health/deep](https://me.ochk.io/api/health/deep) still read
+"none anchored yet".
 
 ## Handoffs
 
 | Handoff                                       | Run                                                                                                                                                                                                                                                                                                                                                                                                                |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | A seat to an operator, before the ceremony    | **Run, 2026-10-22.** Four operators each bound a key and claimed a reserved seat in `oc-mutiny-v1`: two in the browser, two by script with a claim signed over Bitcoin block 972639 (`000000000000000000016e48619f0e6d7304598ea2b044e4dadb815383c0b65f`). The key ceremony then ran on all four (run `2026-10-22T17-57-50-820Z`). The successor's four seats were reserved and claimed the same way by 2026-10-27. |
-| A running federation to its successor         | **First sitting run, 2026-10-27; second from 2026-11-10.** The executor moved the float from `oc-mutiny-v1` to `oc-mutiny-v2` in five on-chain batches, listed below. 227,797 sats before = 220,028 credited + 2,748 on-chain fees + 5,020 mint fees + 1 left behind; unexplained 0 (run `2026-10-27T06-32-36-960Z`).                                                                                              |
+| A running federation to its successor         | **First sitting run, 2026-10-27; the second, runnable since 2026-11-10, has not run yet.** The executor moved the float from `oc-mutiny-v1` to `oc-mutiny-v2` in five on-chain batches, listed below. 227,797 sats before = 220,028 credited + 2,748 on-chain fees + 5,020 mint fees + 1 left behind; unexplained 0 (run `2026-10-27T06-32-36-960Z`).                                                              |
 | A federation to a user                        | **Run on mutinynet.** Payouts from the federation to a Lightning address settled through the gateway: C04, and C11 for an invoice with no description hash. Not yet with real amounts: that is the [bounded mainnet test](#still-open).                                                                                                                                                                            |
 | Balances orangecheck holds, into a federation | **Not run.** It needs a mainnet federation that production can join, and a Fedimint executor in production; production's executor runs phoenixd. The plan of who is owed what is built, read-only.                                                                                                                                                                                                                 |
 
@@ -131,14 +133,15 @@ response names. The response also says how to check each signature offline; the
 steps are on [the federation's page](/federation/oc-me-v1).
 
 - **No operator has signed 1.1.0.** The federation's trust posture reads
-  "charter ratified by the guardians" as not met, "0/4 operator signature(s)
-  match the current charter hash" (read 2026-10-31).
+  "charter ratified by every operator" as not met: "0 of 4 seats have a seated
+  guardian, so not every guardian is there to sign" (read 2026-11-10).
 - **The one signature on record** is on the superseded 1.0.0, from 2026-05-21.
   Its envelope was not kept, so it cannot be checked offline, and the response
   says so.
 
 Live since 2026-10-31: the offline check and the served text in oc-me-web
-`9aac21ad` to `e45f2598`, and the criterion's label in oc-me-web `76ab9457`.
+`9aac21ad` to `e45f2598`. The trust posture's charter criteria read as above
+since oc-me-web `087a4aba` and `1fd0efda` (2026-11-04).
 
 ## Halt-and-restart drill
 
@@ -208,7 +211,7 @@ production with the next executor deploy. The rehearsal ran all three on the
 same machine and they passed, including a stop during a payment, where the
 payment was held on restart and never paid twice.
 
-**2026-10-31, the build prepared now.** The build that would replace
+**2026-10-31, the build prepared then.** The build that would have replaced
 production's executor (bundle SHA-256
 `9d061290780af6c7edf45f852f06307debe6aa810b210c5801bab4352de0d109`, oc-me-web
 `3eabf682`) keeps the phoenixd fix and adds the executor's half of the privacy
@@ -226,10 +229,23 @@ and passed all four parts:
 - **No payee anywhere:** no invoice in any executor or phoenixd log line,
   journal state or report to the portal.
 
+**2026-11-10, the build approved for production's next update.** oc-me-web
+`d0b76fdd` (bundle SHA-256
+`75fdbdac2b2d1d09107a88c73abf4112f35a4c44e0c7d4ca1aad0cd5f1accb4f`), built the
+same way as the build above and compared with it. On phoenixd it differs in
+three ways: a stop that lands while the start script is starting a process now
+stops the executor as well as phoenixd, a hold's reason is cleaned of anything
+that names a payee until nothing more changes, and one error message counts
+payments in words. The rest is in the Fedimint drivers, which production's
+executor does not run. Nothing it sends to the portal or accepts from it
+changes. It has not been rehearsed on phoenixd: the C07 sitting runs it on the
+test executor first, stopping and restarting it during a move, and orangecheck
+deploys it to production after that.
+
 **Production's executor has not changed.** Its status line on
 [me.ochk.io/api/health/deep](https://me.ochk.io/api/health/deep) still reports
 the deployment of 2026-10-26, `01M5X2T2VJK57GRY3PY6ZYW3JV` (oc-me-web
-`2fc3a6fd`), read 2026-10-31. The portal's side of these changes is live
+`2fc3a6fd`), read 2026-11-10. The portal's side of these changes is live
 (oc-me-web `d2e05d6c` to `2b5ad9a4`); the executor's side, phoenixd's restart
 supervisor included, reaches production only when orangecheck deploys the new
 build.
@@ -275,14 +291,15 @@ that opens the sign-in popup, an OC Connect client, a webhook receiver) gets a
 person's email address or Bitcoin address only through a scope the person
 grants. Granting it, or turning on its renewal, takes a fresh re-proof within 5
 minutes: a passkey, or an email code or a Bitcoin signature (oc-me-web
-`src/pages/api/me/scope-grants.ts:208` and `:260`,
-`src/lib/privacy/identity-reproof.ts:38`). No grant from before that rule is in
+`src/pages/api/me/scope-grants.ts:210` and `:262`,
+`src/lib/privacy/identity-reproof.ts:46`). No grant from before that rule is in
 force: on 2026-10-28 production held no scope grants at all. On every sign-in
-path the popup hands the opening site only the account id, did, display name and
-Nostr key (`src/lib/auth/popup-resume.ts:80`), and a site outside orangecheck
-gets a token bound to its own origin, with neither in it (oc-www
-`src/lib/auth/bound-token.ts:13`). orangecheck's own sites on ochk.io are the
-exception: they receive the Bitcoin address and the sign-in identity without a
+path the popup hands a site outside orangecheck only the account id and did, and
+the site gets a token bound to its own origin, with neither address in it
+(oc-me-web `src/lib/auth/popup-resume.ts:82`, live since 2026-11-10 in
+`fad7560d`; oc-www `src/lib/auth/bound-token.ts:13`). orangecheck's own sites
+are the exception: the popup also hands them the display name and Nostr key, and
+on ochk.io they receive the Bitcoin address and the sign-in identity without a
 grant (oc-www `src/pages/api/auth/me.ts:111`).
 
 **What deleting an account does.** It does what ochk.app's deletion dialog and
@@ -300,11 +317,14 @@ cached by the CDN expire within a day.
 The order is me.ochk.io, then vault, chat and cosign, then ochk.io, with a
 second pass minutes later (oc-me-web `src/lib/me/account-purge.ts:1-23`). The
 purge keys payment records and drops their description
-(`src/lib/payment/store.ts:88`), keys the request and drops its reason
-(`src/lib/me/deletion-requests-store.ts:261`), drops the person's webhook
-retries (`src/lib/developer/webhook-queue.ts:350`), and deletes every backup row
-that names the account, in its key or its value
-(`src/lib/backup/run-backup.ts:452`), live in oc-me-web `7e1ce4d1`.
+(`src/lib/payment/store.ts:93`), keys the request and drops its reason and the
+admin's note (`src/lib/me/deletion-requests-store.ts:223`), drops the person's
+webhook retries (`src/lib/developer/webhook-queue.ts:394`), and deletes every
+backup row that names the account, in its key or its value
+(`src/lib/backup/run-backup.ts:528`), live in oc-me-web `7e1ce4d1`. A nightly
+backup that runs while an account is erased checks for the erasure under the
+same lock before it writes, so it does not put the account's rows back into the
+backups (oc-me-web `4e18989e`, live since 2026-11-05).
 
 **What operators see.** On 2026-10-31 an audit of what orangecheck's own
 operators see about a person found the consoles showing more than they need.
@@ -325,10 +345,11 @@ Fixed and live by that day:
 
 Some of this has no live row to show it on: on 2026-10-31 production held no
 operator applications, no held payouts or claims, and no hosting request with an
-email, so those masks rest on their tests. Waiting on orangecheck: the
+email, so those masks rest on their tests. The payout-claim audit rows needed no
+rewrite: on 2026-11-04 production held none. Waiting on orangecheck: the
 executor's half, where it journals the invoice's hash before paying (oc-me-web
 `17e96163`, `7e1925cf`; see [Executor on phoenixd](#executor-on-phoenixd)),
-rewriting the audit rows and hold reasons written before the fix, and the keys
+rewriting hold reasons written before the fix, and the database change and keys
 that put ochk.io's remaining internal lookups behind a recorded reason; until
 then those lookups still answer orangecheck's own servers without one.
 
@@ -353,14 +374,15 @@ each request into a fresh database read or check.
 
 ## Still open
 
-| Part                                                                                                                    | When, or who                                                                  |
-| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1` | not before 2026-11-10 04:20:41 UTC                                            |
-| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor restarted mid-batch  | after the second sitting                                                      |
-| The executor build for production: phoenixd's restart supervisor and shutdown order, and no payee in its output         | built and rehearsed; waits on orangecheck's deploy                            |
-| Rewriting the payout-claim audit rows and hold reasons written before 2026-10-31                                        | orangecheck; ready to run                                                     |
-| The keys that put ochk.io's remaining internal lookups behind a recorded reason                                         | orangecheck                                                                   |
-| The bounded mainnet test: payouts and each handoff with small real amounts                                              | orangecheck; not scheduled                                                    |
-| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                | orangecheck, choosing the operators; not started                              |
-| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name         | orangecheck, with counsel                                                     |
-| Balances orangecheck holds, into a federation                                                                           | orangecheck; after a mainnet federation and a Fedimint executor in production |
+| Part                                                                                                                                                 | When, or who                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1`                              | orangecheck's sitting; runnable since 2026-11-10 04:20:41 UTC, not yet run     |
+| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor stopped and restarted while a batch is in transit | in the same sitting; that move's switch about 14 days later                    |
+| The executor build for production: phoenixd's restart supervisor and shutdown order, and no payee in its output                                      | oc-me-web `d0b76fdd` approved; orangecheck deploys it after the C07 sitting    |
+| Rewriting hold reasons written before 2026-10-31                                                                                                     | orangecheck; ready to run                                                      |
+| The database change and keys that put ochk.io's remaining internal lookups behind a recorded reason                                                  | orangecheck; ready to run                                                      |
+| chat.ochk.io and cosign.ochk.io reporting sign-ins to ochk.app as integrators: wired, still off                                                      | orangecheck's settings change                                                  |
+| The bounded mainnet test: payouts and each handoff with small real amounts                                                                           | orangecheck's decisions; its runbook was brought to today's code on 2026-11-10 |
+| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                                             | orangecheck, choosing the operators; not started                               |
+| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name                                      | orangecheck, with counsel                                                      |
+| Balances orangecheck holds, into a federation                                                                                                        | orangecheck; after a mainnet federation and a Fedimint executor in production  |

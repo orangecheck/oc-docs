@@ -8,7 +8,8 @@ export const metadata = {
 
 > **Draft, not final.** One step, C07 (moving a running federation to its
 > successor), is half done: its first sitting passed on 2026-10-27, and its
-> second can run from 2026-11-10 04:20 UTC. This page changes when it closes.
+> second, runnable since 2026-11-10 04:20 UTC, has not run yet (read
+> 2026-11-10). This page changes when it closes.
 
 **What this is.** A federation run end to end through ochk.app: operators take
 seats, four guardians run on hosted machines, a key ceremony runs through the
@@ -147,9 +148,9 @@ fixed on 2026-10-27, and the sitting carried on:
 
 **Still open.**
 
-- The second sitting, from 2026-11-10 04:20 UTC: the switch, moving the
-  projects, resuming payouts, a top-up and a payout on `oc-mutiny-v2`, and
-  retiring `oc-mutiny-v1`.
+- The second sitting, runnable since 2026-11-10 04:20 UTC and not yet run: the
+  switch, moving the projects, resuming payouts, a top-up and a payout on
+  `oc-mutiny-v2`, and retiring `oc-mutiny-v1`.
 - Two safety checks have not run on the test stack: halting the move part-way,
   and restarting the executor while a batch is in transit. In the first sitting
   the executor reported the move only once it had finished, so the run never saw
@@ -157,7 +158,11 @@ fixed on 2026-10-27, and the sitting carried on:
   on regtest on 2026-10-27, within stated limits: the portal ran locally, the
   executor's regular report to it was a stand-in, the halt was set directly, and
   the restart followed a forced kill of the executor. The live drill runs on the
-  test stack from 2026-11-10.
+  test stack in the same sitting as the switch: a short move from `oc-mutiny-v2`
+  to a successor, `oc-mutiny-v3`, halted once its first batch has left and
+  resumed once that batch is credited, with the executor stopped for 3 minutes
+  once the next batch has left, then started again. That move's own switch waits
+  out its 14 days' notice.
 
 C07 was first started on 2026-10-26, by mistake, during a rerun of the other
 steps. It created the successor federation, `oc-mutiny-v2`, with no machines

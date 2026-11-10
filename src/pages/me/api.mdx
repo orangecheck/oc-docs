@@ -193,17 +193,22 @@ instead.
 
 ## Authenticated · payment authorization (Per action)
 
-| Method | Path                     | Purpose                                                                   |
-| ------ | ------------------------ | ------------------------------------------------------------------------- |
-| `POST` | `/api/payment/authorize` | authorize a payment, at most 20 per account a UTC day · moves no sats yet |
+| Method | Path                     | Purpose                                                                            |
+| ------ | ------------------------ | ---------------------------------------------------------------------------------- |
+| `POST` | `/api/payment/authorize` | authorize a payment, at most 20 per account per site a UTC day · moves no sats yet |
 
 Call it from your server with the person's sign-in token as
 `Authorization: Bearer`: it sends no CORS headers, so a browser on another site
 can't call it, and without a session it answers `401 payment_not_authenticated`.
 The body takes `amount_sats` (or `usd_cents`) and a `description` of up to 280
 characters of text. The description is yours: it stays on the record, and is
-never signed, published or served by `GET /api/payment/[id]`. A 21st
-authorization in a UTC day answers `429 payment_daily_cap`.
+never signed, published or served by `GET /api/payment/[id]`. The token must
+come from a sign-in on orangecheck's own sites or on your live project's
+verified domain: one minted for any other site answers
+`403 payment_site_not_registered` and records nothing, and
+`503 payment_site_unavailable` means that could not be checked just now. Each
+site counts its own: a 21st authorization from one site in a UTC day answers
+`429 payment_daily_cap`.
 
 ## Authenticated · integrator event ingestion
 
@@ -235,7 +240,9 @@ project's owner. A `user_address` naming anyone else answers
 becomes one the first time they sign in on your site, so name people who have
 signed in there. Someone who signed in before 25 October 2026 becomes one at
 their next sign-in. A request carrying the person's own sign-in token for your
-origin needs nothing more.
+origin needs nothing more. A token minted for any other site, or a cookie, earns
+only for someone who has already acted toward your project; for anyone else it
+answers `403 earner_not_member`.
 
 | Method | Path                          | Purpose                                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------------------------------------- |
@@ -350,7 +357,7 @@ Without the SDK, the header is
 | 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                                         |
 | 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                                        |
 | 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                                          |
-| 403    | `earner_not_member`                                      | A live project's event names someone who never signed in to it or granted it anything                              |
+| 403    | `earner_not_member`                                      | A live project's event earns for someone who never signed in to it or granted it anything                          |
 | 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; nothing was recorded, send it again                             |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                                             |
 | 404    | `project_not_found`                                      | No project has this key. Only a signed-in caller is told; anyone else gets `401 project_auth_required`             |

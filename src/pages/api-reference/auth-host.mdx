@@ -55,7 +55,7 @@ over 10 minutes old, can't vouch for a session. Then ochk.app's own session
 routes and its calls to me.ochk.io, and every me.ochk.io endpoint that needs a
 session, answer `503 session_unverified` with `Retry-After: 60`, never as signed
 out; their public reads answer as they would signed out. vault and chat answer
-`/api/auth/me` the same way and their other session routes `401`; the owner
+`/api/auth/me` and every route that needs a session the same way; the owner
 tools send their pages to sign-in and answer their APIs `401`. Every other
 consumer keeps serving reads through the outage and refuses writes. The sites
 named here give the state of their copy as `revocation_feed` (`live`,

@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: OcPopupAccount
 
-Defined in: [popup.ts:46](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L46)
+Defined in: [popup.ts:48](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L48)
 
 The account the sign-in popup hands your page, the same on every way of
  signing in: who signed in, and nothing more. An email or a Bitcoin address
@@ -22,7 +22,7 @@ The account the sign-in popup hands your page, the same on every way of
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| &lt;a id="property-did_oc">&lt;/a> `did_oc` | `string` | Opaque public identity, `did:oc:<32-hex>`: the same at every site and stable across linking. | [popup.ts:51](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L51) |
-| &lt;a id="property-display_name">&lt;/a> `display_name` | `string` \| `null` | - | [popup.ts:52](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L52) |
-| &lt;a id="property-id">&lt;/a> `id` | `string` | The account's id at me.ochk.io. | [popup.ts:48](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L48) |
-| &lt;a id="property-nostr_npub">&lt;/a> `nostr_npub` | `string` \| `null` | - | [popup.ts:53](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L53) |
+| &lt;a id="property-did_oc">&lt;/a> `did_oc` | `string` | Opaque public identity, `did:oc:<32-hex>`: the same at every site and stable across linking. | [popup.ts:53](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L53) |
+| &lt;a id="property-display_name">&lt;/a> `display_name` | `string` \| `null` | The name the person set, only for one of orangecheck's own sites (the family origins @orangecheck/auth-core lists). Always null for any other site: the popup never tells it a name. | [popup.ts:57](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L57) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | The account's id at me.ochk.io. | [popup.ts:50](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L50) |
+| &lt;a id="property-nostr_npub">&lt;/a> `nostr_npub` | `string` \| `null` | The person's Nostr npub, for a family site only, like `display_name`. | [popup.ts:59](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/popup.ts#L59) |

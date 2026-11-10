@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: isOneLineValue()",
+    description: "Auto-generated API reference for Function: isOneLineValue(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/sdk**](../README)
+
+***
+
+[@orangecheck/sdk](../README) / isOneLineValue
+
+# Function: isOneLineValue()
+
+```ts
+function isOneLineValue(value: string): boolean;
+```
+
+Defined in: [one-line.ts:11](https://github.com/orangecheck/oc-packages/blob/main/sdk/src/one-line.ts#L11)
+
+Whether `value` can be one value of a signed line (SPEC §2.2, Appendix A.1): no C0 control,
+DEL, U+0085, U+2028 or U+2029, which a wallet may show as a line break, and no lone
+surrogate, which would leave one signature covering two strings.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `string` |
+
+## Returns
+
+`boolean`

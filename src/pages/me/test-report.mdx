@@ -330,6 +330,18 @@ other copies the request carried, so the retry carries only the cookie ochk.io
 sets at its root (oc-www `src/lib/auth/session.ts:1078`, live since 2026-11-10
 in `f7cae1ca`).
 
+**Signing out.** Each site checks a session against its own copy of ochk.io's
+list of ended sessions, fetched at most once a minute, so while ochk.io answers
+a sign-out reaches every site within a minute. A site that has not fetched a
+fresh copy for 10 minutes can't vouch for any session. Then the attest, lock,
+vote, stamp, agent and pledge sites, cosign and btc.ochk.io refuse every write
+and keep serving reads, so a session ended after their last copy can still show
+as signed in there until ochk.io answers again. ochk.app, me.ochk.io, vault,
+chat and orangecheck's internal tools act for no session until then (oc-packages
+`auth-core/src/revocation.ts:319`, `site-kit/src/auth/session.ts:102`; the
+[auth host reference](/api-reference/auth-host#auth-scheme) says what each
+answers).
+
 **What deleting an account does.** It does what ochk.app's deletion dialog and
 the erasure email say (oc-app-web `f87a2ae`, oc-me-web `1d38acfe`, both live
 since 2026-10-28). An admin completes the request, and an alert tells us when

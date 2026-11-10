@@ -294,13 +294,32 @@ minutes: a passkey, or an email code or a Bitcoin signature (oc-me-web
 `src/pages/api/me/scope-grants.ts:210` and `:262`,
 `src/lib/privacy/identity-reproof.ts:46`). No grant from before that rule is in
 force: on 2026-10-28 production held no scope grants at all. On every sign-in
-path the popup hands a site outside orangecheck only the account id and did, and
-the site gets a token bound to its own origin, with neither address in it
-(oc-me-web `src/lib/auth/popup-resume.ts:82`, live since 2026-11-10 in
-`fad7560d`; oc-www `src/lib/auth/bound-token.ts:13`). orangecheck's own sites
-are the exception: the popup also hands them the display name and Nostr key, and
-on ochk.io they receive the Bitcoin address and the sign-in identity without a
-grant (oc-www `src/pages/api/auth/me.ts:111`).
+path the popup hands a site outside orangecheck only the account id and did,
+with no display name or Nostr key, and the site gets a token bound to its own
+origin, with neither address in it (oc-me-web `src/lib/auth/popup-resume.ts:82`,
+live since 2026-11-10 in `fad7560d`; oc-www `src/lib/auth/bound-token.ts:13`).
+orangecheck's own sites are the exception: the popup also hands them the display
+name and Nostr key, and on ochk.io they receive the Bitcoin address and the
+sign-in identity without a grant (oc-www `src/pages/api/auth/me.ts:111`).
+
+**Which page opened the popup.** Before it asks for a site's token, the popup
+posts a random challenge to the page that opened it, addressed to the origin the
+page names, and waits up to 2 seconds for that page to echo it back
+(`@orangecheck/me-client` 0.59.0 answers it). orangecheck's own sites are not
+asked. Since 2026-11-10 19:19 UTC this reports and does not refuse: the token
+request says whether the page answered, and ochk.io logs only the site's origin
+and that answer (oc-me-web `src/lib/auth/opener-check.ts:15`, live in
+`6b05b930`; oc-www `src/pages/api/auth/audience-token.ts:148`, live in
+`b86627d9`). The popup starts refusing a page that does not answer only after
+the sites that open it answer on 0.59.0, seven days of that log have been read
+site by site, and one sign-in each from Safari on iOS and Chrome on Android has
+been seen to answer.
+
+**One session per change on ochk.io.** A request that changes something on
+ochk.io and carries more than one ochk.io session cookie acts for none of them:
+it answers 401 and clears the extra cookies, so the retry carries the person's
+own session alone (oc-www `src/lib/auth/session.ts:1078`, live since 2026-11-10
+in `f7cae1ca`).
 
 **What deleting an account does.** It does what ochk.app's deletion dialog and
 the erasure email say (oc-app-web `f87a2ae`, oc-me-web `1d38acfe`, both live
@@ -382,6 +401,7 @@ each request into a fresh database read or check.
 | Rewriting hold reasons written before 2026-10-31                                                                                                     | orangecheck; ready to run                                                      |
 | The database change and keys that put ochk.io's remaining internal lookups behind a recorded reason                                                  | orangecheck; ready to run                                                      |
 | chat.ochk.io and cosign.ochk.io reporting sign-ins to ochk.app as integrators: wired, still off                                                      | orangecheck's settings change                                                  |
+| The sign-in popup refusing a page that does not answer its challenge                                                                                 | the conditions in the No-KYC walk-through; reporting since 2026-11-10          |
 | The bounded mainnet test: payouts and each handoff with small real amounts                                                                           | orangecheck's decisions; its runbook was brought to today's code on 2026-11-10 |
 | Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                                             | orangecheck, choosing the operators; not started                               |
 | The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name                                      | orangecheck, with counsel                                                      |

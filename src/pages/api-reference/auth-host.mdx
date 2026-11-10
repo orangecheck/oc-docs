@@ -51,15 +51,16 @@ var at deploy time.
 Each consumer also keeps a copy of ochk.io's list of ended sessions, read with
 its own token at most once a minute, so while ochk.io answers, a sign-out
 reaches every site within a minute. A site with no copy yet, or whose copy is
-over 10 minutes old, can't vouch for a session. Then ochk.app and me.ochk.io
-answer every call that carries one `503 session_unverified` with
-`Retry-After: 60`, never as signed out; vault and chat answer `/api/auth/me` the
-same way and their other routes `401`; the owner tools send their pages to
-sign-in and answer their APIs `401`. Every other consumer keeps serving reads
-through the outage and refuses writes. The sites named here give the state of
-their copy as `revocation_feed` (`live`, `unverified` or `no-token`) on
-`/api/health`; ochk.app gives it on `/api/auth/revocation-feed`, since its
-`/api/health` is me.ochk.io's.
+over 10 minutes old, can't vouch for a session. Then ochk.app's own session
+routes and its calls to me.ochk.io, and every me.ochk.io endpoint that needs a
+session, answer `503 session_unverified` with `Retry-After: 60`, never as signed
+out; their public reads answer as they would signed out. vault and chat answer
+`/api/auth/me` the same way and their other session routes `401`; the owner
+tools send their pages to sign-in and answer their APIs `401`. Every other
+consumer keeps serving reads through the outage and refuses writes. The sites
+named here give the state of their copy as `revocation_feed` (`live`,
+`unverified` or `no-token`) on `/api/health`; ochk.app gives it on
+`/api/auth/revocation-feed`, since its `/api/health` is me.ochk.io's.
 
 ## Sign-in primitives
 

@@ -876,10 +876,10 @@
   dependencies:
     "@orangecheck/auth-core" "^2.26.1"
 
-"@orangecheck/site-kit@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.11.0.tgz#a1a25c979d40cda3cccf0e92f428a7cc6bf6b679"
-  integrity sha512-TUK9td8bJ7dFXjXVZ/7WtFOHGKjyD54of+N1tHchpUfVChcsZk15NW0jRNpxgK3uf9paY6Lgaoj7+MgvZxOFJQ==
+"@orangecheck/site-kit@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.12.0.tgz#4baa7c347f5a387e19af16439193e22bb4ecc2a6"
+  integrity sha512-0oUbR1vOvlvfsyhF3Jyu50LNAEUB1qcGaFRAICe2NjxFOLNxUlQ0UQLvk3sc81Q5rAK3RR5PkY9FAm1B+zekEA==
 
 "@orangecheck/wallet-adapter@^0.7.0":
   version "0.7.2"

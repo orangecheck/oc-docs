@@ -162,17 +162,9 @@ const nextConfig: NextConfig = {
 
     async rewrites() {
         return [
-            // Plausible proxied first-party (paths mirror the
-            // NEXT_PUBLIC_PLAUSIBLE_SRC / _API defaults in _document.tsx;
-            // basePath applies, so they answer under /docs).
-            // Loading same-origin keeps the script + events off ad-blocker
-            // blocklists, which is what threw ERR_BLOCKED_BY_CLIENT.
-            {
-                source: '/oc-insights.js',
-                destination:
-                    'https://plausible.io/js/script.outbound-links.pageview-props.tagged-events.js',
-            },
-            { source: '/oc-insights/event', destination: 'https://plausible.io/api/event' },
+            // Page views reach Plausible through the site's own route, never a rewrite to it
+            // (basePath applies: /docs/oc-insights/event).
+            { source: '/oc-insights/event', destination: '/api/oc-insights/event' },
         ];
     },
 

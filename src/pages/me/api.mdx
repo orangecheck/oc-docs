@@ -173,9 +173,10 @@ block header are all it takes; orangecheck does not need to be online.
 
 While me.ochk.io can't vouch for a session (it has no copy of ochk.io's list of
 ended sessions yet, or its copy is over 10 minutes old), every endpoint that
-reads one answers `503 session_unverified` with `Retry-After: 60`, reads and
-writes alike. The person is still signed in: ask again after `Retry-After`. A
-session that has ended answers `401` as before.
+needs one answers `503 session_unverified` with `Retry-After: 60`, reads and
+writes alike; a public read answers as it would signed out, without the parts
+that are the person's own. The person is still signed in: ask again after
+`Retry-After`. A session that has ended answers `401` as before.
 
 | Method | Path                    | Purpose                                              |
 | ------ | ----------------------- | ---------------------------------------------------- |

@@ -266,7 +266,15 @@ sign-ins were read in the code, not walked.
   ("need not be your real name"), a Nostr key, more ways to sign in, a backing
   coin, passkeys. A Lightning address is asked only to cash out. No page asks
   for a legal name, phone, date of birth, ID, selfie, postal address, country,
-  tax id or bank details, and no code calls an identity check.
+  tax id or bank details, and no code calls an identity check. An email address
+  that takes 20 wrong codes within 24 hours is held: no code for it is checked
+  until the oldest of those ages out. Meanwhile signing in or confirming a
+  change by email mails a single-use link in place of the code, and every other
+  email-code step for that address waits (oc-www
+  `src/lib/auth/rate-slots.ts:41`, `src/lib/auth/email-otp.ts:269`). The count
+  is per mailbox, with plus tags and Gmail's dots folded, and wrong codes count
+  from whoever sends them; the link is what keeps the address's owner able to
+  sign in while it is held.
 - **An integrator** uses an ordinary account. A project asks for a name, a
   domain and its settings; the domain is proved by DNS or a meta tag. There is
   no billing profile, legal entity, address, country, tax id or payout

@@ -162,7 +162,6 @@ export default withOcAuth(
             account: {
                 id: req.ocSession.sub,
                 did_oc: req.ocSession.did_oc,
-                display_name: req.ocSession.name ?? null,
             },
         });
     },

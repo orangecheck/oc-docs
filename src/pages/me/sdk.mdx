@@ -225,8 +225,6 @@ export default withOcAuth(
             account: {
                 id: req.ocSession.sub,
                 did_oc: req.ocSession.did_oc,
-                display_name: req.ocSession.name ?? null,
-                nostr_npub: req.ocSession.npub ?? null,
             },
         });
     },
@@ -1273,7 +1271,7 @@ on `cross_integrator_lifetime_sats`, `cross_integrator_distinct_count`,
 | `trust_attestation_count`            | Four numbers about statements other apps made about them          | A stronger sign than activity alone            |
 | `trust_attestations_bundle`          | The statements other apps made about them, each one in full       | When a count is not enough                     |
 | `attest_tier`                        | Deprecated: `anonymous` / `bonded`                                | None; see below                                |
-| `display_name`                       | Deprecated: nothing                                               | None: the sign-in already gives you the name   |
+| `display_name`                       | Deprecated: nothing                                               | None: the sign-in gives you no name either     |
 
 Every value in `scopes` is a string. `trust_attestation_count` reads
 `total,good,distinct_good_issuers,caution`; `parseTrustAttestationCount(value)`
@@ -1285,9 +1283,9 @@ with `GET /api/envelope/<id>?format=wrapped` and check its signature (see
 [ochk.app/me/apps](https://ochk.app/me/apps). A value that can't be read at that
 moment is left out, so a missing one means unknown, not none.
 
-`display_name` shares nothing: the sign-in token already carries the name
-(`req.ocSession.name`), so ochk.app no longer offers it. Asking for it still
-works and adds nothing to `scopes`.
+`display_name` shares nothing, and the sign-in gives you no name either: the
+token names the person by `did_oc` alone. ochk.app no longer offers it. Asking
+for it still works and adds nothing to `scopes`.
 
 Don't gate on `attest_tier` to keep bots out. It is deprecated, and `bonded`
 only ever meant one signature over an address, with no amount behind it. To let

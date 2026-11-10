@@ -316,9 +316,10 @@ site by site, and one sign-in each from Safari on iOS and Chrome on Android has
 been seen to answer.
 
 **One session per change on ochk.io.** A request that changes something on
-ochk.io and carries more than one ochk.io session cookie acts for none of them:
-it answers 401 and clears the extra cookies, so the retry carries the person's
-own session alone (oc-www `src/lib/auth/session.ts:1078`, live since 2026-11-10
+ochk.io, carries more than one ochk.io session cookie and does not name its
+tab's session acts for none of them: it is refused, and the answer clears the
+other copies the request carried, so the retry carries only the cookie ochk.io
+sets at its root (oc-www `src/lib/auth/session.ts:1078`, live since 2026-11-10
 in `f7cae1ca`).
 
 **What deleting an account does.** It does what ochk.app's deletion dialog and

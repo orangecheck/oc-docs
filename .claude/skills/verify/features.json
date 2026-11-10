@@ -61,6 +61,14 @@
             ]
         },
         {
+            "id": "api:ANY /api/oc-insights/event",
+            "kind": "api",
+            "entry": "src/pages/api/oc-insights/event.ts",
+            "reach": "https://ochk.io/docs/api/oc-insights/event",
+            "area": "oc-insights",
+            "tests": []
+        },
+        {
             "id": "api:ANY /api/og",
             "kind": "api",
             "entry": "src/pages/api/og.tsx",

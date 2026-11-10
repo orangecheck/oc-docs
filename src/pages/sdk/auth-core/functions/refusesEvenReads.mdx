@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: refusesEvenReads()",
+    description: "Auto-generated API reference for Function: refusesEvenReads(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / refusesEvenReads
+
+# Function: refusesEvenReads()
+
+```ts
+function refusesEvenReads(claims: RevocableClaims, check?: RevocationCheck): Promise<false | "revoked" | "unverified">;
+```
+
+Defined in: [revocation.ts:452](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/revocation.ts#L452)
+
+For a site that holds a person's data (an account, money, messages,
+secrets): whether to refuse the session for any request, reads included.
+`"revoked"` when the list ends it; `"unverified"` when no copy of the list is
+fresh enough to vouch for it, which passes once the auth host answers again
+(answer 503 and ask the person to try again, never "signed out"); `false`
+when it may go on. Uses the process-wide check unless given one.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `claims` | [`RevocableClaims`](../interfaces/RevocableClaims) |
+| `check` | [`RevocationCheck`](../interfaces/RevocationCheck) |
+
+## Returns
+
+`Promise`\&lt;`false` \| `"revoked"` \| `"unverified"`\>

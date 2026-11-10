@@ -701,6 +701,30 @@ removed after.
 
 The same rules hold when orangecheck deletes a project.
 
+## Authenticated · operator writes
+
+The operator pages on ochk.app call `/api/operator/*` with your session. The
+writes below change who acts for a federation or where its money goes, so each
+needs a fresh identity check, as setting the settlement key and forcing a
+gateway teardown already do. Without one they answer 401
+`identity_reproof_required`. The check is asked after the route's own refusals,
+so a write that would be refused anyway says why first.
+
+| Method   | Path                                                  | Asks                                                     |
+| -------- | ----------------------------------------------------- | -------------------------------------------------------- |
+| `POST`   | `/api/operator/federations/[slug]/seats`              | always: assigning a key, or holding a seat for an invite |
+| `DELETE` | `/api/operator/federations/[slug]/seats?index=`       | always                                                   |
+| `POST`   | `/api/operator/federations/[slug]/seats/[index]/host` | always: provisioning the seat's machine                  |
+| `POST`   | `/api/operator/federations/[slug]/ceremony`           | for `{ action: 'init' }` only                            |
+| `POST`   | `/api/operator/federations/[slug]/publish-invite`     | always                                                   |
+| `POST`   | `/api/operator/federations/create`                    | only to stand up one of orangecheck's own federations    |
+| `PATCH`  | `/api/operator/federations/[slug]/gateway`            | for `{ action: 'attach' }` only                          |
+
+A ceremony refresh or reset, a new federation of your own, and the other gateway
+actions need no check. Nor does a write you sign with your operator key, such as
+a charter signature, a seat claim, an exit or a vote: the signature is the
+proof.
+
 ## Response shapes
 
 A signed-in, admin or operator endpoint called without a session answers

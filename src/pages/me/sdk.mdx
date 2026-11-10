@@ -1357,7 +1357,9 @@ const result = await oc.payment.authorize({
 `bearerToken` goes with this call alone, so two people paying at once never
 share one. The token decides whose payment it is: me.ochk.io uses its account's
 `did_oc` and ignores the old `identity` option. Without a token the call answers
-`401 payment_not_authenticated`. `user_envelope_id` is the receipt's id, the
+`401 payment_not_authenticated`. The token must come from a sign-in on your live
+project's verified domain; one from any other site answers
+`403 payment_site_not_registered`. `user_envelope_id` is the receipt's id, the
 same as `id`, and `verify_url` opens that receipt. Today the call records the
 authorization and moves no sats, because paying is in testing.
 

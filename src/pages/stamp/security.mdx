@@ -58,8 +58,10 @@ for the full reporting protocol.
 
 - **Bitcoin's security model holds.** secp256k1 / Schnorr remain unforgeable at
   current parameter sizes; work-weighted longest chain is canonical.
-- **BIP-322 is implemented correctly.** Pin a verifier known to handle all
-  address types (P2WPKH, P2TR, P2WSH, P2PKH).
+- **BIP-322 is implemented correctly.** Pin a verifier known to handle each
+  address type a signer may use (P2WPKH, P2SH-P2WPKH, P2TR, P2PKH); the spec's
+  vectors v10–v13 carry one real signature for each. `@orangecheck/bip322`
+  checks a P2TR signature on the key path only and does not check P2WSH.
 - **At least one OTS calendar is non-colluding.** Submit to ≥2
   independently-operated calendars. `@orangecheck/stamp-ots` sends to three
   default calendars (alice, bob, finney) and needs two to answer.

@@ -79,10 +79,10 @@ transport is the user's choice (URL fragment, email, IPFS, Nostr, QR, paper).
 
 ### `signer`
 
-| Field     | Rule                                                                                         |
-| --------- | -------------------------------------------------------------------------------------------- |
-| `address` | Mainnet Bitcoin address (P2WPKH, P2TR, or P2PKH). MUST equal `address` in canonical message. |
-| `alg`     | MUST equal `"bip322"` in v1.                                                                 |
+| Field     | Rule                                                                                                      |
+| --------- | --------------------------------------------------------------------------------------------------------- |
+| `address` | Mainnet Bitcoin address (P2WPKH, P2SH-P2WPKH, P2TR, or P2PKH). MUST equal `address` in canonical message. |
+| `alg`     | MUST equal `"bip322"` in v1.                                                                              |
 
 ### `signed_at`
 

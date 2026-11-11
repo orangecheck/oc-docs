@@ -137,7 +137,7 @@ it too. Clearing the cookie is what signs them out of your site at once. Signing
 out of ochk.io does not sign them out of your site. Once your server has your
 project key and signing secret, its list of ended sessions carries each token
 ended at your origin and every session someone ended everywhere, and your server
-refuses either within about two minutes (see
+refuses either within about two minutes while it can read that list (see
 [when someone ends every session](/me/sdk#when-someone-ends-every-session)).
 
 `@orangecheck/auth-client` is for orangecheck's own sites; integrators use
@@ -239,10 +239,12 @@ On your project's **Sign-in** tab, under **Who can sign in**:
 | **Everyone** (default) | every orangecheck account                                                |
 | **Backed by bitcoin**  | accounts backed by one coin of **at least N sats, held at least D days** |
 
-The coin stays in the person's wallet, and you never see it. A change is
-enforced within a minute. An account below the bar gets `403 bond_required` with
-a `back_url`, where the person can back their account. Details, and how to keep
-one account per coin: [Who can sign in](/me/require-bond).
+The coin stays in the person's wallet, and you never see it. A change is read by
+your server within a minute. If it can't read the rule, the last one read stands
+for up to ten minutes, and after that signed-in requests are refused until it
+can. An account below the bar gets `403 bond_required` with a `back_url`, where
+the person can back their account. Details, and how to keep one account per
+coin: [Who can sign in](/me/require-bond).
 
 That is sign-in. It costs nothing, in test mode or live.
 
@@ -280,14 +282,15 @@ Each line is a way an integration has gone wrong, with why it matters.
 - [ ] Signing out clears your session and, where the token is your session,
       [ends the token](/me/sdk#ending-a-session). _Otherwise orangecheck goes on
       accepting the token until it expires; once ended, your own server refuses
-      it within about two minutes too._
+      it within about two minutes too, while it can read the list._
 - [ ] Your server has `OC_PROJECT_KEY` and `OC_SIGNING_SECRET`, refuses to start
       without either, and your domain is verified. _Without them, "sign out
       everywhere" never reaches your site._
-- [ ] A session someone ended everywhere is refused within about two minutes,
-      and a token without `rh` is refused: me-client 0.40.0 and `orangecheck`
-      3.0.0 do this unless you pass `requireHandle: false`
-      (`require_handle=False`). _Nothing could ever end it._
+- [ ] A session someone ended everywhere is refused within about two minutes
+      while your server can read the list, and a token without `rh` is refused:
+      me-client 0.40.0 and `orangecheck` 3.0.0 do this unless you pass
+      `requireHandle: false` (`require_handle=False`). _Nothing could ever end
+      it._
 - [ ] Anything you mint while someone is signed in (your session, a provider
       session, API keys, OAuth grants, refresh tokens) ends when their session
       ends everywhere. _Otherwise sign-out ends the cookie and leaves a key

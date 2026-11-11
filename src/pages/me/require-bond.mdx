@@ -51,8 +51,9 @@ export default withOcAuth(
 );
 ```
 
-A change in your settings is enforced within a minute. An account below the
-floor gets:
+A change in your settings is read by your server within a minute. If it can't
+read the rule, the last one read stands for up to ten minutes, and after that
+signed-in requests are refused until it can. An account below the floor gets:
 
 ```text
 403 {

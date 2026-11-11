@@ -27,7 +27,7 @@ keeps the token they return in its own cookie.
 
 | Method | Path                         | Purpose                                                                |
 | ------ | ---------------------------- | ---------------------------------------------------------------------- |
-| `POST` | `/api/auth/email-otp/start`  | issue a stateless OTP token + email a 6-digit code (rate-limited 5/hr) |
+| `POST` | `/api/auth/email-otp/start`  | issue a single-use OTP token, email a 6-digit code (rate-limited 5/hr) |
 | `POST` | `/api/auth/email-otp/verify` | verify `{email, code, token}`, upsert account, set `oc_session` cookie |
 | `GET`  | `/api/challenge`             | issue a fresh BIP-322 challenge to sign                                |
 | `POST` | `/api/auth/signin`           | verify a signed BIP-322 challenge, upsert account, set `oc_session`    |
@@ -51,7 +51,7 @@ cookie, so a retry ends the same session; it never reads as signed out.
 | `GET`  | `/api/platform-fee-policy`             | published `PLATFORM_FEE_POLICY`                                                                    |
 | `GET`  | `/api/abuse-limits`                    | published per-class abuse rate limits                                                              |
 | `GET`  | `/api/integrator-config?project_key=…` | the project's live `IntegratorPriceConfig`, or 404                                                 |
-| `GET`  | `/api/integrator/config?project_key=…` | a project's published config, drop schedules and `pay_periods`; CORS `*`, cached up to ten minutes |
+| `GET`  | `/api/integrator/config?project_key=…` | a project's published config, drop schedules and `pay_periods`; CORS `*`, cached: up to 70 min old |
 | `GET`  | `/api/stats/earned`                    | sats earned and event counts, last 7d and lifetime                                                 |
 | `GET`  | `/api/federations`                     | every federation: seats, invite, custody state                                                     |
 | `POST` | `/api/integrator-config`               | validate an `IntegratorPriceConfig`: echoes it, or `422 config_invalid`                            |
@@ -723,8 +723,8 @@ All 429 rate-limit responses include a `Retry-After` header in seconds.
 | `stats.earned`              | 60    | 60s    |
 | `public.federations`        | 60    | 60s    |
 
-Limits are per IP, per bucket (except `verify-domain` which is per-account so
-DNS retries don't get throttled by a noisy neighbor). Headers
-`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted
-on every rate-limited response. v1 buckets reset on cold start (per-instance
-in-memory); production fronts every endpoint with an edge-level limiter.
+Limits are per IP, per bucket. `verify-domain`'s bucket also carries the
+account, so it is per account per IP. Headers `X-RateLimit-Limit`,
+`X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted on every rate-limited
+response. v1 buckets reset on cold start (per-instance in-memory); production
+fronts every endpoint with an edge-level limiter.

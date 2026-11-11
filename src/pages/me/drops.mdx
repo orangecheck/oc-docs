@@ -28,7 +28,8 @@ Three rules make batches safe for the people who earn:
    batch.
 3. **A published ceiling.** No schedule may hold earnings longer than
    `MAX_DROP_WINDOW_DAYS` (92), published in `ABUSE_LIMITS` and on the trust
-   page.
+   page, plus the 24-hour safety valve: a batch whose closing block is late is
+   released 24 hours after its scheduled end (below).
 
 ## Cadences
 
@@ -36,7 +37,7 @@ Three rules make batches safe for the people who earn:
 | ------------ | ----------- | ------------------------------------ | ---------------------- |
 | Weekly       | `weekly`    | a fixed weekday + hour, UTC          | "the Friday payout"    |
 | Monthly      | `monthly`   | a fixed day (1–28) + hour, UTC       | payroll-shaped payouts |
-| When you say | `manual`    | when you say (auto-closes ≤ 92 days) | a campaign, a launch   |
+| When you say | `manual`    | when you say (closes within 92 days) | a campaign, a launch   |
 
 Set a schedule on your project, under **Release schedule**, or read schedules
 publicly:

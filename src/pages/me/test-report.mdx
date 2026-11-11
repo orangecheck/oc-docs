@@ -287,7 +287,9 @@ deployment runs older builds until it is redeployed.
   code (oc-app-web `src/components/oca/user/identity/LinkedIdentities.tsx` posts
   to `/api/auth/email-otp/start`), so a held address is mailed the link in place
   of the code, and the add form, which takes a code, can add it only once the
-  hold ends.
+  hold ends. A code that only links an address is built for that form: it mails
+  a held address nothing and says when the hold ends. It waits on a database
+  change orangecheck runs (see [Still open](#still-open)).
 - **An integrator** uses an ordinary account. A project asks for a name, a
   domain and its settings; the domain is proved by DNS or a meta tag. There is
   no billing profile, legal entity, address, country, tax id or payout
@@ -445,6 +447,7 @@ each request into a fresh database read or check.
 | The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor stopped and restarted while a batch is in transit | in the same sitting; that move's switch about 14 days later                    |
 | The executor build for production: phoenixd's restart supervisor and shutdown order, and no payee in its output                                      | oc-me-web `d0b76fdd` approved; orangecheck deploys it after the C07 sitting    |
 | Rewriting hold reasons written before 2026-10-31                                                                                                     | orangecheck; ready to run                                                      |
+| ochk.app's add-email form taking a code that only links the address: a held address is mailed nothing and told when it frees                         | orangecheck's database change 055; the code is approved and waits on it        |
 | The database change and keys that put ochk.io's remaining internal lookups behind a recorded reason                                                  | orangecheck; ready to run                                                      |
 | chat.ochk.io and cosign.ochk.io reporting sign-ins to ochk.app as integrators: wired, still off                                                      | orangecheck's settings change                                                  |
 | The sign-in popup refusing a page that does not answer its challenge                                                                                 | the conditions in the No-KYC walk-through; reporting since 2026-11-10          |

@@ -10,11 +10,10 @@ export const metadata = {
 
 In the design, an orangecheck federation is run by independent **guardians**:
 one operator key per guardian, each guardian threshold-signing federation
-actions with its peers. orangecheck recruits, vets and pays guardians. A
-guardian's application, charter signature, seat claim, votes and exit handoff
-are signed with its own operator key; the rest of what an operator does on
-ochk.app takes a signed-in session
-([charter §4](/federation/oc-me-v1#4-orangechecks-role) says which).
+actions with its peers. orangecheck recruits, vets and pays guardians. Some of
+what an operator does on ochk.app needs its own operator key's signature as well
+as a signed-in session, and the rest takes the session alone;
+[charter §4](/federation/oc-me-v1#4-orangechecks-role) lists which.
 
 **The program is not open.** While the system is in testing, orangecheck holds
 every key that can move funds, and there are no guardian seats yet.
@@ -34,7 +33,9 @@ Two paths into it:
   `oc-guardian apply prepare`, and email `application.json` with your filled-in
   questionnaire to apply@ochk.io. The kit signs everything the portal signs but
   two: claiming a seat and voting on an amendment are signed only in the portal
-  today. The envelopes are the same, and so is the review queue.
+  today. And ochk.app has no upload yet for a charter signature the kit signs,
+  so only a key held in the portal can ratify a charter today. The envelopes are
+  the same, and so is the review queue.
 
 ## Lifecycle
 
@@ -79,16 +80,18 @@ What the program is built to hold, and where each falls short today.
 
 1. **Operator-held keys.** orangecheck's servers never receive your operator
    key. Where the key lives decides who else can reach it. The kit keeps it in
-   the OS keychain, outside any page. The portal keeps it in ochk.app's browser
-   storage, where the script ochk.app serves can read it, and orangecheck
-   deploys that script. For a key no page can read, keep it in the kit.
+   the OS keychain or a key file, outside any page. The portal keeps it in
+   ochk.app's browser storage, where the script ochk.app serves can read it, and
+   orangecheck deploys that script. For a key no page can read, keep it in the
+   kit.
 2. **Bypass parity.** The kit signs everything the portal signs but two, each
    step in
    [BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md):
    claiming a seat and voting on an amendment are signed only in the portal
    today. The kit signs without the portal, and what it signs is uploaded on
-   ochk.app, signed in. At the federation, a guardian run from the kit looks the
-   same as one run from the portal.
+   ochk.app, signed in, except a charter signature, which ochk.app has no upload
+   for yet. At the federation, a guardian run from the kit looks the same as one
+   run from the portal.
 3. **Public commitments.** A charter ratification, incident or attestation made
    now is operator-signed and verifiable offline, so OC cannot forge one. Two
    kinds of row fall short. One kept without its envelope cannot be checked

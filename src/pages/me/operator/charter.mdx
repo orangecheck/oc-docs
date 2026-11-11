@@ -34,17 +34,18 @@ shasum -a 256 charter.txt
 ```
 
 `oc-guardian charter fetch oc-me-v1` prints the published hash, version and
-canonical URL. Then sign in the portal (verify-then-sign flow) or via the kit:
+canonical URL. Then sign in the portal (verify-then-sign flow). The kit signs
+the same `charter-sign` envelope:
 
 ```bash
 oc-guardian charter sign oc-me-v1 --out charter-sig.json
-oc-guardian charter publish --file charter-sig.json
 ```
 
-Either path produces a byte-identical `charter-sign` envelope. The federation
-verifies the Ed25519 signature against your operator pubkey and adds you to its
-ratification roster. From that moment on, your commitment is public and
-recoverable from any node that has the envelope.
+ochk.app has no upload for that file yet, so only a key held in the portal can
+ratify a charter today. When a signature reaches it, the federation verifies the
+Ed25519 signature against your operator pubkey and adds you to its ratification
+roster. From that moment on, your commitment is public and recoverable from any
+node that has the envelope.
 
 ## Signature roster
 

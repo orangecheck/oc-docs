@@ -83,26 +83,33 @@ program. The company never asks operators to sign envelopes on its behalf.
 
 What an operator's key signs today, and what it does not:
 
-- **Signed.** Charter signatures, seat claims, votes on amendments and exit
-  ratifications are envelopes the operator key signs, and the server checks each
-  signature before it records one. Binding the key to an ochk.app account is
-  signed by the key too.
-- **A session, not a signature.** The other operator writes, such as creating a
+- **Signed and signed in.** These operator writes need the operator key's
+  signature and a signed-in operator session on ochk.app, and the server checks
+  the signature before it records one: an application to the program, binding
+  the key to an ochk.app account, charter signatures, seat claims, attestation
+  delegations, votes on amendments, exit handoffs and their ratifications,
+  payout claims, incident reports, and a creator's handover offer and its
+  acceptance.
+- **Signed in alone.** Every other operator write, such as creating a
   federation, editing its seats or its settlement key, publishing its invite and
-  completing an exit, take a signed-in operator session on ochk.app. Setting the
-  settlement key, forcing a gateway teardown, and binding a key that changes
-  which operator the account acts as also ask for a fresh identity check.
+  completing an exit, takes the session and no signature.
+- **Fresh check.** Setting the settlement key, forcing a gateway teardown, and
+  binding a key that changes which operator the account acts as also ask for a
+  fresh identity check.
 - **Where the key lives.** The operator portal (`ochk.app/me/operator`)
   generates its key in the page and keeps it in ochk.app's browser storage,
   where the script ochk.app serves can read it. orangecheck deploys that script.
   orangecheck's servers never receive the key. The
   [kit](https://github.com/orangecheck/oc-guardian-kit) keeps its key in the OS
-  keychain, outside any page.
+  keychain or in a key file (`--key-file`), outside any page.
 - **No hardware key yet.** No operator signature is hardware-backed today: the
   kit's `--hsm` choices all keep the key in the OS keychain or a key file
   ([kit README, "What is not built yet"](https://github.com/orangecheck/oc-guardian-kit#what-is-not-built-yet)).
-- **Uploads.** An envelope the kit signs reaches a federation's timeline through
-  an upload on ochk.app, signed in.
+- **Uploads.** The kit signs everything above but a seat claim and a vote on an
+  amendment. Its application goes by email to apply@ochk.io; the rest reaches
+  the server through an upload on ochk.app, signed in, except a charter
+  signature: ochk.app has no upload for one yet, so only a key held in the
+  portal can ratify a charter today.
 
 ## 5. Lightning gateway disclosure
 
@@ -110,8 +117,8 @@ The federation registers at least one Lightning gateway operated by a
 non-OrangeCheck party, and publishes that gateway's operator, fee schedule and
 uptime SLA. None of this is published yet: the federation's record at
 [`/api/public/federations/oc-me-v1`](https://me.ochk.io/api/public/federations/oc-me-v1)
-carries only a gateway's status and whether it is connected, and every gateway
-today is one orangecheck runs.
+carries at most a gateway's status and whether it is connected, and every
+gateway today is one orangecheck runs.
 
 ## 6. Exit clause
 

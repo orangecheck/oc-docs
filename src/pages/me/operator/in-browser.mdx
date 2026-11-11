@@ -15,8 +15,8 @@ this browser's IndexedDB, and the page signs with it. orangecheck's servers only
 ever receive signed envelopes, never the private key. The page itself can read
 the key, and so can any script ochk.app serves; orangecheck deploys that script.
 For a key no page can read, keep it in the kit, which holds it in the OS
-keychain. The kit signs everything the portal signs but two: claiming a seat and
-voting on an amendment are signed only here today.
+keychain or a key file. The kit signs everything the portal signs but two:
+claiming a seat and voting on an amendment are signed only here today.
 
 The operator program is not open. The portal's operator pages open only to
 accounts the program lets in, and while the system is in testing orangecheck
@@ -135,7 +135,9 @@ signs these without a key in the browser:
 Both paths produce byte-identical envelopes, indexed in the same KV store,
 visible on the same public timelines. The kit signs without the portal, but most
 of what it signs still reaches a timeline through an upload on ochk.app, signed
-in (BYPASS.md, "Submitting what the kit signs"). Claiming a seat and voting on
-an amendment have no kit command yet, and some operator writes, such as setting
-a federation's settlement key or completing an exit, take a signed-in session
-and no envelope at all. Pick whichever fits your trust posture; mix them freely.
+in (BYPASS.md, "Submitting what the kit signs"). A charter signature has no
+upload there yet, so only a key held here can ratify a charter today. Claiming a
+seat and voting on an amendment have no kit command yet, and some operator
+writes, such as setting a federation's settlement key or completing an exit,
+take a signed-in session and no envelope at all. Pick whichever fits your trust
+posture; mix them freely.

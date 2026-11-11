@@ -359,7 +359,8 @@ Add your own events too, under any key you choose (`lesson_completed`, say). Try
 numbers first in the [sandbox](https://ochk.app/integrate/sandbox). In the
 config (`IntegratorPriceConfig`) a price is `site_pays`, and your user earns
 `user_share_pct` of it, which is `0.8`. A config sent with a lower share is
-saved at `0.8`, with the lower price that earns your user the same.
+saved at `0.8`, with the lower price that earns your user the same, unless that
+price is outside the platform's price bounds (`422 config_invalid`).
 
 ### 3 · send events from your server
 

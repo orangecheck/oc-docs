@@ -42,7 +42,8 @@ Sender and recipient may be the same person (self-vault).
 
 An **OC identity** is the pair `(btc_address, attestation_id)` where:
 
-- `btc_address` is a mainnet Bitcoin address (P2WPKH, P2TR, or P2PKH)
+- `btc_address` is a mainnet Bitcoin address (P2WPKH, P2SH-P2WPKH, P2TR, or
+  P2PKH)
 - `attestation_id` is the SHA-256 of a canonical orangecheck message signed by
   that address
 
@@ -251,8 +252,10 @@ A sealed vault is a canonical JSON object. File extension `.lock`, MIME
 1. Generate random `content_key` (32 bytes).
 2. Generate random `nonce_ct` (12 bytes).
 3. `ciphertext = AEAD(content_key, nonce_ct, payload, aad=envelope_id_draft)`
-   where `envelope_id_draft` is SHA-256 of the canonical envelope with
-   `ciphertext`, `sig`, and `recipients[*].wrapped_key` elided.
+   where `envelope_id_draft` is SHA-256 of the canonical envelope with `id`,
+   `ciphertext`, `sig.value` and each `recipients[*].wrapped_key` set to `""`
+   (§5). The draft carries the recipient entries step 4 builds, so step 4 runs
+   first.
 4. For each recipient device:
     - `(eph_sk, eph_pk) := x25519_keygen()`
     - `shared = X25519(eph_sk, device_pk)`
@@ -260,7 +263,8 @@ A sealed vault is a canonical JSON object. File extension `.lock`, MIME
     - `nonce_kek` random 12 bytes
     - `wrapped_key = AEAD(kek, nonce_kek, content_key, aad=device_id)`
     - zeroize `eph_sk`
-5. Canonicalize full envelope; `id = sha256(canonical_bytes_without_sig)`.
+5. `id` = SHA-256 of the canonical envelope with `id` and `sig.value` set to
+   `""` (§5).
 6. `sig.value = BIP322(sender_addr, id)`.
 7. Zeroize `content_key`.
 
@@ -313,6 +317,11 @@ and §4.6 and the [OC Chat spec](/chat/spec).
 - Final byte is LF.
 
 Reference: RFC 8785 JCS, with the additional `recipients[]` rule.
+
+Both hashes take these bytes, the final LF included. `id` sets `id` and
+`sig.value` to `""`. `envelope_id_draft` sets `id`, `ciphertext`, `sig.value`
+and each `recipients[*].wrapped_key` to `""`, with `sig.alg` `"bip322"` and
+`sig.pubkey` the sender's `from.address`. Test vectors v01–v04 pin both.
 
 ## §6 Errors
 

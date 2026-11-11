@@ -62,7 +62,7 @@ normative rules, see the [specification](/lock/spec).
 | -------------------------- | ---------------------------- | ------------------------------------------------------------------------ |
 | `v`                        | integer (literal `2`)        | Format version. Clients MUST reject unknown versions.                    |
 | `kind`                     | `"identity"` \| `"payment"`  | Identity = local decrypt; payment = relay-held key released after tx.    |
-| `id`                       | 64-char lowercase hex        | SHA-256 of the canonical envelope with `sig.value` emptied.              |
+| `id`                       | 64-char lowercase hex        | SHA-256 of the canonical envelope with `id` and `sig.value` emptied.     |
 | `alg`                      | object                       | Algorithm identifiers. Fixed in v2; reserved for forward-compat.         |
 | `from.address`             | string                       | Sender's mainnet Bitcoin address.                                        |
 | `from.attestation_id`      | hex, optional                | SHA-256 of the sender's orangecheck canonical message.                   |
@@ -87,7 +87,7 @@ verification fails. Rules per [SPEC §5](/lock/spec):
 4. Integers within IEEE 754 double range are serialized without fractional zeros
    or exponents.
 5. Strings use `\uXXXX` escape only for control chars and `"` / `\`.
-6. File ends in a single LF.
+6. The bytes end in a single LF, and both the `id` and the AAD hash include it.
 
 This is RFC 8785 JCS plus the one `recipients[]` sort rule.
 `@orangecheck/lock-core` ships the canonicalizer; if you implement one in a new
@@ -102,20 +102,22 @@ Given `payload: Uint8Array` and one or more recipient
 
 1. `content_key := random(32)` — the only key that ever touches the payload.
 2. `nonce_ct := random(12)`.
-3. Build the **draft envelope** — every field filled in _except_ `ciphertext`,
-   `sig.value`, and `recipients[*].wrapped_key`, which are empty strings.
-4. `envelope_id_draft := SHA-256(canonical(draft))`.
-5. `ciphertext := AEAD(content_key, nonce_ct, payload, aad = envelope_id_draft)`.
-6. For each recipient:
+3. For each recipient:
     - `(eph_sk, eph_pk) := x25519_keygen()`
     - `shared := X25519(eph_sk, device_pk)` (32 bytes)
     - `kek := HKDF(ikm = shared, salt = nonce_ct, info = "oc-lock/v2/kek:" || device_id, L = 32)`
     - `nonce_kek := random(12)`
     - `wrapped_key := AEAD(kek, nonce_kek, content_key, aad = device_id)`
     - Zeroize `eph_sk`, `shared`, `kek`.
+4. Build the **draft envelope**: every field filled in, the recipient entries
+   from step 3 included, with `id`, `ciphertext`, `sig.value` and each
+   `recipients[*].wrapped_key` set to empty strings, `sig.alg` to `"bip322"` and
+   `sig.pubkey` to the sender's address.
+5. `envelope_id_draft := SHA-256(canonical(draft))`.
+6. `ciphertext := AEAD(content_key, nonce_ct, payload, aad = envelope_id_draft)`.
 7. Canonicalize the now-complete envelope (with `ciphertext` and all
    `wrapped_key` values).
-8. `id := SHA-256(canonical(envelope with sig.value empty))`.
+8. `id := SHA-256(canonical(envelope with id and sig.value empty))`.
 9. `sig.value := BIP322(sender_addr, id)`.
 10. Zeroize `content_key`.
 
@@ -135,7 +137,7 @@ Given an envelope and a local `(device_id, device_sk)`:
 5. `kek := HKDF(ikm = shared, salt = nonce_ct, info = "oc-lock/v2/kek:" || device_id, L = 32)`.
 6. `content_key := AEAD.decrypt(kek, nonce_kek, wrapped_key, aad = device_id)`.
 7. `payload := AEAD.decrypt(content_key, nonce_ct, ciphertext, aad = envelope_id_draft)`
-   where `envelope_id_draft` is recomputed exactly as in step 3 of the
+   where `envelope_id_draft` is recomputed exactly as in steps 4 and 5 of the
    encryption procedure.
 8. Zeroize `shared`, `kek`, `content_key`.
 

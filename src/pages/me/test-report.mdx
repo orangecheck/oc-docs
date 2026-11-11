@@ -332,13 +332,14 @@ in `f7cae1ca`).
 
 **Signing out.** Each site checks a session against its own copy of ochk.io's
 list of ended sessions, fetched at most once a minute, so while ochk.io answers
-a sign-out reaches every site within a minute. A site that has not fetched a
-fresh copy for 10 minutes can't vouch for any session. Then the attest, lock,
+a sign-out reaches every site within a minute. A site with no copy yet, or whose
+copy is over 10 minutes old, can't vouch for any session. Then the attest, lock,
 vote, stamp, agent and pledge sites, cosign and btc.ochk.io refuse every write
-and keep serving reads, so a session ended after their last copy can still show
-as signed in there until ochk.io answers again. ochk.app, me.ochk.io, vault,
-chat and orangecheck's internal tools act for no session until then (oc-packages
-`auth-core/src/revocation.ts:319`, `site-kit/src/auth/session.ts:102`; the
+and keep serving reads, so an ended session can still show as signed in there
+until ochk.io answers again, unless the copy the site holds lists it. ochk.app,
+me.ochk.io, vault, chat and orangecheck's internal tools act for no session
+until then (oc-packages `auth-core/src/revocation.ts:319`,
+`site-kit/src/auth/session.ts:102`; the
 [auth host reference](/api-reference/auth-host#auth-scheme) says what each
 answers).
 

@@ -12,10 +12,13 @@ export const metadata = {
 # Function: resolveSessionFromRequest()
 
 ```ts
-function resolveSessionFromRequest(headers: IncomingRequestHeaders, cfg: VerifyConfig): Promise<ResolveSessionResult>;
+function resolveSessionFromRequest(
+   headers: IncomingRequestHeaders, 
+   cfg: VerifyConfig, 
+request?: ResolveSessionRequest): Promise<ResolveSessionResult>;
 ```
 
-Defined in: [index.ts:692](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L692)
+Defined in: [index.ts:720](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L720)
 
 Resolve the EFFECTIVE session for a request — the per-tab choke
 point every consumer's `readJwtSession` should delegate to.
@@ -29,6 +32,9 @@ Precedence:
      which is precisely the bug per-tab pinning exists to prevent.
      Clients clear their pin on 401 and re-resolve.
   2. Every `oc_session` cookie in the jar, first one that verifies.
+     Given the request's method, a state change that carries several
+     resolves to `{ ok: false, reason: 'several_sessions' }` instead
+     (see [cookiePickRefused](cookiePickRefused)).
 
 Crypto-only (signature + exp + iss via [verifySessionToken](verifySessionToken)); a
 signed-out token still resolves, so pass the payload to
@@ -40,6 +46,7 @@ signed-out token still resolves, so pass the payload to
 | ------ | ------ |
 | `headers` | [`IncomingRequestHeaders`](../type-aliases/IncomingRequestHeaders) |
 | `cfg` | [`VerifyConfig`](../interfaces/VerifyConfig) |
+| `request?` | [`ResolveSessionRequest`](../interfaces/ResolveSessionRequest) |
 
 ## Returns
 

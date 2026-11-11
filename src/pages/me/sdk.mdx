@@ -588,11 +588,12 @@ end it, so no other credential is asked for.
 
 What an ended token reaches, and when:
 
-- ochk.io, me.ochk.io and the family sites refuse it within a minute while they
-  can read ochk.io's list of ended sessions, which each reads at most once a
-  minute. If a read fails, the last copy keeps answering until it is ten minutes
-  old; after that they refuse writes, and the sites that hold a person's data,
-  me.ochk.io among them, refuse reads too.
+- ochk.io refuses it at once. me.ochk.io and the family sites refuse it within a
+  minute while they can read ochk.io's list of ended sessions, which each reads
+  at most once a minute. If a read fails, the last copy keeps answering until it
+  is ten minutes old; after that they refuse writes, and me.ochk.io, ochk.app,
+  vault and chat refuse reads too
+  ([which site does what](/api-reference/auth-host#auth-scheme)).
 - Your own server refuses it within about two minutes, wherever it checks
   sessions against
   [the list of ended sessions](#when-someone-ends-every-session) (`withOcAuth`

@@ -588,14 +588,21 @@ end it, so no other credential is asked for.
 
 What an ended token reaches, and when:
 
-- ochk.io, me.ochk.io and the family sites refuse it within a minute.
+- ochk.io, me.ochk.io and the family sites refuse it within a minute while they
+  can read ochk.io's list of ended sessions, which each reads at most once a
+  minute. If a read fails, the last copy keeps answering until it is ten minutes
+  old; after that they refuse writes, and the sites that hold a person's data,
+  me.ochk.io among them, refuse reads too.
 - Your own server refuses it within about two minutes, wherever it checks
   sessions against
   [the list of ended sessions](#when-someone-ends-every-session) (`withOcAuth`
   or `checkOcSession` in me-client; `verify_session` with a `RevocationList` in
   `orangecheck` 3.3.1 or later). me.ochk.io lists the token for your origin
-  within a minute, and your server reads that list at most once a minute. A
-  copied cookie that holds it stops working there too.
+  within a minute, and your server reads that list at most once a minute. If a
+  read fails, the last list read keeps answering until it is ten minutes old by
+  its own clock; after that writes are refused and reads go on
+  ([below](#when-someone-ends-every-session)). A copied cookie that holds it
+  stops working there too.
 - Clearing your own cookie is what ends the session on your site at once; do
   both.
 - Tokens ended before 2026-10-24 are not on your list. They expire within 30
@@ -1272,6 +1279,10 @@ on `cross_integrator_lifetime_sats`, `cross_integrator_distinct_count`,
 | `trust_attestations_bundle`          | The statements other apps made about them, each one in full       | When a count is not enough                     |
 | `attest_tier`                        | Deprecated: `anonymous` / `bonded`                                | None; see below                                |
 | `display_name`                       | Deprecated: nothing                                               | None: the sign-in gives you no name either     |
+
+The six activity scopes count only events that cost someone something: test
+fires, simulations and unbilled events are left out, so while payments run in
+simulation the counts read 0 and the first event's date is empty.
 
 Every value in `scopes` is a string. `trust_attestation_count` reads
 `total,good,distinct_good_issuers,caution`; `parseTrustAttestationCount(value)`

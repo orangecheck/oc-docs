@@ -12,7 +12,8 @@ use orangecheck only to sign people in and keep bots out, and pay nobody.
 
 What decides it is the project's **pay periods**: stretches of time in which its
 events earn its users sats. Outside every period an event earns nothing, costs
-nothing, and leaves no record.
+nothing, and is not kept. A call that carries the person's own token still
+records that they use your project, as their sign-in usually already has.
 
 | You want                | Pay periods                                     |
 | ----------------------- | ----------------------------------------------- |
@@ -110,7 +111,8 @@ const result = oc.event.verify(envelope, config, undefined, {
 // result.issues includes 'outside_pay_period' for an event billed outside every period
 ```
 
-The response is cached for up to ten minutes, so compare against your own clock
+A cached copy can be about 70 minutes old (10 minutes at the edge, then served
+stale for up to an hour while it refreshes), so compare against your own clock
 rather than trusting a "paying now" you read earlier. orangecheck runs the same
 check in its own audit.
 

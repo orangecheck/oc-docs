@@ -261,10 +261,10 @@ the person claims it into an orangecheck account of their own, at ochk.app.
 
 Only an account whose person agreed can earn: one you provisioned with
 `consent: true`, or one they claimed. An event naming any other is refused with
-`403 connect_consent_required`, and nothing is recorded or charged. me.ochk.io
+`403 connect_consent_required`, and no event is recorded or charged. me.ochk.io
 checks consent with ochk.io, at most once a month for an account that has it. If
 that check cannot be made, the event gets `503 connect_state_unavailable`, also
-with nothing recorded, so retry it later.
+with no event recorded, so retry it later.
 
 **A claim link.** When your signed-in user asks to claim, mint a link from your
 backend and send them to it:

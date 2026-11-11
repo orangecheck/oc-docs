@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'ochk.app · In-Browser Operator Flow',
     description:
-        'How ochk.app runs the entire guardian-program lifecycle in the browser without compromising the operator-held-keys invariant. Ed25519 in IDB, BIP-39 mnemonic backup, envelope round-trip with the kit.',
+        'How ochk.app runs the guardian-program lifecycle in the browser: an Ed25519 key in IndexedDB that the page itself can read, a BIP-39 mnemonic backup, and the envelope round-trip with the kit.',
 };
 
 # ochk.app · In-Browser Operator Flow
@@ -10,10 +10,13 @@ export const metadata = {
 
 The portal at [ochk.app/me/operator](https://ochk.app/me/operator) lets
 operators apply, ratify charters, publish incidents, and request hosted hardware
-without ever installing the kit. The architectural invariant — **signatures must
-be produced on operator-held key material the portal cannot reach** — is
-preserved by holding the key in the _browser's_ IndexedDB and signing
-client-side; the portal only sees signed envelopes, never the private half.
+without ever installing the kit. The key is generated in the page and kept in
+this browser's IndexedDB, and the page signs with it. orangecheck's servers only
+ever receive signed envelopes, never the private key. The page itself can read
+the key, and so can any script ochk.app serves; orangecheck deploys that script.
+For a key no page can read, keep it in the kit, which holds it in the OS
+keychain. The kit signs everything the portal signs but two: claiming a seat and
+voting on an amendment are signed only here today.
 
 The operator program is not open. The portal's operator pages open only to
 accounts the program lets in, and while the system is in testing orangecheck
@@ -119,7 +122,7 @@ Bitcoin nodes with the same xpriv.
 
 The kit-only flow in
 [BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
-covers every action without using the portal:
+signs these without a key in the browser:
 
 | Action            | Kit command                          | Portal equivalent                                 |
 | ----------------- | ------------------------------------ | ------------------------------------------------- |
@@ -130,5 +133,9 @@ covers every action without using the portal:
 | run guardian      | `oc-guardian fedimintd run`          | docker recipe in runbook + hosted-hardware option |
 
 Both paths produce byte-identical envelopes, indexed in the same KV store,
-visible on the same public timelines. Pick whichever fits your trust posture;
-mix them freely.
+visible on the same public timelines. The kit signs without the portal, but most
+of what it signs still reaches a timeline through an upload on ochk.app, signed
+in (BYPASS.md, "Submitting what the kit signs"). Claiming a seat and voting on
+an amendment have no kit command yet, and some operator writes, such as setting
+a federation's settlement key or completing an exit, take a signed-in session
+and no envelope at all. Pick whichever fits your trust posture; mix them freely.

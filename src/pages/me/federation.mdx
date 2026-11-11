@@ -58,8 +58,16 @@ Specifically:
 4. **A Lightning gateway run by someone other than orangecheck.**
 5. **orangecheck holds no seat.**
 
-[ochk.app/custody](https://ochk.app/custody) checks each of these live, derived
-from the seat roster and the signed charter.
+[ochk.app/custody](https://ochk.app/custody) shows each of these and how it is
+known. The seat count, the threshold and the charter's signatures are read from
+the federation's published record. A distinct key per seat is a count of the
+roster until every seat has proved its key with a signature over a Bitcoin block
+hash. Separate legal entities and countries rest on a signed attestation, which
+cannot show that one person does not hold several keys. The gateway check (4) is
+not read from anything yet: it reads "orangecheck runs it today". And (5) counts
+as unmet until the roster is complete, every seat has proved its key and none is
+orangecheck's; even then it is declared, not proven, since nothing published
+shows who is behind a key.
 
 A live federation's guardians also have to keep running. Each guardian's kit
 posts a signed runtime attestation every 5 minutes, and a quorum of them dates
@@ -97,9 +105,9 @@ Once a federation is bound, the charter (with all of the above disclosed) is
 published in three places:
 
 1. The federation's own site / status page.
-2. ochk.app's [`/custody`](https://ochk.app/custody) page, including the SHA-256
-   hash of the charter so you can verify the copy you read against the one OC
-   bound.
+2. The federation's page on ochk.app, `ochk.app/federations/<slug>`, including
+   the SHA-256 hash of the charter so you can verify the copy you read against
+   the one OC bound.
 3. `https://me.ochk.io/api/operator/charter?federation=<slug>`, with the hash
    and each guardian's signature over it.
 

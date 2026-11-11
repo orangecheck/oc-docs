@@ -66,9 +66,13 @@ first.
 
 ### 05 · Audit verifies without us.
 
-Every audit bundle and every receipt OrangeCheck issues, billable or not, is
-verifiable offline, against Bitcoin headers, by anyone, forever. If OrangeCheck
-disappeared tomorrow, every receipt continues to verify. We sell operations, not
+Every receipt OrangeCheck signs is verifiable offline, against Bitcoin headers,
+by anyone, forever. On `ochk.app` that is its payment receipts, and every event
+receipt that is live, billed and not a test fire: each is signed over its
+canonical bytes and anchored with OpenTimestamps. Any other event receipt (a
+test fire, an unbilled event, an event in a test-mode project) is served with
+its SHA-256 digest only; nothing signs or anchors it. If OrangeCheck disappeared
+tomorrow, every signed receipt continues to verify. We sell operations, not
 lock-in. The protocol is the API.
 
 ### 06 · No agent-replacing-humans positioning.
@@ -101,8 +105,8 @@ review window, and a versioned re-ratification.
   the destination (commitment 02). Three kinds of billable event: one-time, per
   action and per session. Integrators set what each event pays the user; OC's
   fee is a fixed 20% of the price. Commitments **02** (custody you can move out
-  of), **05** (every receipt verifies offline), and **07** (sats first-class)
-  bind this product specifically.
+  of), **05** (every signed receipt verifies offline), and **07** (sats
+  first-class) bind this product specifically.
 - **`vault.ochk.io`** — consumer commercial product. An end-to-end encrypted
   password manager, sealed with OC Lock's primitives under a vault key that
   opens with a passphrase only you hold. OC holds ciphertext only — no entry
@@ -130,7 +134,7 @@ review window, and a versioned re-ratification.
 
 ## If we ever break one of these
 
-The protocol layer continues to work without us. Every receipt we ever issued
+The protocol layer continues to work without us. Every receipt we ever signed
 continues to verify. The spec repos stay public under the MIT license their
 `LICENSE` files state, and the npm packages remain published. Customers can fork
 the managed components and run them themselves on day one. This is the whole
@@ -145,10 +149,10 @@ spec, and to this page, is a public commit there.
 These commitments are made by the OrangeCheck founding team. Names will be
 appended here as public commitments are formalized.
 
-| Field            | Value                                                     |
-| ---------------- | --------------------------------------------------------- |
-| Ratified         | v1 · 2026-04-28                                           |
-| Corrected        | 2026-11-03 · facts in 03, 07, vault, and the product list |
-| Next review      | 2026-12-01 (or earlier if material change proposed)       |
-| Source of truth  | `oc-docs/src/pages/charter.mdx`                           |
-| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)  |
+| Field            | Value                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| Ratified         | v1 · 2026-04-28                                                                                  |
+| Corrected        | 2026-11-03 · facts in 03, 07, vault, and the product list; 2026-11-11 · which receipts 05 covers |
+| Next review      | 2026-12-01 (or earlier if material change proposed)                                              |
+| Source of truth  | `oc-docs/src/pages/charter.mdx`                                                                  |
+| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)                                         |

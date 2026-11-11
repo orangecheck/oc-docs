@@ -307,15 +307,18 @@ deployment runs older builds until it is redeployed.
 asks for a legal name or company name with its jurisdiction, a country and
 region, and two references, and says the operator is listed publicly with them.
 The portal stores the answers; no code checks or publishes any of it. Whether it
-keeps asking is open, with the legal read below. Two documents say more is
-published than is. ochk.app's privacy notice names what the questionnaire asks
-and says its handle, name, jurisdiction, contact channel and fingerprint are
-published in the federation charter (oc-packages `legal/src/content/me.ts:312`),
-and the oc-me-v1 charter says each guardian's disclosures appear on
-ochk.app/trust (oc-docs `src/pages/federation/oc-me-v1.mdx:70`). The charter
-carries the guardians' keys only (oc-me-web
-`src/lib/operator/charter.ts:288-290`), and ochk.app/trust lists operator keys
-only (oc-app-web `src/pages/trust.tsx:62`).
+keeps asking is open, with the legal read below. Two documents said more was
+published than was; on 2026-11-11 both were brought in line with the code.
+ochk.app's privacy notice names what the questionnaire asks and says a
+federation charter publishes the operator key of each seated guardian and
+nothing else from an application yet (oc-packages `legal/src/content/me.ts:313`,
+legal 0.7.34 at `199d6e4a`, served by ochk.app from `c67c7e43`). The oc-me-v1
+charter says the records on ochk.app/trust link the list of every operator key
+that holds a seat, and that the other three disclosures are not published
+anywhere yet (oc-docs `src/pages/federation/oc-me-v1.mdx:70-73` at `02d328f5`).
+Both match the code: the charter carries the guardians' keys only (oc-me-web
+`src/lib/operator/charter.ts:289-290`), and ochk.app/trust links the
+operator-key list (oc-app-web `src/pages/trust.tsx:62`).
 
 **What an app receives.** A third-party app (an integrator's project, a site
 that opens the sign-in popup, an OC Connect client, a webhook receiver) gets a

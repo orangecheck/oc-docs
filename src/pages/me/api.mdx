@@ -301,9 +301,9 @@ The request body is JSON. The fields, in any order:
 | `project_key`         | yes      | Your project, `pk_test_…` or `pk_live_…`                                             |
 | `subtype`             | yes      | An event your project defined and enabled, built-in or your own                      |
 | `user_address`        | backend  | Who earns: the person's `did_oc` from their sign-in token. Accepted only when signed |
-| `payment_amount_sats` | some     | The payment, for an event priced as a share of one                                   |
+| `payment_amount_sats` | some     | The payment in whole sats, for an event priced as a share of one                     |
 | `action_label`        | no       | A short label shown on the receipt: up to 280 characters of plain text               |
-| `note`                | no       | A note shown to the person: up to 280 characters of plain text                       |
+| `note`                | no       | Public plain text shown to the person, in the event's receipt: up to 280 characters  |
 | `is_agent`            | no       | `true` when an AI agent acted for the person                                         |
 
 Sign the exact bytes you send, in one header:
@@ -355,7 +355,7 @@ Without the SDK, the header is
 | 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: no event recorded or charged                                                             |
 | 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
 | 400    | `project_key_required`, `subtype_required`               | A required field is missing                                                                                        |
-| 400    | `payment_amount_sats_required`                           | The event is priced as a share of a payment and `payment_amount_sats` is missing                                   |
+| 400    | `payment_amount_sats_required`                           | The event is priced as a share of a payment and `payment_amount_sats` is missing, not above 0 or not whole sats    |
 | 400    | `idempotency_key_too_long`                               | `Idempotency-Key` is longer than 200 characters                                                                    |
 | 401    | `invalid_signature`                                      | The header is there but does not verify (`stale_timestamp`, `future_timestamp`, `bad_signature`, `invalid_format`) |
 | 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                                            |

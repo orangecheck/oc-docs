@@ -306,19 +306,31 @@ deployment runs older builds until it is redeployed.
 ([`application-questionnaire.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/docs/application-questionnaire.md))
 asks for a legal name or company name with its jurisdiction, a country and
 region, and two references, and says the operator is listed publicly with them.
-The portal stores the answers; no code checks or publishes any of it. Whether it
-keeps asking is open, with the legal read below. Two documents said more was
-published than was; on 2026-11-11 both were brought in line with the code.
-ochk.app's privacy notice names what the questionnaire asks and says a
-federation charter publishes the operator key of each seated guardian and
-nothing else from an application yet (oc-packages `legal/src/content/me.ts:313`,
-legal 0.7.34 at `199d6e4a`, served by ochk.app from `c67c7e43`). The oc-me-v1
-charter says the records on ochk.app/trust link the list of every operator key
-that holds a seat, and that the other three disclosures are not published
-anywhere yet (oc-docs `src/pages/federation/oc-me-v1.mdx:70-73` at `02d328f5`).
-Both match the code: the charter carries the guardians' keys only (oc-me-web
-`src/lib/operator/charter.ts:289-290`), and ochk.app/trust links the
-operator-key list (oc-app-web `src/pages/trust.tsx:62`).
+The portal stores the answers and no code checks them. Two places publish from
+an application, to anyone: the operator registry lists the operator key of every
+accepted application, the operator id made from that key, and when it was
+accepted, whether or not it holds a seat (oc-me-web
+`src/pages/api/operator/registry.ts:21-33`,
+`src/lib/operator/applications-store.ts:282-298`), and a federation charter
+carries the operator key of each seated guardian (oc-me-web
+`src/lib/operator/charter.ts:289-290`). Nothing else from an application is
+published. Whether the questionnaire keeps asking is open, with the legal read
+below. Two documents said more was published than was; on 2026-11-11 both were
+brought in line with the code. ochk.app's privacy notice names what the
+questionnaire asks and both places that publish from an application (oc-packages
+`legal/src/content/me.ts:329`, legal 0.7.35 at `960ab8f2`, served by ochk.app
+from `ed1e84d8`). The oc-me-v1 charter says the records on ochk.app/trust link
+the list of every operator key that holds a seat, and that the other three
+disclosures are not published anywhere yet (oc-docs
+`src/pages/federation/oc-me-v1.mdx:70-73` at `02d328f5`). ochk.app/trust links
+that list of seated operators (oc-app-web `src/pages/trust.tsx:62`).
+
+_Corrected 2026-11-11._ This paragraph first cited legal 0.7.34, whose privacy
+notice said a charter's guardian keys were all that was published from an
+application, and said that matched the code. It did not: the operator registry
+also publishes the key of every accepted application and when it was accepted.
+On 2026-11-11 the registry listed no operators, so it had published none. The
+privacy notice names the registry from legal 0.7.35.
 
 **What an app receives.** A third-party app (an integrator's project, a site
 that opens the sign-in popup, an OC Connect client, a webhook receiver) gets a

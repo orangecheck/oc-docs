@@ -84,9 +84,9 @@ program. The company never asks operators to sign envelopes on its behalf.
 What an operator's key signs today, and what it does not:
 
 - **Signed and signed in.** These operator writes need the operator key's
-  signature and a signed-in operator session on ochk.app, and the server checks
-  the signature before it records one: an application to the program, binding
-  the key to an ochk.app account, charter signatures, seat claims, attestation
+  signature and a signed-in session on ochk.app, and the server checks the
+  signature before it records one: an application to the program, binding the
+  key to an ochk.app account, charter signatures, seat claims, attestation
   delegations, votes on amendments, exit handoffs and their ratifications,
   payout claims, incident reports, and a creator's handover offer and its
   acceptance.
@@ -105,11 +105,10 @@ What an operator's key signs today, and what it does not:
 - **No hardware key yet.** No operator signature is hardware-backed today: the
   kit's `--hsm` choices all keep the key in the OS keychain or a key file
   ([kit README, "What is not built yet"](https://github.com/orangecheck/oc-guardian-kit#what-is-not-built-yet)).
-- **Uploads.** The kit signs everything above but a seat claim and a vote on an
-  amendment. Its application goes by email to apply@ochk.io; the rest reaches
-  the server through an upload on ochk.app, signed in, except a charter
-  signature: ochk.app has no upload for one yet, so only a key held in the
-  portal can ratify a charter today.
+- **Uploads.** The kit signs everything above. Its application goes by email to
+  apply@ochk.io; the rest reaches the server through an upload on ochk.app,
+  signed in, except a charter signature: ochk.app has no upload for one yet, so
+  only a key held in the portal can ratify a charter today.
 
 ## 5. Lightning gateway disclosure
 

@@ -726,5 +726,5 @@ All 429 rate-limit responses include a `Retry-After` header in seconds.
 Limits are per IP, per bucket. `verify-domain`'s bucket also carries the
 account, so it is per account per IP. Headers `X-RateLimit-Limit`,
 `X-RateLimit-Remaining`, `X-RateLimit-Window` are emitted on every rate-limited
-response. v1 buckets reset on cold start (per-instance in-memory); production
-fronts every endpoint with an edge-level limiter.
+response. Each server instance keeps its own buckets in memory, so a limit
+counts per instance and resets when the instance starts.

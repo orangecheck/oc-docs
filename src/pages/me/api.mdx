@@ -306,6 +306,10 @@ The request body is JSON. The fields, in any order:
 | `note`                | no       | Public plain text shown to the person, in the event's receipt: up to 280 characters  |
 | `is_agent`            | no       | `true` when an AI agent acted for the person                                         |
 
+A built-in event keeps only the text its class shows: `note` on a class A event,
+`action_label` on a class B event, neither on class C. Your own events keep
+both.
+
 Sign the exact bytes you send, in one header:
 
 ```

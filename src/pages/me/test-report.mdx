@@ -261,20 +261,33 @@ with a fresh Bitcoin key, every form recorded and nothing submitted, its stored
 rows read back and the account purged after. The email-code and Google or GitHub
 sign-ins were read in the code, not walked.
 
+**2026-11-11.** What bears on the no-KYC claim (no email, phone or name is
+needed to get or use an account, the Bitcoin address is the identity, and
+nothing identifying reaches a site outside orangecheck without a grant) was read
+again in the code, at the then-current `main` of oc-www (`4ae1e804`), oc-app-web
+(`7352ae5d`), oc-me-web (`55ef6c5e`), oc-packages (`17c073a3`), oc-guardian-kit
+(`02de1509`) and oc-docs (`82edad09`). It was not walked live again: the test
+deployment runs older builds until it is redeployed.
+
 - **A person** signs in with a Bitcoin address and a BIP-322 signature, an email
   and a code, or Google or GitHub. Everything else is optional: a display name
-  ("need not be your real name"), a Nostr key, more ways to sign in, a backing
-  coin, passkeys. A Lightning address is asked only to cash out. No page asks
-  for a legal name, phone, date of birth, ID, selfie, postal address, country,
-  tax id or bank details, and no code calls an identity check. An email address
-  that takes 20 wrong codes within 24 hours is held: no code for it is checked
-  until the oldest of those ages out. Meanwhile signing in or confirming a
-  change by email mails a single-use link in place of the code, and every other
-  email-code step for that address waits (oc-www
+  and a Nostr key (the Profile card says "Both are optional", oc-app-web
+  `src/components/oca/user/settings/Profile.tsx:116`), more ways to sign in, a
+  backing coin, passkeys. A Lightning address is asked only to cash out. No page
+  asks for a legal name, phone, date of birth, ID, selfie, postal address,
+  country, tax id or bank details, and no code calls an identity check. An email
+  address that takes 20 wrong codes within 24 hours is held: no code for it is
+  checked until the oldest of those ages out. Meanwhile signing in or confirming
+  a change by email mails a single-use link in place of the code, and every
+  other email-code step for that address waits (oc-www
   `src/lib/auth/rate-slots.ts:41`, `src/lib/auth/email-otp.ts:269`). The count
   is per mailbox, with plus tags and Gmail's dots folded, and wrong codes count
   from whoever sends them; the link is what keeps the address's owner able to
-  sign in while it is held.
+  sign in while it is held. Adding an email on ochk.app sends the same sign-in
+  code (oc-app-web `src/components/oca/user/identity/LinkedIdentities.tsx` posts
+  to `/api/auth/email-otp/start`), so a held address is mailed the link in place
+  of the code, and the add form, which takes a code, can add it only once the
+  hold ends.
 - **An integrator** uses an ordinary account. A project asks for a name, a
   domain and its settings; the domain is proved by DNS or a meta tag. There is
   no billing profile, legal entity, address, country, tax id or payout
@@ -292,21 +305,32 @@ sign-ins were read in the code, not walked.
 asks for a legal name or company name with its jurisdiction, a country and
 region, and two references, and says the operator is listed publicly with them.
 The portal stores the answers; no code checks or publishes any of it. Whether it
-keeps asking is open, with the legal read below.
+keeps asking is open, with the legal read below. Two documents say more is
+published than is. ochk.app's privacy notice names what the questionnaire asks
+and says its handle, name, jurisdiction, contact channel and fingerprint are
+published in the federation charter (oc-packages `legal/src/content/me.ts:312`),
+and the oc-me-v1 charter says each guardian's disclosures appear on
+ochk.app/trust (oc-docs `src/pages/federation/oc-me-v1.mdx:70`). The charter
+carries the guardians' keys only (oc-me-web
+`src/lib/operator/charter.ts:288-290`), and ochk.app/trust lists operator keys
+only (oc-app-web `src/pages/trust.tsx:62`).
 
 **What an app receives.** A third-party app (an integrator's project, a site
 that opens the sign-in popup, an OC Connect client, a webhook receiver) gets a
 person's email address or Bitcoin address only through a scope the person
 grants. Granting it, or turning on its renewal, takes a fresh re-proof within 5
 minutes: a passkey, or an email code or a Bitcoin signature (oc-me-web
-`src/pages/api/me/scope-grants.ts:210` and `:262`,
+`src/pages/api/me/scope-grants.ts:211` and `:263`,
 `src/lib/privacy/identity-reproof.ts:46`). No grant from before that rule is in
 force: on 2026-10-28 production held no scope grants at all. On every sign-in
 path the popup hands a site outside orangecheck only the account id and did,
 with no display name or Nostr key, and the site gets a token bound to its own
-origin, with neither address in it (oc-me-web `src/lib/auth/popup-resume.ts:82`,
-live since 2026-11-10 in `fad7560d`; oc-www `src/lib/auth/bound-token.ts:13`).
-orangecheck's own sites are the exception: the popup also hands them the display
+origin, with neither address in it (oc-me-web `src/lib/auth/popup-resume.ts:86`,
+live since 2026-11-10 in `fad7560d`; oc-www
+`src/lib/auth/bound-token.ts:24-32`). orangecheck's own sites are the exception:
+the origins on auth-core's family list, which includes me-demo.ochk.io,
+orangecheck's demo integration (oc-packages
+`auth-core/src/family-origins.ts:23`). The popup also hands them the display
 name and Nostr key, and on ochk.io they receive the Bitcoin address and the
 sign-in identity without a grant (oc-www `src/pages/api/auth/me.ts:111`).
 
@@ -327,8 +351,8 @@ been seen to answer.
 ochk.io, carries more than one ochk.io session cookie and does not name its
 tab's session acts for none of them: it is refused, and the answer clears the
 other copies the request carried, so the retry carries only the cookie ochk.io
-sets at its root (oc-www `src/lib/auth/session.ts:1078`, live since 2026-11-10
-in `f7cae1ca`).
+sets at its root (oc-www `src/lib/auth/session.ts:1092-1095`, live since
+2026-11-10 in `f7cae1ca`).
 
 **Signing out.** Each site checks a session against its own copy of ochk.io's
 list of ended sessions, fetched at most once a minute, so while ochk.io answers

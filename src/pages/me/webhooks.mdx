@@ -152,21 +152,21 @@ through `*`, or only the ones it names in `subscribed`:
 
 The three escrow notices come once for each change of state. `escrow.depleted`
 says billing is paused. An event is refused with `402 escrow_depleted` as soon
-as the available balance can't cover its fee, and from then on the project
-counts as depleted while the balance stays under that fee. The fee stands for an
-hour after the last refusal, each refusal renewing it. Money paid into the
-balance clears it: a top-up, a refund, an adjustment or preview credit, but not
-a per-event rebate. With no refused fee standing, depleted means under 1 sat.
-`escrow.low` means the available balance is under its floor, and
-`escrow.recovered` that it is back above it. The state is checked after an
-event's debit settles, and, since no debit settles while events are refused,
-after a refused event too, at most once a minute per project. When events
-arriving together see different states, the later state is announced too, not
-only the first. The project's owner sees each change in their ochk.app
-notifications, and `escrow.depleted` also by email when their account has a
-verified one, unless they turned notification emails off. When some balance is
-left, the depleted notice names what is spendable against what the refused event
-needed, and says billable events costing more than that are paused.
+as the available balance can't cover its fee less any site rebate, and from then
+on the project counts as depleted while the balance stays under that fee. The
+fee stands for an hour after the last refusal, each refusal renewing it. Money
+paid into the balance clears it: a top-up, a refund, an adjustment or preview
+credit. With no refused fee standing, depleted means under 1 sat. `escrow.low`
+means the available balance is under its floor, and `escrow.recovered` that it
+is back above it. The state is checked after an event's debit settles, and,
+since no debit settles while events are refused, after a refused event too, at
+most once a minute per project. When events arriving together see different
+states, the later state is announced too, not only the first. The project's
+owner sees each change in their ochk.app notifications, and `escrow.depleted`
+also by email when their account has a verified one, unless they turned
+notification emails off. When some balance is left, the depleted notice names
+what is spendable against what the refused event needed, and says billable
+events costing more than that are paused.
 
 Both federation notices carry `migration_id`, `from` and `to`. The project's
 owner also sees each one in their ochk.app notifications, and by email when

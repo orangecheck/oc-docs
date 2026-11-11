@@ -10,8 +10,11 @@ export const metadata = {
 
 In the design, an orangecheck federation is run by independent **guardians**:
 one operator key per guardian, each guardian threshold-signing federation
-actions with its peers. orangecheck recruits, vets and pays guardians, and every
-commitment a guardian makes is signed with its own operator key.
+actions with its peers. orangecheck recruits, vets and pays guardians. A
+guardian's application, charter signature, seat claim, votes and exit handoff
+are signed with its own operator key; the rest of what an operator does on
+ochk.app takes a signed-in session
+([charter §4](/federation/oc-me-v1#4-orangechecks-role) says which).
 
 **The program is not open.** While the system is in testing, orangecheck holds
 every key that can move funds, and there are no guardian seats yet.
@@ -28,19 +31,20 @@ Two paths into it:
   ceremonies, incident publishing) runs in the portal without a CLI.
 - **[The kit](https://github.com/orangecheck/oc-guardian-kit)** —
   `oc-guardian init` on a server you control, fill the questionnaire, run
-  `oc-guardian apply prepare`, email `application.json` to apply@ochk.io. Each
-  portal step has a kit equivalent; the envelopes are the same, and so is the
-  review queue.
+  `oc-guardian apply prepare`, and email `application.json` with your filled-in
+  questionnaire to apply@ochk.io. The kit signs everything the portal signs but
+  two: claiming a seat and voting on an amendment are signed only in the portal
+  today. The envelopes are the same, and so is the review queue.
 
 ## Lifecycle
 
-| Stage           | What happens                                                                                                                                                                                                        | Where                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **identity**    | Generate (or import) an Ed25519 operator keypair. The browser stores it in IndexedDB, backed up by a 24-word BIP-39 phrase; the kit stores it in the OS keychain, or in a key file (`--key-file`) on a server.      | [ochk.app/me/operator](https://ochk.app/me/operator)                       |
-| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). `oc-guardian apply prepare` hashes the answers and signs a `program-apply` envelope into `application.json`; email it to apply@ochk.io. | Kit + email                                                                |
-| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                        | Reviewer side                                                              |
-| **federation**  | Once you are accepted, an orangecheck admin assigns you a guardian seat, and you ratify the federation's charter: a `charter-sign` envelope under your operator key. The ratification is your join.                 | [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) |
-| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`).    | Portal + binary                                                            |
+| Stage           | What happens                                                                                                                                                                                                                                                                                                       | Where                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| **identity**    | Generate (or import) an Ed25519 operator keypair. The browser stores it in IndexedDB, backed up by a 24-word BIP-39 phrase; the kit stores it in the OS keychain, or in a key file (`--key-file`) on a server.                                                                                                     | [ochk.app/me/operator](https://ochk.app/me/operator)                       |
+| **application** | Fill the questionnaire (handle, contact, hardware setup, motivation, etc.). `oc-guardian apply prepare` hashes the answers and signs a `program-apply` envelope into `application.json`; email it to apply@ochk.io with the questionnaire attached, since the envelope carries the answers' hash, not the answers. | Kit + email                                                                |
+| **review**      | OC team verifies the envelope signature, reads the questionnaire, and decides. Reviewer signs an `program-accept` envelope on accept; you verify it locally before trusting.                                                                                                                                       | Reviewer side                                                              |
+| **federation**  | Once you are accepted, a federation's creator holds a seat for you (on the federations orangecheck creates, that is orangecheck), you claim it with your operator key, and you ratify the federation's charter: a `charter-sign` envelope under your operator key. The ratification is your join.                  | [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) |
+| **operate**     | Run the `oc-guardian` binary on hardware you control or hardware OC provisions on your behalf. Publish incidents (`alert-publish`), participate in ceremonies (`charter-sign`), claim payouts (`payouts-claim`).                                                                                                   | Portal + binary                                                            |
 
 ## Two ways to run the guardian binary
 
@@ -71,20 +75,27 @@ written to its audit log first.
 
 ## Architectural invariants
 
-These hold for every federation in the program. Anything that violates them is a
-bug.
+What the program is built to hold, and where each falls short today.
 
-1. **Operator-held keys.** OC the company has zero credentials capable of
-   signing as you. Browser IDB or kit OS keychain are equivalent storage — both
-   are operator-controlled.
-2. **Bypass parity.** Every portal feature has a documented kit-only equivalent
-   in
-   [BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md).
-   A guardian operating purely via the kit is architecturally indistinguishable
-   from one operating with the portal.
-3. **Public commitments.** Charter ratifications, incidents, attestations are
-   operator-signed and publicly verifiable offline. OC cannot forge a row in any
-   of these timelines.
+1. **Operator-held keys.** orangecheck's servers never receive your operator
+   key. Where the key lives decides who else can reach it. The kit keeps it in
+   the OS keychain, outside any page. The portal keeps it in ochk.app's browser
+   storage, where the script ochk.app serves can read it, and orangecheck
+   deploys that script. For a key no page can read, keep it in the kit.
+2. **Bypass parity.** The kit signs everything the portal signs but two, each
+   step in
+   [BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md):
+   claiming a seat and voting on an amendment are signed only in the portal
+   today. The kit signs without the portal, and what it signs is uploaded on
+   ochk.app, signed in. At the federation, a guardian run from the kit looks the
+   same as one run from the portal.
+3. **Public commitments.** A charter ratification, incident or attestation made
+   now is operator-signed and verifiable offline, so OC cannot forge one. Two
+   kinds of row fall short. One kept without its envelope cannot be checked
+   again: the one charter signature on record, over the superseded v1.0.0, reads
+   `offline_verifiable: false`, and incidents recorded before 2026-11-08 kept
+   none. And a hosted seat's liveness reports are signed with a key orangecheck
+   made (Option B above).
 4. **Funds sit with the federation.** In a federation, the guardians hold the
    bitcoin collectively, and orangecheck's executor holds each user's claim on
    it, as ecash it can spend, until it pays them out

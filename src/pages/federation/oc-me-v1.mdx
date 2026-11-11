@@ -19,11 +19,13 @@ kept [below](#superseded-v100) as signed history.
 This is the charter for the Fedimint federation designed to hold
 [`ochk.app`](https://ochk.app) balances. Each guardian operator would sign an
 envelope naming the SHA-256 of this document's canonical bytes (the
-[Canonical bytes](#canonical-bytes) section below) with a hardware-backed
-Ed25519 operator key. Those signatures would appear on
-[ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies) and
-the per-federation view at
-[ochk.app/federations/oc-me-v1](https://ochk.app/federations/oc-me-v1).
+[Canonical bytes](#canonical-bytes) section below) with its Ed25519 operator
+key. The charter asks for a hardware-backed key (§3); no operator key is
+hardware-backed today (§4). The signatures are published at
+[me.ochk.io/api/operator/charter?federation=oc-me-v1](https://me.ochk.io/api/operator/charter?federation=oc-me-v1),
+and [ochk.app/me/operator/ceremonies](https://ochk.app/me/operator/ceremonies)
+shows a guardian their own signature and how many of the guardians it needs have
+signed.
 
 This charter binds the **federation**, not OrangeCheck the company. OC operates
 under the [company-wide charter](/charter); this document is downstream of it
@@ -77,18 +79,39 @@ disclosures are not published anywhere yet.
 OrangeCheck the company is a **client** of this federation, not a guardian. OC
 holds zero key shares and cannot reach the threshold by itself, alone or with
 any subset of guardians the company has not formally accepted into the operator
-program. The company never asks operators to sign envelopes on its behalf, and
-the operator portal (`ochk.app/me/operator`) is incapable of producing operator
-signatures — every state-changing action requires the operator's hardware-key
-signature, which the portal cannot forge.
+program. The company never asks operators to sign envelopes on its behalf.
+
+What an operator's key signs today, and what it does not:
+
+- **Signed.** Charter signatures, seat claims, votes on amendments and exit
+  ratifications are envelopes the operator key signs, and the server checks each
+  signature before it records one. Binding the key to an ochk.app account is
+  signed by the key too.
+- **A session, not a signature.** The other operator writes, such as creating a
+  federation, editing its seats or its settlement key, publishing its invite and
+  completing an exit, take a signed-in operator session on ochk.app. Setting the
+  settlement key, forcing a gateway teardown, and binding a key that changes
+  which operator the account acts as also ask for a fresh identity check.
+- **Where the key lives.** The operator portal (`ochk.app/me/operator`)
+  generates its key in the page and keeps it in ochk.app's browser storage,
+  where the script ochk.app serves can read it. orangecheck deploys that script.
+  orangecheck's servers never receive the key. The
+  [kit](https://github.com/orangecheck/oc-guardian-kit) keeps its key in the OS
+  keychain, outside any page.
+- **No hardware key yet.** No operator signature is hardware-backed today: the
+  kit's `--hsm` choices all keep the key in the OS keychain or a key file
+  ([kit README, "What is not built yet"](https://github.com/orangecheck/oc-guardian-kit#what-is-not-built-yet)).
+- **Uploads.** An envelope the kit signs reaches a federation's timeline through
+  an upload on ochk.app, signed in.
 
 ## 5. Lightning gateway disclosure
 
 The federation registers at least one Lightning gateway operated by a
-non-OrangeCheck party. The gateway disclosure (operator, fee schedule, uptime
-SLA) is published per-instance and rotates as the federation's gateway
-relationships change. The current registry lives on the per-federation
-deep-view.
+non-OrangeCheck party, and publishes that gateway's operator, fee schedule and
+uptime SLA. None of this is published yet: the federation's record at
+[`/api/public/federations/oc-me-v1`](https://me.ochk.io/api/public/federations/oc-me-v1)
+carries only a gateway's status and whether it is connected, and every gateway
+today is one orangecheck runs.
 
 ## 6. Exit clause
 
@@ -136,12 +159,18 @@ Amendments that materially change the federation's operational posture
 (threshold, target guardian count, fee structure, exit clause) require the
 amendment to publish at least 14 days before activation.
 
+The server enforces the quorum, not the notices or the 14 days. An amendment is
+ratified the moment its tally meets the quorum, with no activation date to hold
+it back, and no alert on ochk.app names an amendment. The 14 days is a
+commitment in the canonical bytes (`amendment_notice_days: 14`) that the
+guardians keep by hand, and the notices are posted by hand too.
+
 ## Canonical bytes
 
 The SHA-256 of the following canonical bytes is the federation's charter hash.
-Operators sign an envelope that names this hash with their hardware-backed
-Ed25519 key; that signature is the ratification. Every guardian signs v1.1.0
-before their seat counts.
+Operators sign an envelope that names this hash with their Ed25519 operator key;
+that signature is the ratification. Every guardian signs v1.1.0 before their
+seat counts.
 
 ```
 # OC-Me Federation Charter v1.1.0 · canonical bytes

@@ -257,7 +257,7 @@ answers `403 earner_not_member`.
 | `POST` | `/api/integrator/event/batch` | fire 1–100 billable events in one call · per-event idempotency keys                |
 
 Outside the project's [pay periods](/me/paying-users) both answer `200` with
-`earned: false` (`not_paying` per event in a batch) and record nothing. Paying
+`earned: false` (`not_paying` per event in a batch) and record no event. Paying
 users is optional.
 
 A test project records events for the account that owns it and nobody else, so
@@ -352,7 +352,7 @@ Without the SDK, the header is
 | Status | `error` / `reason`                                       | Meaning                                                                                                            |
 | ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project                         |
-| 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: nothing recorded or charged                                                              |
+| 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: no event recorded or charged                                                             |
 | 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
 | 400    | `project_key_required`, `subtype_required`               | A required field is missing                                                                                        |
 | 400    | `payment_amount_sats_required`                           | The event is priced as a share of a payment and `payment_amount_sats` is missing                                   |
@@ -590,15 +590,15 @@ to another change answers `400 unexpected_field`.
 
 `POST /api/me/projects` takes:
 
-| Field              |                                                                                                                                                    |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                           |
-| `domain`           | Required. A DNS hostname.                                                                                                                          |
-| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                |
-| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                        |
-| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults. |
-| `user_share_pct`   | Optional, with `enabled_subtypes`: the share of each price your users earn, `0` to `0.8`. Missing or out of range, `0.8`.                          |
-| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                               |
+| Field              |                                                                                                                                                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                                                                                              |
+| `domain`           | Required. A DNS hostname.                                                                                                                                                                                             |
+| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                                                                                   |
+| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                                                                                           |
+| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults.                                                                    |
+| `user_share_pct`   | Optional, with `enabled_subtypes`: what your users earn of each default price, `0` to `0.8`. Below `0.8`, each event is saved at `0.8` with the lower price that earns them the same. Missing or out of range, `0.8`. |
+| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                                                                                                  |
 
 It answers `200 { ok: true, project }`. The signing secret is not in it: reveal
 it on the project's **Keys & webhooks** tab.

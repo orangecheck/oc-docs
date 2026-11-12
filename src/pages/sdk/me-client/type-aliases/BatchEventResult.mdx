@@ -14,6 +14,7 @@ export const metadata = {
 ```ts
 type BatchEventResult = 
   | {
+  drop?: DropResponseBlock;
   event: BillableEvent;
   index: number;
   status: "recorded";
@@ -35,7 +36,7 @@ type BatchEventResult =
 };
 ```
 
-Defined in: [me-client/src/event.ts:295](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L295)
+Defined in: [me-client/src/event.ts:335](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L335)
 
 ## Union Members
 
@@ -43,11 +44,19 @@ Defined in: [me-client/src/event.ts:295](https://github.com/orangecheck/oc-packa
 
 ```ts
 {
+  drop?: DropResponseBlock;
   event: BillableEvent;
   index: number;
   status: "recorded";
 }
 ```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `drop?` | [`DropResponseBlock`](../interfaces/DropResponseBlock) | The drop window the person's share vests in, when a drop schedule covers the subtype. | [me-client/src/event.ts:341](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L341) |
+| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:339](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L339) |
+| `index` | `number` | - | [me-client/src/event.ts:337](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L337) |
+| `status` | `"recorded"` | - | [me-client/src/event.ts:338](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L338) |
 
 ***
 
@@ -76,10 +85,10 @@ Defined in: [me-client/src/event.ts:295](https://github.com/orangecheck/oc-packa
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `code?` | [`BatchRejectCode`](BatchRejectCode) | Absent from a server older than the codes. | [me-client/src/event.ts:310](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L310) |
-| `index` | `number` | - | [me-client/src/event.ts:307](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L307) |
-| `reason` | `string` | - | [me-client/src/event.ts:311](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L311) |
-| `status` | `"rejected"` | - | [me-client/src/event.ts:308](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L308) |
+| `code?` | [`BatchRejectCode`](BatchRejectCode) | Absent from a server older than the codes. | [me-client/src/event.ts:352](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L352) |
+| `index` | `number` | - | [me-client/src/event.ts:349](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L349) |
+| `reason` | `string` | - | [me-client/src/event.ts:353](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L353) |
+| `status` | `"rejected"` | - | [me-client/src/event.ts:350](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L350) |
 
 ***
 

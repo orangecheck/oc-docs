@@ -198,13 +198,15 @@ instead.
 | `POST` | `/api/session/refresh`    | refresh inside the policy window — free |
 | `POST` | `/api/session/invalidate` | tear down — free, needs no session      |
 
-## Authenticated · payment authorization (Per action)
+## Authenticated · payment intents
 
-| Method | Path                     | Purpose                                                                            |
-| ------ | ------------------------ | ---------------------------------------------------------------------------------- |
-| `POST` | `/api/payment/authorize` | authorize a payment, at most 20 per account per site a UTC day · moves no sats yet |
+| Method | Path                     | Purpose                                                                                           |
+| ------ | ------------------------ | ------------------------------------------------------------------------------------------------- |
+| `POST` | `/api/payment/authorize` | record a payment intent, at most 20 per account per site a UTC day · moves no sats, earns nothing |
 
-Call it from your server with the person's sign-in token as
+It records a payment intent and settles nothing: the answer carries
+`mode: 'stub'`, `settles: false` and `is_stub: true`, no sats move, and nobody
+earns from it. Call it from your server with the person's sign-in token as
 `Authorization: Bearer`: it sends no CORS headers, so a browser on another site
 can't call it, and without a session it answers `401 payment_not_authenticated`.
 The body takes `amount_sats` (or `usd_cents`) and a `description` of up to 280
@@ -594,15 +596,15 @@ to another change answers `400 unexpected_field`.
 
 `POST /api/me/projects` takes:
 
-| Field              |                                                                                                                                                                                                                                                                                                           |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                                                                                                                                                                                  |
-| `domain`           | Required. A DNS hostname.                                                                                                                                                                                                                                                                                 |
-| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                                                                                                                                                                       |
-| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                                                                                                                                                                               |
-| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults.                                                                                                                                                        |
-| `user_share_pct`   | Optional, with `enabled_subtypes`: what your users earn of each default price, `0` to `0.8`. Below `0.8`, each event is saved at `0.8` with the lower price that earns them the same; a lower price outside the platform's price bounds answers `422 invalid event seed`. Missing or out of range, `0.8`. |
-| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                                                                                                                                                                                      |
+| Field              |                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                                                                                                                                                                                                                                         |
+| `domain`           | Required. A DNS hostname.                                                                                                                                                                                                                                                                                                                                        |
+| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                                                                                                                                                                                                                              |
+| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                                                                                                                                                                                                                                      |
+| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults.                                                                                                                                                                                                               |
+| `user_share_pct`   | Optional, with `enabled_subtypes`: what your users earn of each default price, above `0` and at most `0.8`. Below `0.8`, each event is saved at `0.8` with the lower price that earns them the same; a share of `0`, which earns nothing, or a lower price outside the platform's price bounds answers `422 invalid event seed`. Missing or out of range, `0.8`. |
+| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                                                                                                                                                                                                                                             |
 
 It answers `200 { ok: true, project }`. The signing secret is not in it: reveal
 it on the project's **Keys & webhooks** tab.

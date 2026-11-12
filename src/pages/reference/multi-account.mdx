@@ -155,41 +155,58 @@ import { useState } from 'react';
 function Header() {
     const { account, roster, switchAccount, addAccountUrl, trySignOut } =
         useOcSession();
-    const [failed, setFailed] = useState(false);
+    const [problem, setProblem] = useState<string | null>(null);
+
+    async function leave(scope?: 'current') {
+        const r = await trySignOut(scope ? { scope } : undefined);
+        if (r.ok) setProblem(null);
+        else if (r.reason === 'several_sessions')
+            setProblem(
+                "Your browser sent more than one ochk.io sign-in, so you weren't signed out. Check which account is signed in now, then try again."
+            );
+        else setProblem("Couldn't sign you out. Try again.");
+    }
+
+    async function switchTo(didOc: string) {
+        try {
+            await switchAccount(didOc);
+            setProblem(null);
+        } catch {
+            setProblem(
+                "Couldn't switch accounts. Check which account is signed in now, then try again."
+            );
+        }
+    }
 
     return (
         <nav>
             <span>signed in as {account?.didOc}</span>
             {roster.map((peer) => (
-                <button
-                    key={peer.didOc}
-                    onClick={() => switchAccount(peer.didOc)}
-                >
+                <button key={peer.didOc} onClick={() => switchTo(peer.didOc)}>
                     switch to {peer.displayName ?? peer.didOc}
                 </button>
             ))}
             <a href={addAccountUrl()}>add another account</a>
-            <button
-                onClick={async () =>
-                    setFailed(!(await trySignOut({ scope: 'current' })).ok)
-                }
-            >
-                leave this account
-            </button>
-            <button onClick={async () => setFailed(!(await trySignOut()).ok)}>
-                sign out of everything
-            </button>
-            {failed ? (
-                <span role="alert">Couldn't sign you out. Try again.</span>
-            ) : null}
+            <button onClick={() => leave('current')}>leave this account</button>
+            <button onClick={() => leave()}>sign out of everything</button>
+            {problem ? <span role="alert">{problem}</span> : null}
         </nav>
     );
 }
 ```
 
-Use `trySignOut` wherever a person signs out. It resolves to `{ ok: false }`
-when the auth host refused or didn't answer, and the session may then still be
-live, so say so. `signOut` resolves the same way either way and can't tell you.
+Use `trySignOut` wherever a person signs out. It resolves to
+`{ ok: false, reason }` when the auth host refused or didn't answer, and the
+session may then still be live, so say so. `'several_sessions'` means the
+browser sent more than one ochk.io sign-in: ochk.io cleared the extra cookies
+and ended nothing, and the provider has read the session again, so the page
+shows the account still signed in. `signOut` resolves the same way either way
+and can't tell you.
+
+`switchAccount` throws when it did not switch. When the refusal was
+`several_sessions`, it reads the session again first and its message is a
+sentence for the person. Any other refusal's message names the reason for
+developers, so show your own words, as above.
 
 No family package renders the roster for you. `AccountMenu` from
 `@orangecheck/app-design/chrome` draws the account button with the items you

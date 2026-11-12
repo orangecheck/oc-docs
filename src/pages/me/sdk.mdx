@@ -1123,6 +1123,8 @@ const stamp = await oc.event.fire({
 });
 if (stamp.earned) {
     // stamp.event.id, .gross_fee_sats, .user_earned_sats, .verify_url
+} else if (stamp.reason === 'not_billed') {
+    // recorded and charged nothing, so it paid nobody: stamp.event, stamp.detail
 } else {
     // stamp.reason === 'not_paying'; stamp.next_pay_period, or null
 }
@@ -1137,9 +1139,9 @@ const paid = await oc.event.fire({
 });
 ```
 
-| Function              | Signature                                        | Note                                                                                                              |
-| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<FireEventResult>` | `{ earned: true, event }` with the recorded event, or `{ earned: false, reason: 'not_paying', next_pay_period }`. |
+| Function              | Signature                                        | Note                                                                                                                                                                                                     |
+| --------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `oc.event.fire(opts)` | `(FireEventOptions) => Promise<FireEventResult>` | `{ earned: true, event }` with the recorded event, `{ earned: false, reason: 'not_billed', event }` for one recorded and charged nothing, or `{ earned: false, reason: 'not_paying', next_pay_period }`. |
 
 ## `oc.config.validate` · check a price config locally
 

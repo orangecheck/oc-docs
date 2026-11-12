@@ -260,7 +260,10 @@ answers `403 earner_not_member`.
 
 Outside the project's [pay periods](/me/paying-users) both answer `200` with
 `earned: false` (`not_paying` per event in a batch) and record no event. Paying
-users is optional.
+users is optional. An event recorded and charged nothing answers `200` with
+`earned: false`, `reason: not_billed` and the event: a test project's event
+while orangecheck is live, or one in preview from a project with no preview
+credit yet.
 
 A test project records events for the account that owns it and nobody else, so
 you can try your integration on yourself. An event or batch naming anyone else,
@@ -357,7 +360,8 @@ Without the SDK, the header is
 
 | Status | `error` / `reason`                                       | Meaning                                                                                                            |
 | ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 200    | `earned: true`                                           | Recorded. `event` is the receipt; `event.sub` is the person's pairwise id for your project                         |
+| 200    | `earned: true`                                           | Recorded and charged. `event` is the receipt; `event.sub` is the person's pairwise id for your project             |
+| 200    | `earned: false`, `reason: not_billed`                    | Recorded and charged nothing, so it paid nobody: a test project's event while orangecheck is live                  |
 | 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: no event recorded or charged                                                             |
 | 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
 | 400    | `project_key_required`, `subtype_required`               | A required field is missing                                                                                        |

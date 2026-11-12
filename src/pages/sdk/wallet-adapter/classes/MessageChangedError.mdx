@@ -1,0 +1,55 @@
+export const metadata = {
+    title: "Class: MessageChangedError",
+    description: "Auto-generated API reference for Class: MessageChangedError. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/wallet-adapter**](../README)
+
+***
+
+[@orangecheck/wallet-adapter](../README) / MessageChangedError
+
+# Class: MessageChangedError
+
+Defined in: [wallet-adapter/src/failure.ts:29](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L29)
+
+The page changed the message or address while the wallet signed; the signature is over the old one.
+
+## Extends
+
+- `Error`
+
+## Constructors
+
+### Constructor
+
+```ts
+new MessageChangedError(message?: string): MessageChangedError;
+```
+
+Defined in: [wallet-adapter/src/failure.ts:31](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L31)
+
+#### Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `message` | `string` | `"the message changed while the wallet signed"` |
+
+#### Returns
+
+`MessageChangedError`
+
+#### Overrides
+
+```ts
+Error.constructor
+```
+
+## Properties
+
+| Property | Modifier | Type | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| &lt;a id="property-code">&lt;/a> `code` | `readonly` | `"E_MESSAGE_CHANGED"` | - | [wallet-adapter/src/failure.ts:30](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L30) |
+| &lt;a id="property-message">&lt;/a> `message` | `public` | `string` | `Error.message` | node\_modules/typescript/lib/lib.es5.d.ts:1077 |
+| &lt;a id="property-name">&lt;/a> `name` | `public` | `string` | `Error.name` | node\_modules/typescript/lib/lib.es5.d.ts:1076 |
+| &lt;a id="property-stack">&lt;/a> `stack?` | `public` | `string` | `Error.stack` | node\_modules/typescript/lib/lib.es5.d.ts:1078 |

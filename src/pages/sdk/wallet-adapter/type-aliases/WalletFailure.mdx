@@ -12,7 +12,13 @@ export const metadata = {
 # Type Alias: WalletFailure
 
 ```ts
-type WalletFailure = "rejected" | "wrong-account" | "not-found" | "timed-out" | "other";
+type WalletFailure = 
+  | "rejected"
+  | "wrong-account"
+  | "not-found"
+  | "timed-out"
+  | "changed"
+  | "other";
 ```
 
 Defined in: [wallet-adapter/src/failure.ts:8](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/failure.ts#L8)

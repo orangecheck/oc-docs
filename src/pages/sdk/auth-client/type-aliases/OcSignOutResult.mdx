@@ -18,14 +18,17 @@ type OcSignOutResult =
 }
   | {
   ok: false;
-  reason: "unreachable" | "refused";
+  reason: "unreachable" | "refused" | "several_sessions";
   status?: number;
 };
 ```
 
-Defined in: [types.ts:137](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L137)
+Defined in: [types.ts:140](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/types.ts#L140)
 
 What `signOut()` did. `ok: false` means the session may still be live: the
 auth host did not answer (`'unreachable'`) or refused (`'refused'`, with its
 HTTP status). The provider then changes nothing, so the page still shows the
 signed-in account; tell the person it did not work and let them try again.
+`'several_sessions'` (409): the browser sent more than one ochk.io sign-in.
+ochk.io cleared the extra cookies and ended nothing, and the provider has
+read the session again, so the page shows the account left signed in.

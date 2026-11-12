@@ -1143,13 +1143,17 @@ const paid = await oc.event.fire({
 
 ## `oc.config.validate` · check a price config locally
 
-Check your config against the same rules the server enforces, with no network
-call. You edit a project's prices on its **Paying** tab at
-[ochk.app](https://ochk.app/me/projects); the SDK has no `oc.config.update()`,
-because configs belong to projects, not accounts.
+Check your config's shape and each event's own price limits, with no network
+call. me.ochk.io checks more when you save, among them the domain, the
+operator's price bounds and a price that earns your user nothing, so a config
+that passes here can still be refused. You edit a project's prices on its
+**Paying** tab at [ochk.app](https://ochk.app/me/projects); the SDK has no
+`oc.config.update()`, because configs belong to projects, not accounts.
 
-For each event you set what your user earns. You pay that ÷ 0.8, the 20% fee
-included: earns 100, you pay 125. The smallest earning is 1 sat, and you pay 2.
+For each event you set what your user earns. You pay that plus the fee: 20% of
+the price, rounded to a whole sat and at least 1 sat, so your user gets about
+80%. Earns 100, you pay 125. The smallest earning is 1 sat, and you pay 2. The
+**Paying** tab shows the exact price for each earning you set.
 
 ```ts
 import type { IntegratorPriceConfig } from '@orangecheck/me-client';
@@ -1344,7 +1348,7 @@ takes them only with an ochk.app session, so from your site they answer `401`. A
 | `oc.session.refresh(id)`    | `(string) => Promise<Session>`        | ochk.app only. Free.      |
 | `oc.session.invalidate(id)` | `(string) => Promise<void>`           | ochk.app only. Free.      |
 
-## `oc.payment.authorize` · a payment (Per action)
+## `oc.payment.authorize` · a payment intent
 
 Call it from your server, with the person's sign-in token. me.ochk.io answers no
 browser on another site, so your page posts the token from `signInWithOc()` to
@@ -1370,8 +1374,13 @@ share one. The token decides whose payment it is: me.ochk.io uses its account's
 `401 payment_not_authenticated`. The token must come from a sign-in on your live
 project's verified domain; one from any other site answers
 `403 payment_site_not_registered`. `user_envelope_id` is the receipt's id, the
-same as `id`, and `verify_url` opens that receipt. Today the call records the
-authorization and moves no sats, because paying is in testing.
+same as `id`, and `verify_url` opens that receipt.
+
+The call records a payment intent and settles nothing: the answer carries
+`mode: 'stub'`, `settles: false` and `is_stub: true`. No sats move, your balance
+is not charged, and the person earns nothing from it. To bill for a payment,
+fire the `payment_authorization` event with `oc.event.fire` and its
+`payment_amount_sats`.
 
 ## Other signals
 

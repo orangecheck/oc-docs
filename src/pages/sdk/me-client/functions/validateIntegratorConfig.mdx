@@ -15,7 +15,15 @@ export const metadata = {
 function validateIntegratorConfig(cfg: IntegratorPriceConfig): ValidationResult;
 ```
 
-Defined in: [me-client/src/types.ts:304](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L304)
+Defined in: [me-client/src/types.ts:309](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L309)
+
+Check an integrator's pricing config locally: its shape, and each enabled
+event's own price limits (a fixed price of at least
+MIN_INTEGRATOR_PRICE_SATS, a percent in (0, 1], a user share in [0, 0.8]).
+An agent block is checked for shape only. me.ochk.io checks more when it
+saves, among them the domain, event labels, the operator's price bounds
+and a price that earns the person nothing, so a config that passes here
+can still be refused.
 
 ## Parameters
 

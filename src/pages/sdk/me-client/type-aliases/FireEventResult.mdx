@@ -14,13 +14,28 @@ export const metadata = {
 ```ts
 type FireEventResult = 
   | {
+  drop?: DropResponseBlock;
   earned: true;
-  escrow_mode: "simulation" | "live";
+  escrow_mode?: "simulation" | "live";
   event: BillableEvent;
   idempotent_replay?: boolean;
   ok: true;
   simulation_mode_note?: string;
   webhooks_fired: number;
+  webhooks_queued: number;
+}
+  | {
+  detail: string;
+  drop?: DropResponseBlock;
+  earned: false;
+  escrow_mode?: "simulation" | "live";
+  event: BillableEvent;
+  idempotent_replay?: boolean;
+  ok: true;
+  reason: "not_billed";
+  simulation_mode_note?: string;
+  webhooks_fired: number;
+  webhooks_queued: number;
 }
   | {
   detail: string;
@@ -31,7 +46,7 @@ type FireEventResult =
 };
 ```
 
-Defined in: [me-client/src/event.ts:126](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L126)
+Defined in: [me-client/src/event.ts:131](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L131)
 
 What `oc.event.fire` answers.
 
@@ -41,25 +56,63 @@ What `oc.event.fire` answers.
 
 ```ts
 {
+  drop?: DropResponseBlock;
   earned: true;
-  escrow_mode: "simulation" | "live";
+  escrow_mode?: "simulation" | "live";
   event: BillableEvent;
   idempotent_replay?: boolean;
   ok: true;
   simulation_mode_note?: string;
   webhooks_fired: number;
+  webhooks_queued: number;
 }
 ```
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `earned` | `true` | The event earned the user their share and charged the project. | [me-client/src/event.ts:130](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L130) |
-| `escrow_mode` | `"simulation"` \| `"live"` | - | [me-client/src/event.ts:133](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L133) |
-| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:131](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L131) |
-| `idempotent_replay?` | `boolean` | Set when the same Idempotency-Key already landed: `event` is the prior one. | [me-client/src/event.ts:135](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L135) |
-| `ok` | `true` | - | [me-client/src/event.ts:128](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L128) |
-| `simulation_mode_note?` | `string` | - | [me-client/src/event.ts:136](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L136) |
-| `webhooks_fired` | `number` | - | [me-client/src/event.ts:132](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L132) |
+| `drop?` | [`DropResponseBlock`](../interfaces/DropResponseBlock) | The drop window the person's share vests in, when a drop schedule covers the subtype. | [me-client/src/event.ts:146](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L146) |
+| `earned` | `true` | The event was charged: the project paid its fee and the person earned their share. In preview (`escrow_mode: 'simulation'`) both are a preview, and no sats moved. | [me-client/src/event.ts:137](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L137) |
+| `escrow_mode?` | `"simulation"` \| `"live"` | The mode the event was recorded in. Absent on a replay. | [me-client/src/event.ts:144](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L144) |
+| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:138](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L138) |
+| `idempotent_replay?` | `boolean` | Set when the same Idempotency-Key, or the same signed bytes, already landed: `event` is the prior one, and nothing was recorded again. | [me-client/src/event.ts:149](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L149) |
+| `ok` | `true` | - | [me-client/src/event.ts:133](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L133) |
+| `simulation_mode_note?` | `string` | Only in preview: that no sats moved. | [me-client/src/event.ts:151](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L151) |
+| `webhooks_fired` | `number` | **Deprecated** The same count as `webhooks_queued`: queued, not delivered. | [me-client/src/event.ts:142](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L142) |
+| `webhooks_queued` | `number` | Subscribed webhooks queued to be sent after the answer, 0 on a replay. | [me-client/src/event.ts:140](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L140) |
+
+***
+
+### Type Literal
+
+```ts
+{
+  detail: string;
+  drop?: DropResponseBlock;
+  earned: false;
+  escrow_mode?: "simulation" | "live";
+  event: BillableEvent;
+  idempotent_replay?: boolean;
+  ok: true;
+  reason: "not_billed";
+  simulation_mode_note?: string;
+  webhooks_fired: number;
+  webhooks_queued: number;
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `detail` | `string` | `reason` in words. | [me-client/src/event.ts:161](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L161) |
+| `drop?` | [`DropResponseBlock`](../interfaces/DropResponseBlock) | The drop window the person's share vests in, when a drop schedule covers the subtype. | [me-client/src/event.ts:170](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L170) |
+| `earned` | `false` | The event was recorded and charged nothing, so it paid nobody: a test project's event while orangecheck is live, or one in preview from a project with no preview credit yet. | [me-client/src/event.ts:158](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L158) |
+| `escrow_mode?` | `"simulation"` \| `"live"` | The mode the event was recorded in. Absent on a replay. | [me-client/src/event.ts:168](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L168) |
+| `event` | [`BillableEvent`](../interfaces/BillableEvent) | - | [me-client/src/event.ts:162](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L162) |
+| `idempotent_replay?` | `boolean` | Set when the same Idempotency-Key, or the same signed bytes, already landed: `event` is the prior one, and nothing was recorded again. | [me-client/src/event.ts:173](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L173) |
+| `ok` | `true` | - | [me-client/src/event.ts:154](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L154) |
+| `reason` | `"not_billed"` | - | [me-client/src/event.ts:159](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L159) |
+| `simulation_mode_note?` | `string` | Only in preview: that no sats moved. | [me-client/src/event.ts:175](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L175) |
+| `webhooks_fired` | `number` | **Deprecated** The same count as `webhooks_queued`: queued, not delivered. | [me-client/src/event.ts:166](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L166) |
+| `webhooks_queued` | `number` | Subscribed webhooks queued to be sent after the answer, 0 on a replay. | [me-client/src/event.ts:164](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L164) |
 
 ***
 
@@ -77,8 +130,8 @@ What `oc.event.fire` answers.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `detail` | `string` | - | [me-client/src/event.ts:143](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L143) |
-| `earned` | `false` | The project isn't paying its users now. No event recorded or charged. | [me-client/src/event.ts:141](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L141) |
-| `next_pay_period` | [`PayPeriod`](../interfaces/PayPeriod) \| `null` | The next pay period, or null when none is scheduled. | [me-client/src/event.ts:145](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L145) |
-| `ok` | `true` | - | [me-client/src/event.ts:139](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L139) |
-| `reason` | `"not_paying"` | - | [me-client/src/event.ts:142](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L142) |
+| `detail` | `string` | - | [me-client/src/event.ts:182](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L182) |
+| `earned` | `false` | The project isn't paying its users now. No event recorded or charged. | [me-client/src/event.ts:180](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L180) |
+| `next_pay_period` | [`PayPeriod`](../interfaces/PayPeriod) \| `null` | The next pay period, or null when none is scheduled. | [me-client/src/event.ts:184](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L184) |
+| `ok` | `true` | - | [me-client/src/event.ts:178](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L178) |
+| `reason` | `"not_paying"` | - | [me-client/src/event.ts:181](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/event.ts#L181) |

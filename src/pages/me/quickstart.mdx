@@ -378,7 +378,8 @@ const res = await oc.event.fire({
     accountId: didOc,
 });
 if (!res.earned) {
-    // not paying now: no event recorded or charged
+    // res.reason 'not_paying': not paying now, so no event was recorded or charged.
+    // 'not_billed': recorded and charged nothing, as a test project's is.
 }
 ```
 

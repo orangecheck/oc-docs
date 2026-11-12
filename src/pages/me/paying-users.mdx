@@ -64,10 +64,13 @@ period is checked (the SDK throws it as a `MeClientError`). Outside a period:
 ```
 
 `next_pay_period` is `null` when nothing is scheduled. Inside a period the
-response is the recorded event with `earned: true`. A batch answers `not_paying`
-per event. An `Idempotency-Key` sent with an event that recorded nothing is
-released, so a retry is judged afresh when it arrives. Test fires from your
-dashboard record either way and say whether you are paying now.
+response is the recorded event with `earned: true`. An event recorded and
+charged nothing, as a test project's is while orangecheck is live, answers
+`earned: false` with `reason: 'not_billed'` and the event: it paid nobody. A
+batch answers `not_paying` per event. An `Idempotency-Key` sent with an event
+that recorded nothing is released, so a retry is judged afresh when it arrives.
+Test fires from your dashboard record either way and say whether you are paying
+now.
 
 ```ts
 import { oc } from '@orangecheck/me-client';
@@ -80,7 +83,7 @@ const res = await oc.event.fire({
     signingSecret: process.env.OC_SIGNING_SECRET,
     accountId: didOc,
 });
-if (!res.earned) {
+if (!res.earned && res.reason === 'not_paying') {
     // not paying now; res.next_pay_period says when paying starts, if scheduled
 }
 ```

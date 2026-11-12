@@ -361,7 +361,7 @@ Without the SDK, the header is
 | Status | `error` / `reason`                                       | Meaning                                                                                                            |
 | ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 200    | `earned: true`                                           | Recorded and charged. `event` is the receipt; `event.sub` is the person's pairwise id for your project             |
-| 200    | `earned: false`, `reason: not_billed`                    | Recorded and charged nothing, so it paid nobody: a test project's event while orangecheck is live                  |
+| 200    | `earned: false`, `reason: not_billed`                    | Recorded and charged nothing: a test project's event while orangecheck is live, or a preview with no credit yet    |
 | 200    | `earned: false`, `reason: not_paying`                    | Outside your pay periods: no event recorded or charged                                                             |
 | 400    | `invalid_user_address`                                   | `user_address` is not a `did:oc`                                                                                   |
 | 400    | `project_key_required`, `subtype_required`               | A required field is missing                                                                                        |

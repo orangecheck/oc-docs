@@ -1,0 +1,32 @@
+export const metadata = {
+    title: "Function: isOnOwnerList()",
+    description: "Auto-generated API reference for Function: isOnOwnerList(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / isOnOwnerList
+
+# Function: isOnOwnerList()
+
+```ts
+function isOnOwnerList(id: string | null | undefined, raw: string | null | undefined): boolean;
+```
+
+Defined in: [owner-list.ts:17](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/owner-list.ts#L17)
+
+Is `id` on the owner list `raw`? An exact match on a trimmed entry, case
+included. No id, or a blank one, is never on it, whatever the list holds.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` \| `null` \| `undefined` |
+| `raw` | `string` \| `null` \| `undefined` |
+
+## Returns
+
+`boolean`

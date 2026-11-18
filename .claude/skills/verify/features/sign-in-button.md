@@ -12,7 +12,8 @@ sites draw it in their own style, plus orangecheck's own button and the mark.
   alone in the site's icon button. The components come from
   `@orangecheck/me-client/react`; the sites are `src/components/docs/SignInButtonDemo.tsx`.
 - orangecheck's own button (`appearance="brand"`), plain and themed.
-- The mark's variants (mono on light, mono on dark, brand, tile).
+- The mark's variants (mono on light, mono on dark, brand, tile), and the pixel
+  mark and pixel tile, each at whole pixels a cell.
 - The plain-HTML recipe, and its CDN form: me-client pinned to an exact version on
   jsDelivr with Subresource Integrity hashes. `src/__tests__/sign-in-button-sri.test.ts`
   holds the version and hashes to the installed package's files.

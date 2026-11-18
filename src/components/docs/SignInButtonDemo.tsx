@@ -169,11 +169,11 @@ export function SignInButtonBrand() {
     );
 }
 
-/** The mark's three variants, each on the ground it is for. */
+/** The mark's three variants, each on the ground it is for, and the pixel mark at whole pixels a cell. */
 export function MarkVariants() {
     const cell = 'flex flex-col items-center gap-2 rounded-xl p-4 text-xs';
     return (
-        <div data-demo="marks" className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div data-demo="marks" className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
             <div
                 className={cell}
                 style={{ background: '#ffffff', color: '#18181b', border: '1px solid #e4e4e7' }}
@@ -195,6 +195,17 @@ export function MarkVariants() {
             >
                 <OrangecheckMark variant="tile" size="40px" title="orangecheck" />
                 tile, any ground
+            </div>
+            <div className={cell} style={{ background: '#0a0a0a', color: '#fafafa' }}>
+                <OrangecheckMark variant="brand" pixel size="64px" title="orangecheck, in pixels" />
+                pixel, dark only
+            </div>
+            <div
+                className={cell}
+                style={{ background: '#ffffff', color: '#18181b', border: '1px solid #e4e4e7' }}
+            >
+                <OrangecheckMark variant="tile" pixel size="48px" title="orangecheck, in pixels" />
+                pixel tile, any ground
             </div>
         </div>
     );

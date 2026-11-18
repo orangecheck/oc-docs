@@ -214,11 +214,11 @@ ink, with the mark as drawn. Theme it with custom properties.
 
 Both appearances read these:
 
-| Property         | Default  |                                                                                                                                                          |
-| ---------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--oc-mark-gap`  | `0.5em`  | The space between the mark and the words.                                                                                                                |
-| `--oc-mark-size` | `1.75em` | The mark's width; its height is half that. The tile is `1.25em` square.                                                                                  |
-| `--oc-target`    | `44px`   | The smallest height, and the mark alone's smallest width. 44px is the rule. Lower it only if your own buttons already give a 44px target some other way. |
+| Property         | Default |                                                                                                                                                          |
+| ---------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--oc-mark-gap`  | `0.6em` | The space between the mark and the words.                                                                                                                |
+| `--oc-mark-size` | `1.6em` | The mark's width; its height is 5/8 of that, one line of words. The tile is `1.5em` square.                                                              |
+| `--oc-target`    | `44px`  | The smallest height, and the mark alone's smallest width. 44px is the rule. Lower it only if your own buttons already give a 44px target some other way. |
 
 ## While it works
 
@@ -294,7 +294,7 @@ inside the button.
 | Variant | Use it                                                                                                                                            |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mono`  | Anywhere your button's text has 3:1 contrast with its background. It is drawn in your text colour: its three faces at full, 60% and 30% strength. |
-| `brand` | On dark backgrounds only. Its lightest face is about 1.3:1 on white.                                                                              |
+| `brand` | On dark backgrounds only. Its lightest face is about 1.1:1 on white.                                                                              |
 | `tile`  | On any background: the brand mark on its own ink tile.                                                                                            |
 
 ```ts
@@ -305,20 +305,39 @@ declare const slot: HTMLElement;
 slot.insertAdjacentHTML('afterbegin', markSvg({ variant: 'mono' }));
 ```
 
+### In pixels
+
+`pixel: true` draws the pixel mark: the same check in square cells, 32 by 20.
+Its edges stay sharp only where each cell is a whole number of screen pixels, so
+draw it 32, 64, 96 or 128px wide, and the pixel tile 48, 96, 144 or 192px. Use
+it for an avatar, a splash screen or a game's title. Beside words, as in a
+button, use the smooth mark.
+
+```ts
+import { markSvg } from '@orangecheck/mark';
+
+const icon = markSvg({ variant: 'tile', pixel: true, width: '96' });
+```
+
+A renderer that draws its own cells takes them from `markPixelRuns(perUnit)`:
+each face as runs of cells at 1, 1.5 or 2 cells a unit (16 by 10, 24 by 15 or 32
+by 20).
+
 ## Native apps and games
 
 `@orangecheck/mark/assets/` has every variant as SVG and as PNG at 16, 24, 32,
-40, 48, 64, 80, 96, 128 and 256 px wide (`orangecheck-mark-mono-white-40.png`,
-and so on). The mark is twice as wide as it is tall, so the 40px file is 20px
-tall, the size beside 16px words, and the 80px file is the same mark for a 2x
-screen. `mono-white` reads on a dark theme, `mono-black` on a light one, and
-`tile` on either. In Godot 4:
+40, 48, 64, 80, 96, 128 and 256 px wide (`orangecheck-mark-mono-white-32.png`,
+and so on). The mark is 8 wide to 5 tall, so the 32px file is 20px tall, the
+size beside 16px words, and the 64px file is the same mark for a 2x screen.
+`orangecheck-mark-pixel-brand` (32 to 512px) and `orangecheck-mark-pixel-tile`
+(48 to 480px) are the pixel mark, at whole pixels a cell. `mono-white` reads on
+a dark theme, `mono-black` on a light one, and `tile` on either. In Godot 4:
 
 ```gdscript
 var button := Button.new()
 button.text = "Sign in with orangecheck"
-button.icon = preload("res://ui/orangecheck-mark-mono-white-80.png")
-button.add_theme_constant_override("icon_max_width", 40)
+button.icon = preload("res://ui/orangecheck-mark-mono-white-64.png")
+button.add_theme_constant_override("icon_max_width", 32)
 button.custom_minimum_size.y = 44
 ```
 
@@ -342,6 +361,7 @@ me-client's
 | 0.46.0  | The button: `/button` (`enhanceSignInButton`), `/react` (`SignInWithOrangecheck`) and `button.css`.                                                                                                                      |
 | 0.47.0  | Words in any language that keep "orangecheck"; `busyLabel`; the mark alone (`label: false`); the `[data-oc-mark]` placeholder; the width held while busy; `inherit` drops its own focus ring, so your site's ring shows. |
 | 0.48.0  | `button-auto.mjs`: a `<script src>` that enhances every `button[data-oc-sign-in]` and reports through `oc-signed-in` and `oc-sign-in-outcome` events.                                                                    |
+| 0.63.0  | The mark as the ochk.app design draws it: its sides twice as deep, `1.6em` by `1em` beside the words, the tile `1.5em`, `0.6em` from the words.                                                                          |
 
 ## The rules
 
@@ -393,10 +413,10 @@ The button refuses words without "orangecheck" in them, and "OC" or
 
 ### Size and space
 
-- The mark is at least 16px wide. At the default size it is 1.75em, so 16px text
-  gives a 28px mark, 14px tall.
+- The mark is at least 16px wide. At the default size it is 1.6em, so 16px text
+  gives a 25.6px mark, 16px tall: one line of words.
 - Leave clear space around the mark of at least a quarter of its width. The
-  default gap to the words is 0.5em.
+  default gap to the words is 0.6em.
 - Keep the button at least 44px tall.
 
 ### Never

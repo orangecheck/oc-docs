@@ -369,9 +369,15 @@ price for each earning you set.
 | `payment_authorization` | Per action  | 0.4% of the payment | 0.5% of the payment |
 | `session_creation`      | Per session | 40 sats             | 50 sats             |
 
-Add your own events too, under any key you choose (`lesson_completed`, say). Try
-numbers first in the [sandbox](https://ochk.app/integrate/sandbox). In the
-config (`IntegratorPriceConfig`) a price is `site_pays`, and your user earns
+Add your own events too, on the **Paying** tab under "What each event earns":
+**Add your own event** takes a key (`lesson_completed`, say: up to 64 letters,
+digits and `_ . : -`), the name ochk.app lists it under where people find apps
+that pay, how often it pays, and what your user earns. Nothing is kept until you
+press Save. An event your project doesn't have is refused `event_not_enabled`,
+whether or not you are paying yet. To name what happened on each person's
+activity, send `action_label` with the event (step 3). Try numbers first in the
+[sandbox](https://ochk.app/integrate/sandbox). In the config
+(`IntegratorPriceConfig`) a price is `site_pays`, and your user earns
 `user_share_pct` of it, which is `0.8`. A config sent with a lower share is
 saved at `0.8`, with the lower price that earns your user the same, unless that
 price is outside the platform's price bounds (`422 config_invalid`).
@@ -394,6 +400,11 @@ if (!res.earned) {
     // 'not_billed': recorded and charged nothing, as a test project's is.
 }
 ```
+
+Your own events, and per-action ones, take `action_label`: up to 280 characters
+of plain text naming what happened ("Connected Claude to their Studio"). It is
+signed into the receipt, and the person sees it on their activity; without one,
+they see the event's key.
 
 Send from your backend, never the browser. The signing secret, on your project's
 **Keys & webhooks** tab, proves the call comes from your project; showing or

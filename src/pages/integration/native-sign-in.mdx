@@ -316,4 +316,31 @@ project. `session_ended` means the player ended their sessions everywhere.
 `bond_required` means the account doesn't meet your rule: `back_url` is where
 the player backs it, so show it in the game. `unavailable` is an outage, an
 unreadable list of ended sessions or rule among them: answer it 503, and have
-the app start the sign-in again, since the code may already be spent.
+the app start the sign-in again, since the code may already be spent. `audience`
+(me-client 0.63.0, `orangecheck` 3.19.0) means the token is genuine but was made
+for another site: the `audience` you pass isn't your site's origin exactly.
+
+### The exchange on the wire
+
+For a stand-in in your own tests. The helper posts JSON to
+`https://ochk.io/api/auth/native/token`. The project key goes in the body, with
+no key header:
+
+```json
+{
+    "grant_type": "authorization_code",
+    "code": "<code>",
+    "code_verifier": "<verifier>",
+    "redirect_uri": "http://127.0.0.1:<port>/<path>",
+    "project": "pk_live_<key>"
+}
+```
+
+| ochk.io answers                                                               | The helper's result                                                      |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `200 { "ok": true, "token", "token_type": "orangecheck", "audience", "exp" }` | The token, then every check above.                                       |
+| `400 { "ok": false, "reason": "invalid_grant" }`                              | `invalid_grant`                                                          |
+| `400` with any other `reason` (`unsupported_grant_type`, `invalid_request`)   | `bad_request`                                                            |
+| `404`                                                                         | `not_offered`: native sign-in is off.                                    |
+| `429`                                                                         | `unavailable`, `rate_limited`: 30 a minute per address, 120 per project. |
+| Anything else: a 5xx, a 200 without a token, a timeout                        | `unavailable`, `auth_host_unavailable`.                                  |

@@ -47,6 +47,19 @@ your own session replaces the token: then your server also needs
 ([how](#if-your-own-session-replaces-the-token)). `@orangecheck/auth-client` is
 for orangecheck's own sites; integrators use me-client.
 
+Bundling your server: `@orangecheck/me-client/server` imports only
+`@orangecheck/auth-core` at run time, which brings `jose`. `express` and `hono`
+are optional peers it never imports, so a bundle needs neither.
+
+**Testing your server without ochk.io.** Every server helper calls
+`globalThis.fetch` when it runs, so a stub installed there sees each request:
+ochk.io's key set (`/.well-known/jwks.json`), the project's sign-in rule and the
+list of ended sessions on me.ochk.io, the native code's exchange, `revokeToken`
+and the Connect calls. None takes a `fetch` of its own;
+`integratorRevocationCheck` does, and the wrappers take that check as their
+`revocation` option. The key set is held for an hour and the rule for a minute,
+so install the stub before the first call.
+
 ## sign-in in the browser
 
 ```ts
@@ -447,9 +460,11 @@ To keep their history:
   your site's handle for each account merged into this one. `matchMergedUser`
   (me-client 0.45.0) and `match_merged_user` (`orangecheck` 3.4.0) answer
   `none`, `one` or `conflict`.
-- `none`: create a user, as above. `one`: add this `did_oc` and its `rh` to that
-  user, in one transaction under the same unique rules. `conflict`: the handles
-  name two of your users; pick neither, create nothing and log it.
+- `none`: create a user, as above. `one`: that user is theirs. Their old
+  `did_oc` never signs in again, so with one did per account, put this `did_oc`
+  in its place and add its `rh`, in one transaction under the same unique rules.
+  `conflict`: the handles name two of your users; pick neither, create nothing
+  and log it.
 - Read `merged_rh` from the verified token only, never from anything the browser
   sends.
 - It can't help with an account whose `rh` you never stored, and a Connect
@@ -931,6 +946,19 @@ holds its `rh` and its `iat` is before that cutoff, or it has no `iat`. Fetch it
 at most once a minute per origin, and don't trust a list whose `at` is more than
 ten minutes old, or more than a minute in the future. me.ochk.io answers
 `503 revocations_unavailable` rather than serve a copy older than ten minutes.
+
+Every refusal is `{ "ok": false, "error": "<code>" }`:
+
+| Status | `error`                   | When                                                                                                                                    |
+| ------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 401    | `project_auth_required`   | No project key, or a missing or wrong signature. Its `detail` says how to sign.                                                         |
+| 403    | `dev_origin_not_declared` | A `localhost` or `127.0.0.1` audience that isn't this test project's development origin. A live project has none.                       |
+| 403    | `domain_unverified`       | Any other audience while your project's domain isn't verified.                                                                          |
+| 403    | `audience_not_yours`      | Not your domain or a subdomain of it, or not an origin as a token carries it: `https://`, lowercase, no default port, no path or slash. |
+| 503    | `revocations_unavailable` | The list can't be read.                                                                                                                 |
+
+Treat any answer but a list you can read as a list that can't vouch: let reads
+go on and refuse writes, as the SDKs do.
 
 **Who you trust, and what it tells you.** The list comes from ochk.io, the auth
 host, and me.ochk.io serves it; both are orangecheck. A handle is an HMAC under

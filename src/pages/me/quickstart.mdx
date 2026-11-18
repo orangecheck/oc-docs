@@ -403,8 +403,9 @@ if (!res.earned) {
 
 Your own events, and per-action ones, take `action_label`: up to 280 characters
 of plain text naming what happened ("Connected Claude to their Studio"). It is
-signed into the receipt, and the person sees it on their activity; without one,
-they see the event's key.
+signed into the receipt, and the person sees it on their activity and the
+receipt's page; without one, they see orangecheck's name for a built-in event,
+or your own event's key.
 
 Send from your backend, never the browser. The signing secret, on your project's
 **Keys & webhooks** tab, proves the call comes from your project; showing or

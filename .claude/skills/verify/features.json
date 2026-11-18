@@ -54,19 +54,11 @@
             "reach": "https://ochk.io/docs/api/[...unknown]",
             "area": "home",
             "tests": [
+                "src/lib/unknown-api-route.test.ts",
                 "src/__tests__/doc-link-expect.test.ts",
                 "src/components/docs/DocsFrame.test.tsx",
-                "src/lib/seo/og-card.test.ts",
-                "src/lib/unknown-api-route.test.ts"
+                "src/lib/seo/og-card.test.ts"
             ]
-        },
-        {
-            "id": "api:ANY /api/oc-insights/event",
-            "kind": "api",
-            "entry": "src/pages/api/oc-insights/event.ts",
-            "reach": "https://ochk.io/docs/api/oc-insights/event",
-            "area": "oc-insights",
-            "tests": []
         },
         {
             "id": "api:ANY /api/og",
@@ -683,8 +675,8 @@
             "reach": "https://ochk.io/docs/me",
             "area": "me",
             "tests": [
-                "src/__tests__/backing-copy.test.ts",
-                "src/components/docs/DocsFrame.test.tsx"
+                "src/components/docs/DocsFrame.test.tsx",
+                "src/__tests__/backing-copy.test.ts"
             ]
         },
         {
@@ -1253,7 +1245,11 @@
             "entry": "next.config.ts",
             "reach": "docs.ochk.io/<path> to ochk.io/docs/<path>, query kept",
             "area": "redirects",
-            "tests": ["src/__tests__/inline-scripts.test.ts", "src/__tests__/moved-pages.test.ts"]
+            "tests": [
+                "src/__tests__/inline-scripts.test.ts",
+                "src/__tests__/moved-pages.test.ts",
+                "src/__tests__/rewrites.test.ts"
+            ]
         },
         {
             "id": "redirect:sdk-package",
@@ -1261,7 +1257,11 @@
             "entry": "next.config.ts",
             "reach": "/sdk/<package> to /sdk/<package>/README",
             "area": "redirects",
-            "tests": ["src/__tests__/inline-scripts.test.ts", "src/__tests__/moved-pages.test.ts"]
+            "tests": [
+                "src/__tests__/inline-scripts.test.ts",
+                "src/__tests__/moved-pages.test.ts",
+                "src/__tests__/rewrites.test.ts"
+            ]
         },
         {
             "id": "ui:search",

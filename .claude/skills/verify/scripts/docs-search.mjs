@@ -33,7 +33,7 @@ const check = (ok, what, detail = '') => {
 const browser = await pw.chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 await page.route('**/*', (route) =>
-    /plausible\.io|\/oc-insights/.test(route.request().url())
+    /insights\.ochk\.io/.test(route.request().url())
         ? route.fulfill({ status: 202, body: '' })
         : route.continue()
 );

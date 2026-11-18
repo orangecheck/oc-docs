@@ -304,24 +304,31 @@ deployment runs older builds until it is redeployed.
 
 **Finding.** The operator questionnaire
 ([`application-questionnaire.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/docs/application-questionnaire.md))
-asks for a legal name or company name with its jurisdiction, a country and
-region, and two references, and says the operator is listed publicly with them.
-The portal stores the answers and no code checks them. Two places publish from
-an application, to anyone: the operator registry lists the operator key of every
-accepted application, the operator id made from that key, and when it was
-accepted, whether or not it holds a seat (oc-me-web
-`src/pages/api/operator/registry.ts:21-33`,
+asks for a handle, a legal name or company name with its jurisdiction, a public
+contact channel, a country and region, and two references. Since 2026-11-18 it
+says which are published: each charter an operator signs lists their handle,
+their public contact channel and their operator key, and the legal entity and
+jurisdiction are kept for the review and not published (oc-guardian-kit
+`docs/application-questionnaire.md:19-27` and E1 at `:75`,
+`CHARTER-FORMAT.md:116`, at `50e5162`). The portal stores the answers and no
+code checks them. Two places publish from an application, to anyone: the
+operator registry lists the operator key of every accepted application, the
+operator id made from that key, and when it was accepted, whether or not it
+holds a seat (oc-me-web `src/pages/api/operator/registry.ts:21-33`,
 `src/lib/operator/applications-store.ts:282-298`), and a federation charter
 carries the operator key of each seated guardian (oc-me-web
 `src/lib/operator/charter.ts:289-290`). Nothing else from an application is
-published. Whether the questionnaire keeps asking is open, with the legal read
-below. Two documents said more was published than was; on 2026-11-11 both were
-brought in line with the code. ochk.app's privacy notice names what the
-questionnaire asks and both places that publish from an application (oc-packages
-`legal/src/content/me.ts:329`, legal 0.7.35 at `960ab8f2`, served by ochk.app
-from `ed1e84d8`). The oc-me-v1 charter says the records on ochk.app/trust link
-the list of every operator key that holds a seat, and that the other three
-disclosures are not published anywhere yet (oc-docs
+published. A charter the portal publishes still lists only each seat's operator
+key: its handle and contact channel join it in a new charter version, which
+every seat signs again, before the first operator from outside orangecheck is
+seated. Whether the questionnaire keeps asking for the legal entity is open,
+with the legal read below. Two documents said more was published than was; on
+2026-11-11 both were brought in line with the code. ochk.app's privacy notice
+names what the questionnaire asks and both places that publish from an
+application (oc-packages `legal/src/content/me.ts:329`, legal 0.7.35 at
+`960ab8f2`, served by ochk.app from `ed1e84d8`). The oc-me-v1 charter says the
+records on ochk.app/trust link the list of every operator key that holds a seat,
+and that the other three disclosures are not published anywhere yet (oc-docs
 `src/pages/federation/oc-me-v1.mdx:70-73` at `02d328f5`). ochk.app/trust links
 that list of seated operators (oc-app-web `src/pages/trust.tsx:62`).
 
@@ -362,7 +369,11 @@ and that answer (oc-me-web `src/lib/auth/opener-check.ts:15`, live in
 `b86627d9`). The popup starts refusing a page that does not answer only after
 the sites that open it answer on 0.59.0, seven days of that log have been read
 site by site, and one sign-in each from Safari on iOS and Chrome on Android has
-been seen to answer.
+been seen to answer. The seven days ended on 2026-11-18. That day, sign-ins from
+three origins the popup asks (two integrators' sites, and orangecheck's demo at
+an address off its own list) in an emulated iPhone (WebKit) and an emulated
+Pixel (Chromium) each answered, six of six. An emulator is not a phone, so the
+popup still reports and does not refuse.
 
 **One session per change on ochk.io.** A request that changes something on
 ochk.io, carries more than one ochk.io session cookie and does not name its

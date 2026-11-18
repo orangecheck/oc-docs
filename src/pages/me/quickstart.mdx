@@ -54,6 +54,10 @@ events, no charges, and sign-in works the same before and after.
 
 <InstallTabs pkg="@orangecheck/me-client" />
 
+If your own session replaces the token after sign-in, your server also needs
+`@orangecheck/auth-core` 2.12.0 or later, for `integratorRevocationCheck`
+([how](/me/sdk#if-your-own-session-replaces-the-token)).
+
 No bundler? `dist/popup.mjs` in the published package is a single ES module with
 no imports of its own. Copy it from the version you install to your own origin,
 say as `/js/oc-popup.mjs`, import `signInWithOc` from that path in a
@@ -275,6 +279,9 @@ Each line is a way an integration has gone wrong, with why it matters.
           in an account below your floor._
     - [ ] the token is ended right after the exchange. _You don't keep it, so
           sign-out can't end it later._
+    - [ ] each later check of that session asks the list with its `rh`, `aud`
+          and `iat` only, never the `jti`. _Ending the token put its `jti` on
+          your list, so a check that names it ends your own session._
 
 **Ending sessions**
 ([when someone ends every session](/me/sdk#when-someone-ends-every-session))

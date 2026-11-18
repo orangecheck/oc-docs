@@ -126,7 +126,9 @@ The rules for the box:
   box (in account settings, say), a tick calls again with `consent: true`: the
   same `did_oc`, now consented.
 - **After a deletion**, provision answers `410 account_deleted` until the person
-  ticks the box again.
+  ticks the box again. The call that carries their new tick, `consent: true`, is
+  how ochk.io hears it: it makes them a new account. A call without it still
+  answers 410.
 - **Before a claim, deleting it is yours to do.** The person can delete the
   account at ochk.app only once they have claimed it. Until then, delete it with
   `connectDelete` when they delete their account with you (below).
@@ -317,6 +319,13 @@ email claim has the code. Then:
   naming the account by the `did_oc` you hold.
 - You are never told the id of the account it was joined to, so two sites a
   person claims from cannot link them through one id.
+- **This `did_oc` never signs in.** The claimed account is joined to the
+  person's own, so when they sign in to your site with orangecheck, the token
+  carries their own `did_oc`, and its `merged_rh` leaves this account out. To
+  you that sign-in is someone new. If your site lets people
+  [sign in with orangecheck](/me/sdk#your-own-accounts) too, have them link it
+  to the account they already sign in to before they use it, and say so where
+  they claimed.
 
 In Python:
 

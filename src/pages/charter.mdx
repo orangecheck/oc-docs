@@ -59,21 +59,28 @@ spec keeps a changelog. No private extensions, no closed conformance vectors.
 
 `attest.ochk.io`, `lock.ochk.io`, `vote.ochk.io`, `stamp.ochk.io`,
 `agent.ochk.io`, `pledge.ochk.io` — every sibling protocol site remains free,
-self-hostable, no-account public goods forever. The consumer commercial products
-(`ochk.app`, `vault.ochk.io`) are optional layers, never the only path to using
-the protocols. If we ever change this, the spec stewardship governance ratifies
+no-account public goods forever. Their specs and the libraries they run on are
+public under MIT, so anyone can build the same tools without us; the sites' own
+source is not public today. The consumer commercial products (`ochk.app`,
+`vault.ochk.io`) are optional layers, never the only path to using the
+protocols. If we ever change this, the spec stewardship governance ratifies
 first.
 
 ### 05 · Audit verifies without us.
 
-Every receipt OrangeCheck signs is verifiable offline, against Bitcoin headers,
-by anyone, forever. On `ochk.app` that is its payment receipts, and every event
-receipt that is live, billed and not a test fire: each is signed over its
-canonical bytes and anchored with OpenTimestamps. Any other event receipt (a
-test fire, an unbilled event, an event in a test-mode project) is served with
-its SHA-256 digest only; nothing signs or anchors it. If OrangeCheck disappeared
-tomorrow, every signed receipt continues to verify. We sell operations, not
-lock-in. The protocol is the API.
+Anyone can check a receipt OrangeCheck signs offline: its signature against our
+published receipt key, and its OpenTimestamps proof against Bitcoin headers. The
+proof needs nothing from us, ever. The signature needs the key, which a receipt
+names by id and
+[me.ochk.io/.well-known/oc-envelope-jwks.json](https://me.ochk.io/.well-known/oc-envelope-jwks.json)
+serves; keep a copy, and a receipt you hold verifies even if that address stops
+answering. On `ochk.app` that is its payment receipts, and every event receipt
+that is live, billed and not a test fire: each is signed over its canonical
+bytes and anchored with OpenTimestamps. Any other event receipt (a test fire, an
+unbilled event, an event in a test-mode project) is served with its SHA-256
+digest only; nothing signs or anchors it. If OrangeCheck disappeared tomorrow,
+every signed receipt would still verify against a saved copy of the key. We sell
+operations, not lock-in. The protocol is the API.
 
 ### 06 · No agent-replacing-humans positioning.
 
@@ -139,10 +146,10 @@ review window, and a versioned re-ratification.
 ## If we ever break one of these
 
 The protocol layer continues to work without us. Every receipt we ever signed
-continues to verify. The spec repos stay public under the MIT license their
-`LICENSE` files state, and the npm packages remain published. Customers can fork
-the managed components and run them themselves on day one. This is the whole
-point of the design.
+continues to verify against a saved copy of our receipt key. The spec repos stay
+public under the MIT license their `LICENSE` files state, and the npm packages
+remain published, so anyone can run the protocols from them on day one. The
+sites' own source is not public today. This is the whole point of the design.
 
 Spec stewardship and family governance live at
 [github.com/orangecheck](https://github.com/orangecheck). Every change to a
@@ -153,10 +160,10 @@ spec, and to this page, is a public commit there.
 These commitments are made by the OrangeCheck founding team. Names will be
 appended here as public commitments are formalized.
 
-| Field            | Value                                                                                            |
-| ---------------- | ------------------------------------------------------------------------------------------------ |
-| Ratified         | v1 · 2026-04-28                                                                                  |
-| Corrected        | 2026-11-03 · facts in 03, 07, vault, and the product list; 2026-11-11 · which receipts 05 covers |
-| Next review      | 2026-12-01 (or earlier if material change proposed)                                              |
-| Source of truth  | `oc-docs/src/pages/charter.mdx`                                                                  |
-| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)                                         |
+| Field            | Value                                                                                                                                                          |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ratified         | v1 · 2026-04-28                                                                                                                                                |
+| Corrected        | 2026-11-03 · facts in 03, 07, vault, and the product list; 2026-11-11 · which receipts 05 covers; 2026-11-18 · 04 and 05 say what runs and verifies without us |
+| Next review      | 2026-12-01 (or earlier if material change proposed)                                                                                                            |
+| Source of truth  | `oc-docs/src/pages/charter.mdx`                                                                                                                                |
+| Governance forum | [github.com/orangecheck](https://github.com/orangecheck)                                                                                                       |

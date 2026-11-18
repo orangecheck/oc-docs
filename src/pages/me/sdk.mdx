@@ -198,7 +198,10 @@ export default async function session(
     if (checked.status === 'unavailable') {
         return res.status(503).json({ ok: false, reason: checked.reason });
     }
-    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    // 'audience': a genuine token made for another site. Check `audience` above.
+    if (checked.status !== 'valid') {
+        return res.status(401).json({ ok: false, reason: checked.reason });
+    }
     const s = checked.session;
     const maxAge = (s.exp ?? 0) - Math.floor(Date.now() / 1000);
     res.setHeader(
@@ -826,7 +829,8 @@ export default async function exchange(
     });
     if (checked.status === 'unavailable')
         return res.status(503).json({ ok: false, reason: checked.reason });
-    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    if (checked.status !== 'valid')
+        return res.status(401).json({ ok: false, reason: checked.reason });
     const rule = await checkSignInRule(checked.session, {
         projectKey: process.env.OC_PROJECT_KEY!,
     });

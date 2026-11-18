@@ -113,7 +113,10 @@ export default async function session(
     if (checked.status === 'unavailable') {
         return res.status(503).json({ ok: false, reason: checked.reason });
     }
-    if (checked.status !== 'valid') return res.status(401).json({ ok: false });
+    // 'audience': a genuine token made for another site. Check `audience` above.
+    if (checked.status !== 'valid') {
+        return res.status(401).json({ ok: false, reason: checked.reason });
+    }
     const s = checked.session;
     const maxAge = (s.exp ?? 0) - Math.floor(Date.now() / 1000);
     res.setHeader(
@@ -126,10 +129,12 @@ export default async function session(
 
 On Express or Hono it is the same three moves: check with `checkOcToken`, set
 the cookie, answer `ok`. A 503 means ochk.io's keys could not be read, not a bad
-token, so the page can try again. `checkOcToken` checks the token, not who can
-sign in (step 4): the wrapper in step 3 applies that on every request that reads
-the cookie. If your own session replaces the token, run the exchange inside the
-wrapper instead
+token, so the page can try again. A 401 with `reason: 'audience'` (me-client
+0.63.0 or later) means the token is genuine but was made for another site: set
+`audience` to your site's origin exactly, `https://` and any port included.
+`checkOcToken` checks the token, not who can sign in (step 4): the wrapper in
+step 3 applies that on every request that reads the cookie. If your own session
+replaces the token, run the exchange inside the wrapper instead
 ([if your own session replaces the token](/me/sdk#if-your-own-session-replaces-the-token)).
 A backend in Python or another language checks the token itself: see
 [verify without the SDK](/me/sdk#verify-without-the-sdk).

@@ -160,14 +160,6 @@ const nextConfig: NextConfig = {
         ];
     },
 
-    async rewrites() {
-        return [
-            // Page views reach Plausible through the site's own route, never a rewrite to it
-            // (basePath applies: /docs/oc-insights/event).
-            { source: '/oc-insights/event', destination: '/api/oc-insights/event' },
-        ];
-    },
-
     async headers() {
         return [
             {
@@ -194,13 +186,13 @@ const nextConfig: NextConfig = {
                             // and runs inline scripts by hash only.
                             isDev
                                 ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-                                : `script-src 'self' ${inlineScripts()}`,
+                                : `script-src 'self' ${inlineScripts()} https://insights.ochk.io`,
                             "style-src 'self' 'unsafe-inline'",
                             "img-src 'self' data: https:",
                             "font-src 'self' data:",
                             isDev
                                 ? "connect-src 'self' ws: https://ochk.io https://attest.ochk.io"
-                                : "connect-src 'self' https://ochk.io https://attest.ochk.io",
+                                : "connect-src 'self' https://ochk.io https://attest.ochk.io https://insights.ochk.io",
                             "frame-ancestors 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",

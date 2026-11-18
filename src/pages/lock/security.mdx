@@ -308,9 +308,9 @@ can.
 All browser tabs at `lock.ochk.io` share the same IndexedDB and localStorage. If
 an attacker can get JavaScript execution on any page at that origin, they can
 read your device_sk. The CSP limits where scripts come from:
-`script-src 'self' 'unsafe-inline' https://insights.ochk.io https://plausible.io`.
-Every page runs two analytics scripts: an inline Plausible snippet and the
-family's pulse script from `insights.ochk.io`.
+`script-src 'self' 'unsafe-inline' https://insights.ochk.io`. Every page runs
+one analytics script: the family's pulse script from `insights.ochk.io`, started
+by a small inline loader.
 
 ### The Lock domain itself
 

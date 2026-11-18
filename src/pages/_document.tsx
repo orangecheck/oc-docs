@@ -56,8 +56,8 @@ export default function Document() {
                 />
                 <meta name="color-scheme" content="light dark" />
 
-                {/* Plausible, each page reported as origin and path only. The docs
-                    never loaded oc-pulse, and still don't. script-src runs it by hash,
+                {/* oc-pulse, each page reported as origin and path only, on ochk.io
+                    itself. script-src runs its loader by hash,
                     from the same props (lib/inline-scripts.ts). */}
                 <FamilyAnalytics {...ANALYTICS} />
             </Head>

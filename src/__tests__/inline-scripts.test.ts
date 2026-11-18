@@ -41,7 +41,7 @@ const scriptsOf = (html: string) =>
 describe("ochk.io/docs's script-src", () => {
     it('lists the head scripts and the theme script by hash, and nothing inline besides', async () => {
         const srcs = await scriptSrcsUnder('production');
-        // The build runs the analytics too: logo, Plausible sender (no oc-pulse), theme.
+        // The build runs the analytics too: logo, oc-pulse loader, theme.
         const want = inlineHashes([
             HEAD_SCRIPTS[0]!,
             ...Object.values(familyAnalyticsScripts({ ...ANALYTICS, enabled: true })),
@@ -77,7 +77,7 @@ describe('the document', () => {
         );
         expect(scriptsOf(head)).toEqual([
             HEAD_SCRIPTS[0],
-            familyAnalyticsScripts({ ...ANALYTICS, enabled: true }).plausible,
+            familyAnalyticsScripts({ ...ANALYTICS, enabled: true }).ocpulse,
         ]);
     });
 

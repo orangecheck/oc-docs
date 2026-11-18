@@ -13,7 +13,9 @@ Every guardian on an orangecheck federation ratifies its charter before going
 live. For oc-me-v1, the `charter_hash` is the SHA-256 of the canonical-bytes
 block in [that charter](/federation/oc-me-v1#canonical-bytes). A federation
 created in the portal hashes its own canonical bytes, built from its parameters
-and its seats' operator keys. Operators verify the hash before signing.
+and, for each seat, its operator key and the handle and public contact channel
+its operator set (`(none)` where they set none). An operator's legal entity and
+jurisdiction are not in it. Operators verify the hash before signing.
 
 > **Status.** The operator program is not open, and no federation has guardian
 > seats yet: while the system is in testing, orangecheck holds every role

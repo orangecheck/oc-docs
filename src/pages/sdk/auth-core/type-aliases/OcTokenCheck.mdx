@@ -18,6 +18,7 @@ type OcTokenCheck =
   status: "valid";
 }
   | {
+  reason?: "audience";
   status: "invalid";
 }
   | {
@@ -25,9 +26,14 @@ type OcTokenCheck =
 };
 ```
 
-Defined in: [index.ts:929](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L929)
+Defined in: [index.ts:934](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L934)
 
 A token's verification, telling a bad token from a key set that can't be
 read: `unavailable` when the issuer's JWKS can't be fetched and no copy
 younger than `jwksMaxStaleMs` is held. That is an outage, not a refusal:
 answer it 503 so the client tries again, never as "signed out".
+
+`invalid` carries `reason: "audience"` for a genuine token (signature,
+issuer and expiry all good) whose `aud` the `audience` option does not
+accept: one made for another site, or, with no `audience`, one made for a
+site at all. Any other failure carries no reason.

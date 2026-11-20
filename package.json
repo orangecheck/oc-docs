@@ -36,7 +36,7 @@
         "@orangecheck/mark": "^0.4.0",
         "@orangecheck/me-client": "^0.63.0",
         "@orangecheck/site-kit": "^0.16.1",
-        "@orangecheck/wallet-adapter": "^0.7.0",
+        "@orangecheck/wallet-adapter": "^0.8.0",
         "@types/mdx": "^2.0.13",
         "@types/swagger-ui-react": "^5.18.0",
         "lucide-react": "^0.544.0",

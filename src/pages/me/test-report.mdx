@@ -449,10 +449,13 @@ operator applications, no held payouts or claims, and no hosting request with an
 email, so those masks rest on their tests. The payout-claim audit rows needed no
 rewrite: on 2026-11-04 production held none. Waiting on orangecheck: the
 executor's half, where it journals the invoice's hash before paying (oc-me-web
-`17e96163`, `7e1925cf`; see [Executor on phoenixd](#executor-on-phoenixd)),
-rewriting hold reasons written before 2026-10-31, and the database change and
-keys that put ochk.io's remaining internal lookups behind a recorded reason;
-until then those lookups still answer orangecheck's own servers without one.
+`17e96163`, `7e1925cf`; see [Executor on phoenixd](#executor-on-phoenixd)). Hold
+reasons written before 2026-10-31 needed no rewrite: on 2026-11-20 production
+held no held payout or claim. Since 2026-11-20 ochk.io's internal lookups take
+each caller's own key and record the purpose of every plaintext answer. The
+shared key orangecheck's servers used before still answers, and ochk.io counts
+each answer; once a week of counts shows no caller still needs it, those answers
+are masked.
 
 ## Health routes
 
@@ -475,16 +478,15 @@ each request into a fresh database read or check.
 
 ## Still open
 
-| Part                                                                                                                                                 | When, or who                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1`                              | orangecheck's sitting; started 2026-11-19 20:26 UTC, the guardians catching up with mutinynet; not yet passed |
-| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor stopped and restarted while a batch is in transit | in the same sitting; that move's switch about 14 days later                                                   |
-| The executor build for production: phoenixd's restart supervisor and shutdown order, and no payee in its output                                      | oc-me-web `d0b76fdd` approved; orangecheck deploys it after the C07 sitting                                   |
-| Rewriting hold reasons written before 2026-10-31                                                                                                     | orangecheck; ready to run                                                                                     |
-| The database change and keys that put ochk.io's remaining internal lookups behind a recorded reason                                                  | orangecheck; ready to run                                                                                     |
-| chat.ochk.io and cosign.ochk.io reporting sign-ins to ochk.app as integrators: wired, still off                                                      | orangecheck's settings change                                                                                 |
-| The sign-in popup refusing a page that does not answer its challenge                                                                                 | the conditions in the No-KYC walk-through; reporting since 2026-11-10                                         |
-| The bounded mainnet test: payouts and each handoff with small real amounts                                                                           | orangecheck's decisions; its runbook was brought to today's code on 2026-11-10                                |
-| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                                             | orangecheck, choosing the operators; not started                                                              |
-| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name                                      | orangecheck, with counsel                                                                                     |
-| Balances orangecheck holds, into a federation                                                                                                        | orangecheck; after a mainnet federation and a Fedimint executor in production                                 |
+| Part                                                                                                                                                 | When, or who                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| C07's second sitting: the switch, moving the projects, a top-up and a payout on `oc-mutiny-v2`, retiring `oc-mutiny-v1`                              | orangecheck's sitting; started 2026-11-19 20:26 UTC, the guardians catching up with mutinynet; not yet passed                      |
+| The move drill on a short `oc-mutiny-v2` to `oc-mutiny-v3` move: a halt part-way, and the executor stopped and restarted while a batch is in transit | in the same sitting; that move's switch about 14 days later                                                                        |
+| The executor build for production: phoenixd's restart supervisor and shutdown order, and no payee in its output                                      | oc-me-web `d0b76fdd` approved; orangecheck deploys it after the C07 sitting                                                        |
+| Masking every answer ochk.io gives on the shared internal key                                                                                        | orangecheck, after a week of its counts (read 2026-11-27); each caller's own key, with the purpose recorded, live since 2026-11-20 |
+| chat.ochk.io and cosign.ochk.io reporting sign-ins to ochk.app as integrators: wired, still off                                                      | orangecheck's settings change                                                                                                      |
+| The sign-in popup refusing a page that does not answer its challenge                                                                                 | the conditions in the No-KYC walk-through; reporting since 2026-11-10                                                              |
+| The bounded mainnet test: payouts and each handoff with small real amounts                                                                           | orangecheck's decisions; its runbook was brought to today's code on 2026-11-10                                                     |
+| Real operators, with orangecheck holding no seat on [/custody](https://ochk.app/custody)                                                             | orangecheck, choosing the operators; not started                                                                                   |
+| The legal read: orangecheck's interim custody, the operators' role, and the operator questionnaire's legal name                                      | orangecheck, with counsel                                                                                                          |
+| Balances orangecheck holds, into a federation                                                                                                        | orangecheck; after a mainnet federation and a Fedimint executor in production                                                      |

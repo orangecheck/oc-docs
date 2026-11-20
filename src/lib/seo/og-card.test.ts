@@ -43,13 +43,13 @@ const DAY = 'public, max-age=86400, s-maxage=86400';
  * Cards as the docs' own route drew them before the move onto site-kit's
  * handler (the default and /attest equal the live cards' bytes), so the move
  * changed no pixel. A new app-design changes these; the new values come from
- * the card it then draws.
+ * the card it then draws (app-design 2.19.0's 8:5 check, 2026-11-20).
  */
 const DRAWN: Record<string, string> = {
-    '/api/og': '2093e093c28a12896c44cb03f86c921a9d55bfcd7fe6fd66ab0fe9363b6831b7',
-    '/api/og?page=%2Fattest': '56acb9633b0b5dc5451c8089271f697f4ea3acf80a084a6406d436a54ab39bf3',
+    '/api/og': '8a2b4c7a754563cdea74fcf80d41210eae3b68c468b7f6b835e0074354d607a5',
+    '/api/og?page=%2Fattest': 'a881c6156507f5d92080e56f93ab096528770d5906861a765fed18bdbb355762',
     '/api/og?page=%2Fpledge%2Fcomposition':
-        'dc4628b5a97f57d080c636762952708bc6bb2f558fa5c270ab29da4e60e8bd18',
+        'b306432500c927ab5963070a6892433b867d7410d6c7a49e0dcf2081f54fdcf8',
 };
 
 const pages = Object.keys(sources).filter((p) => !['/', '/404', '/500'].includes(p));

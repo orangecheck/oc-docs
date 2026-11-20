@@ -18,11 +18,12 @@ type ExchangeNativeCodeRefusal =
   | "bad_request"
   | "invalid_token"
   | "no_session_handle"
+  | "audience"
   | "session_ended"
   | "unknown_project_key";
 ```
 
-Defined in: [me-client/src/native.ts:87](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L87)
+Defined in: [me-client/src/native.ts:89](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/native.ts#L89)
 
 Why there is no session.
 - `invalid_grant`: the code is unknown, spent or expired, was sent with
@@ -32,6 +33,8 @@ Why there is no session.
 - `bad_request`: a field ochk.io could not read.
 - `invalid_token`, `no_session_handle`: the token did not verify for your
   `audience`.
+- `audience`: the token is genuine but was made for another site: check
+  that `audience` is your origin exactly.
 - `session_ended`: the person ended their sessions everywhere.
 - `bond_required`: the account does not meet your project's rule; `need`,
   `have` and `back_url` say what it asks and where to back the account, as

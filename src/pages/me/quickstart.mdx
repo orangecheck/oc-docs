@@ -372,10 +372,11 @@ price for each earning you set.
 Add your own events too, on the **Paying** tab under "What each event earns":
 **Add your own event** takes a key (`lesson_completed`, say: up to 64 letters,
 digits and `_ . : -`), the name ochk.app lists it under where people find apps
-that pay, how often it pays, and what your user earns. Nothing is kept until you
-press Save. An event your project doesn't have is refused `event_not_enabled`,
-whether or not you are paying yet. To name what happened on each person's
-activity, send `action_label` with the event (step 3). Try numbers first in the
+that pay (up to 80 characters, none of orangecheck's own names), how often it
+pays, and what your user earns. Nothing is kept until you press Save. An event
+your project doesn't have is refused `event_not_enabled`, whether or not you are
+paying yet. To name what happened on each person's activity, send `action_label`
+with the event (step 3). Try numbers first in the
 [sandbox](https://ochk.app/integrate/sandbox). In the config
 (`IntegratorPriceConfig`) a price is `site_pays`, and your user earns
 `user_share_pct` of it, which is `0.8`. A config sent with a lower share is

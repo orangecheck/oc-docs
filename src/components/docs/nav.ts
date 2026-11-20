@@ -567,6 +567,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Federation descriptor, M-of-N graduation envelope, guardian rotation.',
             },
             {
+                href: '/me/test-report',
+                label: 'Test report',
+                blurb: 'The testing phase part by part: payouts, the anchor block, handoffs, drills, no-KYC. What passed and what is open.',
+            },
+            {
                 href: '/me/operator',
                 label: 'Operator',
                 blurb: 'How the guardian operator program works, in the browser or with the kit. The program is not open.',
@@ -580,6 +585,11 @@ export const DOCS_NAV: DocsSection[] = [
                 href: '/me/operator/runbook',
                 label: 'Operator runbook',
                 blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, status checks. The program is not open.',
+            },
+            {
+                href: '/me/operator/test-report',
+                label: 'Operator suite test report',
+                blurb: 'A four-guardian federation run through ochk.app on mutinynet: what passed, what is open, the limits found.',
             },
             {
                 href: '/me/operator/in-browser',

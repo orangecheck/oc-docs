@@ -1,0 +1,22 @@
+export const metadata = {
+    title: "Variable: VERIFYCONFIGKEYS",
+    description: "Auto-generated API reference for Variable: VERIFYCONFIGKEYS. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / VERIFY\_CONFIG\_KEYS
+
+# Variable: VERIFY\_CONFIG\_KEYS
+
+```ts
+const VERIFY_CONFIG_KEYS: readonly keyof VerifyConfig[];
+```
+
+Defined in: [index.ts:431](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L431)
+
+The options [verifySessionToken](../functions/verifySessionToken) and [resolveSessionFromRequest](../functions/resolveSessionFromRequest) read.
+Exported so a library can pass an option only where the installed auth-core
+reads it: an unknown one throws.

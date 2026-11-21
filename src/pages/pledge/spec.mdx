@@ -9,6 +9,7 @@ export const metadata = {
 <SpecCard
     repo="oc-pledge-protocol"
     kind="spec"
+    version="v2.0.0"
     note="SPEC.md is the authoritative rules. The full normative set — seven documents plus the required-pass conformance vectors — is laid out below."
 />
 
@@ -65,9 +66,10 @@ explicit version bumps. Adding a new resolution mechanism is a MINOR version
 (existing pledges still verify); changing field order or serialization is MAJOR
 (existing pledges may need re-canonicalization in clients).
 
-`v1.0.0` was released in 2026-05. SPEC.md is marked Draft until implementations
-conform to the changes listed under Unreleased in the
-[CHANGELOG](https://github.com/orangecheck/oc-pledge-protocol/blob/main/CHANGELOG.md).
+`v1.0.0` was released in 2026-05 and `v2.0.0` on 2026-11-21. 2.0.0 refuses, or
+reads differently, some pledges and outcomes that 1.0.0 accepted, as the
+[CHANGELOG](https://github.com/orangecheck/oc-pledge-protocol/blob/main/CHANGELOG.md)
+lists. SPEC.md stays Draft until implementations conform to its dispute rules.
 Future MINOR bumps add fields without breaking existing verifiers; future MAJOR
 bumps require coordinated upgrade across the family.
 

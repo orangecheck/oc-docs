@@ -1,0 +1,161 @@
+export const metadata = {
+    title: 'Work with a coding agent',
+    description:
+        "The orangecheck MCP server gives Claude Code, Cursor and other coding agents these docs, the sign-in steps for your stack, a project's public config and the checks before launch. It runs on your machine, needs no credential and changes nothing.",
+};
+
+# Work with a coding agent
+
+`@orangecheck/mcp` is an MCP server for your coding agent. It reads these docs,
+puts together the sign-in steps for your stack, reads a project's public config,
+and checks a deployed site against
+[the checklist](/me/quickstart#5--check-it-before-real-people-sign-in). Your
+agent writes orangecheck code from the docs as they read today, not from memory.
+
+It runs on your machine. It needs no key and no account, and it changes nothing:
+projects, keys and money stay at [ochk.app](https://ochk.app/me/projects). It
+needs Node 20 or later.
+
+## Add it
+
+Every client starts the same command: `npx -y @orangecheck/mcp`.
+
+### Claude Code
+
+```bash
+claude mcp add orangecheck -- npx -y @orangecheck/mcp
+```
+
+Add `--scope project` to write it to the repository's `.mcp.json`, for everyone
+who works in it.
+
+### Claude Desktop
+
+In `claude_desktop_config.json` (Settings, Developer, Edit Config):
+
+```json
+{
+    "mcpServers": {
+        "orangecheck": { "command": "npx", "args": ["-y", "@orangecheck/mcp"] }
+    }
+}
+```
+
+### Cursor
+
+In `.cursor/mcp.json` in your project, or `~/.cursor/mcp.json` for every
+project:
+
+```json
+{
+    "mcpServers": {
+        "orangecheck": { "command": "npx", "args": ["-y", "@orangecheck/mcp"] }
+    }
+}
+```
+
+### VS Code
+
+In `.vscode/mcp.json`:
+
+```json
+{
+    "servers": {
+        "orangecheck": {
+            "type": "stdio",
+            "command": "npx",
+            "args": ["-y", "@orangecheck/mcp"]
+        }
+    }
+}
+```
+
+### Others
+
+Windsurf takes Cursor's `mcpServers` block in
+`~/.codeium/windsurf/mcp_config.json`. The Codex CLI takes it in
+`~/.codex/config.toml`:
+
+```toml
+[mcp_servers.orangecheck]
+command = "npx"
+args = ["-y", "@orangecheck/mcp"]
+```
+
+Any client that starts a stdio server works: the command is `npx`, the arguments
+`-y @orangecheck/mcp`.
+
+## Ask it
+
+- "Add sign in with orangecheck to this Express app." The agent reads the steps
+  for your stack with `integration_guide`, then the pages they cite.
+- "Is https://yourapp.example ready for real people to sign in?" It runs
+  `check_setup` on the site, then goes through the rest of the checklist with
+  you in your code.
+- "Why won't my domain verify?" It reads your TXT record and meta tag with
+  `check_domain_verification`.
+- "Who can sign in to my project?" It reads the project by its key with
+  `get_project_config`.
+
+Two prompts do the first two in one go: `set_up_sign_in` and `pre_launch_check`.
+In Claude Code they are `/mcp__orangecheck__set_up_sign_in` and
+`/mcp__orangecheck__pre_launch_check`.
+
+## The tools
+
+Every tool reads. None of them writes.
+
+| Tool                        | What it does                                                                                                                                                                                                                           |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search_docs`               | Searches every page of these docs, and the SDK reference by title. Returns the best pages and the lines that matched, each with a link to its section.                                                                                 |
+| `list_docs`                 | Lists every page with its one-line description, by section.                                                                                                                                                                            |
+| `read_doc`                  | Reads one page, or one section of it, as markdown. Takes a link, with or without `#section`, or a path such as `/me/sdk`. It reads nothing outside `https://ochk.io/docs`.                                                             |
+| `get_project_config`        | Reads what me.ochk.io publishes about a project, by its key: its name, its domain and whether it is verified, who can sign in, sign-in from apps, and the published prices, pay periods and release schedules.                         |
+| `check_domain_verification` | Reads what your project's domain check reads: the TXT record `oc-verify=<token>`, and the `oc-domain-verify` meta tag in the HTML `https://yourapp.example/` sends. With your token, says whether it is there; without, lists what is. |
+| `check_setup`               | Checks a deployed site against the checklist, as far as it can be seen from outside, then lists word for word the items only your code can show.                                                                                       |
+| `integration_guide`         | The steps for one stack: `nextjs-pages`, `nextjs-app`, `express`, `hono`, `python` or `godot` (a game signing in through the player's browser).                                                                                        |
+
+It also serves each page as a resource, `orangecheck://docs/me/quickstart` and
+so on, and the index of every page as `orangecheck://docs/llms.txt`.
+
+### How a guide is put together
+
+`integration_guide` writes no code. Each step names a section of these docs. The
+guide copies that section's code and paragraphs as they read when you ask, with
+the link to the section above them. A line that starts "Note" is the only text
+that is not from the docs, and it is there only where the docs have no example
+for your stack: it says so rather than fill the gap. If a page changes and a
+block the guide expects is gone, the guide says which one and links the section
+to read instead.
+
+### What `check_setup` can see
+
+From outside it checks:
+
+- the site answers over HTTPS, and `http://` redirects to it;
+- `www.` and the bare domain end on one origin. That origin is the `audience`
+  your server checks the token for, and the check names it;
+- the page doesn't send `Cross-Origin-Opener-Policy: same-origin`, which keeps
+  the popup from handing the token back;
+- the domain's verification record;
+- with a project key, that the site is on the project's domain, and what the
+  project allows.
+
+It can't see your server, so it hands over the rest of the checklist word for
+word: where the token is kept, the cookie, the audience in your code.
+
+## What it reaches
+
+- `https://ochk.io/docs`: these pages, through `llms.txt`, `llms-full.txt` and
+  each page's `.md` copy. It keeps them for ten minutes.
+- `https://me.ochk.io/api/integrator/<project key>/…` and
+  `https://me.ochk.io/api/integrator/config`: a project's public answers. They
+  need no credential. A project key is not a secret: apps ship it.
+- `https://cloudflare-dns.com/dns-query`: the TXT lookup, made the way
+  me.ochk.io makes it.
+- The site you name. It refuses an IP address and any name that resolves to a
+  private or local address, and it follows a redirect only to the same domain or
+  its `www.` twin.
+
+Each request says `User-Agent: orangecheck-mcp/<version>`. Nothing else leaves
+your machine: no telemetry, no account, no key.

@@ -3,7 +3,7 @@
 The docs home, getting started, the ecosystem pages, reference pages and the API
 references.
 
-<!-- covers: page:/, page:/getting-started/*, page:/ecosystem*, page:/reference/*, page:/integration, page:/integration/reference, page:/integration/native-sign-in, page:/infrastructure/relay, page:/api-reference* -->
+<!-- covers: page:/, page:/getting-started/*, page:/ecosystem*, page:/reference/*, page:/integration, page:/integration/reference, page:/integration/native-sign-in, page:/integration/mcp, page:/infrastructure/relay, page:/api-reference* -->
 
 ## Sub-features
 
@@ -14,7 +14,8 @@ references.
 - reference: error codes, examples, FAQ, glossary, multi-account.
 - integration (overview, the onboarding examples at `/integration/reference`, and
   sign-in from apps and games at `/integration/native-sign-in`: the Godot script,
-  the steps for any engine, and the server halves in Node and Python),
+  the steps for any engine, and the server halves in Node and Python, and the
+  MCP server for coding agents at `/integration/mcp`),
   infrastructure/relay.
 - api-reference: the OpenAPI references (attest, the auth host), rendered by
   `EmbeddedOpenAPI` from the spec it fetches.
@@ -34,7 +35,7 @@ Runtime:
 
 ```sh
 B=https://ochk.io/docs
-for p in "" getting-started/quickstart ecosystem ecosystem/nostr-kind-30078 reference/faq reference/error-codes reference/examples integration integration/reference integration/native-sign-in infrastructure/relay api-reference api-reference/attest api-reference/auth-host; do
+for p in "" getting-started/quickstart ecosystem ecosystem/nostr-kind-30078 reference/faq reference/error-codes reference/examples integration integration/reference integration/native-sign-in integration/mcp infrastructure/relay api-reference api-reference/attest api-reference/auth-host; do
   printf '%-28s ' "/$p"; curl -s -o /dev/null -w '%{http_code}\n' "$B${p:+/$p}"   # the home page is /docs, no slash
 done                                                                    # every one 200
 curl -s "$B/infrastructure/relay" | grep -c 'id="write-quorum-and-read-floor"'   # 1: the family's device-record relay rule

@@ -88,6 +88,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'A desktop build or a game signs the player in through their own browser, with no secret in the app.',
             },
             {
+                href: '/integration/mcp',
+                label: 'Coding agents (MCP)',
+                blurb: "Give Claude Code, Cursor or any MCP client these docs, your stack's steps and the checks before launch.",
+            },
+            {
                 href: '/integration/reference',
                 label: 'Run the whole funnel',
                 blurb: 'Open example sites in Node and Python: your own login, Connect, claiming and sign in with orangecheck.',

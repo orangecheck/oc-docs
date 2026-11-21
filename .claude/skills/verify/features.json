@@ -557,6 +557,14 @@
             "tests": ["src/__tests__/llms.test.ts", "src/__tests__/sign-in-button-sri.test.ts"]
         },
         {
+            "id": "page:/integration/mcp",
+            "kind": "page",
+            "entry": "src/pages/integration/mcp.mdx",
+            "reach": "https://ochk.io/docs/integration/mcp",
+            "area": "integration",
+            "tests": []
+        },
+        {
             "id": "page:/integration/native-sign-in",
             "kind": "page",
             "entry": "src/pages/integration/native-sign-in.mdx",

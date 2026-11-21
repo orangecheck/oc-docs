@@ -862,18 +862,19 @@ What an ended token reaches, and when:
   both.
 - Tokens ended before 2026-10-24 are not on your list. They expire within 30
   days of sign-in.
-- Past 16, one account's ended tokens at your origin fold: the list keeps its
-  newest 16 by key and holds one cutoff for the older ones, under that account
-  in `accounts`. The cutoff ends a token of that account issued before it,
-  wherever you check the token itself: at the exchange, or where the token is
-  your session (`withOcAuth`, `checkOcSession`, `verify_session`), so a token
+- Past 16, one account's ended tokens at your origin fold: the list keeps up to
+  its newest 16 by key and holds one cutoff for the older ones, under that
+  account in `accounts`. The cutoff ends a token of that account issued before
+  it, wherever you check the token itself: at the exchange, or where the token
+  is your session (`withOcAuth`, `checkOcSession`, `verify_session`), so a token
   kept as the session on another device and issued before it ends too. It never
   ends a session you started from a token and check by its `rh`, `aud` and
   `iat`. Other people's sessions are untouched. The list is capped at 20,000
   entries per origin; past that me.ochk.io answers 503 `revocations_unavailable`
-  rather than send part of it, and your writes wait as for any outage.
-  `orangecheck` reads `accounts` from 3.20.0; auth-core and me-client already
-  do.
+  rather than send part of it, and your writes wait as for any outage. auth-core
+  and me-client read `accounts`; `orangecheck` reads it from 3.20.0. Below
+  3.20.0 it doesn't refuse a token folded at your origin, so a Python site that
+  keeps the token as its session must upgrade.
 
 [`revokeToken`](/sdk/me-client/server/functions/revokeToken) (me-client 0.41.0
 or later) and `revoke_token` (`orangecheck` 3.2.0 or later) make that call. A
@@ -1064,8 +1065,9 @@ way, apply the rule with one call:
 0.43.0) reads and holds it as the wrappers do and answers with their status and
 body: `403 bond_required`, `503 bond_policy_unavailable` or
 `500 unknown_project_key`. Then ask the list of ended sessions about the whole
-session, `jti` included, as the wrappers do: a token the person ended on its own
-is in the list by its `jti` alone.
+session, `jti` and `sub` included, as the wrappers do: a token the person ended
+on its own is in the list by its `jti`, or, once its account's older ended
+tokens fold, only under that account's cutoff, keyed by its `sub`.
 
 ```ts
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -1111,10 +1113,13 @@ the same for the `Session` that `verify_session` returned and answers a
 `SessionCheck`. Then spend the token once and don't store it:
 
 - The exchange is a write. Ask the list of ended sessions about the whole token,
-  `jti` included (Node: `status(checked.session)`; Python:
+  `jti` and `sub` included (Node: `status(checked.session)`; Python:
   `revocations=REVOCATIONS, method="POST"`), and refuse it while the list can't
   be read (`503`, never "signed out"), as the wrapper does for a POST: a token
   someone ended, on its own or everywhere, must not start a new session here.
+  The `sub` is what lets a fold reach the token at the exchange: once its
+  account's older ended tokens fold, the list holds it only as that account's
+  cutoff.
 
 - Keep its `rh`, `aud` and `iat` with that session on your server, written
   before you hand the session to the browser. Never let the browser bind them in

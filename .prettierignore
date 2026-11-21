@@ -21,5 +21,7 @@ next-env.d.ts
 
 # The search index: one line of generated JSON, not committed.
 public/search-index.json
+# Each page as markdown, written by scripts/gen-llms.mjs, not committed.
+public/**/*.md
 # Written by eslint --suppress-rule / --prune-suppressions in its own layout (lint-gate.md).
 eslint-suppressions.json

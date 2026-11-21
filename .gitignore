@@ -21,3 +21,8 @@ src/generated/me-client-cdn.mdx
 src/generated/doc-sources.json
 # Written by scripts/gen-sitemap.mjs on every build.
 public/sitemap.xml
+# Written by scripts/gen-llms.mjs on every build: the index, every page in one
+# file, and each page as markdown.
+public/llms.txt
+public/llms-full.txt
+public/**/*.md

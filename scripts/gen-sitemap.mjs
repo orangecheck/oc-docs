@@ -8,7 +8,8 @@
 //     and OMIT lastmod when git can't tell us (omit > a fabricated date).
 //   - same-host URLs only. No cross-domain <loc> (docs lives at ochk.io/docs).
 //
-// Routes are auto-enumerated from src/pages so the sitemap can never drift out
+// Routes are auto-enumerated from src/pages (scripts/page-routes.mjs, which
+// llms.txt reads too) so the sitemap can never drift out
 // of sync with the actual page tree. A route is included iff it is a static
 // (non-[param]) page, is not infra/api, is not in EXCLUDE, and its source does
 // not declare noindex — tying the sitemap to each page's own robots truth.
@@ -18,8 +19,10 @@
 // date-only lastmod) → re-running produces byte-identical bytes, no churn.
 
 import { execSync } from 'node:child_process';
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { statSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { listPages } from './page-routes.mjs';
 
 // ── Per-site config (the ONLY part that differs across the family) ──────────
 const SITE_URL = 'https://ochk.io/docs'; // basePath site: the root is /docs, no slash
@@ -28,28 +31,6 @@ const EXCLUDE = []; // docs is fully public; only 404 (excluded by name) is noin
 
 const PAGES_DIR = join(process.cwd(), 'src', 'pages');
 const OUT = join(process.cwd(), 'public', 'sitemap.xml');
-const PAGE_EXT = /\.(tsx|ts|jsx|js|mdx|md)$/;
-const INFRA = /^(_app|_document|_error|404|500|sitemap.*|robots.*)$/;
-
-function fileToRoute(absFile) {
-    let r = relative(PAGES_DIR, absFile).split(sep).join('/');
-    r = r.replace(PAGE_EXT, '');
-    r = r.replace(/\/index$/, '').replace(/^index$/, '');
-    return '/' + r; // '' -> '/', 'create' -> '/create'
-}
-
-function walk(dir, acc = []) {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-        const abs = join(dir, entry.name);
-        if (entry.isDirectory()) {
-            if (entry.name === 'api' || entry.name.startsWith('_')) continue;
-            walk(abs, acc);
-        } else if (PAGE_EXT.test(entry.name)) {
-            acc.push(abs);
-        }
-    }
-    return acc;
-}
 
 // file (repo-relative, forward slashes) -> most recent commit date (YYYY-MM-DD)
 function buildGitDateMap() {
@@ -82,25 +63,10 @@ function buildGitDateMap() {
 
 function main() {
     const gitDates = buildGitDateMap();
-    const seen = new Set();
     const urls = [];
 
-    for (const abs of walk(PAGES_DIR)) {
-        const rel = relative(process.cwd(), abs).split(sep).join('/');
-        const base = rel.split('/').pop().replace(PAGE_EXT, '');
-        if (INFRA.test(base)) continue;
-        if (rel.includes('[')) continue; // dynamic [param] route — not statically enumerable
-        const route = fileToRoute(abs);
+    for (const { route, rel } of listPages()) {
         if (EXCLUDE.some((ex) => route === ex || route.startsWith(ex + '/'))) continue;
-        if (seen.has(route)) continue;
-        let src = '';
-        try {
-            src = readFileSync(abs, 'utf8');
-        } catch {
-            /* unreadable — skip */
-        }
-        if (/noindex/i.test(src)) continue; // honor the page's own noindex declaration
-        seen.add(route);
         urls.push({ route, lastmod: gitDates.get(rel) || null });
     }
 

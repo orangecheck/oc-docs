@@ -30,7 +30,7 @@
             "id": "check:build",
             "kind": "build",
             "run": "yarn build",
-            "script": "node scripts/gen-sitemap.mjs && next build --webpack"
+            "script": "node scripts/gen-sitemap.mjs && node scripts/gen-llms.mjs && next build --webpack"
         },
         {
             "id": "check:verify",
@@ -130,7 +130,7 @@
             "entry": "src/pages/agent/quickstart.mdx",
             "reach": "https://ochk.io/docs/agent/quickstart",
             "area": "agent",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/agent/scopes",
@@ -274,7 +274,7 @@
             "entry": "src/pages/attest/quickstart.mdx",
             "reach": "https://ochk.io/docs/attest/quickstart",
             "area": "attest",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/attest/scoring",
@@ -378,7 +378,7 @@
             "entry": "src/pages/chat/quickstart.mdx",
             "reach": "https://ochk.io/docs/chat/quickstart",
             "area": "chat",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/chat/seal",
@@ -458,7 +458,7 @@
             "entry": "src/pages/cosign/quickstart.mdx",
             "reach": "https://ochk.io/docs/cosign/quickstart",
             "area": "cosign",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/cosign/trust",
@@ -530,7 +530,7 @@
             "entry": "src/pages/getting-started/quickstart.mdx",
             "reach": "https://ochk.io/docs/getting-started/quickstart",
             "area": "getting-started",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/getting-started/which-protocol",
@@ -554,7 +554,7 @@
             "entry": "src/pages/integration/index.mdx",
             "reach": "https://ochk.io/docs/integration",
             "area": "integration",
-            "tests": ["src/__tests__/sign-in-button-sri.test.ts"]
+            "tests": ["src/__tests__/llms.test.ts", "src/__tests__/sign-in-button-sri.test.ts"]
         },
         {
             "id": "page:/integration/native-sign-in",
@@ -578,7 +578,15 @@
             "entry": "src/pages/integration/sign-in-button.mdx",
             "reach": "https://ochk.io/docs/integration/sign-in-button",
             "area": "integration",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
+        },
+        {
+            "id": "page:/llms.txt",
+            "kind": "page",
+            "entry": "scripts/gen-llms.mjs",
+            "reach": "/llms.txt, /llms-full.txt and /<route>.md for every page, written by the build",
+            "area": "site",
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/lock",
@@ -642,7 +650,7 @@
             "entry": "src/pages/lock/quickstart.mdx",
             "reach": "https://ochk.io/docs/lock/quickstart",
             "area": "lock",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/lock/security",
@@ -676,7 +684,8 @@
             "area": "me",
             "tests": [
                 "src/components/docs/DocsFrame.test.tsx",
-                "src/__tests__/backing-copy.test.ts"
+                "src/__tests__/backing-copy.test.ts",
+                "src/__tests__/llms.test.ts"
             ]
         },
         {
@@ -773,7 +782,7 @@
             "entry": "src/pages/me/quickstart.mdx",
             "reach": "https://ochk.io/docs/me/quickstart",
             "area": "me",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/me/require-bond",
@@ -845,7 +854,7 @@
             "entry": "src/pages/pledge/quickstart.mdx",
             "reach": "https://ochk.io/docs/pledge/quickstart",
             "area": "pledge",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/pledge/resolution-grammar",
@@ -933,7 +942,7 @@
             "entry": "src/pages/sdk/index.mdx",
             "reach": "https://ochk.io/docs/sdk",
             "area": "sdk",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/sdk/<package>/<page>",
@@ -1053,7 +1062,7 @@
             "entry": "src/pages/stamp/quickstart.mdx",
             "reach": "https://ochk.io/docs/stamp/quickstart",
             "area": "stamp",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/stamp/security",
@@ -1125,7 +1134,7 @@
             "entry": "src/pages/vault/quickstart.mdx",
             "reach": "https://ochk.io/docs/vault/quickstart",
             "area": "vault",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/vault/security",
@@ -1181,7 +1190,7 @@
             "entry": "src/pages/vote/quickstart.mdx",
             "reach": "https://ochk.io/docs/vote/quickstart",
             "area": "vote",
-            "tests": []
+            "tests": ["src/__tests__/llms.test.ts"]
         },
         {
             "id": "page:/vote/secret-ballot",

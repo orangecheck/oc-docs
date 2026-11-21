@@ -9,7 +9,7 @@
         "dev": "rm -rf .next && next dev",
         "predev": "node scripts/gen-doc-sources.mjs && node scripts/gen-search-index.mjs && node scripts/me-client-sri.mjs",
         "prebuild": "node scripts/gen-doc-sources.mjs && node scripts/gen-search-index.mjs && node scripts/me-client-sri.mjs",
-        "build": "node scripts/gen-sitemap.mjs && next build --webpack",
+        "build": "node scripts/gen-sitemap.mjs && node scripts/gen-llms.mjs && next build --webpack",
         "start": "next start",
         "lint": "node scripts/lint-guards.mjs && eslint . --pass-on-unpruned-suppressions",
         "format": "prettier --write .",

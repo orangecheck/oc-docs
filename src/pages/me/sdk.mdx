@@ -113,14 +113,100 @@ Both take
 [`SignInWithOcOptions`](/sdk/me-client/popup/interfaces/SignInWithOcOptions):
 `{ signal, popupOrigin, popupPath, features }`. `popupOrigin` (default
 `https://me.ochk.io`) and `popupPath` (default `/popup/signin`) point the popup
-somewhere else, such as a stand-in of your own while you test; the answer is
-accepted only from exactly `popupOrigin`, so give it with no trailing slash.
-`features` is the `window.open` feature string.
+somewhere else, such as a stand-in of your own while you test
+([what a stand-in must do](#a-stand-in-sign-in-window)); the answer is accepted
+only from exactly `popupOrigin`, so give it with no trailing slash. `features`
+is the `window.open` feature string.
 
 **Without a bundler.** `dist/popup.mjs` has no imports of its own. Fetch it with
 `npm pack @orangecheck/me-client@<version>`, serve `package/dist/popup.mjs` from
 your own origin, and import it in a `<script type="module">`. Copy it again when
 you upgrade.
+
+### a stand-in sign-in window
+
+While you test, you can point `popupOrigin` and `popupPath` at a window of your
+own instead of orangecheck's. The
+[examples' offline mode](/integration/reference#run-it-with-no-account) runs
+one. This is what the SDK needs from it, as of me-client 0.63.0. orangecheck's
+window does the same, plus the opener check below.
+
+**How it opens.** The SDK opens `popupPath` on `popupOrigin` with one query
+parameter, `opener_origin`: the origin of the page that called it, such as
+`http://localhost:3000`. The window is named `oc-signin`.
+
+**What it posts.** One message to `window.opener`, with `opener_origin` as the
+target origin, never `'*'`:
+
+```ts
+declare const openerOrigin: string; // the opener_origin parameter, once you have checked it
+declare const token: string; // a JWT your stand-in signed, below
+declare const didOc: string; // did:oc: and 32 hex digits
+
+window.opener.postMessage(
+    {
+        type: 'oc-signin-success',
+        account: {
+            id: 'test-1',
+            did_oc: didOc,
+            display_name: null,
+            nostr_npub: null,
+        },
+        token,
+    },
+    openerOrigin
+);
+```
+
+orangecheck's window sends `account` as
+`{ id, did_oc, display_name, nostr_npub }`. For a site outside orangecheck, the
+last two are always `null`. The SDK checks only that `account` and `token` are
+there. `account` is unsigned: trust only the token.
+
+**What the SDK checks.** A message counts only if its origin is exactly
+`popupOrigin` and it comes from the window the SDK opened. Apart from the opener
+check below, it ignores any other `type`. An `oc-signin-success` without
+`account` or `token` ends as `failed`. The SDK closes the window when it is
+done.
+
+**No failure or cancel message.** Neither window sends one. The SDK checks every
+half second whether the window has closed, and then ends as `closed`
+(`signInWithOc` returns `null`). orangecheck's window shows its own errors and
+waits for the person to close it.
+
+**The opener check.** orangecheck's window first posts
+`{ type: 'oc-signin-challenge', nonce }` to the opener. The SDK (0.59.0 or
+later) posts `{ type: 'oc-signin-echo', nonce }` back to the window. That proves
+the page is really at `opener_origin`. A stand-in can skip it.
+
+**The token.** In a local test your server accepts a token your stand-in signs,
+shaped like ochk.io's ([its claims](#verify-without-the-sdk)):
+
+- An EdDSA (Ed25519) JWT. Its header's `kid` names a key in
+  `<issuer>/.well-known/jwks.json`.
+- `iss` is that issuer: https, or http on localhost only.
+- `aud` is `opener_origin`, exactly.
+- `sub`, `did_oc`, `jti`, `rh`, `iat` and `exp` are set. A token without `rh` is
+  refused (`no_session_handle`).
+
+Name your stand-in as the issuer, and the SDK reads its keys from there:
+
+```ts
+// In a local test only: your stand-in is the issuer.
+import { checkOcToken } from '@orangecheck/me-client/server';
+
+declare const token: string; // what your page posted
+
+const checked = await checkOcToken(token, {
+    audience: 'http://localhost:3000',
+    issuer: 'http://localhost:3000/stand-in',
+});
+```
+
+`withOcAuth` and the other wrappers take the same `issuer`. Give them
+`revocation: false` too: the list of ended sessions is on me.ochk.io, which has
+never seen these tokens. Leave out `projectKey`, which reads your project's rule
+from me.ochk.io. Use these options only in tests.
 
 ### a Bitcoin wallet in the popup
 

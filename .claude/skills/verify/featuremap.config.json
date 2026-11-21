@@ -17,6 +17,13 @@
             "area": "search"
         },
         {
+            "kind": "page",
+            "label": "/llms.txt",
+            "entry": "scripts/gen-llms.mjs",
+            "reach": "/llms.txt, /llms-full.txt and /<route>.md for every page, written by the build",
+            "area": "site"
+        },
+        {
             "kind": "redirect",
             "label": "old-host",
             "entry": "next.config.ts",

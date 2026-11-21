@@ -1,8 +1,9 @@
 # Site
 
-The old host's 308s, moved pages, SDK aliases, the share card and the error pages.
+The old host's 308s, moved pages, SDK aliases, the share card, the error pages and
+the docs for language models.
 
-<!-- covers: redirect:*, page:/sdks*, api:ANY /api/og, page:/404, page:/500 -->
+<!-- covers: redirect:*, page:/sdks*, api:ANY /api/og, page:/404, page:/500, page:/llms.txt -->
 
 ## Sub-features
 
@@ -17,17 +18,28 @@ The old host's 308s, moved pages, SDK aliases, the share card and the error page
   group goes to `/sdk/*` and `/reference/error-codes`.
 - og: `GET /docs/api/og?page=<path>`, the share card PNG with that docs page's own title (from the nav, section above it). A path the docs do not have, and any `?title=`, gets the default card, so a card never carries a caller's text (`src/lib/seo/og-card.ts`; every page's `og:image` names its path).
 - 404 and 500: the error pages.
+- llms: `scripts/gen-llms.mjs`, run by `build`, writes `public/llms.txt` (each page's
+  own metadata title and description, linked to its copy, in sections by folder; the
+  SDK reference's package entry points under `## Optional`), a markdown copy of every
+  page at `public/<route>.md` (the root is `index.md`), and `public/llms-full.txt`
+  (every written page, the SDK reference left out). Routes come from
+  `scripts/page-routes.mjs`, as the sitemap's do. A page that uses a new component
+  fails `src/__tests__/llms.test.ts` until `COMPONENTS` writes it out. ochk.io's own
+  `/llms.txt` belongs to oc-www.
 
 ## How to reach it
 
 - Any URL on `https://docs.ochk.io`.
 - Any retired path under `https://ochk.io/docs`.
 - `https://ochk.io/docs/api/og?page=%2Flock%2Fspec`
+- `https://ochk.io/docs/llms.txt`, `https://ochk.io/docs/llms-full.txt`,
+  `https://ochk.io/docs/me/quickstart.md`
 
 ## How to check it
 
 Static: `src/__tests__/moved-pages.test.ts` (writes each moved page out and checks its
-target), `yarn check:internal-links`.
+target), `yarn check:internal-links`, `src/__tests__/llms.test.ts` (the index, the copies
+and the full file, from the real pages).
 
 Runtime:
 
@@ -43,6 +55,10 @@ curl -s -o /dev/null -w '%{http_code} %{content_type}\n' "$B/api/og?page=%2Flock
 curl -s "$B/api/og" | sha256sum; curl -s "$B/api/og?title=Probe" | sha256sum   # the same hash: caller text is ignored
 curl -s -o /dev/null -w '%{http_code}\n' "$B/nope"                                # 404
 curl -s -o /dev/null -w '%{http_code}\n' "$B/500"                                 # 500
+for p in /llms.txt /llms-full.txt /me/quickstart.md /index.md; do
+  printf '%-20s ' "$p"; curl -s -o /dev/null -w '%{http_code} %{content_type}\n' "$B$p"
+done   # 200 text/plain or text/markdown, charset=utf-8; never text/html
+curl -s "$B/llms.txt" | grep -F '](https://ochk.io/docs/me/quickstart.md): '
 # On a local build the old-host rules answer to the Host header:
 curl -s -H 'Host: docs.ochk.io' -o /dev/null -w '%{http_code} %{redirect_url}\n' "http://localhost:$PORT/lock/spec"
 # 308 https://ochk.io/docs/lock/spec

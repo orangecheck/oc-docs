@@ -371,12 +371,17 @@ Without the SDK, the header is
 | 401    | `signature_required`                                     | A live project, or one requiring signed events, got an unsigned request                                            |
 | 401    | `project_auth_required`                                  | Unsigned, and not from the project owner's own session                                                             |
 | 401    | `earner_requires_signature`                              | `user_address` on an unsigned request                                                                              |
+| 401    | `user_not_authenticated`                                 | Nobody earns: no `user_address` on a signed request, and no session                                                |
+| 401    | `session_ended`, `account_deleted`                       | The session that names who earns was ended, or its account deleted                                                 |
 | 402    | `escrow_depleted`                                        | Your balance cannot cover the event; sign-in is unaffected                                                         |
 | 403    | `domain_unverified`                                      | A live project whose domain is not verified                                                                        |
 | 403    | `earner_not_project_owner`                               | A test project's event names someone other than its owner                                                          |
 | 403    | `earner_not_member`                                      | A live project's event earns for someone who never signed in to it or granted it anything                          |
 | 503    | `membership_unavailable`                                 | Whether the person may be named could not be read; no event was recorded, send it again                            |
 | 403    | `project_frozen`                                         | Frozen by the platform                                                                                             |
+| 403    | `connect_consent_required`                               | `user_address` names a Connect account made without the person agreeing to earn                                    |
+| 409    | `earner_deleted`                                         | `user_address` names a deleted account                                                                             |
+| 503    | `connect_state_unavailable`                              | Whether that Connect account agreed to earn could not be read; nothing was recorded, send it again                 |
 | 404    | `project_not_found`                                      | No project has this key. Only a signed-in caller is told; anyone else gets `401 project_auth_required`             |
 | 409    | `idempotency_key_in_flight`                              | The same `Idempotency-Key` is still being processed; retry after `Retry-After`                                     |
 | 503    | `event_outcome_unknown`                                  | May or may not be recorded: retry with the same `Idempotency-Key` after `Retry-After` (below)                      |
@@ -401,6 +406,70 @@ records it once.
 
 The per-person cap on class A events counts only events billed against live
 escrow. A preview event spends nobody's allowance.
+
+### When an event is refused
+
+`oc.event.fire`, `oc.event.fireBatch` and `oc.payment.authorize` resolve only
+with a `2xx` answer, the ones above. Any other answer throws a `MeClientError`
+(me-client 0.63.0):
+
+| Field               | Holds                                                                                                                                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `status`            | The HTTP status.                                                                                                                                                 |
+| `errorCode`         | The answer's `error`, such as `project_auth_required`. It is stable: match on it. `undefined` when the answer carries no `error`, as a bare `500` or `504` does. |
+| `message`           | The answer's `reason`, else its `detail`, else its `error`; `me.ochk.io <status>` when it carries none. Words for people, which can change.                      |
+| `retryAfterSeconds` | Only on a `429`: its `Retry-After`, or the body's `retry_after_seconds`. Other statuses leave it unset, even with a `Retry-After`.                               |
+| `isRateLimited`     | `status === 429`.                                                                                                                                                |
+
+The error carries nothing else from the answer: not a cap's `limit`, not
+`escrow_depleted`'s `available_sats`. Two things throw without a `status`. A
+mistake the SDK catches before it sends throws a plain `Error`, such as no
+`project_key` or `subtype`, `accountId` without `signingSecret`, or more than
+100 events in a batch. A request that got no answer throws `fetch`'s
+`TypeError`.
+
+`fireBatch` throws only when the whole batch is refused, for example
+`401 user_not_authenticated` or a `429`. An event refused inside a batch comes
+back in the `200`, as a `rejected` result with its `code`.
+
+**Retrying.** A retry with the same `Idempotency-Key` never bills twice. That is
+`idempotencyKey` in `fire`, and `idempotency_key` on each event in a batch. A
+key that recorded an event answers with that event, and a refusal that recorded
+nothing gives its key back. So the only question is whether a retry can succeed:
+
+| Answer                                                                                                                   | Do                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| No answer (`fetch`'s `TypeError`), or a `5xx` with no `errorCode`                                                        | Retry with the same key. It may have been recorded.                                                                                   |
+| `409 idempotency_key_in_flight`                                                                                          | Retry with the same key after a second.                                                                                               |
+| `503 event_outcome_unknown`                                                                                              | Retry with the same key after a minute. It answers once the outcome is known.                                                         |
+| `503 membership_unavailable`, `connect_state_unavailable`, `store_scan_incomplete` or `session_unverified`               | Retry with the same key after up to a minute.                                                                                         |
+| `429 rate_limit_exceeded` or `project_rate_limit_exceeded`                                                               | Retry with the same key after `retryAfterSeconds`. `withRateLimitRetry(() => oc.event.fire(…))` does this for waits up to 30 seconds. |
+| In a batch: `write_failed`, `outcome_unknown` or `idempotency_key_in_flight`                                             | Send that event again with the same `idempotency_key`.                                                                                |
+| Any other `4xx`, `402 escrow_depleted`, and the caps: `site_cap_exceeded`, `identity_cap_reached`, the test-project caps | Don't retry it as it is. It fails again until you change the request, top up, or the cap's window passes. Nothing was recorded.       |
+
+Never retry an event whose outcome you don't know with a new key, or with none:
+the SDK signs each call afresh, so if the first was recorded, the second records
+and bills again. `withRateLimitRetry` retries every `429`: a cap's carries no
+`Retry-After`, so it is sent twice more within a second and refused each time,
+recording nothing. `oc.payment.authorize` takes no key, so each call that
+succeeds records one more intent.
+
+```ts
+import { MeClientError } from '@orangecheck/me-client';
+
+const SEND_AGAIN = new Set([
+    'idempotency_key_in_flight',
+    'rate_limit_exceeded',
+    'project_rate_limit_exceeded',
+]);
+
+/** Whether to send the same event again, with the same Idempotency-Key. */
+export function sendAgain(err: unknown): boolean {
+    // fetch's TypeError: no answer came, so the event may have been recorded.
+    if (!(err instanceof MeClientError)) return err instanceof TypeError;
+    return err.status >= 500 || SEND_AGAIN.has(err.errorCode ?? '');
+}
+```
 
 ## Integrator · trust statements
 

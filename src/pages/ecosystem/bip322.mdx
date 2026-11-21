@@ -29,14 +29,29 @@ it. Since it does exist and has real wallet support, we use it.
 
 ## What the wallet signs
 
-The wallet signs the **byte-exact canonical message** (see
-[canonical message](/ecosystem/canonical-message)). The wallet does not sign a
-hash of the message, does not strip whitespace, does not trim trailing newlines
-— it signs the raw bytes you pass it.
+A wallet signs the text you paste or pass it, not a hash of it (see
+[canonical message](/ecosystem/canonical-message)). The verifier checks the
+signature over the canonical bytes it rebuilds from the message.
 
-This is critical: any canonicalization or trimming the wallet does would cause
-the signature to validate against different bytes than the verifier uses when
-recomputing the attestation ID, and the whole chain breaks.
+Some wallets trim the text before they sign it: Sparrow on every sign path
+(including a hardware wallet connected to it), Electrum's GUI, Nunchuk on
+Android and Bitcoin Keeper. For a message that ends in one LF, as the sign-in
+challenge does, the trim removes that LF and nothing else.
+
+- **Sign-in.** From `@orangecheck/sdk` 1.27.0, `verifyChallenge` also accepts a
+  signature over the challenge without its final LF, and over no other edit of
+  it: an extra LF, CRLF line ends or a leading space still fail. ochk.io's
+  sign-in, account linking and identity confirmation run it, and the paste box
+  in `@orangecheck/wallet-adapter` 0.8.1 takes such a signature for a challenge.
+- **Attestations, bonds and OC Lock device statements** also end in one LF, and
+  their verifiers still check the exact bytes. A wallet that trims cannot sign
+  them yet; from wallet-adapter 0.8.1 the paste box says the wallet removed the
+  last line break, rather than that the signature is from another address.
+- **Stamps, ballots, delegations and pledges** sign a 64-character hex id, which
+  has nothing to trim, so a wallet that trims signs it as given.
+
+Accepting a signature over the text without its final LF changes no id: an id is
+always the hash of the canonical bytes, final LF included.
 
 ## What the verifier accepts
 
@@ -58,10 +73,13 @@ signing and verifying rather than by reading its code:
   address with the P2PKH flags passes the same as one that uses BIP-137's SegWit
   flags. That is how Electrum signs; no Electrum version has been run against
   it.
-- **The `smp` prefix.** The finalized BIP-322 prefixes a simple signature with
-  `smp`. A verifier needs `@orangecheck/bip322` 1.1.0 or later to accept it;
+- **The `smp` prefix.** BIP-322 is final (version 2.1.0, status Complete), and a
+  signer MUST prefix a simple signature with `smp`; Sparrow moved to the
+  Complete specification in 2.5.1. A verifier needs `@orangecheck/bip322` 1.1.0
+  or later to accept the prefix, and accepts a signature with or without it;
   older verifiers, and `bip322-js`, refuse it. `signMessage` leaves the prefix
-  off unless asked.
+  off unless asked (`prefixed: true`), so its signatures still verify on those
+  older verifiers.
 - **Full and proof-of-funds signatures** (`ful`, `pof`) are refused unread, so a
   wallet that produces only those cannot sign on the family's sites.
 - **Uppercase addresses.** Verification reads bech32 only in lowercase, so one
@@ -72,16 +90,34 @@ signing and verifying rather than by reading its code:
 
 ## Wallet support matrix
 
-| Wallet                                        | Type              | BIP-322 support                                                         |
-| --------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
-| [UniSat](https://unisat.io)                   | browser extension | Yes, all address types                                                  |
-| [Xverse](https://xverse.app)                  | browser + mobile  | Yes, all address types                                                  |
-| [Leather](https://leather.io)                 | browser           | Yes, all address types                                                  |
-| [Alby](https://getalby.com)                   | browser           | No. WebLN signs with a Lightning node key, not a Bitcoin address        |
-| [Sparrow](https://sparrowwallet.com)          | desktop           | Yes, via "Sign message" (right-click an address)                        |
-| [Bitcoin Core](https://bitcoincore.org)       | desktop + CLI     | Partial. BIP-322 for P2WPKH / P2TR via `signmessage`, version-dependent |
-| [Electrum](https://electrum.org)              | desktop           | Yes, through its legacy `signmessage` signature (see above)             |
-| Hardware wallets (Coldcard / Trezor / Ledger) | HW                | Partial, via a PSBT flow. Not one-click signing                         |
+Read from each wallet's current source on 2026-11-21, following the text from
+the field you paste it into to the signing call; not run against each wallet.
+Which address types each signature works for is in the table above. A verifier
+needs `@orangecheck/sdk` 1.27.0 or later for the wallets marked "1.27.0". A
+sign-in challenge is 275 to 326 characters, by address type and site, over eight
+lines.
+
+| Wallet                                  | Type             | Changes the text before signing                                                                                                                                          | Signs in on ochk.io                                                                                  |
+| --------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| [UniSat](https://unisat.io)             | browser          | No                                                                                                                                                                       | Yes                                                                                                  |
+| [Xverse](https://xverse.app)            | browser + mobile | No, by its public source, which trails the store build                                                                                                                   | Yes                                                                                                  |
+| [Leather](https://leather.io)           | browser          | No                                                                                                                                                                       | Yes, from a `bc1q…` or `bc1p…` address, the only ones it signs for                                   |
+| Magic Eden                              | browser          | Not read                                                                                                                                                                 | Not offered as a button yet: the sign-in window does not detect it                                   |
+| [Alby](https://getalby.com)             | browser          | —                                                                                                                                                                        | No. WebLN signs with a Lightning node key, not a Bitcoin address                                     |
+| [Sparrow](https://sparrowwallet.com)    | desktop          | **Yes**, trims both ends on every path, a connected hardware wallet included                                                                                             | Yes, 1.27.0                                                                                          |
+| [Electrum](https://electrum.org)        | desktop          | GUI: **yes**, trims both ends. The `signmessage` command and console: no                                                                                                 | Yes; the GUI from 1.27.0                                                                             |
+| [Bitcoin Core](https://bitcoincore.org) | desktop + CLI    | No                                                                                                                                                                       | From a `1…` address only: Core signs messages for P2PKH alone                                        |
+| Nunchuk                                 | desktop + mobile | Android: **yes**, trims both ends. Desktop: no, but it refuses a paste over 280 characters                                                                               | Android: yes, 1.27.0. Desktop: not run; only a `1…` address's challenge is short enough              |
+| Bitcoin Keeper                          | mobile           | **Yes**, trims both ends                                                                                                                                                 | Yes, 1.27.0                                                                                          |
+| BlueWallet                              | mobile           | No                                                                                                                                                                       | Yes                                                                                                  |
+| Coldcard                                | hardware         | No. Its message signing takes 2 to 240 ASCII characters with no line break over USB; Q from 1.4.1 also signs a BIP-322 PSBT of up to 330 characters, line breaks allowed | Not by message signing: a challenge is too long. Through Sparrow's BIP-322 PSBT: not run, and 1.27.0 |
+| Trezor                                  | hardware         | No (up to 1,024 bytes)                                                                                                                                                   | Not run. It refuses to sign a message for a `bc1p…` address                                          |
+| BitBox02                                | hardware         | Firmware: no (up to 1,024 bytes). Its app: not read                                                                                                                      | Not run. It refuses to sign a message for a `bc1p…` address                                          |
+| Ledger                                  | hardware         | No                                                                                                                                                                       | Not run. Its BIP-322 PSBT signing is only in app 2.6.0, which had no tagged release on 2026-11-21    |
+| Jade, Passport, Keystone                | hardware         | No                                                                                                                                                                       | Not run                                                                                              |
+
+Magic Eden's provider (`window.magicEden.bitcoin`) signs BIP-322 by default; the
+sign-in window does not ask it yet.
 
 If your wallet isn't on the list, the canonical test is: does signing a message
 produce an output that

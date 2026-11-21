@@ -444,8 +444,8 @@ Each line is a way an integration has gone wrong, with why it matters.
     - [ ] the token is ended right after the exchange. _You don't keep it, so
           sign-out can't end it later._
     - [ ] each later check of that session asks the list with its `rh`, `aud`
-          and `iat` only, never the `jti`. _Ending the token put its `jti` on
-          your list, so a check that names it ends your own session._
+          and `iat` only, never the `jti` or `sub`. _Ending the token put its
+          `jti` on your list, so a check that names it ends your own session._
 
 **Ending sessions**
 ([when someone ends every session](/me/sdk#when-someone-ends-every-session))

@@ -862,13 +862,18 @@ What an ended token reaches, and when:
   both.
 - Tokens ended before 2026-10-24 are not on your list. They expire within 30
   days of sign-in.
-- One account's ended tokens at your origin fold after 16: the list then holds a
-  single cutoff for that account there, which ends every token of that account
-  at your origin issued up to its newest ended one, including a session still
-  live on another device. Other people's sessions are untouched. The list is
-  capped at 20,000 entries per origin; past that me.ochk.io answers 503
-  `revocations_unavailable` rather than send part of it, and your writes wait as
-  for any outage.
+- Past 16, one account's ended tokens at your origin fold: the list keeps its
+  newest 16 by key and holds one cutoff for the older ones, under that account
+  in `accounts`. The cutoff ends a token of that account issued before it,
+  wherever you check the token itself: at the exchange, or where the token is
+  your session (`withOcAuth`, `checkOcSession`, `verify_session`), so a token
+  kept as the session on another device and issued before it ends too. It never
+  ends a session you started from a token and check by its `rh`, `aud` and
+  `iat`. Other people's sessions are untouched. The list is capped at 20,000
+  entries per origin; past that me.ochk.io answers 503 `revocations_unavailable`
+  rather than send part of it, and your writes wait as for any outage.
+  `orangecheck` reads `accounts` from 3.20.0; auth-core and me-client already
+  do.
 
 [`revokeToken`](/sdk/me-client/server/functions/revokeToken) (me-client 0.41.0
 or later) and `revoke_token` (`orangecheck` 3.2.0 or later) make that call. A
@@ -1133,8 +1138,10 @@ the same for the `Session` that `verify_session` returned and answers a
   the list holds to its `rh` and `iat`. Spending the `jti` once still stops a
   replay at your server while the list is a minute behind.
 - Ask the list about the session on each request with its `rh`, `aud` and `iat`
-  only, never the `jti`: you ended that token yourself after the exchange, so
-  asking with its `jti` would end every session you start. In Node, keep one
+  only, never the `jti` or the `sub`: you ended that token yourself after the
+  exchange, so asking with its `jti` would end every session you start, and with
+  its `sub` an account that signs in here often would have its older sessions
+  ended once its ended tokens fold (above). In Node, keep one
   `integratorRevocationCheck()` from `@orangecheck/auth-core` 2.12.0 or later
   per process and `await check.status({ rh, aud, iat })`; in Python,
   `REVOCATIONS.status(rh, aud, iat)`. `"revoked"` means end your session;
@@ -1181,20 +1188,24 @@ X-OC-Signature: t=<unix>,v1=hmac_sha256(signing_secret, "<t>.GET /api/integrator
 
 `aud` is the token's `aud` exactly as it is, and must be your verified domain, a
 subdomain of it, or your test project's development origin. The answer is
-`{ "v": 1, "at": …, "tokens": ["<key>"], "accounts": {}, "handles": { "<rh>": <cutoff> } }`:
+`{ "v": 1, "at": …, "tokens": ["<key>"], "accounts": { "<key>": <cutoff> }, "handles": { "<rh>": <cutoff> } }`:
 
-| Field      | Holds                                                                                                                                                                       |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `at`       | Unix seconds: when ochk.io read its store of ended sessions for this copy. A list built in milliseconds reads as stale.                                                     |
-| `tokens`   | The key of each token ended on its own for this origin, until it expires: base64url of the first 16 bytes of sha256(`"ocrev1:jti:" + jti`).                                 |
-| `accounts` | Always empty here: an account ended everywhere, or one whose tokens at your origin folded, is in `handles` under its handle for your origin.                                |
-| `handles`  | Each ended `rh` and its cutoff, in Unix seconds: the first whole second after the person ended their sessions. A sign-in after it has a later `iat` and is not ended by it. |
+| Field      | Holds                                                                                                                                                                                                                                        |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `at`       | Unix seconds: when ochk.io read its store of ended sessions for this copy. A list built in milliseconds reads as stale.                                                                                                                      |
+| `tokens`   | The key of each token ended on its own for this origin, until it expires: base64url of the first 16 bytes of sha256(`"ocrev1:jti:" + jti`).                                                                                                  |
+| `accounts` | One cutoff for each account whose ended tokens at your origin outgrew its 16, under the key of the `sub` they carry: base64url of the first 16 bytes of sha256(`"ocrev1:sub:" + sub`). It ends tokens, never a session you started from one. |
+| `handles`  | Each ended `rh` and its cutoff, in Unix seconds: the first whole second after the person ended their sessions. A sign-in after it has a later `iat` and is not ended by it.                                                                  |
 
 A session is ended when `tokens` holds the key of its `jti`, or when `handles`
-holds its `rh` and its `iat` is before that cutoff, or it has no `iat`. Fetch it
-at most once a minute per origin, and don't trust a list whose `at` is more than
-ten minutes old, or more than a minute in the future. me.ochk.io answers
-`503 revocations_unavailable` rather than serve a copy older than ten minutes.
+holds its `rh` and its `iat` is before that cutoff, or it has no `iat`. A token
+you check itself (at the exchange, or kept as your session) is also ended when
+`accounts` holds the key of its `sub` and its `iat` is before that cutoff, or it
+has no `iat`. Never apply `accounts` to a session you started from a token.
+Fetch it at most once a minute per origin, and don't trust a list whose `at` is
+more than ten minutes old, or more than a minute in the future. me.ochk.io
+answers `503 revocations_unavailable` rather than serve a copy older than ten
+minutes.
 
 Every refusal is `{ "ok": false, "error": "<code>" }`:
 
@@ -1212,10 +1223,12 @@ go on and refuse writes, as the SDKs do.
 **Who you trust, and what it tells you.** The list comes from ochk.io, the auth
 host, and me.ochk.io serves it; both are orangecheck. A handle is an HMAC under
 a key only those two hold, bound to one origin: it names nobody, and another
-site's handles for the same person never match yours. The list does show you how
-many accounts ended their sessions recently, and when, as handles you can't tie
-to anyone who hasn't signed in to your site. A plain sign-out on ochk.io still
-does not end your session, by design, as with any sign-in provider.
+site's handles for the same person never match yours. A key in `accounts` is a
+hash of the `sub` the account's tokens carry, which you saw when it signed in
+here. The list does show you how many accounts ended their sessions recently,
+and when, as handles you can't tie to anyone who hasn't signed in to your site.
+A plain sign-out on ochk.io still does not end your session, by design, as with
+any sign-in provider.
 
 ### Python: warming
 

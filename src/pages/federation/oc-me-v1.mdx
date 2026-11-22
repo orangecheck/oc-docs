@@ -107,8 +107,7 @@ What an operator's key signs today, and what it does not:
   ([kit README, "What is not built yet"](https://github.com/orangecheck/oc-guardian-kit#what-is-not-built-yet)).
 - **Uploads.** The kit signs everything above. Its application goes by email to
   apply@ochk.io; the rest reaches the server through an upload on ochk.app,
-  signed in, except a charter signature: ochk.app has no upload for one yet, so
-  only a key held in the portal can ratify a charter today.
+  signed in.
 
 ## 5. Lightning gateway disclosure
 
@@ -235,11 +234,13 @@ criterion ("charter ratified by every operator") in `trust_posture.criteria` as
 unmet: "0 of 4 seats have a seated guardian, so not every guardian is there to
 sign".
 
-The kit does not run this check for you. `oc-guardian charter fetch oc-me-v1`
-prints the version, hash and URL the API publishes, and how many signatures are
-recorded, superseded ones included. `oc-guardian charter sign` signs an envelope
-that names the hash the API publishes, with the operator, version, time, a nonce
-and an expiry, without recomputing the hash from the bytes (see
+The kit does not run these checks on recorded signatures.
+`oc-guardian charter fetch oc-me-v1` prints the version, hash and URL the API
+publishes, and how many signatures are recorded, superseded ones included.
+`oc-guardian charter sign` runs step 3 on the charter it signs: it hashes the
+`meta.canonical_text` the API serves and signs only when that is the
+`charter_hash` the API names. Its envelope names that hash, with the operator,
+version, time, a nonce and an expiry (see
 [`oc-guardian-kit/BYPASS.md`](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md)
 §06).
 

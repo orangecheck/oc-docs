@@ -132,16 +132,119 @@ export default async function session(
 }
 ```
 
-On Express or Hono it is the same three moves: check with `checkOcToken`, set
-the cookie, answer `ok`. A 503 means ochk.io's keys could not be read, not a bad
-token, so the page can try again. A 401 with `reason: 'audience'` (me-client
-0.63.0 or later) means the token is genuine but was made for another site: set
-`audience` to your site's origin exactly, `https://` and any port included.
-`checkOcToken` checks the token, not who can sign in (step 4): the wrapper in
-step 3 applies that on every request that reads the cookie. If your own session
-replaces the token, run the exchange inside the wrapper instead
+The Next.js App Router, Express and Hono make the same three moves: check with
+`checkOcToken`, set the cookie, answer `ok`.
+
+```ts
+// Next.js App Router · app/api/auth/session/route.ts
+import { checkOcToken } from '@orangecheck/me-client/server';
+import { NextResponse } from 'next/server';
+
+export async function POST(req: Request) {
+    const body: { token?: unknown } = await req.json().catch(() => ({}));
+    const token = String(body.token ?? '');
+    const checked = await checkOcToken(token, {
+        audience: 'https://yourapp.example',
+    });
+    if (checked.status === 'unavailable') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 503 }
+        );
+    }
+    if (checked.status !== 'valid') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 401 }
+        );
+    }
+    const maxAge = (checked.session.exp ?? 0) - Math.floor(Date.now() / 1000);
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set('oc_session', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge,
+    });
+    return res;
+}
+```
+
+```ts
+// Express
+import { checkOcToken } from '@orangecheck/me-client/server';
+import express from 'express';
+
+const app = express();
+app.use(express.json());
+
+app.post('/api/auth/session', async (req, res) => {
+    const token = String(req.body?.token ?? '');
+    const checked = await checkOcToken(token, {
+        audience: 'https://yourapp.example',
+    });
+    if (checked.status === 'unavailable') {
+        return res.status(503).json({ ok: false, reason: checked.reason });
+    }
+    if (checked.status !== 'valid') {
+        return res.status(401).json({ ok: false, reason: checked.reason });
+    }
+    const maxAge = (checked.session.exp ?? 0) - Math.floor(Date.now() / 1000);
+    res.cookie('oc_session', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: maxAge * 1000, // Express counts milliseconds
+    });
+    res.json({ ok: true });
+});
+```
+
+```ts
+// Hono, Bun, Deno
+import { checkOcToken } from '@orangecheck/me-client/server';
+import { Hono } from 'hono';
+import { setCookie } from 'hono/cookie';
+
+const app = new Hono();
+
+app.post('/api/auth/session', async (c) => {
+    const body: { token?: unknown } = await c.req.json().catch(() => ({}));
+    const token = String(body.token ?? '');
+    const checked = await checkOcToken(token, {
+        audience: 'https://yourapp.example',
+    });
+    if (checked.status === 'unavailable') {
+        return c.json({ ok: false, reason: checked.reason }, 503);
+    }
+    if (checked.status !== 'valid') {
+        return c.json({ ok: false, reason: checked.reason }, 401);
+    }
+    const maxAge = (checked.session.exp ?? 0) - Math.floor(Date.now() / 1000);
+    setCookie(c, 'oc_session', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'Lax',
+        path: '/',
+        maxAge,
+    });
+    return c.json({ ok: true });
+});
+```
+
+A 503 means ochk.io's keys could not be read, not a bad token, so the page can
+try again. A 401 with `reason: 'audience'` (me-client 0.63.0 or later) means the
+token is genuine but was made for another site: set `audience` to your site's
+origin exactly, `https://` and any port included. `checkOcToken` checks the
+token, not who can sign in (step 4): step 3 applies that on every request that
+reads the cookie. If your own session replaces the token, run the exchange
+inside the wrapper instead
 ([if your own session replaces the token](/me/sdk#if-your-own-session-replaces-the-token)).
-A backend in Python or another language checks the token itself: see
+A Python backend uses the `orangecheck` package:
+[a sign-in route in FastAPI](/sdk/python#sign-in-fastapi). A backend in another
+language checks the token itself: see
 [verify without the SDK](/me/sdk#verify-without-the-sdk).
 
 The token lasts as long as the person's ochk.io session, 30 days at most, and is
@@ -184,6 +287,49 @@ export default withOcAuth(
         projectKey: process.env.OC_PROJECT_KEY!,
     }
 );
+```
+
+The Next.js App Router has no wrapper. There,
+[`checkOcSession`](/sdk/me-client/server/functions/checkOcSession) reads the
+cookie, [`checkSignInRule`](/sdk/me-client/server/functions/checkSignInRule)
+applies who can sign in, and the route sets the cache headers the wrappers set:
+
+```ts
+// Next.js App Router · app/api/auth/me/route.ts
+import { checkOcSession, checkSignInRule } from '@orangecheck/me-client/server';
+import { NextResponse } from 'next/server';
+
+const headers = {
+    'Cache-Control': 'no-store, private',
+    Vary: 'Cookie, Authorization',
+};
+
+export async function GET(req: Request) {
+    const checked = await checkOcSession(req.headers, {
+        audience: 'https://yourapp.example',
+        method: req.method,
+    });
+    if (checked.status === 'unavailable') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 503, headers }
+        );
+    }
+    if (checked.status !== 'signed_in') {
+        return NextResponse.json({ ok: false }, { status: 401, headers });
+    }
+    const rule = await checkSignInRule(checked.session, {
+        projectKey: process.env.OC_PROJECT_KEY!,
+    });
+    if (!rule.ok) {
+        return NextResponse.json(rule.body, { status: rule.status, headers });
+    }
+    const { sub, did_oc } = checked.session;
+    return NextResponse.json(
+        { ok: true, account: { id: sub, did_oc } },
+        { headers }
+    );
+}
 ```
 
 Express:
@@ -272,6 +418,10 @@ Each line is a way an integration has gone wrong, with why it matters.
       _Any script on the page could read it._
 - [ ] Your server verifies it with your exact origin as `audience`. _A token
       made for another site must not sign anyone in here._
+- [ ] If your site answers at both `www` and the apex, those are two audiences:
+      `audience` lists both origins, or one host redirects to the other before
+      anyone signs in. _A token made at `www` is refused at the apex, and the
+      other way round._
 - [ ] If your site has its own sessions (yours, or a provider's such as Supabase
       or Auth0), the token is spent once and never stored: your session takes
       over. Otherwise keep it in an httpOnly cookie, as in step 2. _A stored

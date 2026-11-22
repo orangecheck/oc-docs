@@ -311,6 +311,82 @@ export default async function session(
 }
 ```
 
+The same route in the Next.js App Router:
+
+```ts
+// Next.js App Router · app/api/auth/session/route.ts
+import { checkOcToken } from '@orangecheck/me-client/server';
+import { NextResponse } from 'next/server';
+
+export async function POST(req: Request) {
+    const body: { token?: unknown } = await req.json().catch(() => ({}));
+    const token = String(body.token ?? '');
+    const checked = await checkOcToken(token, {
+        audience: 'https://yourapp.example',
+    });
+    if (checked.status === 'unavailable') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 503 }
+        );
+    }
+    if (checked.status !== 'valid') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 401 }
+        );
+    }
+    const maxAge = (checked.session.exp ?? 0) - Math.floor(Date.now() / 1000);
+    const res = NextResponse.json({ ok: true });
+    res.cookies.set('oc_session', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge,
+    });
+    return res;
+}
+```
+
+Express and Hono versions are in the
+[quickstart](/me/quickstart#2--add-the-sign-in-popup).
+
+**Python** ([`orangecheck`](/sdk/python) 3.0.0 or later), in FastAPI:
+
+```python
+# FastAPI · the route your page posts the token to
+import time
+
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from orangecheck import InvalidSession, verify_session
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class SignIn(BaseModel):
+    token: str = ""
+
+
+@app.post("/api/auth/session")
+def session(body: SignIn):  # def, not async def: verify_session may fetch ochk.io's keys
+    try:
+        s = verify_session(body.token, "https://yourapp.example")
+    except InvalidSession as err:
+        # ochk.io's keys can't be read right now: the page can try again.
+        status = 503 if err.reason == "key_set_unavailable" else 401
+        return JSONResponse({"ok": False, "reason": err.reason}, status_code=status)
+    res = JSONResponse({"ok": True})
+    res.set_cookie("oc_session", body.token, max_age=s.exp - int(time.time()),
+                   httponly=True, secure=True, samesite="lax", path="/")
+    return res
+```
+
+The route that reads the cookie on later requests, with `check_oc_session`, is
+in [a sign-in route in FastAPI](/sdk/python#sign-in-fastapi).
+
 ## checking the session on your server
 
 `withOcAuth` for Next.js Pages Router:
@@ -335,6 +411,48 @@ export default withOcAuth(
         projectKey: process.env.OC_PROJECT_KEY!,
     }
 );
+```
+
+The Next.js App Router has no wrapper: `checkOcSession` reads the cookie,
+[`checkSignInRule`](/sdk/me-client/server/functions/checkSignInRule) applies who
+can sign in, and the route sets the cache headers the wrappers set.
+
+```ts
+// Next.js App Router · app/api/auth/me/route.ts
+import { checkOcSession, checkSignInRule } from '@orangecheck/me-client/server';
+import { NextResponse } from 'next/server';
+
+const headers = {
+    'Cache-Control': 'no-store, private',
+    Vary: 'Cookie, Authorization',
+};
+
+export async function GET(req: Request) {
+    const checked = await checkOcSession(req.headers, {
+        audience: 'https://yourapp.example',
+        method: req.method,
+    });
+    if (checked.status === 'unavailable') {
+        return NextResponse.json(
+            { ok: false, reason: checked.reason },
+            { status: 503, headers }
+        );
+    }
+    if (checked.status !== 'signed_in') {
+        return NextResponse.json({ ok: false }, { status: 401, headers });
+    }
+    const rule = await checkSignInRule(checked.session, {
+        projectKey: process.env.OC_PROJECT_KEY!,
+    });
+    if (!rule.ok) {
+        return NextResponse.json(rule.body, { status: rule.status, headers });
+    }
+    const { sub, did_oc } = checked.session;
+    return NextResponse.json(
+        { ok: true, account: { id: sub, did_oc } },
+        { headers }
+    );
+}
 ```
 
 `ocAuthExpress` for Express:

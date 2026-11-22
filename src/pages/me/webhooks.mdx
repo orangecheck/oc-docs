@@ -19,6 +19,23 @@ is historical; it is the production key). It is **not** the sign-in key set at
 checked against it always fails with an unknown `kid`. Both SDKs fetch the right
 one and cache it for an hour.
 
+One key signs every project's deliveries, so the signature alone does not say
+the delivery was meant for you. Every delivery signs three fields into its body,
+billable events and project notices alike:
+
+| Field         | Meaning                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| `id`          | The delivery's id. A retry carries the same one: deduplicate on it                                      |
+| `project_key` | The project it was sent for. Refuse any other                                                           |
+| `issued_at`   | When it was first sent, an ISO time in UTC (`2026-11-23T08:00:00.000Z`). Refuse one more than a day old |
+
+Pass your project key as `project` and the SDKs check all three
+(`@orangecheck/me-client` 0.64.0 or later, `orangecheck` 3.21.0 or later). A
+delivery signed for another project is refused, as is one first sent more than a
+day ago or more than five minutes ahead of your clock. `project` is optional
+until each SDK's next major version, and a verify without it warns once per
+process.
+
 ## Reception · Node + Express
 
 ```ts
@@ -34,15 +51,15 @@ app.post('/api/oc/webhook', async (req, res) => {
     const result = await oc.webhook.verify(
         req.body,
         req.header('OC-Signature'),
-        req.header('OC-Key-Id')
+        req.header('OC-Key-Id'),
+        { project: process.env.OC_PROJECT_KEY! } // a delivery for another project is refused
     );
     if (!result.ok) return res.status(401).end(result.reason);
 
     const envelope = JSON.parse(req.body);
     // envelope.kind === 'oc-billable-event' | 'oc-system-event'
     // envelope.subtype === 'session_creation' | 'connect.claimed' | …
-    // A billable event's id is in the signed body; a system notice has none,
-    // only the OC-Envelope-Id header. Deduplicate on whichever it has.
+    // result.id is the delivery's signed id, for both kinds: deduplicate on it.
     await onOcEvent(envelope);
     res.status(200).end();
 });
@@ -50,14 +67,19 @@ app.post('/api/oc/webhook', async (req, res) => {
 
 ## Reception · Python
 
-`orangecheck` 2.3 or later (`pip install orangecheck`). `verify_webhook` takes
-the request headers and the raw body, and returns the parsed event or raises
-`InvalidWebhook` with a one-word `reason`.
+`orangecheck` 3.21.0 or later (`pip install orangecheck`). `verify_webhook`
+takes the request headers, the raw body and your project key, and returns the
+parsed event or raises `InvalidWebhook` with a one-word `reason`: `project`,
+`stale` and `incomplete` for the signed fields, `signature`, `unknown_key`,
+`malformed` and `missing` for the signature.
 
 ```python
+import os
+
 from fastapi import FastAPI, HTTPException, Request
 from orangecheck import InvalidWebhook, verify_webhook
 
+PROJECT_KEY = os.environ["OC_PROJECT_KEY"]
 app = FastAPI()
 seen: set[str] = set()  # use your database in production
 
@@ -69,16 +91,12 @@ def on_oc_event(event: dict) -> None: ...  # your handler
 async def oc_webhook(request: Request):
     raw = await request.body()  # the bytes as sent, never the parsed JSON
     try:
-        event = verify_webhook(request.headers, raw)
+        event = verify_webhook(request.headers, raw, project=PROJECT_KEY)
     except InvalidWebhook as err:
         raise HTTPException(401, err.reason)
-    # A billable event's id is in the signed body. A system notice
-    # (connect.claimed, escrow.low, …) has none: its id is the OC-Envelope-Id header.
-    event_id = event.get("id") or request.headers.get("OC-Envelope-Id")
-    if event_id in seen:  # deliveries can repeat
+    if event["id"] in seen:  # deliveries can repeat; the id is signed, for both kinds
         return {}
-    if event_id:
-        seen.add(event_id)
+    seen.add(event["id"])
     on_oc_event(event)
     return {}
 ```
@@ -88,9 +106,14 @@ In Flask, pass `request.headers` and `request.get_data()`; in Django,
 
 ## Reception · Rust + Axum
 
+Without an SDK, check the signed fields yourself, after the signature:
+
 ```rust
 use axum::{extract::State, http::StatusCode, response::IntoResponse};
+use chrono::{DateTime, Duration, Utc};
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+
+const PROJECT_KEY: &str = "pk_live_…"; // your project key
 
 async fn webhook(
     State(pub_key): State<VerifyingKey>,
@@ -105,27 +128,39 @@ async fn webhook(
     if pub_key.verify(&body, &sig).is_err() {
         return StatusCode::UNAUTHORIZED;
     }
-    let envelope: serde_json::Value = serde_json::from_slice(&body).unwrap();
-    process_event(envelope).await;
+    let Ok(envelope) = serde_json::from_slice::<serde_json::Value>(&body) else {
+        return StatusCode::BAD_REQUEST;
+    };
+    // Signed into every delivery: one key signs every project's.
+    let issued_at = envelope["issued_at"].as_str().and_then(|t| DateTime::parse_from_rfc3339(t).ok());
+    let (Some(_id), Some(issued_at)) = (envelope["id"].as_str(), issued_at) else {
+        return StatusCode::UNAUTHORIZED;
+    };
+    let age = Utc::now().signed_duration_since(issued_at);
+    if envelope["project_key"] != PROJECT_KEY || age > Duration::days(1) || age < -Duration::minutes(5) {
+        return StatusCode::UNAUTHORIZED;
+    }
+    process_event(envelope).await; // deduplicate on its id
     StatusCode::OK
 }
 ```
 
 ## Headers OC sends
 
-| Header                | Meaning                                                                                                                      |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                                                                   |
-| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                                                             |
-| `OC-Envelope-Id`      | The event's `id` for a billable event; for a system notice, which has no `id` in its body, the delivery's own id. Not signed |
-| `OC-Subtype`          | Event subtype, copied for routing convenience                                                                                |
-| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices                                                  |
-| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)                                                  |
-| `Content-Type`        | `application/json`                                                                                                           |
+| Header                | Meaning                                                                          |
+| --------------------- | -------------------------------------------------------------------------------- |
+| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                       |
+| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                 |
+| `OC-Envelope-Id`      | The body's `id`, for both kinds. Not signed: deduplicate on the `id` in the body |
+| `OC-Subtype`          | Event subtype, copied for routing convenience                                    |
+| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices      |
+| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)      |
+| `Content-Type`        | `application/json`                                                               |
 
 ## What the body carries
 
-A billable event arrives as the event itself plus three fields:
+Besides `id`, `project_key` and `issued_at`, a billable event arrives as the
+event itself plus three fields:
 
 | Field              | Meaning                                                                                                                           |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -135,10 +170,12 @@ A billable event arrives as the event itself plus three fields:
 | `id`, `subtype`, … | The event: `id`, `occurred_at`, `class`, `subtype`, `site`, the fee split, `context`, `verify_url`                                |
 
 A project notice (`OC-Class: system`) is
-`{ kind: 'oc-system-event', subtype, project_key, … }` with no `id`. It names no
-person, except `connect.claimed`, which carries the `did_oc` your Connect app
-was given and the person's `sub` for your project. A webhook gets every notice
-through `*`, or only the ones it names in `subscribed`:
+`{ kind: 'oc-system-event', subtype, id, project_key, issued_at, … }`. A notice
+sent again keeps its `id`: a `connect.claimed` for the same person, or a
+federation notice for the same move. It names no person, except
+`connect.claimed`, which carries the `did_oc` your Connect app was given and the
+person's `sub` for your project. A webhook gets every notice through `*`, or
+only the ones it names in `subscribed`:
 
 | Subtype                          | When                                                                                                                                                                                                                                                                                                 |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -199,12 +236,12 @@ if (notice.subtype === 'federation.migrating') {
 
 ## Delivery semantics
 
-|                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Guarantee**      | At-least-once. Deduplicate a billable event on its `id`, from the signed body: the signature has no timestamp, so that is also your replay protection. A system notice has no `id` in its body; deduplicate it on `OC-Envelope-Id`, which is not signed, and handle it so a repeat changes nothing.                                                                                                                                                                                                                                 |
-| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due.                                                                                                                                                                                                                                                                                                                                                            |
-| **After that**     | The delivery is dead-lettered: listed with your webhooks for 30 days, where you can requeue it, and the project's owner gets a `webhook.dead_letter` notice in their ochk.app notifications. A failed delivery whose retry cannot be queued is dead-lettered at once, with the same notice. System notices take the same path. If neither can be written, the delivery is lost; orangecheck counts each one for its operators (`webhooks.deliveries_lost`). The endpoint is not muted, and the event stays at `/api/envelope/[id]`. |
+|                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Guarantee**      | At-least-once. Deduplicate every delivery on its signed `id`, and keep each id at least a day: that, with the day-long window on `issued_at`, is your replay protection. Handle a notice so a repeat changes nothing.                                                                                                                                                                                                                                                                                                                                                                       |
+| **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due; the last comes within about 20 hours of the first. A retry sends the same bytes, so its `issued_at` is the first send's.                                                                                                                                                                                                                                                                                           |
+| **After that**     | The delivery is dead-lettered: listed with your webhooks for 30 days, where you can requeue it (signed again with a new `issued_at`, keeping its `id`), and the project's owner gets a `webhook.dead_letter` notice in their ochk.app notifications. A failed delivery whose retry cannot be queued is dead-lettered at once, with the same notice. System notices take the same path. If neither can be written, the delivery is lost; orangecheck counts each one for its operators (`webhooks.deliveries_lost`). The endpoint is not muted, and the event stays at `/api/envelope/[id]`. |
 
 ## The raw-body trap
 
@@ -243,22 +280,24 @@ declare function onOcEvent(envelope: unknown): Promise<void>; // your handler
 const app = express();
 app.use(express.text({ type: 'application/json' })); // raw body!
 
-// Idempotency · keep a small cache of recently seen envelope ids.
-const seen = new LRUCache<string, true>({ max: 10_000 });
+// Idempotency · keep the ids seen for a day: an older delivery is refused anyway.
+const seen = new LRUCache<string, true>({
+    max: 10_000,
+    ttl: 24 * 60 * 60 * 1000,
+});
 
 app.post('/api/oc/webhook', async (req, res) => {
     const result = await oc.webhook.verify(
         req.body,
         req.header('OC-Signature'),
-        req.header('OC-Key-Id')
+        req.header('OC-Key-Id'),
+        { project: process.env.OC_PROJECT_KEY! }
     );
-    if (!result.ok) return res.status(401).end(result.reason);
+    if (!result.ok || !result.id) return res.status(401).end(result.reason);
 
     const envelope = JSON.parse(req.body);
-    // A system notice has no id in its body; its id is the OC-Envelope-Id header.
-    const id: string | undefined = envelope.id ?? req.header('OC-Envelope-Id');
-    if (id && seen.has(id)) return res.status(200).end(); // already processed
-    if (id) seen.set(id, true);
+    if (seen.has(result.id)) return res.status(200).end(); // already processed
+    seen.set(result.id, true);
 
     try {
         await onOcEvent(envelope);

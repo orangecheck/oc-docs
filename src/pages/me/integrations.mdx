@@ -116,13 +116,15 @@ Signing in:
 
 Paying your users:
 
-| What you see                                        | Meaning                                                                                                | Fix                                                                                                     |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `config_invalid` (422)                              | Your `IntegratorPriceConfig` failed validation server-side, or is outside the platform's price bounds. | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`.   |
-| `signature does not match` from `oc.webhook.verify` | Either you parsed the body before verifying, or you're verifying against the wrong or a stale key set. | Use raw body bytes; the key set is `me.ochk.io/api/dev-jwks`, re-fetched with `oc.webhook.fetchJwks()`. |
-| `rate_limit_exceeded` (429)                         | You exceeded a per-IP bucket.                                                                          | Honor `Retry-After`; back off exponentially.                                                            |
-| `domain_unverified` (403)                           | Your project_key fired in `live` mode but `verification.state !== 'verified'`.                         | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.           |
-| `invalid_signature`, `signature_required` (401)     | The event's `X-OC-Signature` is wrong or missing.                                                      | Sign the exact bytes you send: see [signing an event](/me/api#signing-an-event) and every answer there. |
+| What you see                                              | Meaning                                                                                                | Fix                                                                                                         |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `config_invalid` (422)                                    | Your `IntegratorPriceConfig` failed validation server-side, or is outside the platform's price bounds. | Run `oc.config.validate(cfg)` locally first; the response includes `details: [{ subtype, message }]`.       |
+| `signature does not match` from `oc.webhook.verify`       | Either you parsed the body before verifying, or you're verifying against the wrong or a stale key set. | Use raw body bytes; the key set is `me.ochk.io/api/dev-jwks`, re-fetched with `oc.webhook.fetchJwks()`.     |
+| `signed for another project (…)` from `oc.webhook.verify` | The delivery is genuine, but was sent for the project it names, not the `project` you passed.          | Pass the key of the project this endpoint is registered on.                                                 |
+| `older than the accepted age` from `oc.webhook.verify`    | The delivery was first sent more than a day ago (or your `maxAgeSeconds`).                             | Check your server's clock. To process a dead letter, requeue it: it is signed again with a new `issued_at`. |
+| `rate_limit_exceeded` (429)                               | You exceeded a per-IP bucket.                                                                          | Honor `Retry-After`; back off exponentially.                                                                |
+| `domain_unverified` (403)                                 | Your project_key fired in `live` mode but `verification.state !== 'verified'`.                         | Verify your domain to [go live](/me/quickstart#5--go-live) (DNS TXT or meta tag), then retry.               |
+| `invalid_signature`, `signature_required` (401)           | The event's `X-OC-Signature` is wrong or missing.                                                      | Sign the exact bytes you send: see [signing an event](/me/api#signing-an-event) and every answer there.     |
 
 ## Self-host considerations
 

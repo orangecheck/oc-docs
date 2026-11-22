@@ -88,7 +88,7 @@ When a window closes, subscribed webhooks receive a `drop.closed` system event:
 ```ts
 import type { DropClosedWebhookPayload } from '@orangecheck/me-client';
 
-// kind: 'oc-system-event', subtype: 'drop.closed',
+// kind: 'oc-system-event', subtype: 'drop.closed', id, project_key, issued_at,
 // window_id, schedule_id, label, manifest_id, verify_url,
 // sealed_at, sealed_height, event_count, recipient_count,
 // gross_fee_sats, user_share_sats

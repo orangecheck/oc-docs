@@ -1485,10 +1485,19 @@ signature will not validate.
 const result = await oc.webhook.verify(
     rawBody, // string | Uint8Array
     req.header('OC-Signature'),
-    req.header('OC-Key-Id')
+    req.header('OC-Key-Id'),
+    { project: process.env.OC_PROJECT_KEY! }
 );
 if (!result.ok) return res.status(401).end(result.reason);
+result.id; // the delivery's signed id: deduplicate on it
 ```
+
+From 0.64.0 it answers the signed `id`, `project_key` and `issued_at` every
+delivery carries, and refuses one signed for a project other than `project`, one
+first sent more than `maxAgeSeconds` ago (a day by default), one more than five
+minutes ahead of your clock, and one without those fields. `project` is optional
+until the next major version; a verify without it accepts any project's delivery
+and warns once per process.
 
 A missing header answers `ok: false`, so pass `req.header(...)` straight in. The
 webhook key set, `https://me.ochk.io/api/dev-jwks`, is fetched and cached for an

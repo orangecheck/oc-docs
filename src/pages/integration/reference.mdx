@@ -94,7 +94,7 @@ The examples follow these pages, and each one has tests for the rules they set.
 | Sign in with orangecheck                                    | Spend the token once, refuse one without `rh`, keep `rh`, `aud` and `iat` with your session   | [Quickstart](/me/quickstart) |
 | Sessions ended everywhere                                   | Ended there means signed out here; an unreadable list is never "signed out"                   | [SDK reference](/me/sdk)     |
 | Linking orangecheck to an account with its own login        | A fresh sign-in with your own login first; one did per account; tell the account's email      | [Quickstart](/me/quickstart) |
-| `connect.claimed`                                           | Verify the signature over the raw body                                                        | [Webhooks](/me/webhooks)     |
+| `connect.claimed`                                           | Verify the signature over the raw body, with your project key; deduplicate on its signed `id` | [Webhooks](/me/webhooks)     |
 
 ## What you host, and what you depend on
 

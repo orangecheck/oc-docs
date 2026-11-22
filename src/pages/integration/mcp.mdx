@@ -149,8 +149,9 @@ word: where the token is kept, the cookie, the audience in your code.
 - `https://ochk.io/docs`: these pages, through `llms.txt`, `llms-full.txt` and
   each page's `.md` copy. It keeps them for ten minutes.
 - `https://me.ochk.io/api/integrator/<project key>/…` and
-  `https://me.ochk.io/api/integrator/config`: a project's public answers. They
-  need no credential. A project key is not a secret: apps ship it.
+  `https://me.ochk.io/api/integrator/config?project_key=<project key>`: a
+  project's public answers. They need no credential. A project key is not a
+  secret: apps ship it.
 - `https://cloudflare-dns.com/dns-query`: the TXT lookup, made the way
   me.ochk.io makes it.
 - The site you name. It refuses an IP address and any name that resolves to a

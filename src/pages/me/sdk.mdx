@@ -184,8 +184,8 @@ shaped like ochk.io's ([its claims](#verify-without-the-sdk)):
 
 - An EdDSA (Ed25519) JWT. Its header's `kid` names a key in
   `<issuer>/.well-known/jwks.json`.
-- `iss` is that issuer: one origin with no path, https, or http on `localhost`
-  or `127.0.0.1`. me-client refuses a token issued at `http://[::1]`.
+- `iss` is that issuer: one origin with no path, https, or http on `localhost`,
+  `127.0.0.1` or `[::1]`.
 - `aud` is `opener_origin`, exactly.
 - `sub`, `did_oc`, `jti`, `rh`, `iat` and `exp` are set. A token without `rh` is
   refused (`no_session_handle`).
@@ -226,9 +226,10 @@ with. These are every call me-client 0.63.0 makes:
 | The list         | `GET <meOrigin>/api/integrator/revocations?project_key=<key>&aud=<aud>` | [the list, without an SDK](#the-list-of-ended-sessions-without-an-sdk)           |
 
 For a test to see a revoked token end, your stand-in's list holds that token's
-key in `tokens`, as ochk.io's does. `issuer` is one origin with no path (revoke
-and the native trade refuse a path), and on http works on `localhost` or
-`127.0.0.1` only; `meOrigin` is used as you give it.
+key in `tokens`, as ochk.io's does. `issuer` and `meOrigin` (and `OC_ME_ORIGIN`)
+are each one origin with no path: https, or http on `localhost`, `127.0.0.1` or
+`[::1]`. Anything else throws where the options are read, before any request is
+sent.
 
 ### a Bitcoin wallet in the popup
 
@@ -603,10 +604,11 @@ your site's origin as `aud`, and `iat`.
 
 `issuer=` names another auth host, a test stack's say: the token must carry it
 as `iss`, and from 3.2 the keys come from `<issuer>/.well-known/jwks.json`, as
-in Node. Here it is one origin with no path: https, or http on `localhost`,
-`127.0.0.1` or `[::1]`. Before 3.2 they came from ochk.io's key set whatever the
-issuer. To check against keys you hold, a stand-in issuer in tests say, pass
-`jwks=`, a dict shaped like the key set's JSON; it wins, and nothing is fetched.
+in Node. Here `issuer` and `me_origin` are each one origin with no path: https,
+or http on `localhost`, `127.0.0.1` or `[::1]`. Before 3.2 the keys came from
+ochk.io's key set whatever the issuer. To check against keys you hold, a
+stand-in issuer in tests say, pass `jwks=`, a dict shaped like the key set's
+JSON; it wins, and nothing is fetched.
 
 `verify_session` reads the rule from me.ochk.io inside the first call that needs
 it, then holds it a minute. That read is one round trip (235 to 270 ms in our

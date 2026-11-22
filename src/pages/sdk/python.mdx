@@ -324,9 +324,10 @@ def session(body: SignIn):
 def me(request: Request, oc_session: Optional[str] = Cookie(default=None)):
     checked = check_oc_session(oc_session, AUDIENCE, policy=POLICY,
                                revocations=REVOCATIONS, method=request.method)
-    if not checked.ok:
+    session = checked.session
+    if not checked.ok or session is None:
         return JSONResponse(checked.body, status_code=checked.status, headers=NO_STORE)
-    account = {'id': checked.session.sub, 'did_oc': checked.session.did_oc}
+    account = {'id': session.sub, 'did_oc': session.did_oc}
     return JSONResponse({'ok': True, 'account': account}, headers=NO_STORE)
 ```
 

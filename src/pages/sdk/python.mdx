@@ -267,11 +267,18 @@ from orangecheck import InvalidWebhook, verify_webhook
 
 headers: Mapping[str, Any]  # the request's headers
 raw_body: bytes  # the request body, unparsed
+project_key: str  # your project key
 
-event = verify_webhook(headers, raw_body)  # raises InvalidWebhook
+event = verify_webhook(headers, raw_body, project=project_key)  # raises InvalidWebhook
+event["id"]  # the delivery's signed id: deduplicate on it
 ```
 
-Pass the raw body, before any JSON parsing. The key set is
+Pass the raw body, before any JSON parsing, and your project key (3.21.0 or
+later): a delivery signed for another project is refused as `project`, one first
+sent more than `max_age` seconds ago (a day) or more than five minutes ahead as
+`stale`, and one without its signed `id`, `project_key` and `issued_at` as
+`incomplete`. Without `project` it accepts any project's delivery and warns
+once. The key set is
 `https://me.ochk.io/api/dev-jwks`. A full receiver is on
 [Webhooks](/me/webhooks#reception--python).
 

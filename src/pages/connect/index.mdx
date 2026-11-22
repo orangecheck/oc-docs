@@ -327,8 +327,9 @@ email claim has the code. Then:
 - `/api/connect/provision` keeps returning the **same** `did_oc` for that user.
   Keep firing events for it; they land with the person.
 - Your project's webhooks get a `connect.claimed` notice
-  (`{ kind: 'oc-system-event', subtype: 'connect.claimed', did_oc, sub }`),
-  naming the account by the `did_oc` you hold.
+  (`{ kind: 'oc-system-event', subtype: 'connect.claimed', id, project_key, issued_at, did_oc, sub }`),
+  naming the account by the `did_oc` you hold. Verify it with your project key
+  (see [Webhooks](/me/webhooks)): one key signs every project's notices.
 - You are never told the id of the account it was joined to, so two sites a
   person claims from cannot link them through one id.
 - **This `did_oc` never signs in.** The claimed account is joined to the

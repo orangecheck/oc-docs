@@ -587,6 +587,11 @@ export const DOCS_NAV: DocsSection[] = [
                 blurb: 'Run the oc-guardian binary on hardware you control. Docker, cosign, status checks. The program is not open.',
             },
             {
+                href: '/me/operator/test-stack',
+                label: 'Operator test stack',
+                blurb: 'Where an invited operator runs a guardian while the program is closed: the test addresses, the mutinynet Esplora, the kit in order.',
+            },
+            {
                 href: '/me/operator/in-browser',
                 label: 'In-browser flow',
                 blurb: 'How the portal runs the operator lifecycle without a CLI. Storage, round-trip, recovery. The program is not open.',

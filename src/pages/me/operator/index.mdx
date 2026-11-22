@@ -31,9 +31,8 @@ Two paths into it:
 - **[The kit](https://github.com/orangecheck/oc-guardian-kit)** —
   `oc-guardian init` on a server you control, fill the questionnaire, run
   `oc-guardian apply prepare`, and email `application.json` with your filled-in
-  questionnaire to apply@ochk.io. The kit signs everything the portal signs, but
-  ochk.app has no upload yet for a charter signature the kit signs, so only a
-  key held in the portal can ratify a charter today. The envelopes are the same,
+  questionnaire to apply@ochk.io. The kit signs everything the portal signs, and
+  you upload what it signs on ochk.app, signed in. The envelopes are the same,
   and so is the review queue.
 
 ## Lifecycle
@@ -86,9 +85,8 @@ What the program is built to hold, and where each falls short today.
 2. **Bypass parity.** The kit signs everything the portal signs, each step in
    [BYPASS.md](https://github.com/orangecheck/oc-guardian-kit/blob/main/BYPASS.md).
    The kit signs without the portal, and what it signs is uploaded on ochk.app,
-   signed in, except a charter signature, which ochk.app has no upload for yet.
-   At the federation, a guardian run from the kit looks the same as one run from
-   the portal.
+   signed in. At the federation, a guardian run from the kit looks the same as
+   one run from the portal.
 3. **Public commitments.** A charter ratification, incident or attestation made
    now is operator-signed and verifiable offline, so OC cannot forge one. Two
    kinds of row fall short. One kept without its envelope cannot be checked

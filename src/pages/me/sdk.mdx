@@ -184,12 +184,14 @@ shaped like ochk.io's ([its claims](#verify-without-the-sdk)):
 
 - An EdDSA (Ed25519) JWT. Its header's `kid` names a key in
   `<issuer>/.well-known/jwks.json`.
-- `iss` is that issuer: https, or http on localhost only.
+- `iss` is that issuer: one origin with no path, https, or http on `localhost`
+  or `127.0.0.1`. me-client refuses a token issued at `http://[::1]`.
 - `aud` is `opener_origin`, exactly.
 - `sub`, `did_oc`, `jti`, `rh`, `iat` and `exp` are set. A token without `rh` is
   refused (`no_session_handle`).
 
-Name your stand-in as the issuer, and the SDK reads its keys from there:
+Serve your stand-in's keys at the root of an origin of its own, name that origin
+as the issuer, and the SDK reads its keys from there:
 
 ```ts
 // In a local test only: your stand-in is the issuer.
@@ -199,14 +201,34 @@ declare const token: string; // what your page posted
 
 const checked = await checkOcToken(token, {
     audience: 'http://localhost:3000',
-    issuer: 'http://localhost:3000/stand-in',
+    issuer: 'http://localhost:4000',
 });
 ```
 
-`withOcAuth` and the other wrappers take the same `issuer`. Give them
-`revocation: false` too: the list of ended sessions is on me.ochk.io, which has
-never seen these tokens. Leave out `projectKey`, which reads your project's rule
-from me.ochk.io. Use these options only in tests.
+`withOcAuth` and the other wrappers take the same `issuer`. To test sign-in
+alone, give them `revocation: false` too: the list of ended sessions is on
+me.ochk.io, which has never seen these tokens. Leave out `projectKey`, which
+reads your project's rule from me.ochk.io. Use these options only in tests.
+
+**To test the rule, the list, the native trade and revoke as well,** keep them
+on and stand in for orangecheck's side of each. Point `issuer` at your stand-in
+for the keys, revoke and the native trade, and `meOrigin` for the rule and the
+list (`OC_ME_ORIGIN` sets the list's alone). Keep `projectKey`, and set
+`OC_SIGNING_SECRET` to the secret your stand-in checks the list's signature
+with. These are every call me-client 0.63.0 makes:
+
+| Call             | Request                                                                 | Wire format                                                                      |
+| ---------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| The keys         | `GET <issuer>/.well-known/jwks.json`                                    | `{ "keys": [<Ed25519 JWK>] }`, each with the `kid` your tokens name              |
+| Revoke           | `POST <issuer>/api/auth/revoke`                                         | [ending a session](#ending-a-session)                                            |
+| The native trade | `POST <issuer>/api/auth/native/token`                                   | [the exchange on the wire](/integration/native-sign-in#the-exchange-on-the-wire) |
+| The rule         | `GET <meOrigin>/api/integrator/<key>/sign-in`                           | [set the floor](/me/require-bond#1-set-the-floor)                                |
+| The list         | `GET <meOrigin>/api/integrator/revocations?project_key=<key>&aud=<aud>` | [the list, without an SDK](#the-list-of-ended-sessions-without-an-sdk)           |
+
+For a test to see a revoked token end, your stand-in's list holds that token's
+key in `tokens`, as ochk.io's does. `issuer` is one origin with no path (revoke
+and the native trade refuse a path), and on http works on `localhost` or
+`127.0.0.1` only; `meOrigin` is used as you give it.
 
 ### a Bitcoin wallet in the popup
 
@@ -581,10 +603,10 @@ your site's origin as `aud`, and `iat`.
 
 `issuer=` names another auth host, a test stack's say: the token must carry it
 as `iss`, and from 3.2 the keys come from `<issuer>/.well-known/jwks.json`, as
-in Node (https, or http on localhost only). Before 3.2 they came from ochk.io's
-key set whatever the issuer. To check against keys you hold, a stand-in issuer
-in tests say, pass `jwks=`, a dict shaped like the key set's JSON; it wins, and
-nothing is fetched.
+in Node. Here it is one origin with no path: https, or http on `localhost`,
+`127.0.0.1` or `[::1]`. Before 3.2 they came from ochk.io's key set whatever the
+issuer. To check against keys you hold, a stand-in issuer in tests say, pass
+`jwks=`, a dict shaped like the key set's JSON; it wins, and nothing is fetched.
 
 `verify_session` reads the rule from me.ochk.io inside the first call that needs
 it, then holds it a minute. That read is one round trip (235 to 270 ms in our
@@ -628,6 +650,16 @@ request signed the same person in first. Either read the winner's row and carry
 on, or answer `409` "try again" and the retry reads it. Both are safe, as long
 as the losing request deletes the user it created: a user with no did is an
 account nobody can reach.
+
+**If your users need an email address.** A sign-in carries none: only `did_oc`
+and `sub`. An address comes from the `email` scope
+([below](#ocscope--what-people-share-with-your-app)) if the person shares it,
+and they can share it for an hour, stop sharing it, or have none. So make the
+address optional for a user a sign-in created, and give each path that mails
+someone an answer for a user without one. Read a shared address from
+`oc.scope.granted` when you send, rather than copy it into your table. Never
+fill the column with an address made from the did, and never find or join a user
+by an address you have not checked yourself with a code or a link.
 
 **If an identity provider holds your users** (Supabase, Auth0, Cognito…), make
 sure no one else can create the user a first sign-in is about to create: turn
@@ -1123,6 +1155,19 @@ the list answers `"revoked"`, revoke it too. Otherwise "sign out everywhere"
 ends the cookie and leaves an API key working. While the list answers
 `"unverified"`, the same rule as for your session applies to them: reads go on,
 and writes made with them wait.
+
+**A socket, or reads and writes on one method.** What splits a read from a write
+is what a request does, not how it arrives. A WebSocket outlives the request
+that opened it, so check its session for each message, not only at the upgrade:
+`check.refuses(claims, method)` with `'GET'` for a message that reads and
+`'POST'` for one that writes. Where every call is a `POST` (GraphQL, RPC), set
+`checkOcSession`'s `method` per operation; with none, a request counts as a
+write. Each check reads the copy of the list held for a minute, so one per
+message costs nothing; on a timer, check at least once a minute. On `"revoked"`,
+end the session and close the socket. While the list can't vouch, refuse each
+message that writes, as a route answers `503 revocations_unavailable`, let reads
+go on, and keep the socket open. The close codes and the refusal's shape are
+yours.
 
 ### the list of ended sessions, without an SDK
 

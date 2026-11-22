@@ -272,6 +272,11 @@ static func _decode(query: String) -> Dictionary[String, String]:
 	return out
 ```
 
+The three sentences the listener answers the browser with are yours: reword them
+or translate them. Nothing at orangecheck reads them. Keep what is around them:
+400 for another sign-in's answer, `Cache-Control: no-store`, and nothing from
+the request in the page.
+
 Then send the three values to your server and keep whatever session it gives
 back:
 
@@ -313,7 +318,8 @@ The same steps, in whatever your engine has:
 - Answer only `GET /<path>` whose `state` matches. Another state is another
   sign-in's answer, from an old tab say: reply 400 with a sentence and keep
   waiting. With `code`, reply with a short page and stop listening. With
-  `error=access_denied`, the player said no.
+  `error=access_denied`, the player said no. The sentences are yours, in any
+  language; put nothing from the request in them.
 - Hold a few connections at most (16 is plenty), drop one that hasn't sent its
   request in about 5 seconds, and when full let the oldest go, so a stalled
   connection can't keep the browser out.

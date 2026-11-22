@@ -217,6 +217,8 @@ another `issuer=`, 3.2 or later), is fetched and cached for an hour, and kept
 through an outage; pass `jwks=` to check offline. A token for any other
 origin, or one with no `aud`, is refused. The token carries no email address.
 What each claim means is in [verify without the SDK](/me/sdk#verify-without-the-sdk).
+A whole sign-in, with the cookie and the route that reads it, is in
+[Sign-in (FastAPI)](#sign-in-fastapi).
 
 Who may sign in (`SignInPolicy`, `BondRequired`), the HTTP answer for a request
 (`check_oc_session`), sessions ended everywhere (`RevocationList`,
@@ -274,6 +276,76 @@ Pass the raw body, before any JSON parsing. The key set is
 [Webhooks](/me/webhooks#reception--python).
 
 ## Framework integration
+
+### Sign-in (FastAPI)
+
+The two routes a site needs when people sign in through the
+[ochk.app popup](/me/quickstart): one takes the token the popup returned, checks
+it and keeps it in an httpOnly cookie; the other reads that cookie on later
+requests. With `orangecheck` 3.2 or later:
+
+```python
+import os
+import time
+from typing import Optional
+
+from fastapi import Cookie, FastAPI, Request
+from fastapi.responses import JSONResponse
+from orangecheck import InvalidSession, RevocationList, SignInPolicy, check_oc_session, verify_session
+from pydantic import BaseModel
+
+AUDIENCE = 'https://your-site.example'
+POLICY = SignInPolicy(os.environ['OC_PROJECT_KEY'])  # who can sign in, from your project
+REVOCATIONS = RevocationList(os.environ['OC_PROJECT_KEY'], os.environ['OC_SIGNING_SECRET'])
+NO_STORE = {'Cache-Control': 'no-store, private', 'Vary': 'Cookie'}
+
+app = FastAPI()
+
+
+class SignIn(BaseModel):
+    token: str = ''
+
+
+@app.post('/api/auth/session')
+def session(body: SignIn):
+    try:
+        s = verify_session(body.token, AUDIENCE)
+    except InvalidSession as err:
+        # ochk.io's keys can't be read right now: the page can try again.
+        status = 503 if err.reason == 'key_set_unavailable' else 401
+        return JSONResponse({'ok': False, 'reason': err.reason}, status_code=status)
+    res = JSONResponse({'ok': True})
+    res.set_cookie('oc_session', body.token, max_age=s.exp - int(time.time()),
+                   httponly=True, secure=True, samesite='lax', path='/')
+    return res
+
+
+@app.get('/api/auth/me')
+def me(request: Request, oc_session: Optional[str] = Cookie(default=None)):
+    checked = check_oc_session(oc_session, AUDIENCE, policy=POLICY,
+                               revocations=REVOCATIONS, method=request.method)
+    if not checked.ok:
+        return JSONResponse(checked.body, status_code=checked.status, headers=NO_STORE)
+    account = {'id': checked.session.sub, 'did_oc': checked.session.did_oc}
+    return JSONResponse({'ok': True, 'account': account}, headers=NO_STORE)
+```
+
+The first route checks the token alone, as `checkOcToken` does in Node.
+`check_oc_session` does the rest on every later request: it applies who can sign
+in (`policy`), refuses a session the person ended everywhere (`revocations`),
+and answers as me-client's `withOcAuth` does, with a status and a body. A 503
+from either route is an outage, never a sign-out. Both handlers are plain `def`,
+not `async def`: each call can wait on a network read, and FastAPI runs a plain
+`def` on a worker thread instead of blocking its event loop. In Flask or Django,
+the same two calls go in the same two views.
+
+### Stake, not sign-in: `check()`
+
+`check()` does not sign anyone in. It asks the hosted API whether an address's
+OC Attest stake meets `min_sats` and `min_days`, and it knows nothing about who
+sent the request: the views below take the address from the request or your own
+session. Use it to gate a route on stake once you know whose address it is; use
+the sign-in route above to know who someone is.
 
 ### Django
 

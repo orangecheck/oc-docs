@@ -353,6 +353,11 @@ button.custom_minimum_size.y = 44
 
 The words are plain text. Keep your theme's font, colours and focus style.
 
+When the theme changes while the app runs, tint `mono-white` with the new text
+colour rather than swap files. Its three faces are white at full, 60% and 30%
+opacity, so a multiply tint draws `mono` exactly: the mark in your text colour,
+as on the web. `mono-black` is near-black and does not tint.
+
 In a web export, the page that hosts the game opens the orangecheck window, as
 in [plain HTML](#plain-html-and-javascript). A native build signs the player in
 through their own browser: see [apps and games](/integration/native-sign-in).

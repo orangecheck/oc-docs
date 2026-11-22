@@ -73,10 +73,14 @@ click handler, or the browser blocks the popup. The person signs in on
 orangecheck's page with email, Google, GitHub or a Bitcoin wallet, and the popup
 hands your page a token bound to your origin. A page served with
 `Cross-Origin-Opener-Policy: same-origin` never gets it back; send
-`same-origin-allow-popups`, or no such header. Under a Content Security Policy
-the popup needs no orangecheck origin in `connect-src` or `frame-src`: it opens
-a window and takes one message from it. Only `script-src` must allow wherever
-you serve the module. Post the token to your own server:
+`same-origin-allow-popups`, or no such header. A page that must stay
+cross-origin isolated (`same-origin` with `Cross-Origin-Embedder-Policy`, for
+`SharedArrayBuffer`) can't relax it: open the sign-in from a page of your own
+that isn't isolated, such as your account page, let it post the token to your
+server, and send the person back once your session is set. Under a Content
+Security Policy the popup needs no orangecheck origin in `connect-src` or
+`frame-src`: it opens a window and takes one message from it. Only `script-src`
+must allow wherever you serve the module. Post the token to your own server:
 
 ```ts
 import { signInWithOc } from '@orangecheck/me-client/popup';

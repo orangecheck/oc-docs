@@ -1,0 +1,119 @@
+export const metadata = {
+    title: 'ochk.app · Operator Test Stack',
+    description:
+        'Where an invited guardian operator runs a guardian while the program is closed: the test stack’s addresses, the mutinynet Esplora, the attestation URL, and the kit commands in order.',
+};
+
+# ochk.app · Operator Test Stack
+
+**Where an invited operator runs a guardian while the program is closed.**
+
+The operator program is closed while the test federation is tested.
+[ochk.app/guardians](https://ochk.app/guardians) says what an operator does,
+what it costs, and how to be told when the program opens. An operator
+orangecheck invites runs a guardian on the **test stack**: its own copy of
+ochk.app, of the API behind it and of the sign-in host, with its own accounts
+and data, on mutinynet, a signet. Nothing on it is real money, and nothing on it
+reaches ochk.app or me.ochk.io.
+
+Your seat there is a reserved seat in a new test federation, or a seat in a
+successor federation that a running one moves to. Seats are fixed at the key
+ceremony, so it is never a seat in a federation that already runs.
+
+## The stack
+
+| What                      | Where                                                    |
+| ------------------------- | -------------------------------------------------------- |
+| Operator pages, signed in | `https://oc-app-test.vercel.app/me/operator`             |
+| API (what the kit calls)  | `https://oc-me-test.vercel.app`                          |
+| Chain                     | signet: mutinynet (`OC_BITCOIN_NETWORK=signet`)          |
+| Esplora                   | `https://mutinynet.com/api`                              |
+| Liveness reports (attest) | `https://oc-me-test.vercel.app/api/operator/attestation` |
+
+- **An account on the test stack is not your ochk.app account.** Sign in on
+  `oc-app-test.vercel.app` itself. The invitation names that account.
+- The test API provisions its hosted guardians with the same Esplora
+  (`OC_ESPLORA_URL_SIGNET`).
+- Every kit command that calls the API reads `OC_PORTAL_BASE`, which is
+  `https://me.ochk.io` when unset. Set it once for the shell.
+
+## The kit, in order
+
+[Install the kit](https://github.com/orangecheck/oc-guardian-kit#install) (the
+signed release binary, or the signed image), then:
+
+```sh
+export OC_PORTAL_BASE=https://oc-me-test.vercel.app
+
+# 1. Your operator key. On a server with no OS keychain, keep it in a file:
+#    the file is the key.
+oc-guardian init --key-file /var/lib/oc-guardian/operator.key
+
+# 2. Bind it to your test account. oc-app-test.vercel.app/me/operator shows
+#    this command filled in, and takes the bind-claim.json it writes.
+oc-guardian bind --did <your test account id> --block-height <h> --block-hash <hash>
+```
+
+3. **Apply** at `https://oc-app-test.vercel.app/me/operator/apply`, signed in to
+   the invited account. The key that signs is the one in your browser: import
+   the key file from step 1 on the operator page (64 hex characters).
+
+```sh
+# 4. Once accepted, claim the seat held for you, and upload the seat-claim.json
+#    it writes at oc-app-test.vercel.app/me/operator/federations/<slug>.
+oc-guardian seat claim <slug> <seat> --block-height <h> --block-hash <hash>
+
+# 5. Read the federation's charter and sign it, then upload the charter-sig.json
+#    it writes, within the hour, at
+#    oc-app-test.vercel.app/me/operator/federations/<slug>.
+oc-guardian charter fetch <slug>
+oc-guardian charter sign <slug> --out charter-sig.json
+```
+
+### 6 · Run the guardian
+
+On hardware you control, follow the [runbook](/me/operator/runbook) with these
+settings for the test stack:
+
+```bash
+# /etc/oc-guardian/guardian.env on the test stack
+OC_OPERATOR_ID=op-<your-id>
+OC_OPERATOR_PUBKEY_HEX=<64 hex chars>
+OC_FEDERATION_SLUG=<slug>
+OC_BITCOIN_NETWORK=signet
+OC_ESPLORA_URL=https://mutinynet.com/api
+OC_PUBLIC_HOST=<the name peers reach this host at>
+# keeps setup closed to other machines until DKG is done; use a long random one
+OC_GUARDIAN_SETUP_PASSWORD=<a password>
+OC_ATTESTATION_POST_URL=https://oc-me-test.vercel.app/api/operator/attestation
+```
+
+A report is sent only when the guardian has a key to sign with
+([runbook §04](/me/operator/runbook#04--confirm-health)): your operator key, if
+the kit on that machine holds it, or an attestation key you delegate to with
+`oc-guardian attest-delegate`.
+
+Or let orangecheck host it: the seat's page on the test stack starts a machine
+in the region you choose. No hosting fee is charged on a test network.
+
+### 7 · The key ceremony
+
+Seats orangecheck hosts are set up from the portal. A seat you run takes the
+kit's four steps with the other guardians, with the same password
+([kit README, "The DKG ceremony"](https://github.com/orangecheck/oc-guardian-kit#the-dkg-ceremony)):
+
+```sh
+FM_PASSWORD=… oc-guardian ceremony start --name <your guardian name>
+oc-guardian ceremony add-peer --code <each other guardian's code>
+oc-guardian ceremony dkg
+oc-guardian ceremony status     # until it says RUNNING
+oc-guardian ceremony finalize
+```
+
+Once it runs, `oc-app-test.vercel.app/me/operator/guardians` shows each
+guardian's last signed report.
+
+## What the kit pins
+
+The kit runs fedimintd 0.11.4, the version
+`oc-guardian fedimintd install --version 0.11.4` downloads and checks by hash.

@@ -777,6 +777,14 @@
             "tests": []
         },
         {
+            "id": "page:/me/operator/test-stack",
+            "kind": "page",
+            "entry": "src/pages/me/operator/test-stack.mdx",
+            "reach": "https://ochk.io/docs/me/operator/test-stack",
+            "area": "me",
+            "tests": []
+        },
+        {
             "id": "page:/me/paying-users",
             "kind": "page",
             "entry": "src/pages/me/paying-users.mdx",

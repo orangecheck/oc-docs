@@ -23,18 +23,17 @@ One key signs every project's deliveries, so the signature alone does not say
 the delivery was meant for you. Every delivery signs three fields into its body,
 billable events and project notices alike:
 
-| Field         | Meaning                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| `id`          | The delivery's id. A retry carries the same one: deduplicate on it                                      |
-| `project_key` | The project it was sent for. Refuse any other                                                           |
-| `issued_at`   | When it was first sent, an ISO time in UTC (`2026-11-23T08:00:00.000Z`). Refuse one more than a day old |
+| Field         | Meaning                                                                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | The delivery's id. A retry carries the same one: deduplicate on it                                                                 |
+| `project_key` | The project it was sent for. Refuse any other                                                                                      |
+| `issued_at`   | When this send was signed, an ISO time in UTC (`2026-11-23T08:00:00.000Z`). Each retry has its own. Refuse one more than a day old |
 
 Pass your project key as `project` and the SDKs check all three
 (`@orangecheck/me-client` 0.64.0 or later, `orangecheck` 3.21.0 or later). A
-delivery signed for another project is refused, as is one first sent more than a
-day ago or more than five minutes ahead of your clock. `project` is optional
-until each SDK's next major version, and a verify without it warns once per
-process.
+delivery signed for another project is refused, as is one signed more than a day
+ago or more than five minutes ahead of your clock. `project` is optional until
+each SDK's next major version, and a verify without it warns once per process.
 
 ## Reception · Node + Express
 
@@ -240,7 +239,7 @@ if (notice.subtype === 'federation.migrating') {
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Guarantee**      | At-least-once. Deduplicate every delivery on its signed `id`, and keep each id at least a day: that, with the day-long window on `issued_at`, is your replay protection. Handle a notice so a repeat changes nothing.                                                                                                                                                                                                                                                                                                                                                                       |
 | **Ack**            | Any 2xx within 8 seconds. A redirect is not followed or retried: register the final URL.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due; the last comes within about 20 hours of the first. A retry sends the same bytes, so its `issued_at` is the first send's.                                                                                                                                                                                                                                                                                           |
+| **Retry schedule** | 6 attempts: at once, then 30 s, 5 min, 30 min, 2 h and 12 h after each failure. Retries are picked up by an hourly sweep, so each can run up to an hour after it is due, or later while many are waiting; the last usually comes within about 20 hours of the first. Each retry is signed again as it is sent: a new `issued_at`, the same `id`.                                                                                                                                                                                                                                            |
 | **After that**     | The delivery is dead-lettered: listed with your webhooks for 30 days, where you can requeue it (signed again with a new `issued_at`, keeping its `id`), and the project's owner gets a `webhook.dead_letter` notice in their ochk.app notifications. A failed delivery whose retry cannot be queued is dead-lettered at once, with the same notice. System notices take the same path. If neither can be written, the delivery is lost; orangecheck counts each one for its operators (`webhooks.deliveries_lost`). The endpoint is not muted, and the event stays at `/api/envelope/[id]`. |
 
 ## The raw-body trap

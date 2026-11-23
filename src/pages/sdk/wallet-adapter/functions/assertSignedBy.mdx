@@ -19,10 +19,13 @@ function assertSignedBy(args: {
 }): Promise<void>;
 ```
 
-Defined in: [wallet-adapter/src/sign.ts:56](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L56)
+Defined in: [wallet-adapter/src/sign.ts:62](https://github.com/orangecheck/oc-packages/blob/main/wallet-adapter/src/sign.ts#L62)
 
 Throw `WrongAccountError` unless `signature` is a valid BIP-322 (or legacy)
 signature of `message` by `address`. Every signer runs this before returning.
+A wallet that trims (Sparrow, Electrum's GUI) signs a message without its
+final LF: that passes for an auth challenge, which `@orangecheck/sdk` 1.27.0
+verifies, and throws `TrimmedSignatureError` for any other message.
 
 ## Parameters
 

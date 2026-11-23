@@ -516,6 +516,12 @@ you describe your sign-in, in your words, and keep these facts:
 - **Your user id** is 1 to 256 characters, counted in UTF-16 code units.
 - **No redirects.** These endpoints never redirect, so the SDKs treat a redirect
   as an error: the key goes to ochk.io and nowhere else.
+- **One host.** `connectProvision`, `connectClaimLink` and `connectDelete` post
+  to `https://ochk.io`, and so do Python's `connect_*`. No option moves them,
+  and me-client's `setOrigin` does not either
+  ([where each call goes](/me/sdk#where-each-call-goes)). So a staging site on
+  the [test stack](/me/operator/test-stack#a-site-on-the-test-stack) leaves
+  Connect off: its accounts would be real ones.
 - **Unknown options are refused** before anything is sent: me-client throws, and
   Python raises `TypeError`.
 - **The key is shown once.** Save it when you register the app. Lost it?

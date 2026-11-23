@@ -1313,6 +1313,65 @@ the limits below.
   `status(rh, aud, iat, jti)` answers (an `rh` that is not a string is
   `"revoked"`).
 
+## where each call goes
+
+me-client has no one setting for where it calls. Each call has its own default,
+and its own option moves it:
+
+| Calls                                                                                                                                                                                      | Default                                                               | Moved by                                                |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- | ------------------------------------------------------- |
+| `oc.event.fire`, `oc.event.fireBatch`, `oc.payment.authorize`, `oc.scope.granted`, `oc.session.create`, `refresh` and `invalidate`, `oc.federations.list`, `live`, `get` and `defaultLive` | `https://me.ochk.io`                                                  | `setOrigin(url)`                                        |
+| `signInWithOc`, `signInWithOcOutcome` and the sign-in button: the popup                                                                                                                    | `https://me.ochk.io`                                                  | `popupOrigin` (the button's `popup.popupOrigin`)        |
+| `oc.scope.request`: the consent page                                                                                                                                                       | `https://ochk.app`                                                    | `origin`                                                |
+| `checkOcToken`, `verifyOcToken`, `checkOcSession`, `withOcAuth` and the other wrappers: the auth host's keys                                                                               | `https://ochk.io`                                                     | `issuer`                                                |
+| The project's rule: `checkSignInRule`, and the wrappers given `projectKey`                                                                                                                 | `https://me.ochk.io`                                                  | `meOrigin`                                              |
+| The list of ended sessions: `checkOcSession` and the wrappers                                                                                                                              | `OC_ME_ORIGIN`, else `https://me.ochk.io`                             | `meOrigin`                                              |
+| `revokeToken`                                                                                                                                                                              | `https://ochk.io`                                                     | `issuer`                                                |
+| `exchangeNativeCode`                                                                                                                                                                       | `https://ochk.io`, and `https://me.ochk.io` for the rule and the list | `issuer`, and `meOrigin`                                |
+| `oc.webhook.verify` and `oc.identity.verifyActivityAttestation`: the keys                                                                                                                  | `https://me.ochk.io`                                                  | `issuer`                                                |
+| `oc.family.scopes`                                                                                                                                                                         | `https://me.ochk.io`                                                  | `origin`                                                |
+| `connectProvision`, `connectClaimLink` and `connectDelete`                                                                                                                                 | `https://ochk.io`                                                     | Nothing: Connect's calls go to ochk.io and nowhere else |
+
+`setOrigin(url)` moves only the first row: `revokeToken`, `checkOcToken` and
+`checkSignInRule` take `issuer` or `meOrigin` instead. It sets one value for the
+whole process, read by every call after it, so call it once, at startup, before
+any event. One trailing slash is dropped, and anything else is taken as given.
+`getOrigin()` reads it back.
+
+### a staging site on the test stack
+
+A staging build can run against orangecheck's
+[test stack](/me/operator/test-stack#a-site-on-the-test-stack), which has its
+own accounts, projects and keys. Its project is a test-stack project for the
+staging site's own domain, made on `https://oc-app-test.vercel.app`, so
+`OC_PROJECT_KEY` and `OC_SIGNING_SECRET` are the test stack's. Then point every
+row above at the test stack:
+
+```ts
+// lib/oc.ts · a staging build. Import it before anything sends an event.
+import type { WithOcAuthOptions } from '@orangecheck/me-client/server';
+
+import { setOrigin } from '@orangecheck/me-client';
+
+export const TEST_ME = 'https://oc-me-test.vercel.app';
+export const TEST_AUTH = 'https://oc-www-test.vercel.app';
+
+setOrigin(TEST_ME); // events, payments, scopes, sessions, federations
+
+export const ocAuth: WithOcAuthOptions = {
+    audience: 'https://staging.yourapp.example',
+    projectKey: process.env.OC_PROJECT_KEY!,
+    issuer: TEST_AUTH, // the keys, and a token's iss
+    meOrigin: TEST_ME, // the rule and the list of ended sessions
+};
+```
+
+In the browser, pass `popupOrigin: TEST_ME` to `signInWithOc`, and
+`origin: 'https://oc-app-test.vercel.app'` to `oc.scope.request`. Give
+`revokeToken` `issuer: TEST_AUTH`, and `oc.webhook.verify` `issuer: TEST_ME`.
+Leave Connect off on a staging site: it reaches only ochk.io, whose accounts are
+real ones.
+
 ## React
 
 The session is your own cookie, so a React app reads it from your own
@@ -1766,6 +1825,7 @@ the three groups: One-time, Per action and Per session.
 | `validateIntegratorConfig(cfg)`                 | `(IntegratorPriceConfig) => ValidationResult`                               |
 | `setBearerToken(token)`                         | `(string \| null) => void` · a token for later calls                        |
 | `getBearerToken()` / `clearBearerToken()`       | `() => string \| null` / `() => void`                                       |
+| `setOrigin(url)` / `getOrigin()`                | `(string) => void` / `() => string` · [where](#where-each-call-goes)        |
 
 `MIN_INTEGRATOR_PRICE_SATS` is the smallest price the server takes. At 1 sat the
 whole price is the fee, so the smallest earning is 1 sat, and you pay 2.

@@ -742,6 +742,15 @@ on `error`:
 | `409 federation_winding_down` | Your project's federation is moving to a new one ([`federation.migrating`](/me/webhooks)). In preview and while live. Only a top-up is refused: a preview refund still works.                                                                                                                                      | Offer no top-up, and say top-ups are paused while the project moves. Events and sign-in carry on. Top up again once the project is on its new federation, or after `federation.migration_cancelled`.                                              |
 | `409 federation_not_settling` | While orangecheck is live, when your project's federation does not settle payments yet (it is not live, or has no settlement key), or your project names no federation. Also when the Lightning rail settles a federation other than your project's: that one comes only when you top up, never in `topup_closed`. | Offer no top-up, and say top-ups open when the project's federation goes live. Nothing on your side opens it, and sign-in keeps working. A test project that pays its users goes live only with a funded balance, so it stays in test until then. |
 
+Three more answers bound how many top-ups a project makes. The two with a number
+carry it as `limit`:
+
+| Answer                       | When                                                                                                                                                                            | What to do                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `429 escrow_daily_cap`       | The project has made 20 top-ups and preview refunds this UTC day (`limit: 20`). A live top-up is counted before its invoice is asked for, and stays counted if making it fails. | Try again after 00:00 UTC.                   |
+| `409 escrow_open_limit`      | While orangecheck is live, the project already has 3 top-up invoices that can still be paid (`limit: 3`).                                                                       | Pay one or let it expire, then top up again. |
+| `503 escrow_cap_unavailable` | The day's count could not be kept, or, while live, the open invoices could not be counted. Nothing was counted or charged.                                                      | Try again.                                   |
+
 ### Moving a verified domain
 
 A verified domain is what consent screens name and what every receipt records,

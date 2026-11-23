@@ -377,7 +377,9 @@ In Python, `connect_delete(api_key, user_id)` returns the same.
 - `already_deleted`: nothing left to do.
 - `409 holds_earnings`: nobody claimed it, but it earned. That is the person's,
   so it stays; send them a claim link before they go.
-- `404 unknown_user`: you never provisioned this user.
+- `404 unknown_user`: you never provisioned this user. A provision for them that
+  was still running when you deleted makes nothing (below); a later one makes
+  their account as for anyone new.
 - `409 not_deletable`: orangecheck keeps this account for a reason of its own,
   so nothing was deleted, and asking again gives the same answer.
 - `429 rate_limited`, `401 invalid_api_key`, `400 bad_request`: as named. The
@@ -483,12 +485,22 @@ so the same table applies.
 
 **A daily canary.** Once a day, call `connectDelete` for a user id you never
 provisioned, such as `oc-canary-never-a-user`. It must answer
-`{ ok: false, reason: 'unknown_user' }`; nothing is deleted or recorded.
-Anything else means deleting would fail for real users too: `invalid_api_key` is
-your key, `unavailable` is an outage. Alert yourself on either.
+`{ ok: false, reason: 'unknown_user' }`, every day; nothing is deleted, and that
+id could still be provisioned later. Anything else means deleting would fail for
+real users too: `invalid_api_key` is your key, `unavailable` is an outage. Alert
+yourself on either.
 
-After any of these, `provision` answers `410 account_deleted` for that user. The
-same happens when the person deletes their orangecheck account themselves.
+After `deleted`, `detached` or `already_deleted`, `provision` answers
+`410 account_deleted` for that user. The same happens when the person deletes
+their orangecheck account themselves.
+
+**A delete wins over a provision still running.** If you gave up waiting on a
+provision and then deleted that user, the delete holds whichever finishes first:
+the provision makes no account, or the account it made goes, and it answers
+`410 account_deleted`. That holds for a provision with `consent: true` too, when
+you delete after sending it. A tick sent after the delete makes a new account,
+as for anyone who opts in again. For a few seconds after deleting a user you
+never provisioned, a provision for them without consent answers 410 as well.
 
 An app can't be deleted while accounts it made are still unclaimed
 (`409 has_unclaimed_accounts`): delete those users first.

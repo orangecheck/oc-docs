@@ -277,8 +277,9 @@ projects never count toward it. A refused event records nothing and counts
 toward none of these. To record events for your users, verify your domain and go
 live. A test project's events are never billed against live escrow, whatever
 mode the platform runs in: that is decided when each event comes in. Its live
-top-up stays open, because going live needs a funded live balance, which the
-project spends once it is live.
+top-up stays open while its federation settles ([topping up](#topping-up)),
+because a project that pays its users goes live only with a funded live balance,
+which it spends once it is live.
 
 `/event/batch` takes the person's own session, not `user_address`: the cookie,
 or the token from the sign-in popup as `Authorization: Bearer`. Every event in a
@@ -623,6 +624,8 @@ after you rotate) and your project's key set (`issuer_jwks_url`).
 | `DELETE` | `/api/me/projects/[id]/domain`      | cancel an open move · owner-gated                                                                                         |
 | `DELETE` | `/api/me/projects/[id]`             | delete project; refused while it holds sats or owes a step ([below](#deleting-a-project)) · owner-gated                   |
 | `POST`   | `/api/me/projects/[id]/pay-periods` | when the project pays its users: `add`, `end`, `set_end`, `cancel` ([details](/me/paying-users)) · owner-gated            |
+| `GET`    | `/api/me/projects/[id]/escrow`      | the balance, its newest ledger entries, and whether a top-up is open ([below](#topping-up)) · owner-gated                 |
+| `POST`   | `/api/me/projects/[id]/escrow`      | top up: `{ action: 'topup', sats }` ([below](#topping-up)) · owner-gated, rate-limited 10/min                             |
 | `POST`   | `/api/me/projects/[id]/verify`      | run a domain-ownership check (DNS TXT, falls back to meta tag); during a move, checks the new domain · rate-limited 5/min |
 | `DELETE` | `/api/me/projects/[id]/verify`      | reissue the verification token; a verified domain stays verified until its next check · owner-gated                       |
 | `POST`   | `/api/me/projects/[id]/test-fire`   | fire a real envelope under this project_key (same pipeline as production) · owner-gated · for the smoke-test sandbox      |
@@ -669,15 +672,15 @@ to another change answers `400 unexpected_field`.
 
 `POST /api/me/projects` takes:
 
-| Field              |                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                                                                                                                                                                                                                                         |
-| `domain`           | Required. A DNS hostname.                                                                                                                                                                                                                                                                                                                                        |
-| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                                                                                                                                                                                                                              |
-| `federation_slug`  | Optional. One listed at `/api/federations`; without it, the first live one.                                                                                                                                                                                                                                                                                      |
-| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults.                                                                                                                                                                                                               |
-| `user_share_pct`   | Optional, with `enabled_subtypes`: what your users earn of each default price, above `0` and at most `0.8`. Below `0.8`, each event is saved at `0.8` with the lower price that earns them the same; a share of `0`, which earns nothing, or a lower price outside the platform's price bounds answers `422 invalid event seed`. Missing or out of range, `0.8`. |
-| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                                                                                                                                                                                                                                             |
+| Field              |                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `display_name`     | Required. 1–80 characters, under the naming rules above.                                                                                                                                                                                                                                                                                                                                                |
+| `domain`           | Required. A DNS hostname.                                                                                                                                                                                                                                                                                                                                                                               |
+| `mode`             | `'test'` (the default) or `'live'`.                                                                                                                                                                                                                                                                                                                                                                     |
+| `federation_slug`  | Optional. One listed at `/api/federations` that settles payments: live, with a settlement key, and not moving to a new federation. One not yet live, or with no settlement key, answers `422 federation_not_settling`; one moving, `422 federation_winding_down`. Without it, one the Lightning rail settles, or none while none does; a project with none takes no live top-up ([below](#topping-up)). |
+| `enabled_subtypes` | Optional. Built-in events to start with, at their default prices; any other name answers `422 invalid event seed`. Without it, the three defaults.                                                                                                                                                                                                                                                      |
+| `user_share_pct`   | Optional, with `enabled_subtypes`: what your users earn of each default price, above `0` and at most `0.8`. Below `0.8`, each event is saved at `0.8` with the lower price that earns them the same; a share of `0`, which earns nothing, or a lower price outside the platform's price bounds answers `422 invalid event seed`. Missing or out of range, `0.8`.                                        |
+| `pay`              | Optional. An `add` change, as for pay periods below, to pay from the start; anything else answers `400 invalid_pay`.                                                                                                                                                                                                                                                                                    |
 
 It answers `200 { ok: true, project }`. The signing secret is not in it: reveal
 it on the project's **Keys & webhooks** tab.
@@ -697,6 +700,47 @@ strings, and an `ends_at` of `null` means until you turn it off.
 A body that is none of these answers `400 invalid_change`; a change the rules in
 [Paying your users](/me/paying-users) refuse, `422` with its `reason` and
 `detail`. It answers `200 { ok: true, project }`, with `project.pay_periods`.
+
+### Topping up
+
+Your project's balance pays for its events. `GET /api/me/projects/[id]/escrow`
+reads it:
+
+| Field           |                                                                                                                                                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform_mode` | `'live'` while orangecheck is live, `'simulation'` in preview. The balance shown, and a top-up, are in this mode.                                                                                                            |
+| `mode`          | The mode your project's events bill in: `'simulation'` for a test project.                                                                                                                                                   |
+| `runway`        | `balance_sats`, `held_sats`, `available_sats`, the last 7 days' spend, and `days_of_runway` at that rate.                                                                                                                    |
+| `entries`       | The newest ledger entries, newest first: 100, or `?limit=` up to 500.                                                                                                                                                        |
+| `topup_closed`  | `null` while a top-up would be taken. Otherwise `{ error, reason }`, the refusal below that a top-up would get now. Offer no top-up while it is set, and read it again each time you show the balance: it clears on its own. |
+
+`POST /api/me/projects/[id]/escrow` with `{ action: 'topup', sats }` tops it up.
+`sats` is a positive whole number, at most 100,000,000 (1 BTC); anything else
+answers `400`. While orangecheck is live it answers
+`200 { ok: true, mode: 'live', invoice }`: a Lightning invoice, and nothing is
+credited until it is paid. In preview it credits preview sats at once and
+answers `200 { ok: true, entry, runway }`, so you can try an event that runs the
+balance out before you go live. `{ action: 'refund', sats }` takes preview sats
+back; while orangecheck is live a refund is not self-serve and answers
+`409 live_mode`.
+
+Two refusals close top-ups for a project's federation. Both answer before
+anything is charged or any invoice is made, and both come as
+`{ ok: false, error, reason }`. `reason` is a sentence for a person, so branch
+on `error`:
+
+```json
+{
+    "ok": false,
+    "error": "federation_not_settling",
+    "reason": "top-ups open when this project's federation goes live · OC-Me Federation v1 is recruiting"
+}
+```
+
+| Answer                        | When                                                                                                                                                                                                                                                                                                               | What to do                                                                                                                                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `409 federation_winding_down` | Your project's federation is moving to a new one ([`federation.migrating`](/me/webhooks)). In preview and while live. Only a top-up is refused: a preview refund still works.                                                                                                                                      | Offer no top-up, and say top-ups are paused while the project moves. Events and sign-in carry on. Top up again once the project is on its new federation, or after `federation.migration_cancelled`.                                              |
+| `409 federation_not_settling` | While orangecheck is live, when your project's federation does not settle payments yet (it is not live, or has no settlement key), or your project names no federation. Also when the Lightning rail settles a federation other than your project's: that one comes only when you top up, never in `topup_closed`. | Offer no top-up, and say top-ups open when the project's federation goes live. Nothing on your side opens it, and sign-in keeps working. A test project that pays its users goes live only with a funded balance, so it stays in test until then. |
 
 ### Moving a verified domain
 

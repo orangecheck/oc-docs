@@ -1,7 +1,7 @@
 export const metadata = {
     title: 'ochk.app · Operator Test Stack',
     description:
-        'Where an invited guardian operator runs a guardian while the program is closed: the test stack’s addresses, the mutinynet Esplora, the attestation URL, and the kit commands in order.',
+        'Where an invited guardian operator runs a guardian while the program is closed: the test stack’s addresses, the mutinynet Esplora, the attestation URL, the kit commands in order, and the hosts a staging site uses.',
 };
 
 # ochk.app · Operator Test Stack
@@ -117,3 +117,22 @@ guardian's last signed report.
 
 The kit runs fedimintd 0.11.4, the version
 `oc-guardian fedimintd install --version 0.11.4` downloads and checks by hash.
+
+## A site on the test stack
+
+A staging build of your site can sign people in and send events on the test
+stack instead of ochk.io and me.ochk.io. Make its project on
+`https://oc-app-test.vercel.app`: its key and signing secret are the test
+stack's own, and nothing it records reaches ochk.app.
+
+| What                                                       | Where                                                                      |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Auth host and issuer: a token's `iss`, and revoke          | `https://oc-www-test.vercel.app`, its keys at `/.well-known/jwks.json`     |
+| me origin: the rule, the list of ended sessions and events | `https://oc-me-test.vercel.app`, the host the kit's `OC_PORTAL_BASE` names |
+| Sign-in popup                                              | `https://oc-me-test.vercel.app/popup/signin`                               |
+| Webhook keys                                               | `https://oc-me-test.vercel.app/api/dev-jwks`                               |
+| Native sign-in                                             | Not supported on the test stack                                            |
+| Connect                                                    | None: Connect reaches only ochk.io, so leave it off                        |
+
+[Where each call goes](/me/sdk#where-each-call-goes) names the me-client option
+that takes each host.

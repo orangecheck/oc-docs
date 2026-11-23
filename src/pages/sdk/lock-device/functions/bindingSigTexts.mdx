@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: bindingSigTexts()",
+    description: "Auto-generated API reference for Function: bindingSigTexts(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / bindingSigTexts
+
+# Function: bindingSigTexts()
+
+```ts
+function bindingSigTexts(statement: string): string[];
+```
+
+Defined in: [verify.ts:28](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L28)
+
+The texts a device record's `binding_sig` may cover (OC Lock SPEC §3.3): its
+statement, and, when the statement ends in exactly one LF, the statement
+without it, which is what a wallet that trims the text before signing it
+signs. A reader tries these and no other.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `statement` | `string` |
+
+## Returns
+
+`string`[]

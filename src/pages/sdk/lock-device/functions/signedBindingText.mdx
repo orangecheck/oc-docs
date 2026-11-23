@@ -1,0 +1,39 @@
+export const metadata = {
+    title: "Function: signedBindingText()",
+    description: "Auto-generated API reference for Function: signedBindingText(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/lock-device**](../README)
+
+***
+
+[@orangecheck/lock-device](../README) / signedBindingText
+
+# Function: signedBindingText()
+
+```ts
+function signedBindingText(
+   statement: string, 
+   address: string, 
+   signature: string, 
+opts: VerifyDeviceRecordsOptions): Promise<string | null>;
+```
+
+Defined in: [verify.ts:43](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L43)
+
+The text `signature` covers for `address`: the one of bindingSigTexts(statement)
+it verifies over, or null for neither. A publisher writes this text as
+`event.content` (OC Lock SPEC §3.3). A verifier that throws counts as no.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `statement` | `string` |
+| `address` | `string` |
+| `signature` | `string` |
+| `opts` | [`VerifyDeviceRecordsOptions`](../interfaces/VerifyDeviceRecordsOptions) |
+
+## Returns
+
+`Promise`\&lt;`string` \| `null`\>

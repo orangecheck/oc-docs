@@ -18,12 +18,13 @@ function verifyDeviceRecords(
 opts: VerifyDeviceRecordsOptions): Promise<ParsedDeviceEvent[]>;
 ```
 
-Defined in: [verify.ts:33](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L33)
+Defined in: [verify.ts:68](https://github.com/orangecheck/oc-packages/blob/main/lock-device/src/verify.ts#L68)
 
 The device records among `events` that count for `address`: binds and
 revocations alike, each with a valid Nostr event, a statement that names
-`address` itself, and a BIP-322 signature by `address` over that statement.
-A record filed under the address's slot that names another address is dropped.
+`address` itself, and a BIP-322 signature by `address` over that statement or
+over it without its final LF (bindingSigTexts). A record filed under the
+address's slot that names another address is dropped.
 
 ## Parameters
 

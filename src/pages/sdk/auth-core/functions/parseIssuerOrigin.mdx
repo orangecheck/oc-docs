@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: parseIssuerOrigin()",
+    description: "Auto-generated API reference for Function: parseIssuerOrigin(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / parseIssuerOrigin
+
+# Function: parseIssuerOrigin()
+
+```ts
+function parseIssuerOrigin(value: unknown): string | null;
+```
+
+Defined in: [issuer-origin.ts:21](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/issuer-origin.ts#L21)
+
+`value` as one origin, `scheme://host[:port]` in lower case, or null for
+anything else. https, or http on localhost, 127.0.0.1 or [::1] only: keys,
+tokens and signed requests go there, and plain http elsewhere can be read
+and changed on the way. One trailing slash is dropped. A path, a query, a
+fragment, a user name, the scheme's own port, space or any character
+outside printable ASCII is refused rather than repaired, so every caller in
+every language sends requests to the same place.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `unknown` |
+
+## Returns
+
+`string` \| `null`

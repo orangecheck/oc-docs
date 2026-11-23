@@ -1,6 +1,6 @@
 // scripts/land.sh against a scripted gh: a PR the queue has merged is reported
 // merged even when one read shows it open and out of the queue, and a real drop
-// still fails, with its reason. A PR it opens carries the branch's suppressions lines.
+// still fails, with its reason and the queue's. A PR it opens carries the branch's suppressions lines.
 import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -8,15 +8,24 @@ import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-/** One read of the PR, as the script's jq turns it into a tab-separated line. */
+/**
+ * One read of the PR, as the script's jq turns it into a tab-separated line. `left` is the queue's
+ * reason for its last removal of the PR, and `leftMain` the commit it names.
+ */
 const read = (
     state: string,
     inQueue: boolean,
     auto: boolean,
     entry = '-',
     merged = '-',
-    head = 'h'.repeat(40)
-) => [state, inQueue, auto, entry, 'SUCCESS', merged, head].join('\t');
+    head = 'h'.repeat(40),
+    left = '-',
+    leftMain = '-'
+) => [state, inQueue, auto, entry, 'SUCCESS', merged, head, left, leftMain].join('\t');
+
+/** A read of the PR, open, after the queue last removed it for `reason`, naming main's commit `main`. */
+const leftQueue = (reason: string, main: string, inQueue = false) =>
+    read('OPEN', inQueue, inQueue, inQueue ? 'QUEUED' : '-', '-', 'h'.repeat(40), reason, main);
 
 /** A scratch git checkout whose origin is on GitHub: the script reads its repository from origin. */
 function checkout() {
@@ -33,8 +42,11 @@ function checkout() {
     return dir;
 }
 
-/** Runs the script on PR 7 with gh answering `reads` in turn (the last repeats) and `compare` for main...head. */
-function land(reads: string[], compare = 'diverged', timeout = '30') {
+/**
+ * Runs the script on PR 7 with gh answering `reads` in turn (the last repeats) and `compare` for
+ * head...main (its status, then the first of main's commits with the head's tree, or -).
+ */
+function land(reads: string[], compare = 'diverged\t-', timeout = '30') {
     const dir = mkdtempSync(join(tmpdir(), 'land-'));
     writeFileSync(join(dir, 'reads'), reads.join('\n') + '\n');
     writeFileSync(join(dir, 'compare'), compare + '\n');
@@ -42,6 +54,7 @@ function land(reads: string[], compare = 'diverged', timeout = '30') {
     writeFileSync(
         fake,
         `#!/usr/bin/env bash
+printf '%s\\n' "$*" >> "${dir}/calls"
 case "$*" in
   *graphql*)
     n=$(cat "${dir}/n" 2>/dev/null || echo 0); n=$((n + 1)); echo "$n" > "${dir}/n"
@@ -58,7 +71,8 @@ esac
         env: { ...process.env, LAND_GH: fake, LAND_PR: '7', LAND_POLL: '0', LAND_TIMEOUT: timeout },
         encoding: 'utf8',
     });
-    return { code: r.status, out: r.stdout + r.stderr };
+    const calls = existsSync(join(dir, 'calls')) ? readFileSync(join(dir, 'calls'), 'utf8') : '';
+    return { code: r.status, out: r.stdout + r.stderr, calls };
 }
 
 /**
@@ -135,13 +149,77 @@ describe('scripts/land.sh', () => {
         ]);
         expect(r.out).toContain(`land: merged; main is now ${'m'.repeat(40)} (PR #7)`);
         expect(r.code).toBe(0);
+        // One line per read, so a wait that stalls shows which field held it.
+        const stamp = String.raw`land: \d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ PR #7`;
+        expect(r.out).toMatch(
+            new RegExp(
+                `${stamp} state=OPEN in_queue=true auto=true entry=QUEUED checks=SUCCESS removed=-\n`
+            )
+        );
+        expect(r.out).toMatch(
+            new RegExp(
+                `${stamp} state=MERGED in_queue=false auto=false entry=- checks=SUCCESS removed=-\n`
+            )
+        );
+        expect(r.out.match(/ PR #7 state=/g)).toHaveLength(r.calls.match(/graphql/g)?.length ?? -1);
     });
 
     it('reports merged when main already holds the PR head, though the PR still reads open', () => {
-        const r = land([read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)], 'behind');
+        const r = land(
+            [read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)],
+            'ahead\t-'
+        );
         expect(r.out).toContain('land: merged; main holds hhhh');
         expect(r.out).toContain("the PR's head (PR #7)");
         expect(r.code).toBe(0);
+    });
+
+    it('reports merged when the queue says it removed the PR because it merged it, though the PR reads open', () => {
+        // PR #510 in oc-packages: the queue moved main and removed the PR at once; GitHub read it MERGED
+        // 105 s later. Its record can follow the PR out of the queue by a second, so the read before a
+        // drop is not the last.
+        const m = 'm'.repeat(40);
+        const r = land([
+            read('OPEN', true, true, 'QUEUED'),
+            read('OPEN', false, false),
+            leftQueue('merged', m),
+        ]);
+        expect(r.out).toContain(`land: merged; main is now ${m} (PR #7)`);
+        expect(r.code).toBe(0);
+        expect(r.calls).not.toContain('compare');
+        // At once, on the first read that carries the queue's record, even while auto-merge still reads on.
+        const autoOn = read('OPEN', false, true, '-', '-', 'h'.repeat(40), 'merged', m);
+        const lagging = land([read('OPEN', true, true, 'QUEUED'), autoOn]);
+        expect(lagging.code).toBe(0);
+        expect(lagging.calls.match(/graphql/g)).toHaveLength(2);
+    });
+
+    it("reports merged when main holds a commit with the PR head's tree (a rebase merge)", () => {
+        const rebased = 'r'.repeat(40);
+        const r = land(
+            [read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)],
+            `diverged\t${rebased}`
+        );
+        expect(r.out).toContain(
+            `land: merged; main holds ${rebased}, with the PR's head's tree (PR #7)`
+        );
+        expect(r.code).toBe(0);
+        expect(r.calls).toMatch(/compare\/h{40}\.\.\.main/);
+        expect(r.out).toContain(`Z PR #7 compare=diverged tree_match=${rebased}\n`);
+    });
+
+    it("names the queue's reason when it dropped the PR, and no stale one while the PR is queued", () => {
+        const r = land([
+            read('OPEN', true, true, 'QUEUED'),
+            leftQueue('failed_checks', 'b'.repeat(40)),
+        ]);
+        expect(r.out).toContain(
+            "land: the queue dropped PR #7: its group run failed or main changed under it (the queue's reason: failed_checks)\n"
+        );
+        expect(r.code).toBe(1);
+        const queued = land([leftQueue('failed_checks', 'b'.repeat(40), true)], 'diverged\t-', '0');
+        expect(queued.out).toContain('land: timed out waiting for the queue to merge PR #7\n');
+        expect(queued.code).toBe(1);
     });
 
     it('fails a PR the queue really dropped, with the reason', () => {
@@ -152,19 +230,22 @@ describe('scripts/land.sh', () => {
         expect(r.code).toBe(1);
     });
 
-    it('fails a dropped PR that main has not caught up with (compare reads "ahead")', () => {
-        const r = land([read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)], 'ahead');
+    it('fails a dropped PR that main has not caught up with (compare reads "behind")', () => {
+        const r = land(
+            [read('OPEN', true, true, 'QUEUED'), read('OPEN', false, false)],
+            'behind\t-'
+        );
         expect(r.out).toContain('land: the queue dropped PR #7');
         expect(r.code).toBe(1);
     });
 
     it('re-reads before it reports a timeout', () => {
-        expect(land([read('OPEN', true, true, 'QUEUED')], 'diverged', '0').out).toContain(
+        expect(land([read('OPEN', true, true, 'QUEUED')], 'diverged\t-', '0').out).toContain(
             'land: timed out waiting for the queue to merge PR #7'
         );
         const merged = land(
             [read('OPEN', true, true, 'QUEUED'), read('MERGED', false, false, '-', 'm'.repeat(40))],
-            'diverged',
+            'diverged\t-',
             '0'
         );
         expect(merged.code).toBe(0);
@@ -181,7 +262,9 @@ describe('scripts/land.sh', () => {
 
     it('fails a closed PR and a failed check at once', () => {
         expect(land([read('CLOSED', false, false)]).out).toContain('land: PR #7 was closed');
-        const failed = land([['OPEN', 'true', 'true', 'QUEUED', 'FAILURE', '-', 'h'].join('\t')]);
+        const failed = land([
+            ['OPEN', 'true', 'true', 'QUEUED', 'FAILURE', '-', 'h', '-', '-'].join('\t'),
+        ]);
         expect(failed.out).toContain('a check failed on PR #7');
         expect(failed.code).toBe(1);
     });

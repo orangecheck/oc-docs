@@ -711,7 +711,7 @@ reads it:
 | `platform_mode` | `'live'` while orangecheck is live, `'simulation'` in preview. The balance shown, and a top-up, are in this mode.                                                                                                            |
 | `mode`          | The mode your project's events bill in: `'simulation'` for a test project.                                                                                                                                                   |
 | `runway`        | `balance_sats`, `held_sats`, `available_sats`, the last 7 days' spend, and `days_of_runway` at that rate.                                                                                                                    |
-| `entries`       | The newest ledger entries, newest first: 100, or `?limit=` up to 500.                                                                                                                                                        |
+| `entries`       | The newest ledger entries, newest first: 100, or `?limit=` from 1 to 500. A number past either end reads 1 or 500.                                                                                                           |
 | `topup_closed`  | `null` while a top-up would be taken. Otherwise `{ error, reason }`, the refusal below that a top-up would get now. Offer no top-up while it is set, and read it again each time you show the balance: it clears on its own. |
 
 `POST /api/me/projects/[id]/escrow` with `{ action: 'topup', sats }` tops it up.
@@ -720,8 +720,10 @@ answers `400`. While orangecheck is live it answers
 `200 { ok: true, mode: 'live', invoice }`: a Lightning invoice, and nothing is
 credited until it is paid. In preview it credits preview sats at once and
 answers `200 { ok: true, entry, runway }`, so you can try an event that runs the
-balance out before you go live. `{ action: 'refund', sats }` takes preview sats
-back; while orangecheck is live a refund is not self-serve and answers
+balance out before you go live. A project holds at most 10,000,000 preview sats:
+a top-up past that answers `422 preview_escrow_cap`, with `balance_sats`,
+`cap_sats` and a `detail` sentence. `{ action: 'refund', sats }` takes preview
+sats back; while orangecheck is live a refund is not self-serve and answers
 `409 live_mode`.
 
 Two refusals close top-ups for a project's federation. Both answer before
@@ -750,6 +752,15 @@ carry it as `limit`:
 | `429 escrow_daily_cap`       | The project has made 20 top-ups and preview refunds this UTC day (`limit: 20`). A live top-up is counted before its invoice is asked for, and stays counted if making it fails. | Try again after 00:00 UTC.                   |
 | `409 escrow_open_limit`      | While orangecheck is live, the project already has 3 top-up invoices that can still be paid (`limit: 3`).                                                                       | Pay one or let it expire, then top up again. |
 | `503 escrow_cap_unavailable` | The day's count could not be kept, or, while live, the open invoices could not be counted. Nothing was counted or charged.                                                      | Try again.                                   |
+
+While orangecheck is live, three more answers come from a top-up that meets
+another change to the project. Each comes with a `reason`:
+
+| Answer                | When                                                                                                                                                                                                              | What to do                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `409 topup_busy`      | Another top-up for the project is being made.                                                                                                                                                                     | Try again in a moment.        |
+| `503 project_busy`    | The project was busy with another change as its invoice was made. No invoice is shown and nothing is charged, but the top-up counts toward the day's 20, and its invoice toward the 3 open ones until it expires. | Try again in a moment.        |
+| `409 project_deleted` | The project was deleted while the top-up was being made. No invoice was issued.                                                                                                                                   | Nothing: the project is gone. |
 
 ### Moving a verified domain
 

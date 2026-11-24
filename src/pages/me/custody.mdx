@@ -40,10 +40,13 @@ sats reach keys you hold. No app pays real sats yet, and
 The protocol's custody contract also describes recovery by re-proving your email
 and a sweep of your sats to a BIP-322 wallet. ochk.app builds neither.
 
-None of that is in force. The guardians that once ran this were torn down in
-July 2026, and the browser-side Fedimint client that would have joined a
-federation was removed from `oc-me-web` in September 2026 — it could only ever
-reach its own error path.
+None of that is in force for real bitcoin. The production guardians that once
+ran this were torn down in July 2026. Guardian federations run today only on the
+[test stack](/me/operator/test-stack), on mutinynet, a signet: every seat so far
+is on hardware orangecheck provisions, and nothing there is real money. The
+browser-side Fedimint client that would have joined a federation was removed
+from `oc-me-web` in September 2026 — it could only ever reach its own error
+path.
 
 ## The three options at threshold
 

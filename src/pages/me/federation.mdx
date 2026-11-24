@@ -47,25 +47,36 @@ bitcoin itself takes the guardians' threshold signature.
 How much this leaves with orangecheck depends on **the specific federation**.
 Specifically:
 
-1. **At least 4 guardian seats filled**, threshold strictly greater than half
-   (so 3-of-4, 4-of-7, etc.). A production federation needs 4, so one guardian
-   can fail.
-2. **A different operator key in every seat, held by separate legal entities in
-   3 or more countries.** Operator-key diversity is the property that counts;
+1. **At least 4 guardian seats filled.** A production federation needs 4, so one
+   guardian can fail.
+2. **A threshold that is a true majority**: more than half the seats must sign
+   (3-of-4, 4-of-7).
+3. **A different operator key in every seat**, each proved with a signature over
+   a Bitcoin block hash. Operator-key diversity is the property that counts;
    spreading hosting providers helps with incidents but is not a trust gate.
-3. **A published, content-addressed charter, signed by the guardians**, with an
-   on-chain way out written into it.
-4. **A Lightning gateway run by someone other than orangecheck.**
-5. **orangecheck holds no seat.**
+4. **The ratified charter's hash recorded**: the federation's record carries the
+   SHA-256 of the published charter, and every seated guardian has signed it.
+5. **The charter ratified by every operator**, counted by operator, so one
+   operator holding several seats counts once.
+6. **A Lightning gateway run by someone other than orangecheck.**
+7. **orangecheck holds no seat.**
+8. **Operators that are separate legal entities in 3 or more countries**, as a
+   signed independence attestation states.
+9. **An on-chain way out written into the charter**: its canonical bytes commit
+   that every user can withdraw on-chain.
+10. **A fresh independence attestation**: no more than 30 days old, with a
+    warning after 7.
 
 [ochk.app/custody](https://ochk.app/custody) shows each of these and how it is
-known. The seat count, the threshold and the charter's signatures are read from
-the federation's published record. A distinct key per seat is a count of the
-roster until every seat has proved its key with a signature over a Bitcoin block
-hash. Separate legal entities and countries rest on a signed attestation, which
-cannot show that one person does not hold several keys. The gateway check (4) is
-not read from anything yet: it reads "orangecheck runs it today". And (5) counts
-as unmet until the roster is complete, every seat has proved its key and none is
+known. The seat count (1), the threshold (2) and the charter's hash and
+signatures (4, 5) are read from the federation's published record. A distinct
+key per seat (3) is a count of the roster until every seat has proved its key.
+Separate legal entities and countries (8) rest on a signed attestation, which
+cannot show that one person does not hold several keys, and (10) is its age. The
+exit clause (9) counts once a valid charter hash is recorded, since a charter
+made through the portal carries it. The gateway check (6) is not read from
+anything yet: it reads "orangecheck runs it today". And (7) counts as unmet
+until the roster is complete, every seat has proved its key and none is
 orangecheck's; even then it is declared, not proven, since nothing published
 shows who is behind a key.
 
@@ -156,12 +167,14 @@ never where your sats sit. Sat-earning continues unchanged.
 
 ## Current state
 
-No guardian federation is bound, and the browser-side Fedimint client that would
-have joined one was removed from `oc-me-web` in September 2026 — it could only
-ever reach its own error path, and code that demonstrates a money movement which
-cannot happen reads as a feature someone forgot to link up. The guardians that
-once ran this were torn down in July 2026. Who will run the guardians is not
-decided yet.
+No guardian federation is bound in production, and the browser-side Fedimint
+client that would have joined one was removed from `oc-me-web` in September 2026
+— it could only ever reach its own error path, and code that demonstrates a
+money movement which cannot happen reads as a feature someone forgot to link up.
+The production guardians that once ran this were torn down in July 2026.
+Guardian federations run today only on the
+[test stack](/me/operator/test-stack), on mutinynet, a signet, where nothing is
+real money. Who will run the production guardians is not decided yet.
 
 So today orangecheck holds what you accrue. There is no stored balance to hold,
 strictly speaking — it is recomputed from your signed billable envelopes on

@@ -128,7 +128,7 @@ you upgrade.
 While you test, you can point `popupOrigin` and `popupPath` at a window of your
 own instead of orangecheck's. The
 [examples' offline mode](/integration/reference#run-it-with-no-account) runs
-one. This is what the SDK needs from it, as of me-client 0.63.0. orangecheck's
+one. This is what the SDK needs from it, as of me-client 0.64.0. orangecheck's
 window does the same, plus the opener check below.
 
 **How it opens.** The SDK opens `popupPath` on `popupOrigin` with one query
@@ -220,7 +220,7 @@ on and stand in for orangecheck's side of each. Point `issuer` at your stand-in
 for the keys, revoke and the native trade, and `meOrigin` for the rule and the
 list (`OC_ME_ORIGIN` sets the list's alone). Keep `projectKey`, and set
 `OC_SIGNING_SECRET` to the secret your stand-in checks the list's signature
-with. These are every call me-client 0.63.0 makes:
+with. These are every call me-client 0.64.0 makes:
 
 | Call             | Request                                                                 | Wire format                                                                      |
 | ---------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
@@ -610,10 +610,12 @@ your site's origin as `aud`, and `iat`.
 `issuer=` names another auth host, a test stack's say: the token must carry it
 as `iss`, and from 3.2 the keys come from `<issuer>/.well-known/jwks.json`, as
 in Node. Here `issuer` and `me_origin` are each one origin with no path: https,
-or http on `localhost`, `127.0.0.1` or `[::1]`. Before 3.2 the keys came from
-ochk.io's key set whatever the issuer. To check against keys you hold, a
-stand-in issuer in tests say, pass `jwks=`, a dict shaped like the key set's
-JSON; it wins, and nothing is fetched.
+or http on `localhost`, `127.0.0.1` or `[::1]`; anything else raises
+`ValueError` before keys are fetched from it. With `jwks=` nothing is fetched
+and `issuer` is taken as given: the token's `iss` must still name it. Before 3.2
+the keys came from ochk.io's key set whatever the issuer. To check against keys
+you hold, a stand-in issuer in tests say, pass `jwks=`, a dict shaped like the
+key set's JSON; it wins, and nothing is fetched.
 
 `verify_session` reads the rule from me.ochk.io inside the first call that needs
 it, then holds it a minute. That read is one round trip (235 to 270 ms in our

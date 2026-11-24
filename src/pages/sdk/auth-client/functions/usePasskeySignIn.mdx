@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: usePasskeySignIn()",
+    description: "Auto-generated API reference for Function: usePasskeySignIn(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / usePasskeySignIn
+
+# Function: usePasskeySignIn()
+
+```ts
+function usePasskeySignIn(opts?: UseHostOptions): UsePasskeySignInReturn;
+```
+
+Defined in: [webauthn.tsx:280](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L280)
+
+Sign in with a passkey that the account's Bitcoin address has signed for.
+Never throws: it resolves `{ ok: false, reason }` (`cancelled`,
+`passkey_not_for_signin`, `passkey_not_recognised`, …) and sets `error`. On a family site it then
+reads the session again, so the page sees who signed in.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts?` | `UseHostOptions` |
+
+## Returns
+
+[`UsePasskeySignInReturn`](../interfaces/UsePasskeySignInReturn)

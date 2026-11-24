@@ -497,16 +497,22 @@ their orangecheck account themselves.
 provision and then deleted that user, the delete holds whichever finishes first:
 the provision makes no account, or the account it made goes, and it answers
 `410 account_deleted`. That holds for a provision with `consent: true` too, when
-you delete after sending it. For five seconds after a delete, every provision
-for that user answers 410, with or without consent, so a delay or two servers'
-clocks can't let a provision slip past it. A tick sent after that makes a new
-account, as for anyone who opts in again. The same five seconds follow a delete
-of a user you never provisioned.
+you delete after sending it. For five seconds after a delete, a provision for
+that user answers 410 before making anything, with or without consent, so a
+delay or two servers' clocks can't let a provision slip past it. A tick sent
+after those five seconds makes a new account, as for anyone who opts in again. A
+tick refused inside them changes nothing, so the five seconds always run from
+the delete. The same five seconds follow a delete of a user you never
+provisioned.
 
-That hold for users you never provisioned covers up to 1,000 of them per app a
-day. Past that, a delete of such a user still answers `unknown_user`, but a
-provision for them that was running at the same moment can make its account. A
-user you provisioned is always deleted, whatever the count.
+That hold for users you never provisioned covers 1,000 deletes per app a day.
+What counts toward it is a delete that answers `unknown_user`, or one refused
+for a user you provisioned. One that answers `deleted` or `detached` stops
+counting just after it answers, and `already_deleted` never counts. Past 1,000,
+a delete of a user you never provisioned still answers `unknown_user`, but
+nothing holds after it: a provision for them, running at that moment or sent
+just after, makes its account. A user you provisioned is always deleted,
+whatever the count.
 
 An app can't be deleted while accounts it made are still unclaimed
 (`409 has_unclaimed_accounts`): delete those users first.

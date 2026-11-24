@@ -6,8 +6,8 @@ export const metadata = {
 
 # ochk.app · Federation custody
 
-> **Status: this is the design, not today.** No guardian federation is bound.
-> [`/api/federations`](https://me.ochk.io/api/federations) is the
+> **Status: this is the design, not today.** No guardian federation is bound in
+> production. [`/api/federations`](https://me.ochk.io/api/federations) is the
 > machine-readable answer. It lists two entries, neither with an invite, so no
 > client can join one: `oc-me-v1`, recruiting with no guardian seats, and
 > `oc-testnet-v1`, a single-key test federation on testnet that orangecheck
@@ -23,7 +23,8 @@ together — holds the bitcoin. orangecheck's executor holds your claim on it, a
 ecash it can spend, until it pays you out to a Lightning wallet you choose. The
 executor sends payouts and holds the key that signs settlements; with a
 federation, it pays from the ecash it holds, and a gateway only routes the
-payment. None of that is in force: no guardian federation is bound.
+payment. None of that is in force: no guardian federation is bound in
+production.
 
 If you run a guardian, read the [operator runbook](/me/operator/runbook). If
 you're a user, this page is enough.

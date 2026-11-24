@@ -70,7 +70,8 @@ app.post('/api/oc/webhook', async (req, res) => {
 takes the request headers, the raw body and your project key, and returns the
 parsed event or raises `InvalidWebhook` with a one-word `reason`: `project`,
 `stale` and `incomplete` for the signed fields, `signature`, `unknown_key`,
-`malformed` and `missing` for the signature.
+`malformed` and `missing` for the signature, and `key_set_unavailable` while the
+key set can't be read.
 
 ```python
 import os
@@ -146,15 +147,15 @@ async fn webhook(
 
 ## Headers OC sends
 
-| Header                | Meaning                                                                          |
-| --------------------- | -------------------------------------------------------------------------------- |
-| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                       |
-| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                 |
-| `OC-Envelope-Id`      | The body's `id`, for both kinds. Not signed: deduplicate on the `id` in the body |
-| `OC-Subtype`          | Event subtype, copied for routing convenience                                    |
-| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices      |
-| `OC-Delivery-Attempt` | 1-based attempt counter, updated on each retry (the signature is unchanged)      |
-| `Content-Type`        | `application/json`                                                               |
+| Header                | Meaning                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| `OC-Signature`        | Ed25519 signature, hex-encoded, computed over the raw body                         |
+| `OC-Key-Id`           | `kid` of the OC public JWK that signed the event                                   |
+| `OC-Envelope-Id`      | The body's `id`, for both kinds. Not signed: deduplicate on the `id` in the body   |
+| `OC-Subtype`          | Event subtype, copied for routing convenience                                      |
+| `OC-Class`            | A · B · C: One-time, Per action, Per session · `system` for project notices        |
+| `OC-Delivery-Attempt` | 1-based attempt counter. Each retry is signed again, so `OC-Signature` changes too |
+| `Content-Type`        | `application/json`                                                                 |
 
 ## What the body carries
 

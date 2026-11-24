@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Variable: AUTHMETHODS",
+    description: "Auto-generated API reference for Variable: AUTHMETHODS. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / AUTH\_METHODS
+
+# Variable: AUTH\_METHODS
+
+```ts
+const AUTH_METHODS: readonly ["bip322", "passkey", "email", "google", "github"];
+```
+
+Defined in: [sign-in.ts:10](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L10)
+
+The ceremonies a sign-in can name in its `amr` claim. The claim follows
+OpenID Connect (RFC 8176); the values are orangecheck's: `bip322` a Bitcoin
+wallet's signature, `passkey` a passkey assertion, `email` a code sent to the
+address, `google` and `github` that provider's sign-in.

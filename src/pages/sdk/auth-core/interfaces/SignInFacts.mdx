@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: SignInFacts",
+    description: "Auto-generated API reference for Interface: SignInFacts. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / SignInFacts
+
+# Interface: SignInFacts
+
+Defined in: [sign-in.ts:15](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L15)
+
+What a token says of its sign-in. Null for a fact it does not state clearly.
+
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| &lt;a id="property-amr">&lt;/a> `amr` | \| (`"bip322"` \| `"email"` \| `"passkey"` \| `"google"` \| `"github"`)[] \| `null` | Every ceremony of the sign-in. Null when absent, empty, repeated or naming one outside [AUTH\_METHODS](../variables/AUTH_METHODS). | [sign-in.ts:17](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L17) |
+| &lt;a id="property-auth_time">&lt;/a> `auth_time` | `number` \| `null` | Unix seconds of the sign-in. Null when absent or not a whole number of seconds. | [sign-in.ts:19](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L19) |

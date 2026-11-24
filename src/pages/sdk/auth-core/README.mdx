@@ -24,6 +24,8 @@ export const metadata = {
 - [SessionPayload](interfaces/SessionPayload)
 - [SessionRequestHeaders](interfaces/SessionRequestHeaders)
 - [SignConfig](interfaces/SignConfig)
+- [SignInFacts](interfaces/SignInFacts)
+- [SignInRequirement](interfaces/SignInRequirement)
 - [VerifyConfig](interfaces/VerifyConfig)
 - [VerifyOcOptions](interfaces/VerifyOcOptions)
 
@@ -31,6 +33,7 @@ export const metadata = {
 
 - [AudienceRule](type-aliases/AudienceRule)
 - [AuthKey](type-aliases/AuthKey)
+- [AuthMethod](type-aliases/AuthMethod)
 - [DidOc](type-aliases/DidOc)
 - [DisplayIdentityKind](type-aliases/DisplayIdentityKind)
 - [IncomingRequestHeaders](type-aliases/IncomingRequestHeaders)
@@ -42,6 +45,8 @@ export const metadata = {
 
 ## Variables
 
+- [AUTH\_METHODS](variables/AUTH_METHODS)
+- [AUTH\_TIME\_SKEW\_SECS](variables/AUTH_TIME_SKEW_SECS)
 - [DEFAULT\_ISSUER](variables/DEFAULT_ISSUER)
 - [DISPLAY\_IDENTITY\_KINDS](variables/DISPLAY_IDENTITY_KINDS)
 - [FAMILY\_ORIGINS](variables/FAMILY_ORIGINS)
@@ -78,17 +83,21 @@ export const metadata = {
 - [ownerListEntries](functions/ownerListEntries)
 - [parseIssuerOrigin](functions/parseIssuerOrigin)
 - [parsePublicJwk](functions/parsePublicJwk)
+- [parseSignInRequirement](functions/parseSignInRequirement)
 - [readAllSessionCookies](functions/readAllSessionCookies)
 - [readBondClaim](functions/readBondClaim)
 - [readBondNeed](functions/readBondNeed)
 - [readOcSessionToken](functions/readOcSessionToken)
 - [readSessionCookie](functions/readSessionCookie)
+- [readSignInFacts](functions/readSignInFacts)
 - [refusesEvenReads](functions/refusesEvenReads)
+- [reproofFresh](functions/reproofFresh)
 - [resolveDisplayIdentity](functions/resolveDisplayIdentity)
 - [resolveSessionFromRequest](functions/resolveSessionFromRequest)
 - [retiredKeyVouches](functions/retiredKeyVouches)
 - [revocationFeedState](functions/revocationFeedState)
 - [revocationKey](functions/revocationKey)
+- [satisfiesSignInRule](functions/satisfiesSignInRule)
 - [serializeSessionCookie](functions/serializeSessionCookie)
 - [signSession](functions/signSession)
 - [verifyOcToken](functions/verifyOcToken)

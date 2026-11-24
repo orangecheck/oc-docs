@@ -18,7 +18,7 @@ type OcTokenCheck =
   status: "valid";
 }
   | {
-  reason?: "audience";
+  reason?: "audience" | "insufficient_authentication";
   status: "invalid";
 }
   | {
@@ -26,7 +26,7 @@ type OcTokenCheck =
 };
 ```
 
-Defined in: [index.ts:962](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L962)
+Defined in: [index.ts:997](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L997)
 
 A token's verification, telling a bad token from a key set that can't be
 read: `unavailable` when the issuer's JWKS can't be fetched and no copy
@@ -36,4 +36,6 @@ answer it 503 so the client tries again, never as "signed out".
 `invalid` carries `reason: "audience"` for a genuine token (signature,
 issuer and expiry all good) whose `aud` the `audience` option does not
 accept: one made for another site, or, with no `audience`, one made for a
-site at all. Any other failure carries no reason.
+site at all. It carries `reason: "insufficient_authentication"` for a genuine
+token for this audience whose sign-in does not meet `requireSignIn`. Any other
+failure carries no reason.

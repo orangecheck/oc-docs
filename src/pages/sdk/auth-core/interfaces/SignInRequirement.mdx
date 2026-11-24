@@ -1,0 +1,23 @@
+export const metadata = {
+    title: "Interface: SignInRequirement",
+    description: "Auto-generated API reference for Interface: SignInRequirement. Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / SignInRequirement
+
+# Interface: SignInRequirement
+
+Defined in: [sign-in.ts:44](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L44)
+
+What a caller requires of a sign-in: every ceremony in `amr`, and an `auth_time` at most `maxAge` seconds ago.
+
+## Properties
+
+| Property | Type | Defined in |
+| ------ | ------ | ------ |
+| &lt;a id="property-amr">&lt;/a> `amr?` | readonly (`"bip322"` \| `"email"` \| `"passkey"` \| `"google"` \| `"github"`)[] | [sign-in.ts:45](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L45) |
+| &lt;a id="property-maxage">&lt;/a> `maxAge?` | `number` | [sign-in.ts:46](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L46) |

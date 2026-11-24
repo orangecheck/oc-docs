@@ -1343,13 +1343,17 @@ any event. One trailing slash is dropped, and anything else is taken as given.
 A staging build can run against orangecheck's
 [test stack](/me/operator/test-stack#a-site-on-the-test-stack), which has its
 own accounts, projects and keys. Its project is a test-stack project for the
-staging site's own domain, made on `https://oc-app-test.vercel.app`, so
-`OC_PROJECT_KEY` and `OC_SIGNING_SECRET` are the test stack's. Then point every
-row above at the test stack:
+staging site's own domain: sign in at `https://oc-app-test.vercel.app` the same
+way you sign in at ochk.app, and make it there, so `OC_PROJECT_KEY` and
+`OC_SIGNING_SECRET` are the test stack's. Then point every row above at the test
+stack:
 
 ```ts
 // lib/oc.ts · a staging build. Import it before anything sends an event.
-import type { WithOcAuthOptions } from '@orangecheck/me-client/server';
+import type {
+    ExchangeNativeCodeOptions,
+    WithOcAuthOptions,
+} from '@orangecheck/me-client/server';
 
 import { setOrigin } from '@orangecheck/me-client';
 
@@ -1364,7 +1368,17 @@ export const ocAuth: WithOcAuthOptions = {
     issuer: TEST_AUTH, // the keys, and a token's iss
     meOrigin: TEST_ME, // the rule and the list of ended sessions
 };
+
+// A native app's server: exchangeNativeCode(input, ocNative).
+export const ocNative: ExchangeNativeCodeOptions = {
+    projectKey: process.env.OC_PROJECT_KEY!,
+    issuer: TEST_AUTH, // the trade, the keys, and a token's iss
+    meOrigin: TEST_ME, // the rule and the list of ended sessions
+};
 ```
+
+A native sign-in's `audience` is one the test project proves: its development
+origin, such as `http://127.0.0.1:8123`, or its verified domain.
 
 In the browser, pass `popupOrigin: TEST_ME` to `signInWithOc`, and
 `origin: 'https://oc-app-test.vercel.app'` to `oc.scope.request`. Give

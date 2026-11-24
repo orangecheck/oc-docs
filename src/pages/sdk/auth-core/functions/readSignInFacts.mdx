@@ -1,0 +1,36 @@
+export const metadata = {
+    title: "Function: readSignInFacts()",
+    description: "Auto-generated API reference for Function: readSignInFacts(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / readSignInFacts
+
+# Function: readSignInFacts()
+
+```ts
+function readSignInFacts(payload: {
+  amr?: unknown;
+  auth_time?: unknown;
+}): SignInFacts;
+```
+
+Defined in: [sign-in.ts:28](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L28)
+
+A token's sign-in facts. A token minted before the auth host wrote them
+states neither: null means "not known", and no requirement is met by it.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | \&#123; `amr?`: `unknown`; `auth_time?`: `unknown`; \&#125; |
+| `payload.amr?` | `unknown` |
+| `payload.auth_time?` | `unknown` |
+
+## Returns
+
+[`SignInFacts`](../interfaces/SignInFacts)

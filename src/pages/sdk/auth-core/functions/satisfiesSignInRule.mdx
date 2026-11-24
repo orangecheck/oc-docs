@@ -1,0 +1,44 @@
+export const metadata = {
+    title: "Function: satisfiesSignInRule()",
+    description: "Auto-generated API reference for Function: satisfiesSignInRule(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / satisfiesSignInRule
+
+# Function: satisfiesSignInRule()
+
+```ts
+function satisfiesSignInRule(
+   payload: {
+  amr?: unknown;
+  auth_time?: unknown;
+}, 
+   requirement: SignInRequirement, 
+   now?: number): boolean;
+```
+
+Defined in: [sign-in.ts:85](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L85)
+
+Whether a token's sign-in meets `requirement` at `now`, in Unix seconds. A
+fact the token does not state meets nothing, so a token minted before the
+facts were written meets only an empty requirement. Throws on a
+requirement [parseSignInRequirement](parseSignInRequirement) refuses, or a `now` that is not a
+finite number.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | \&#123; `amr?`: `unknown`; `auth_time?`: `unknown`; \&#125; |
+| `payload.amr?` | `unknown` |
+| `payload.auth_time?` | `unknown` |
+| `requirement` | [`SignInRequirement`](../interfaces/SignInRequirement) |
+| `now` | `number` |
+
+## Returns
+
+`boolean`

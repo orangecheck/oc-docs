@@ -1,0 +1,40 @@
+export const metadata = {
+    title: "Function: reproofFresh()",
+    description: "Auto-generated API reference for Function: reproofFresh(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / reproofFresh
+
+# Function: reproofFresh()
+
+```ts
+function reproofFresh(payload: SessionPayload, opts: {
+  max_age_secs: number;
+}): boolean;
+```
+
+Defined in: [index.ts:361](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/index.ts#L361)
+
+Whether a session holds a fresh re-proof for a gate that moves money or
+releases identity: a fresh `sudo_at` (an email code or a wallet signature),
+or a fresh `step_up_at` (a passkey tap) on a session whose sign-in named
+more than a passkey. A passkey cannot vouch for itself, so one synced
+passkey never both signs in and opens such a gate. A session that states no
+`amr` was minted before the auth host wrote it, and its step-up counts as it
+always has; an `amr` that does not read ([readSignInFacts](readSignInFacts)) does not.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `payload` | [`SessionPayload`](../interfaces/SessionPayload) |
+| `opts` | \&#123; `max_age_secs`: `number`; \&#125; |
+| `opts.max_age_secs` | `number` |
+
+## Returns
+
+`boolean`

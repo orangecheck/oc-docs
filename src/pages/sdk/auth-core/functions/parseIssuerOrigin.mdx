@@ -15,7 +15,7 @@ export const metadata = {
 function parseIssuerOrigin(value: unknown): string | null;
 ```
 
-Defined in: [issuer-origin.ts:21](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/issuer-origin.ts#L21)
+Defined in: [issuer-origin.ts:23](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/issuer-origin.ts#L23)
 
 `value` as one origin, `scheme://host[:port]` in lower case, or null for
 anything else. https, or http on localhost, 127.0.0.1 or [::1] only: keys,
@@ -24,6 +24,8 @@ and changed on the way. One trailing slash is dropped. A path, a query, a
 fragment, a user name, the scheme's own port, space or any character
 outside printable ASCII is refused rather than repaired, so every caller in
 every language sends requests to the same place.
+
+Since `@orangecheck/auth-core` 2.34.0.
 
 ## Parameters
 

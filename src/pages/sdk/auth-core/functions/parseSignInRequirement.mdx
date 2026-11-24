@@ -1,0 +1,46 @@
+export const metadata = {
+    title: "Function: parseSignInRequirement()",
+    description: "Auto-generated API reference for Function: parseSignInRequirement(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-core**](../README)
+
+***
+
+[@orangecheck/auth-core](../README) / parseSignInRequirement
+
+# Function: parseSignInRequirement()
+
+```ts
+function parseSignInRequirement(requirement: unknown): {
+  amr: ("bip322" | "email" | "passkey" | "google" | "github")[];
+  maxAge?: number;
+};
+```
+
+Defined in: [sign-in.ts:60](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L60)
+
+`requirement` as [satisfiesSignInRule](satisfiesSignInRule) reads it. Throws on one it
+cannot read: not an object, a key other than `amr` and `maxAge`, a method
+outside [AUTH\_METHODS](../variables/AUTH_METHODS), or a `maxAge` that is not a whole number of
+seconds from 0. A misspelt key would otherwise require nothing.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `requirement` | `unknown` |
+
+## Returns
+
+```ts
+{
+  amr: ("bip322" | "email" | "passkey" | "google" | "github")[];
+  maxAge?: number;
+}
+```
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `amr` | (`"bip322"` \| `"email"` \| `"passkey"` \| `"google"` \| `"github"`)[] | [sign-in.ts:60](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L60) |
+| `maxAge?` | `number` | [sign-in.ts:60](https://github.com/orangecheck/oc-packages/blob/main/auth-core/src/sign-in.ts#L60) |

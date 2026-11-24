@@ -486,7 +486,8 @@ from a live project with a verified domain.
 
 Before the first statement, make an Ed25519 key pair, keep the private half on
 your server, and register the public half on your project
-(`POST /api/me/projects/[id]/jwk` with `{ jwk }`, or the keys page on ochk.app).
+(`POST /api/me/projects/[id]/jwk` with `{ jwk }`, or **Project signing key** on
+the project's keys page on ochk.app).
 
 | Method   | Path                                     | Purpose                                                         |
 | -------- | ---------------------------------------- | --------------------------------------------------------------- |
@@ -641,8 +642,8 @@ Four project writes need a fresh identity check, as revealing the signing secret
 does: going live (`PATCH` with `{ mode: 'live' }`, asked once the project is
 ready), saving prices on a live project, a pay-period change on a live project
 that pays sooner or longer (`add`, or `set_end` later or to no end), and
-registering a co-signing key (`POST /api/me/projects/[id]/jwk`). Without one
-they answer 401 `identity_reproof_required`. Returning to test, ending or
+registering a project signing key (`POST /api/me/projects/[id]/jwk`). Without
+one they answer 401 `identity_reproof_required`. Returning to test, ending or
 shortening a period, removing the key, and a test project's prices and periods
 need none.
 

@@ -509,11 +509,12 @@ provisioned.
 That hold for users you never provisioned covers 1,000 deletes per app a day.
 What counts toward it is a delete that answers `unknown_user`, or one refused
 for a user you provisioned. One that answers `deleted` or `detached` stops
-counting just after it answers, and `already_deleted` never counts. Past 1,000,
-a delete of a user you never provisioned still answers `unknown_user`, but
-nothing holds after it: a provision for them, running at that moment or sent
-just after, makes its account. A user you provisioned is always deleted,
-whatever the count.
+counting just after it answers. So does an `already_deleted` from a delete that
+found the account removed by another call while it ran; after an earlier delete,
+`already_deleted` never counts. Past 1,000, a delete of a user you never
+provisioned still answers `unknown_user`, but nothing holds after it: a
+provision for them, running at that moment or sent just after, makes its
+account. A user you provisioned is always deleted, whatever the count.
 
 An app can't be deleted while accounts it made are still unclaimed
 (`409 has_unclaimed_accounts`): delete those users first.

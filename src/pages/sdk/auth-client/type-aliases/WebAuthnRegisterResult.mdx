@@ -14,6 +14,13 @@ export const metadata = {
 ```ts
 type WebAuthnRegisterResult = 
   | {
+  binding?:   | {
+     ok: true;
+   }
+     | {
+     ok: false;
+     reason: string;
+   };
   credential: WebAuthnCredentialPublic;
   ok: true;
 }
@@ -23,4 +30,39 @@ type WebAuthnRegisterResult =
 };
 ```
 
-Defined in: [webauthn.tsx:81](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L81)
+Defined in: [webauthn.tsx:85](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L85)
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  binding?:   | {
+     ok: true;
+   }
+     | {
+     ok: false;
+     reason: string;
+   };
+  credential: WebAuthnCredentialPublic;
+  ok: true;
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `binding?` | \| \&#123; `ok`: `true`; \&#125; \| \&#123; `ok`: `false`; `reason`: `string`; \&#125; | Present when ochk.io offered a binding: whether the key now signs in, and why not. | [webauthn.tsx:90](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L90) |
+| `credential` | [`WebAuthnCredentialPublic`](../interfaces/WebAuthnCredentialPublic) | - | [webauthn.tsx:88](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L88) |
+| `ok` | `true` | - | [webauthn.tsx:87](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/webauthn.tsx#L87) |
+
+***
+
+### Type Literal
+
+```ts
+{
+  ok: false;
+  reason: string;
+}
+```

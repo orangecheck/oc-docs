@@ -126,14 +126,14 @@ stack instead of ochk.io and me.ochk.io. Sign in at
 the project there: its key and signing secret are the test stack's own, and
 nothing it records reaches ochk.app.
 
-| What                                                       | Where                                                                                                                                                                                                                                                      |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Auth host and issuer: a token's `iss`, and revoke          | `https://oc-www-test.vercel.app`, its keys at `/.well-known/jwks.json`                                                                                                                                                                                     |
-| me origin: the rule, the list of ended sessions and events | `https://oc-me-test.vercel.app`, the host the kit's `OC_PORTAL_BASE` names                                                                                                                                                                                 |
-| Sign-in popup                                              | `https://oc-me-test.vercel.app/popup/signin`                                                                                                                                                                                                               |
-| Webhook keys                                               | `https://oc-me-test.vercel.app/api/dev-jwks`                                                                                                                                                                                                               |
-| Native sign-in                                             | On, for a test project's developer: `https://oc-www-test.vercel.app/native/authorize`, then `exchangeNativeCode` with the two hosts above. Run end to end there: consent, the code at a `127.0.0.1` listener, the trade, a reused code refused, and Cancel |
-| Connect                                                    | None: Connect reaches only ochk.io, so leave it off                                                                                                                                                                                                        |
+| What                                                       | Where                                                                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth host and issuer: a token's `iss`, and revoke          | `https://oc-www-test.vercel.app`, its keys at `/.well-known/jwks.json`                                                                                                                                                                                                                                    |
+| me origin: the rule, the list of ended sessions and events | `https://oc-me-test.vercel.app`, the host the kit's `OC_PORTAL_BASE` names                                                                                                                                                                                                                                |
+| Sign-in popup                                              | `https://oc-me-test.vercel.app/popup/signin`                                                                                                                                                                                                                                                              |
+| Webhook keys                                               | `https://oc-me-test.vercel.app/api/dev-jwks`                                                                                                                                                                                                                                                              |
+| Native sign-in                                             | On, for a test project's developer: `https://oc-www-test.vercel.app/native/authorize`, then `exchangeNativeCode` with the two hosts above. Run end to end there, signed out: sign-in on its own `/signin` page, consent, the code at a `127.0.0.1` listener, the trade, a reused code refused, and Cancel |
+| Connect                                                    | None: Connect reaches only ochk.io, so leave it off                                                                                                                                                                                                                                                       |
 
 The test auth host admits the test popup: it answers the popup's calls from
 `https://oc-me-test.vercel.app` with credentials, so `signInWithOc` with that
@@ -141,9 +141,9 @@ The test auth host admits the test popup: it answers the popup's calls from
 so the session cookie the popup gets is a third-party one there, and a browser
 that blocks third-party cookies cannot keep it.
 
-Native sign-in needs a session on the test auth host. Its own `/signin` page
-signs in to ochk.io, not to the test stack, so a signed-out visit to
-`/native/authorize` cannot finish there.
+A signed-out visit to `/native/authorize` on the test auth host goes to its own
+`/signin` page, which signs you in to the test stack and comes back to the
+consent page.
 
 [Where each call goes](/me/sdk#where-each-call-goes) names the me-client option
 that takes each host.

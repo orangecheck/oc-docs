@@ -839,10 +839,10 @@
     "@orangecheck/wallet-adapter" "^0.8.0"
     "@simplewebauthn/browser" "^13.3.0"
 
-"@orangecheck/auth-core@^2.32.0":
-  version "2.32.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.32.0.tgz#1bb802907e861c1f90968188b746979543bc1f0e"
-  integrity sha512-1SRmkDoLtp4cMANT18Sh0SKK4LXOIFOBMIknxmch5hkaEbrK0y+ZjomOIOSRjb0Sqiz/pXVF9QwJNXrLJI9HdA==
+"@orangecheck/auth-core@^2.34.0":
+  version "2.34.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-core/-/auth-core-2.34.0.tgz#d1bf2546a852393b9561af1d73fb52a88c278b66"
+  integrity sha512-dR3rRY9i4PxqVZOc75pg0nSP6pvjZEpqhKQMf1jsznHCuMESUshon92+NcXbOSnAGdBqe189PWU0UqglWTc+zg==
   dependencies:
     "@orangecheck/stamp-core" "1.4.0"
     jose "^6.2.2"
@@ -870,12 +870,12 @@
   resolved "https://registry.yarnpkg.com/@orangecheck/mark/-/mark-0.4.0.tgz#3a3ebf7696f03b07712510a0aba6ae498eaf6a0d"
   integrity sha512-BOzoMpXZ7hRI+MyTMTuMwzQGJ4qqo8N6WyYa+LYhK3uA96YCyh+xqQsPVOGEcb+r4f33mPowX4JqWwiWxXihgg==
 
-"@orangecheck/me-client@^0.63.0":
-  version "0.63.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.63.0.tgz#ed779c43af47265a6f35e8bae64cf781cde864d1"
-  integrity sha512-C1bAgdb+WqjCd8CKW2GzNSNVA5KtstuPBis0vdxO7QToLGzik2a+COXVGgmSNxMFkVxEy0gzmoESgIPoszSahA==
+"@orangecheck/me-client@^0.64.0":
+  version "0.64.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.64.0.tgz#c0168527c16926e0c95a7e91043614c656180e83"
+  integrity sha512-np/1JnfpZI47rEOplDeubDhfE+KjbJfqHp7JXDn04H/eAoKy6nAzf9hp1ebg4av/jJYek4uS9qQxbH8MAqjvUQ==
   dependencies:
-    "@orangecheck/auth-core" "^2.32.0"
+    "@orangecheck/auth-core" "^2.34.0"
 
 "@orangecheck/site-kit@^0.17.0":
   version "0.17.0"

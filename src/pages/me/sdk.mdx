@@ -207,13 +207,14 @@ const checked = await checkOcToken(token, {
 
 `withOcAuth` and the other wrappers take the same `issuer`. An issuer with a
 path, such as `http://localhost:4000/stand-in`, worked with auth-core 2.33 and
-earlier. It throws from auth-core 2.34.0 (in `checkOcToken` and
-`checkOcSession`) and from me-client 0.64.0 (as soon as a wrapper is made). A
-stand-in that lived at a path moves its keys to `/.well-known/jwks.json` at its
-origin's root and signs `iss` as that origin. To test sign-in alone, give them
-`revocation: false` too: the list of ended sessions is on me.ochk.io, which has
-never seen these tokens. Leave out `projectKey`, which reads your project's rule
-from me.ochk.io. Use these options only in tests.
+earlier. It throws from auth-core 2.34.0 (in `checkOcToken`, and in
+`checkOcSession` and the wrappers on a request with a token) and from me-client
+0.64.0 (as soon as a wrapper is made). A stand-in that lived at a path moves its
+keys to `/.well-known/jwks.json` at its origin's root and signs `iss` as that
+origin. To test sign-in alone, give them `revocation: false` too: the list of
+ended sessions is on me.ochk.io, which has never seen these tokens. Leave out
+`projectKey`, which reads your project's rule from me.ochk.io. Use these options
+only in tests.
 
 **To test the rule, the list, the native trade and revoke as well,** keep them
 on and stand in for orangecheck's side of each. Point `issuer` at your stand-in

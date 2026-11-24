@@ -747,20 +747,20 @@ on `error`:
 Three more answers bound how many top-ups a project makes. The two with a number
 carry it as `limit`:
 
-| Answer                       | When                                                                                                                                                                            | What to do                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `429 escrow_daily_cap`       | The project has made 20 top-ups and preview refunds this UTC day (`limit: 20`). A live top-up is counted before its invoice is asked for, and stays counted if making it fails. | Try again after 00:00 UTC.                   |
-| `409 escrow_open_limit`      | While orangecheck is live, the project already has 3 top-up invoices that can still be paid (`limit: 3`).                                                                       | Pay one or let it expire, then top up again. |
-| `503 escrow_cap_unavailable` | The day's count could not be kept, or, while live, the open invoices could not be counted. Nothing was counted or charged.                                                      | Try again.                                   |
+| Answer                       | When                                                                                                                                                                            | What to do                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `429 escrow_daily_cap`       | The project has made 20 top-ups and preview refunds this UTC day (`limit: 20`). A live top-up is counted before its invoice is asked for, and stays counted if making it fails. | Try again after 00:00 UTC.                                             |
+| `409 escrow_open_limit`      | While orangecheck is live, the project already has 3 top-up invoices that can still be paid (`limit: 3`).                                                                       | Pay one, or wait until 15 minutes after it expires, then top up again. |
+| `503 escrow_cap_unavailable` | The day's count could not be kept, or, while live, the open invoices could not be counted. Nothing was counted or charged.                                                      | Try again.                                                             |
 
 While orangecheck is live, three more answers come from a top-up that meets
 another change to the project. Each comes with a `reason`:
 
-| Answer                | When                                                                                                                                                                                                              | What to do                    |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `409 topup_busy`      | Another top-up for the project is being made.                                                                                                                                                                     | Try again in a moment.        |
-| `503 project_busy`    | The project was busy with another change as its invoice was made. No invoice is shown and nothing is charged, but the top-up counts toward the day's 20, and its invoice toward the 3 open ones until it expires. | Try again in a moment.        |
-| `409 project_deleted` | The project was deleted while the top-up was being made. No invoice was issued.                                                                                                                                   | Nothing: the project is gone. |
+| Answer                | When                                                                                                                                                                                                                               | What to do                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `409 topup_busy`      | Another top-up for the project is being made.                                                                                                                                                                                      | Try again in a moment.        |
+| `503 project_busy`    | The project was busy with another change as its invoice was made. No invoice is shown and nothing is charged, but the top-up counts toward the day's 20, and its invoice toward the 3 open ones until 15 minutes after it expires. | Try again in a moment.        |
+| `409 project_deleted` | The project was deleted while the top-up was being made. No invoice was issued.                                                                                                                                                    | Nothing: the project is gone. |
 
 ### Moving a verified domain
 

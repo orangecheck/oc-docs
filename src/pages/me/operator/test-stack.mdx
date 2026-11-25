@@ -115,8 +115,17 @@ guardian's last signed report.
 
 ## What the kit pins
 
-The kit runs fedimintd 0.11.4, the version
-`oc-guardian fedimintd install --version 0.11.4` downloads and checks by hash.
+Kit v0.3.0 runs fedimintd 0.13.0, the version
+`oc-guardian fedimintd install --version 0.13.0` downloads and checks by hash.
+`--version 0.11.4` is pinned too.
+
+Every guardian of a new federation runs the same fedimintd `major.minor`: a 0.13
+guardian refuses a 0.11 guardian's setup code. That holds for a successor
+federation too, and for the seats orangecheck hosts, which run kit v0.3.0. A
+federation that already runs upgrades in place, one guardian at a time
+([kit README, "The DKG ceremony"](https://github.com/orangecheck/oc-guardian-kit#the-dkg-ceremony)).
+On a guardian set up on 0.11, keep `<FM_DATA_DIR>/password.private`: 0.13 reads
+it to open the guardian's key share.
 
 ## A site on the test stack
 

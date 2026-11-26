@@ -831,9 +831,9 @@
     tailwind-merge "^3.3.1"
 
 "@orangecheck/auth-client@^2.51.0":
-  version "2.51.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.51.0.tgz#f37be0cfbebeb9499edaae739875515c65794fb0"
-  integrity sha512-WYnphgrkzJP7+Dh05zzkvMOL7aRcgCTIEK9Z3cuWJxFsUeHdKc4Mio+LeEI/O+xCaHOxyW0v+ierftUZu8knLw==
+  version "2.52.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.52.0.tgz#2d01dec92fd2d824c82e669f2b193aef8cc73c4c"
+  integrity sha512-p1fJqICd++wp/pqwu3XlHmLcL+sgqpki+Y9q4WaJGV7jm8uwD3HA8+aDXMt9zn3MIfBAbyCGYPTi+p7mxBvf0g==
   dependencies:
     "@orangecheck/bip322" "^1.1.2"
     "@orangecheck/wallet-adapter" "^0.8.0"
@@ -847,19 +847,10 @@
     "@orangecheck/stamp-core" "1.4.0"
     jose "^6.2.2"
 
-"@orangecheck/bip322@^1.1.0":
+"@orangecheck/bip322@^1.1.0", "@orangecheck/bip322@^1.1.2":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.2.0.tgz#6a87f04b2d3d2cf4ac9540b9c8f4b00970105e76"
   integrity sha512-GvBzBNzBiLOAOwiuAymMNLRQ53Ov6KFDLDCkLSR1dMoBJObAbVo6fNPQPAoIiq16Kd9Id/HcHAzLQ+BCHivTAg==
-  dependencies:
-    "@noble/curves" "^1.9.7"
-    "@noble/hashes" "^1.8.0"
-    "@scure/base" "^1.2.6"
-
-"@orangecheck/bip322@^1.1.2":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.1.3.tgz#5aee5255f2856041d2a49021f148d95b4f114a26"
-  integrity sha512-F8ANhIcBUHCZcue+me3ytwqndXB1RCJDnoPXCCrqZiXwTgTXoj4oAvSl7gfqicOnIoaaiCkpVcT7akvctMI0qA==
   dependencies:
     "@noble/curves" "^1.9.7"
     "@noble/hashes" "^1.8.0"

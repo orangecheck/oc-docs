@@ -121,7 +121,13 @@ Kit v0.3.0 runs fedimintd 0.13.0, the version
 
 Every guardian of a new federation runs the same fedimintd `major.minor`: a 0.13
 guardian refuses a 0.11 guardian's setup code. That holds for a successor
-federation too, and for the seats orangecheck hosts, which run kit v0.3.0. A
+federation too, and for the seats orangecheck hosts. A hosted seat, like a
+gateway orangecheck runs, gets the line the federation's other seats run: kit
+v0.2.7 and gatewayd 0.11.4 for 0.11, kit v0.3.0 and gatewayd 0.13.0 for 0.13. A
+seat's signed reports say its line; a hosted seat that has not reported yet says
+the line of the image orangecheck made its machine from. With no seat saying
+one, it is 0.13. While seats say two lines, or one orangecheck has no image for,
+no hosted guardian or gateway is added, and the refusal names each seat. A
 federation that already runs upgrades in place, one guardian at a time
 ([kit README, "The DKG ceremony"](https://github.com/orangecheck/oc-guardian-kit#the-dkg-ceremony)).
 On a guardian set up on 0.11, keep `<FM_DATA_DIR>/password.private`: 0.13 reads

@@ -102,9 +102,11 @@ don't collide on overlapping kinds.
 
 A public relay doesn't enforce any of this — `d` is just a string. Tag filters
 match exactly, so `#d` finds one artifact when you know its full `d` value;
-there is no prefix query. The prefix is what tells you, after fetching, which
-protocol an event on a shared kind belongs to. Check it, and the envelope's
-`kind` field, before you use the event.
+there is no prefix query. The `d` tag's form is what tells you, after fetching,
+which protocol an event on a shared kind belongs to: on 30078 an OC Attest
+attestation's is its bare id (64 lowercase hex), and every other record's starts
+with its prefix. Check it, and the envelope's `kind` field, before you use the
+event.
 
 ## Required tags per protocol
 

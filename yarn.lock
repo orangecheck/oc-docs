@@ -847,7 +847,7 @@
     "@orangecheck/stamp-core" "1.4.0"
     jose "^6.2.2"
 
-"@orangecheck/bip322@^1.1.0", "@orangecheck/bip322@^1.1.2":
+"@orangecheck/bip322@^1.1.0", "@orangecheck/bip322@^1.1.2", "@orangecheck/bip322@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.2.0.tgz#6a87f04b2d3d2cf4ac9540b9c8f4b00970105e76"
   integrity sha512-GvBzBNzBiLOAOwiuAymMNLRQ53Ov6KFDLDCkLSR1dMoBJObAbVo6fNPQPAoIiq16Kd9Id/HcHAzLQ+BCHivTAg==
@@ -861,17 +861,17 @@
   resolved "https://registry.yarnpkg.com/@orangecheck/mark/-/mark-0.4.0.tgz#3a3ebf7696f03b07712510a0aba6ae498eaf6a0d"
   integrity sha512-BOzoMpXZ7hRI+MyTMTuMwzQGJ4qqo8N6WyYa+LYhK3uA96YCyh+xqQsPVOGEcb+r4f33mPowX4JqWwiWxXihgg==
 
-"@orangecheck/me-client@^0.64.0":
-  version "0.64.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.64.0.tgz#c0168527c16926e0c95a7e91043614c656180e83"
-  integrity sha512-np/1JnfpZI47rEOplDeubDhfE+KjbJfqHp7JXDn04H/eAoKy6nAzf9hp1ebg4av/jJYek4uS9qQxbH8MAqjvUQ==
+"@orangecheck/me-client@^0.65.0":
+  version "0.65.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/me-client/-/me-client-0.65.0.tgz#0b4af273ccf28fae3bf16be04533aee20e6f2a4f"
+  integrity sha512-HJ9kQyy1SdrgOs80N3yYzviNC0Ie+ct2OW44VrTD1gIPdI37zMKMuPc2lfTEU+VoZYJP+5BoEpm01IRsxxmVoQ==
   dependencies:
     "@orangecheck/auth-core" "^2.34.0"
 
-"@orangecheck/site-kit@^0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.17.0.tgz#16a9bc2c055104a9a4bd337fa3a3559ecef99252"
-  integrity sha512-7ELOCC7I7LSFnBXkeSkblnh6fapCf1JSkcyCoJPGSrcgBb9DVaIxCDobEhEv3x/QD+Jv3VKgacja1VFkJuS9Ng==
+"@orangecheck/site-kit@^0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/site-kit/-/site-kit-0.18.0.tgz#f0f26aa87c0fbe73afc34b8c4aa9fe38811f7212"
+  integrity sha512-fQ9wkLb6hLLKEWKMoQ+ncZnEe3OssPhk2nkZwv82PF8TpqOMDqlJkmQihbIUC+fwiOpfPu/WrfN6qEameETPyg==
 
 "@orangecheck/stamp-core@1.4.0":
   version "1.4.0"
@@ -886,6 +886,13 @@
   integrity sha512-wsjz+NMEI20aoBx19HTiTgyNKs2eg0RWph28m2q+lsrJ5UXCgjgJMeLL1Lpu+zWliDsTLUoFY5nFcrNlnloAXg==
   dependencies:
     "@orangecheck/bip322" "^1.1.0"
+
+"@orangecheck/wallet-adapter@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.9.0.tgz#77a6dd46fcf2c812e594e2cb6ed0be65218aa2bd"
+  integrity sha512-1ss86dgeNhqEtmmZBFoFCFt5PNwUhaJkxYCm+SeJjuL/VCiyD7igg+3RDl+WoyWPtOSkq6zDLpeb6c0SEsonhQ==
+  dependencies:
+    "@orangecheck/bip322" "^1.2.0"
 
 "@oxc-project/types@=0.154.0":
   version "0.154.0"

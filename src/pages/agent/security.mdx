@@ -16,15 +16,15 @@ detailed threat treatment see the upstream
 A full verification of an agent-action `A` against its cited delegation `D`
 establishes:
 
-| Check clean                  | Guarantee                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------ |
-| `E_BAD_SIG` on D             | Holder of `D.principal.address`'s key at `issued_at` authorized this delegation.                 |
-| `E_REVOKED` absent           | No revocation is in effect now, and none predates the action's signed-at (modulo OTS anchoring). |
-| `E_STALE` absent             | The action was signed within the verifier's bound of now (live verification).                    |
-| `E_BAD_ACTION_STAMP` clean   | Holder of `D.agent.address`'s key at `A.signed_at` authorized this action.                       |
-| `E_SCOPE_DENIED` absent      | The exercised scope is a legal narrowing of a granted scope.                                     |
-| `E_BOND_UNVERIFIED` absent   | The principal's declared bond is still staked on-chain.                                          |
-| `A.ots` confirmed + verified | Action's envelope id existed before the declared Bitcoin block.                                  |
+| Check clean                  | Guarantee                                                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `E_BAD_SIG` on D             | Holder of `D.principal.address`'s key at `issued_at` authorized this delegation.                          |
+| `E_REVOKED` absent           | No revocation is in effect now, and none predates the action's signed-at (modulo OTS anchoring).          |
+| `E_STALE` absent             | The action was signed within the verifier's bound of now (live verification).                             |
+| `E_BAD_ACTION_STAMP` clean   | Holder of `D.agent.address`'s key at `A.signed_at` authorized this action.                                |
+| `E_SCOPE_DENIED` absent      | The exercised scope is a legal narrowing of a granted scope.                                              |
+| `E_BOND_UNVERIFIED` absent   | The principal's declared bond is still staked on-chain, by an attestation of the principal's own address. |
+| `A.ots` confirmed + verified | Action's envelope id existed before the declared Bitcoin block.                                           |
 
 ## What OC Agent does NOT prove
 
@@ -62,7 +62,7 @@ establishes:
 | T8  | Revocation forgery           | BIP-322 under the principal or the agent; any other signer is refused                                                     |
 | T9  | Priority manipulation        | Live: a revocation in effect refuses every action, and `signed_at` is bound to the verifier's clock. Audit: OTS anchoring |
 | T9a | Repeated action              | A verifier that acts on actions acts on each action id once                                                               |
-| T10 | Bond misrepresentation       | Attestation re-resolution against current chain state                                                                     |
+| T10 | Bond misrepresentation       | Attestation re-resolution against current chain state, and the attestation must be the principal's own                    |
 | T11 | Unregistered scope confusion | Strict mode rejects unknown; permissive never inflates to wildcard                                                        |
 | T12 | Scope-key confusion          | Strict mode rejects unknown keys; permissive accepts them and they still bind                                             |
 | T13 | Malicious relay              | Authenticity is BIP-322 in envelope; relays cannot forge                                                                  |
@@ -101,7 +101,8 @@ Compliant implementations MUST:
    timed out has not answered; if none answered, revocation is unchecked, not
    clean.
 8. Re-resolve `bond.attestation_id` against current chain state when bond policy
-   is in effect.
+   is in effect, and refuse an attestation whose address is not
+   `principal.address`.
 9. Produce the error codes in §SPEC 11.
 
 SHOULD:

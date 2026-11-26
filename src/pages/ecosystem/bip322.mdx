@@ -41,17 +41,32 @@ challenge does, the trim removes that LF and nothing else.
 - **Sign-in.** From `@orangecheck/sdk` 1.27.0, `verifyChallenge` also accepts a
   signature over the challenge without its final LF, and over no other edit of
   it: an extra LF, CRLF line ends or a leading space still fail. ochk.io's
-  sign-in, account linking and identity confirmation run it, and the paste box
-  in `@orangecheck/wallet-adapter` 0.8.1 takes such a signature for a challenge.
-- **Attestations, bonds and OC Lock device statements** also end in one LF, and
-  their verifiers still check the exact bytes. A wallet that trims cannot sign
-  them yet; from wallet-adapter 0.8.1 the paste box says the wallet removed the
-  last line break, rather than that the signature is from another address.
+  sign-in, account linking and identity confirmation run it.
+- **Attestations and bonds.** From `@orangecheck/sdk` 1.28.0 (OC Attest 2.2.0,
+  SPEC §4.1), `verify()`, `signatureIsValid()` and `verifyBondSignature()`
+  accept the same two texts and no others, and so do `check()`,
+  `readAttestations()` and `verifyAttestationById()`, which check signatures
+  through them. The message you pass in keeps its final LF, and the attestation
+  or bond id is still its hash. In Python, `verify_bond_signature` does the same
+  from `orangecheck` 3.21.0. A reader on an older SDK refuses such a signature.
+- **OC Lock device binds and revocations.** From `@orangecheck/lock-device`
+  0.9.0 (OC Lock 2.6.0, SPEC §3.3), a reader keeps a record whose `binding_sig`
+  covers the statement without its final LF. The publisher writes the text the
+  signature covers as the record's content (`signedBindingText`), and readers on
+  lock-device 0.8.0 accept that record too.
 - **Stamps, ballots, delegations and pledges** sign a 64-character hex id, which
   has nothing to trim, so a wallet that trims signs it as given.
 
 Accepting a signature over the text without its final LF changes no id: an id is
 always the hash of the canonical bytes, final LF included.
+
+From `@orangecheck/wallet-adapter` 0.9.0, the paste box and every signer take a
+signature over the text without its final LF for a sign-in challenge, an
+attestation, a bond, and an OC Lock device bind or revocation (0.8.1 took it for
+a challenge only). For any other message signed that way, the paste box says:
+"Your wallet removed the message's last line break before signing it, and this
+message needs it. Use a browser wallet, or paste a signature from a wallet that
+signs the text exactly as shown."
 
 ## What the verifier accepts
 
@@ -93,9 +108,10 @@ signing and verifying rather than by reading its code:
 Read from each wallet's current source on 2026-11-21, following the text from
 the field you paste it into to the signing call; not run against each wallet.
 Which address types each signature works for is in the table above. A verifier
-needs `@orangecheck/sdk` 1.27.0 or later for the wallets marked "from 1.27.0". A
-sign-in challenge is 275 to 326 characters, by address type and site, over eight
-lines.
+needs `@orangecheck/sdk` 1.27.0 or later for the wallets marked "from 1.27.0".
+An attestation or a bond those wallets sign should verify on sdk 1.28.0 or
+later, and an OC Lock device record on lock-device 0.9.0 or later. A sign-in
+challenge is 275 to 326 characters, by address type and site, over eight lines.
 
 | Wallet                                  | Type             | Changes the text before signing                                                                                                                                          | Signs in on ochk.io                                                                                                                                            |
 | --------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |

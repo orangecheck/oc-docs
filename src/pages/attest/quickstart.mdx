@@ -226,10 +226,11 @@ own server with the published packages.
 Signing needs a wallet that can sign a message: UniSat, Xverse, Leather, OKX and
 Phantom sign with BIP-322, and Electrum's legacy `signmessage` command is
 accepted too ([which forms](/ecosystem/bip322#what-the-verifier-accepts)).
-Sparrow and Electrum's GUI trim the text before they sign it, and an
-attestation's signature is checked over its exact text, final LF included, so
-they cannot sign one yet ([wallets](/ecosystem/bip322#wallet-support-matrix)).
-Open [attest.ochk.io](https://attest.ochk.io), connect it, and sign one short
+Sparrow and Electrum's GUI trim the text before they sign it. An attestation
+they sign should verify on `@orangecheck/sdk` 1.28.0 or later, which
+attest.ochk.io runs, and a reader on an older SDK refuses it
+([wallets](/ecosystem/bip322#wallet-support-matrix)). Open
+[attest.ochk.io](https://attest.ochk.io), connect it, and sign one short
 canonical message — your Bitcoin never moves and no private key leaves your
 wallet. Use a single-key address: `bc1q…`, `bc1p…`, `3…` (P2SH-P2WPKH) or `1…`.
 The address step refuses a script (P2WSH) address, which no wallet can sign the

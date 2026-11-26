@@ -46,7 +46,7 @@ publicly:
 const r = await fetch(
     'https://me.ochk.io/api/integrator/config?project_key=pk_live_yourco'
 ).then((x) => x.json());
-// r.drops → [{ schedule_id, label, subtypes, cadence }]
+// r.drops → [{ schedule_id, label, subtypes, cadence, record_within_seconds }]
 ```
 
 An event belongs to at most one active schedule. Events you don't cover are
@@ -73,7 +73,7 @@ import type { DropResponseBlock } from '@orangecheck/me-client';
 // {
 //   window_id: 'w_…',
 //   label: 'friday drop',
-//   state: 'open' | 'closing',   // 'closing' = boundary passed, sweep pending (within the hour)
+//   state: 'open' | 'closing',   // 'closing' = its scheduled end has passed; the manifest is to come
 //   closes_at_target: '2026-06-12T18:00:00.000Z',
 //   close_height_target: 901008  // null when no tip was observable at open
 // }
@@ -100,7 +100,13 @@ alerts.
 ## The manifest · what anyone can check
 
 Every finished batch publishes a signed, content-addressed `oc-me-drop` manifest
-(OTS-anchored, republished to Nostr kind 30087):
+(OTS-anchored, republished to Nostr kind 30087). An hourly sweep makes it: the
+first run after a batch's end seals the batch, and the next run publishes its
+manifest and sends `drop.closed`, within two hours of the end. A batch released
+early is published within 65 minutes. Both hold while each run finishes: a run
+that fails, or runs out of time, leaves the rest to the next one, an hour more.
+Each schedule in `/api/integrator/config`'s `drops` (above) carries the two-hour
+bound, in seconds, as `record_within_seconds`. The manifest:
 
 - the **id is the sha256** of the canonical bytes; the Ed25519 signature
   verifies against me.ochk.io's published envelope JWKS;

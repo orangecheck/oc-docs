@@ -9,7 +9,7 @@ export const metadata = {
 <SpecCard
     repo="oc-agent-protocol"
     kind="spec"
-    version="v1.11.0"
+    version="v1.11.1"
     note="This page is a shortened reference for implementers who already understand the protocol. The complete text — notation, test vectors, compliance checklist — lives in the spec repo."
 />
 
@@ -139,7 +139,9 @@ verify(A, D):
 optional bond check:
  13. D.bond non-null else E_NO_BOND
  14. D.bond.sats >= threshold else E_BOND_UNMET
- 15. resolve(D.bond.attestation_id) still valid else E_BOND_UNVERIFIED
+ 15. resolve(D.bond.attestation_id) now: its id matches, its address is
+     D.principal.address, and its sats and days still meet the policy,
+     else E_BOND_UNVERIFIED
 ```
 
 `A.signed_at` is chosen by the agent. Live, steps 6, 7 and 11a make it

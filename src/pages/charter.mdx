@@ -78,9 +78,12 @@ answering. On `ochk.app` that is its payment receipts, and every event receipt
 that is live, billed and not a test fire: each is signed over its canonical
 bytes and anchored with OpenTimestamps. Any other event receipt (a test fire, an
 unbilled event, an event in a test-mode project) is served with its SHA-256
-digest only; nothing signs or anchors it. If OrangeCheck disappeared tomorrow,
-every signed receipt would still verify against a saved copy of the key. We sell
-operations, not lock-in. The protocol is the API.
+digest only; nothing signs or anchors it. The one exception is the worked
+example at [ochk.app/verify/example](https://ochk.app/verify/example), an
+unbilled event for a made-up site: it is signed with the same key so you can try
+the check, is not anchored, and is no receipt. If OrangeCheck disappeared
+tomorrow, every signed receipt would still verify against a saved copy of the
+key. We sell operations, not lock-in. The protocol is the API.
 
 ### 06 · No agent-replacing-humans positioning.
 

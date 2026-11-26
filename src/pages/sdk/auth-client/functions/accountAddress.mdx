@@ -1,0 +1,33 @@
+export const metadata = {
+    title: "Function: accountAddress()",
+    description: "Auto-generated API reference for Function: accountAddress(). Source: TypeScript types in oc-packages.",
+};
+
+[**@orangecheck/auth-client**](../README)
+
+***
+
+[@orangecheck/auth-client](../README) / accountAddress
+
+# Function: accountAddress()
+
+```ts
+function accountAddress(account: OcAccount | null | undefined): string | null;
+```
+
+Defined in: [components.tsx:571](https://github.com/orangecheck/oc-packages/blob/main/auth-client/src/components.tsx#L571)
+
+The account's Bitcoin address: its primary one, else the Bitcoin address it
+shows. Consumer sites verify the session locally and have no primary address
+(`primary_btc` is null), but a wallet sign-in shows its address. Null for an
+account that shows an email, a did or a Nostr key and has no primary address.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `account` | [`OcAccount`](../interfaces/OcAccount) \| `null` \| `undefined` |
+
+## Returns
+
+`string` \| `null`

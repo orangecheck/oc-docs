@@ -33,8 +33,8 @@ decides what it stores. It applies two shape gates to every event:
    and OC Chat's 30110–30112 and 30114. Anything else is rejected with
    `blocked: kind <n> is not in the oc family allowlist`.
 2. **`d`-tag prefix gate.** Within those kinds, an event is accepted only if its
-   `d` tag starts with one of its kind's namespace prefixes. Anything else is
-   rejected with
+   `d` tag starts with one of its kind's namespace prefixes or, on 30078, is an
+   attestation's bare id (64 lowercase hex). Anything else is rejected with
    `blocked: d tag '<d>' is not an oc namespace prefix for kind <n>`.
 
 | kind  | sub-protocol                              | accepted `d` tag                                                                                                                                             |

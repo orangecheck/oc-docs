@@ -75,8 +75,9 @@ time; size your gate for it).
 
 1. **Re-derive sats and days** from current chain state. Do not trust
    `sats_bonded` or `days_unspent` in the envelope.
-2. **Check the BIP-322 signature** against the exact canonical message bytes.
-   See [Canonical message](/ecosystem/canonical-message).
+2. **Check the BIP-322 signature** against the exact canonical message bytes, or
+   those bytes without their final LF, and no other text (SPEC §4.1). See
+   [Canonical message](/ecosystem/canonical-message).
 3. **Check the audience** when your gate scopes proofs to one origin, and drop
    attestations issued for a different site.
 4. **Require a confirmation depth** before counting `days_unspent`. Six is the

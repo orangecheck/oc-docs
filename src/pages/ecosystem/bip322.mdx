@@ -62,11 +62,13 @@ always the hash of the canonical bytes, final LF included.
 
 From `@orangecheck/wallet-adapter` 0.9.0, the paste box and every signer take a
 signature over the text without its final LF for a sign-in challenge, an
-attestation, a bond, and an OC Lock device bind or revocation (0.8.1 took it for
-a challenge only). For any other message signed that way, the paste box says:
-"Your wallet removed the message's last line break before signing it, and this
-message needs it. Use a browser wallet, or paste a signature from a wallet that
-signs the text exactly as shown."
+attestation, a bond, an OC Lock device bind or revocation, and a passkey binding
+(`oc-passkey:bind:v1`; ochk.io's passkey bind, which will check one with the
+SDK's `signsText`, is not shipped yet). 0.8.1 took it for a challenge only. For
+any other message signed that way, the paste box says: "Your wallet removed the
+message's last line break before signing it, and this message needs it. Use a
+browser wallet, or paste a signature from a wallet that signs the text exactly
+as shown."
 
 ## What the verifier accepts
 
@@ -110,8 +112,9 @@ the field you paste it into to the signing call; not run against each wallet.
 Which address types each signature works for is in the table above. A verifier
 needs `@orangecheck/sdk` 1.27.0 or later for the wallets marked "from 1.27.0".
 An attestation or a bond those wallets sign should verify on sdk 1.28.0 or
-later, and an OC Lock device record on lock-device 0.9.0 or later. A sign-in
-challenge is 275 to 326 characters, by address type and site, over eight lines.
+later, and an OC Lock device record they sign should be written with lock-device
+0.9.0 or later, which every reader from 0.8.0 accepts. A sign-in challenge is
+275 to 326 characters, by address type and site, over eight lines.
 
 | Wallet                                  | Type             | Changes the text before signing                                                                                                                                          | Signs in on ochk.io                                                                                                                                            |
 | --------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |

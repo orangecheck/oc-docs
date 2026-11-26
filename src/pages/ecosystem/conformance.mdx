@@ -52,22 +52,22 @@ locally), so it keeps no copy. Every vector runs on each CI push.
 
 The 37 OC Attest vectors are organized by test category:
 
-| Category            | Count | What they pin                                                                                              |
-| ------------------- | ----- | ---------------------------------------------------------------------------------------------------------- |
-| `canonical_message` | 7     | Byte-exact canonical-message output for a given input set                                                  |
-| `identities_format` | 3     | Identity-list sort order and escape rules                                                                  |
-| `attestation_id`    | 2     | `sha256(canonical_bytes)` matches                                                                          |
-| `score_v0`          | 4     | Scoring formula output (`tv10`–`tv13`)                                                                     |
-| `reject`            | 4     | MUST-reject cases — malformed identifiers, wrong header, etc.                                              |
-| `bip322_signature`  | 3     | Real BIP-322 signatures against fixed addresses                                                            |
-| `bond_*`            | 7     | The bond extension: message, signature (3), nullifier, floors, extension                                   |
-| `canonical_form`    | 1     | Signed messages that are not attestations in canonical form are `decode_error` (`tv30`)                    |
-| `challenge_form`    | 1     | Sign-in challenges: canonical form, and a signature over the text with or without its final LF (`tv31`)    |
-| `value_form`        | 1     | A value that is not one line is `decode_error` (`tv32`)                                                    |
-| `value_as_written`  | 1     | Values are read as written, never trimmed (`tv33`)                                                         |
-| `network_prefix`    | 1     | The address is on the network the message selects (`tv34`)                                                 |
-| `signature_scheme`  | 1     | The signature's bytes pick its scheme: 65 bytes is BIP-137, anything else BIP-322 simple (`tv35`)          |
-| `signed_text`       | 1     | A signature over the message or the message without its final LF verifies, and over no other text (`tv36`) |
+| Category            | Count | What they pin                                                                                                                                          |
+| ------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `canonical_message` | 7     | Byte-exact canonical-message output for a given input set                                                                                              |
+| `identities_format` | 3     | Identity-list sort order and escape rules                                                                                                              |
+| `attestation_id`    | 2     | `sha256(canonical_bytes)` matches                                                                                                                      |
+| `score_v0`          | 4     | Scoring formula output (`tv10`–`tv13`)                                                                                                                 |
+| `reject`            | 4     | MUST-reject cases — malformed identifiers, wrong header, etc.                                                                                          |
+| `bip322_signature`  | 3     | Real BIP-322 signatures against fixed addresses                                                                                                        |
+| `bond_*`            | 7     | The bond extension: message, signature (3), nullifier, floors, extension                                                                               |
+| `canonical_form`    | 1     | Signed messages that are not attestations in canonical form are `decode_error` (`tv30`)                                                                |
+| `challenge_form`    | 1     | Sign-in challenges: canonical form, and a signature over the text with or without its final LF (`tv31`)                                                |
+| `value_form`        | 1     | A value that is not one line is `decode_error` (`tv32`)                                                                                                |
+| `value_as_written`  | 1     | Values are read as written, never trimmed (`tv33`)                                                                                                     |
+| `network_prefix`    | 1     | The address is on the network the message selects (`tv34`)                                                                                             |
+| `signature_scheme`  | 1     | The signature's bytes pick its scheme: a `ful` or `pof` prefix is `sig_unsupported_script`, 65 bytes is BIP-137, anything else BIP-322 simple (`tv35`) |
+| `signed_text`       | 1     | A signature over the message or the message without its final LF verifies, and over no other text (`tv36`)                                             |
 
 The categories exist so a developer debugging a specific failure can skim to the
 relevant block rather than re-reading all 37.

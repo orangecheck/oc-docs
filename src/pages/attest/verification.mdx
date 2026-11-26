@@ -43,6 +43,12 @@ BIP-322 simple, with or without `smp`. Reject with `sig_invalid` if the
 signature doesn't verify, and with `sig_unsupported_script` if it is a BIP-322
 full or proof-of-funds signature (`ful`, `pof`).
 
+The signature may cover the canonical message or the message without its final
+LF, which is what a wallet that trims the text before signing it signs, and no
+other text (SPEC §4.1). Only this check reads the shorter text: the values and
+the attestation ID in step 3 still come from the canonical message, final LF
+included.
+
 ### 3. Verify the attestation ID
 
 Compute `sha256(canonical_message_bytes)`. If the caller supplied an

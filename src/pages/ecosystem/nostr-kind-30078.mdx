@@ -25,6 +25,7 @@ public roll-up.
 | `30078`         | OC Lock   | Device record (binds an X25519 device key to a Bitcoin address)                                                       |
 | `30078`         | OC Pledge | Pledge envelope, outcome envelope, abandonment envelope (disambiguated by `d` tag)                                    |
 | `30078`         | OC Chat   | Session device record of a `did:oc` identity (`oc-chat:device:<did_oc>`, OC Chat SPEC §8.6)                           |
+| `30078`         | OC Attest | Key-holder records _(proposal)_: who holds an ochk.io address's identity key (OC Attest KEY-HOLDER.md §9)             |
 | `30079`         | —         | Archived; do not use                                                                                                  |
 | `30080`         | OC Vote   | Poll                                                                                                                  |
 | `30081`         | OC Vote   | Ballot                                                                                                                |
@@ -76,6 +77,8 @@ don't collide on overlapping kinds.
 | Protocol  | Kind    | `d` tag format                                                                                                                                                     |
 | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | OC Attest | `30078` | `<attestation_id>` (64-char hex SHA-256)                                                                                                                           |
+| OC Attest | `30078` | `oc-attest-key:<address>:<record_id>`, a key-holder record _(proposal)_; a wallet link or unlink `oc-attest-key:<wallet>:<record_id>`                              |
+| OC Attest | `30078` | `oc-attest-key:issuer:<record_id>`, an issuer hand-over _(proposal)_                                                                                               |
 | OC Lock   | `30078` | `oc-lock:device:<btc_address>` (all of its devices, told apart by pubkey)                                                                                          |
 | OC Lock   | `30078` | `oc-lock:device:<btc_address>:<device_id>` (older form, still accepted)                                                                                            |
 | OC Pledge | `30078` | `oc-pledge:<pledge_id>`                                                                                                                                            |
@@ -126,9 +129,16 @@ event; a filter on one fails (see [Reading events](#reading-events)).
 | `i`       | One per identity binding, formatted as `<protocol>:<identifier>` |
 | `expires` | ISO timestamp (optional)                                         |
 
+**OC Attest key-holder records** _(proposal)_ are read by `t` =
+`oc-attest-key:<address>`, and carry `t` = `oc-attest-key` (an issuer hand-over:
+`t` = `oc-attest-key-issuer` alone). None carries a bare address as a `t` tag,
+so the attestation query by address never returns them.
+
 For the exact normative tag set per protocol, consult that protocol's spec:
 
 - [OC Attest tags](/attest/api) · `oc-attest-protocol` SPEC §3
+- [OC Attest key-holder record tags](https://github.com/orangecheck/oc-attest-protocol/blob/main/KEY-HOLDER.md)
+  · `oc-attest-protocol` KEY-HOLDER.md §9 (proposal)
 - [OC Lock device record tags](/lock) · `oc-lock-protocol` SPEC §3
 - [OC Stamp envelope tags](/stamp/nostr) · `oc-stamp-protocol` SPEC §7
 - [OC Vote tags](/vote) · `oc-vote-protocol` SPEC §3

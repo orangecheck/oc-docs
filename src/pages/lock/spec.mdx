@@ -6,7 +6,7 @@ export const metadata = {
 
 # Specification
 
-**Status:** stable · **Version:** 2.5.0 · **Supersedes:** LOCK v1.0 (adaptor
+**Status:** stable · **Version:** 2.6.0 · **Supersedes:** LOCK v1.0 (adaptor
 signatures), v1.1 (Proof-of-Access)
 
 This page summarises the OC Lock specification. The normative text is
@@ -78,7 +78,9 @@ created_at: <iso8601 utc>
 ```
 
 Each line terminated with LF (`\n`).
-`binding_sig = BIP322(btc_address, binding_statement)`.
+`binding_sig = BIP322(btc_address, binding_statement)`, or a signature over the
+statement without its final LF, and `event.content` is exactly the bytes it
+covers (§3.3).
 
 Publishers MUST emit v3. A verifier MUST reject a v3 record whose `event.pubkey`
 differs from the signed `nostr_pk`. Readers still accept v2 records, which lack
@@ -99,10 +101,27 @@ tags:       [
   ["alg",         "x25519"],
   ["binding_sig", "<base64(binding_sig)>"]
 ]
-content:    <exact bytes of binding_statement>
+content:    <exactly the bytes binding_sig covers, below>
 pubkey:     <ephemeral nostr pubkey, see §3.4>
 created_at: <unix seconds>
 ```
+
+**What `binding_sig` covers.** Some wallets trim the text before they sign it,
+which drops the statement's final LF. A publisher MUST write as `event.content`
+exactly the bytes its `binding_sig` covers: the statement, or the statement
+without its final LF. A reader MUST NOT refuse a record because its content
+lacks the final LF, and reads every field from `event.content` either way. A
+reader MUST accept a `binding_sig` that verifies for the signed address over
+`event.content`, or, when `event.content` ends in exactly one LF, over
+`event.content` without it, and over no other text. This holds for binds and
+revocations alike (vectors `s01`, `s02`).
+
+**Which signatures verify.** A reader checks a `binding_sig` as OC Attest 2.2.0
+SPEC §4 checks a signature, by its bytes: exactly 65 bytes is a legacy BIP-137
+signature, which verifies when the key it recovers derives the signed address,
+whatever its header's address-type flag says, and anything else is BIP-322
+simple. So a wallet that signs only the legacy form can bind and revoke a device
+(vector `s03`).
 
 A record is evidence only for the address its signed statement names. A reader
 MUST reject a bind whose `d` tag is neither `oc-lock:device:<addr>` nor the §3.6
@@ -143,8 +162,9 @@ inbox.
 ### §3.5 Rotation and revocation
 
 A device stops receiving new envelopes only through a **revocation**: a
-kind-30078 event with `device_pk = "revoked"`, whose content is this statement
-and whose `binding_sig` is the address's BIP-322 signature over it.
+kind-30078 event with `device_pk = "revoked"`, whose content is this statement,
+or this statement without its final LF, and whose `binding_sig` is the address's
+signature over exactly that content, as for a bind (§3.3).
 
 ```
 oc-lock:device-revoke:v2
@@ -153,15 +173,16 @@ device_id: <device_id>
 revoked_at: <iso8601 utc>
 ```
 
-Every line ends in LF, the last one too. File it under `oc-lock:device:<addr>`,
-which every reader queries. A device revoking itself should carry it under its
-own Nostr key, so that every relay that accepts it stops serving that device's
-bind; it may use a fresh key. Carry a revocation of another device with a fresh
-key. Never carry one with a key that carries another live bind of the address:
-relays replace a record by `(pubkey, kind, d)`, so it would take that bind's
-place. Readers accept it under any key. The authority is the address's
-signature, so a lost device can be revoked with the wallet alone. A reader takes
-the revocation's address and `device_id` from its signed statement, and does not
+Every line ends in LF, the last one too; `event.content` is exactly the bytes
+the signature covers (§3.3). File it under `oc-lock:device:<addr>`, which every
+reader queries. A device revoking itself should carry it under its own Nostr
+key, so that every relay that accepts it stops serving that device's bind; it
+may use a fresh key. Carry a revocation of another device with a fresh key.
+Never carry one with a key that carries another live bind of the address: relays
+replace a record by `(pubkey, kind, d)`, so it would take that bind's place.
+Readers accept it under any key. The authority is the address's signature, so a
+lost device can be revoked with the wallet alone. A reader takes the
+revocation's address and `device_id` from its signed statement, and does not
 reject one whose `binding_sig` verifies because its `addr`, `device_id` or
 `device_pk` tag is missing or says something else, or because of its `d` tag.
 
@@ -372,13 +393,19 @@ A client is OC Lock v2 compliant iff:
 - Generates device keys as X25519, stores `device_sk` non-extractable when
   WebCrypto permits.
 - Produces binding statements byte-for-byte per §3.2.
-- Publishes kind-30078 records per §3.3 with BIP-322 binding signature.
+- Publishes kind-30078 records per §3.3 with BIP-322 binding signature, writing
+  as `event.content` exactly the bytes it covers.
 - Canonicalizes envelopes per §5 — identical `id` across implementations.
 - Accepts and produces all required envelope fields per §4.1.
 - Verifies sender BIP-322 signatures before accepting envelope contents, with
   `sig.pubkey` equal to `from.address` (§4.3).
 - Uses a device record only for the address its binding statement signs, under
   that address's `d` tag (§3.3).
+- Accepts a `binding_sig` over `event.content` or, when it ends in exactly one
+  LF, over it without that LF, and over no other text, and refuses no record
+  because its content lacks the final LF (§3.3).
+- Checks a `binding_sig` by its bytes, BIP-322 simple or legacy BIP-137, as OC
+  Attest SPEC §4 does (§3.3).
 - Treats a Nostr key as a device's inbox only as §3.4 allows: from 2027-01-21
   only a v3 record's signed `nostr_pk`, and still seals to a live v2 bind's
   `device_pk`; re-binds a v2 device with the v2 statement's `created_at` (§3.4).

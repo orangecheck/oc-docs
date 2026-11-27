@@ -11,7 +11,7 @@ export const metadata = {
 
 # Interface: FederationMigratingWebhookPayload
 
-Defined in: [me-client/src/types.ts:562](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L562)
+Defined in: [me-client/src/types.ts:570](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L570)
 
 `federation.migrating`: your project's federation is being replaced. Top-ups
 pause now; events and sign-in carry on. The project and its balance move no
@@ -31,13 +31,13 @@ sooner than `flip_not_before`.
 
 | Property | Type | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| &lt;a id="property-flip_not_before">&lt;/a> `flip_not_before` | `string` | ISO time: the earliest the move can happen. | - | - | [me-client/src/types.ts:570](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L570) |
-| &lt;a id="property-from">&lt;/a> `from` | `string` | The federation the project is on now (its slug). | - | - | [me-client/src/types.ts:566](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L566) |
-| &lt;a id="property-id">&lt;/a> `id` | `string` | The notice's id. A notice sent again (a retry, a resent move) keeps it. | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`id`](SystemWebhookPayload#property-id) | [me-client/src/types.ts:517](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L517) |
-| &lt;a id="property-issued_at">&lt;/a> `issued_at` | `string` | When this send was signed, ISO. | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`issued_at`](SystemWebhookPayload#property-issued_at) | [me-client/src/types.ts:520](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L520) |
-| &lt;a id="property-kind">&lt;/a> `kind` | `"oc-system-event"` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`kind`](SystemWebhookPayload#property-kind) | [me-client/src/types.ts:514](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L514) |
-| &lt;a id="property-migration_id">&lt;/a> `migration_id` | `string` | - | - | - | [me-client/src/types.ts:564](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L564) |
-| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`project_key`](SystemWebhookPayload#property-project_key) | [me-client/src/types.ts:518](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L518) |
-| &lt;a id="property-subtype">&lt;/a> `subtype` | `"federation.migrating"` | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`subtype`](SystemWebhookPayload#property-subtype) | - | [me-client/src/types.ts:563](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L563) |
-| &lt;a id="property-successor">&lt;/a> `successor` | [`FederationSuccessor`](FederationSuccessor) | - | - | - | [me-client/src/types.ts:571](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L571) |
-| &lt;a id="property-to">&lt;/a> `to` | `string` | The federation it moves to (its slug). | - | - | [me-client/src/types.ts:568](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L568) |
+| &lt;a id="property-flip_not_before">&lt;/a> `flip_not_before` | `string` | ISO time: the earliest the move can happen. | - | - | [me-client/src/types.ts:578](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L578) |
+| &lt;a id="property-from">&lt;/a> `from` | `string` | The federation the project is on now (its slug). | - | - | [me-client/src/types.ts:574](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L574) |
+| &lt;a id="property-id">&lt;/a> `id` | `string` | The notice's id. A notice sent again (a retry, a resent move) keeps it. | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`id`](SystemWebhookPayload#property-id) | [me-client/src/types.ts:525](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L525) |
+| &lt;a id="property-issued_at">&lt;/a> `issued_at` | `string` | When this send was signed, ISO. | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`issued_at`](SystemWebhookPayload#property-issued_at) | [me-client/src/types.ts:528](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L528) |
+| &lt;a id="property-kind">&lt;/a> `kind` | `"oc-system-event"` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`kind`](SystemWebhookPayload#property-kind) | [me-client/src/types.ts:522](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L522) |
+| &lt;a id="property-migration_id">&lt;/a> `migration_id` | `string` | - | - | - | [me-client/src/types.ts:572](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L572) |
+| &lt;a id="property-project_key">&lt;/a> `project_key` | `string` | - | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`project_key`](SystemWebhookPayload#property-project_key) | [me-client/src/types.ts:526](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L526) |
+| &lt;a id="property-subtype">&lt;/a> `subtype` | `"federation.migrating"` | - | [`SystemWebhookPayload`](SystemWebhookPayload).[`subtype`](SystemWebhookPayload#property-subtype) | - | [me-client/src/types.ts:571](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L571) |
+| &lt;a id="property-successor">&lt;/a> `successor` | [`FederationSuccessor`](FederationSuccessor) | - | - | - | [me-client/src/types.ts:579](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L579) |
+| &lt;a id="property-to">&lt;/a> `to` | `string` | The federation it moves to (its slug). | - | - | [me-client/src/types.ts:576](https://github.com/orangecheck/oc-packages/blob/main/me-client/src/types.ts#L576) |

@@ -102,11 +102,12 @@ alerts.
 Every finished batch publishes a signed, content-addressed `oc-me-drop` manifest
 (OTS-anchored, republished to Nostr kind 30087). An hourly sweep makes it: the
 first run after a batch's end seals the batch, and the next run publishes its
-manifest and sends `drop.closed`, within two hours of the end. A batch released
-early is published within 65 minutes. Both hold while each run finishes: a run
-that fails, or runs out of time, leaves the rest to the next one, an hour more.
-Each schedule in `/api/integrator/config`'s `drops` (above) carries the two-hour
-bound, in seconds, as `record_within_seconds`. The manifest:
+manifest and sends `drop.closed`, within 126 minutes of the end. A batch
+released early is published within 71 minutes. Both count the minute a run can
+start late and the five minutes it can take, and both hold while each run
+finishes: a run that fails, or runs out of time, leaves the rest to the next
+one, an hour more. Each schedule in `/api/integrator/config`'s `drops` (above)
+carries the first bound, in seconds, as `record_within_seconds`. The manifest:
 
 - the **id is the sha256** of the canonical bytes; the Ed25519 signature
   verifies against me.ochk.io's published envelope JWKS;

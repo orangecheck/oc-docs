@@ -831,12 +831,12 @@
     tailwind-merge "^3.3.1"
 
 "@orangecheck/auth-client@^2.51.0":
-  version "2.52.0"
-  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.52.0.tgz#2d01dec92fd2d824c82e669f2b193aef8cc73c4c"
-  integrity sha512-p1fJqICd++wp/pqwu3XlHmLcL+sgqpki+Y9q4WaJGV7jm8uwD3HA8+aDXMt9zn3MIfBAbyCGYPTi+p7mxBvf0g==
+  version "2.53.0"
+  resolved "https://registry.yarnpkg.com/@orangecheck/auth-client/-/auth-client-2.53.0.tgz#e3335f45038be82c3922977a1a8304e499d20da9"
+  integrity sha512-W62weWvWQG22IITDiHuj/VUjBoTt4QEyfYQsmDAHsaidFVS62I/9x5huVOrkNZ0qyxkXH1zam2Jkl1exsLMU7Q==
   dependencies:
-    "@orangecheck/bip322" "^1.1.2"
-    "@orangecheck/wallet-adapter" "^0.8.0"
+    "@orangecheck/bip322" "^1.2.0"
+    "@orangecheck/wallet-adapter" "^0.9.0"
     "@simplewebauthn/browser" "^13.3.0"
 
 "@orangecheck/auth-core@^2.34.0":
@@ -847,7 +847,7 @@
     "@orangecheck/stamp-core" "1.4.0"
     jose "^6.2.2"
 
-"@orangecheck/bip322@^1.1.0", "@orangecheck/bip322@^1.1.2", "@orangecheck/bip322@^1.2.0":
+"@orangecheck/bip322@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@orangecheck/bip322/-/bip322-1.2.0.tgz#6a87f04b2d3d2cf4ac9540b9c8f4b00970105e76"
   integrity sha512-GvBzBNzBiLOAOwiuAymMNLRQ53Ov6KFDLDCkLSR1dMoBJObAbVo6fNPQPAoIiq16Kd9Id/HcHAzLQ+BCHivTAg==
@@ -879,13 +879,6 @@
   integrity sha512-bewIib2F0hNWHM9iwtXH9B/MyE7HG0wKwLalqNqnylbz3ZxpMD6CyWqpH5s3sbOa+euWT4MXPzh23GDWorM7dw==
   dependencies:
     "@noble/hashes" "^1.5.0"
-
-"@orangecheck/wallet-adapter@^0.8.0":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@orangecheck/wallet-adapter/-/wallet-adapter-0.8.1.tgz#1689bf2fc59bc717eb48619cf0fbfb08dfca471b"
-  integrity sha512-wsjz+NMEI20aoBx19HTiTgyNKs2eg0RWph28m2q+lsrJ5UXCgjgJMeLL1Lpu+zWliDsTLUoFY5nFcrNlnloAXg==
-  dependencies:
-    "@orangecheck/bip322" "^1.1.0"
 
 "@orangecheck/wallet-adapter@^0.9.0":
   version "0.9.0"
